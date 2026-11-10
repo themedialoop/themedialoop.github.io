@@ -1808,6 +1808,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .hm-marq .pill.t-gold{color:var(--gold)}
 .hm-marq .pill.t-plum{color:#57385a}
 .hm-marq .pill.t-sage{color:#ccd389}
+/* used very sparingly: mist blue (the blue, lightened) and mauve (the plum, lifted), as rare pills and now and then as words on the darker pills */
+.hm-marq .c-mist{background:linear-gradient(160deg,#c3d1e7,#afc1de 55%,#94a9cf);color:var(--deep, #1d3866)}
+.hm-marq .c-mauve{background:linear-gradient(160deg,#b087b3,#a173a5 55%,#875d8b);color:var(--cream)}
+.hm-marq .pill.t-mist{color:#afc1de}
+.hm-marq .pill.t-mauve{color:#a173a5}
 /* now and then a word in another face: Cormorant Garamond (an elegant old-style serif, set bigger because it runs small) or Figtree (a friendly sans);
    each word gets its own weight from what that face offers (Cormorant 300-700, Figtree 300-900), sometimes in italic */
 .hm-marq .pill.f-corm{font-family:'Cormorant Garamond',serif;font-weight:var(--fw) !important;letter-spacing:0;font-size:calc(clamp(19px,2.15vw,30px) * 1.28);line-height:1;padding:.5em 1em .54em}
@@ -1839,7 +1844,12 @@ button,input,select,textarea,optgroup{font-family:inherit}
   // one word in each row in Cormorant Garamond and one in Figtree (about 5% each), different words each visit
   const fw = (lo, hi) => ' f-w' + (lo + 100 * Math.floor(Math.random() * ((hi - lo) / 100 + 1)));   // a random weight the face actually has
   const faces = n => { const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * (n - 1)); if (b >= a) b++; return i => { if (i === a) return ' f-corm' + fw(300, 700); if (i === b) return ' f-fig' + fw(300, 900); const r = Math.random(); return r < .03 ? ' f-crete' : r < .05 ? ' f-crete-it' : ''; }; };   // plus about 3% Crete Round and 2% Crete Round italic, at random
-  const tcol = c => /blue|deep/.test(c) ? (Math.random() < .3 ? ' t-gold' : '') : /gold|sage/.test(c) ? (Math.random() < .3 ? ' t-plum' : '') : c === 'c-plum' && Math.random() < .08 ? ' t-sage' : '';   // some blue pills get gold words, some gold and green ones plum, and now and then a plum one green
+  const tcol = c => { const r = Math.random();   // some blue pills get gold words, and now and then mist blue or (on the deep blue) mauve; gold and green ones plum; plum ones now and then green or mist blue
+    if (c === 'c-deep') return r < .28 ? ' t-gold' : r < .32 ? ' t-mist' : r < .37 ? ' t-mauve' : '';
+    if (c === 'c-blue') return r < .3 ? ' t-gold' : r < .34 ? ' t-mist' : '';
+    if (/gold|sage/.test(c)) return r < .3 ? ' t-plum' : '';
+    if (c === 'c-plum') return r < .08 ? ' t-sage' : r < .13 ? ' t-mist' : '';
+    return ''; };
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
   const WT = [200, 300, 400, 500, 600, 700, 800, 900], WTB = [100, 200, 300, 500, 700, 800, 900];
   const pick = a => a[Math.floor(Math.random() * a.length)];
@@ -1849,7 +1859,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const face = faces(set.length);
     const one = set.map((t, fi) => { const fun = t[0] === '*', w = fun ? t.slice(1) : t;
       // sage chartreuse turns up only very rarely, as a little surprise
-      const col = Math.random() < .07 ? 'c-sage' : PAL[k % PAL.length], light = /cream|lav|gold|sage/.test(col);
+      const cr = Math.random(), col = cr < .07 ? 'c-sage' : cr < .095 ? 'c-mist' : cr < .12 ? 'c-mauve' : PAL[k % PAL.length], light = /cream|lav|gold|sage|mist/.test(col);
       // the thinnest weights only on the darker pills, so they stay readable
       let wt = pick(fun ? WTB : WT); if (light && wt < 300) wt = 300; const it = Math.random() < .35;
       const dot = Math.random() < .18 ? '<span class="gdot" aria-hidden="true"></span>' : '';
