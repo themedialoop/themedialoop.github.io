@@ -28,7 +28,7 @@
   --step-3:clamp(2.4rem,1.4rem + 4.6vw,5.6rem);
   --gutter:clamp(16px,4vw,56px);
   --gold:#e7aa4d;
-  --card:#e9e2c9;      /* people cards: a shade deeper than the page */
+  --card:#f2eedd;      /* the same cream as the page: one cream everywhere */
   --rainbow:linear-gradient(90deg,#1d3866,#2c5494 30%,#5b82c6 65%,#9bb4e4);   /* tone-on-tone blue, for link hovers */
   --net-size:1700px;
   color-scheme:light;
@@ -269,7 +269,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .side-in{position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;gap:clamp(16px,2.4vh,28px);
   padding:clamp(84px,12vh,130px) clamp(28px,3vw,48px) clamp(44px,8vh,90px);overflow-y:auto;scrollbar-width:none}
 .p-side .back{margin:0;color:var(--cream)}
-.p-side .back .arr,.p-side .p-links .arr{color:#f2eedd99 !important}
+.p-side .back .arr,.p-side .p-links .arr{color:var(--cream) !important}
 .p-side .back:hover .arr,.p-side .p-links a:hover .arr{color:var(--gold) !important}
 .p-side .p-hero{display:flex;flex-direction:column;align-items:flex-start;gap:clamp(18px,3vh,32px);padding:0}
 .p-side .p-photo-shadow{width:min(64%,250px);filter:none}
@@ -524,7 +524,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
       const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, w, h);
       const tilePx = (mobile() ? 820 : 1100) * dpr, k = tilePx / TILE, bx0 = -off[0] * tilePx, by0 = -off[1] * tilePx;
-      g.fillStyle = 'rgba(242,238,221,.92)';
+      g.fillStyle = 'rgb(242,238,221)';
       for (let ty = 0; ty <= Math.ceil(h / tilePx) + 1; ty++) for (let tx = 0; tx <= Math.ceil(w / tilePx) + 1; tx++)
         for (const hh of holes) {
           const px = bx0 + tx * tilePx + hh.cx * k, py = by0 + ty * tilePx + hh.cy * k;
@@ -553,7 +553,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const boxes = [...sideIn.querySelectorAll('.back, .p-photo-wrap, .p-intro'), document.querySelector('.menu-btn'), document.querySelector('.top .mark')].filter(Boolean).map(el => { const b = el.getBoundingClientRect();
       return [(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr]; });
     const tilePx = (mobile() ? 820 : 1150) * dpr, k = tilePx / TILE, ox = -time * 4 * dpr, pad = 10 * dpr, soft = 46 * dpr;
-    g.fillStyle = 'rgba(242,238,221,.95)';
+    g.fillStyle = 'rgb(242,238,221)';
     for (let ty = -1; ty <= Math.ceil(h / tilePx) + 1; ty++) for (let tx = Math.floor(-ox / tilePx) - 1; tx * tilePx + ox < w + tilePx; tx++)
       for (const hh of holes) {
         const px = ox + tx * tilePx + hh.cx * k, py = ty * tilePx + hh.cy * k;

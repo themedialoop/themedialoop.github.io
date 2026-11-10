@@ -74,7 +74,7 @@
   --step-3:clamp(2.4rem,1.4rem + 4.6vw,5.6rem);
   --gutter:clamp(16px,4vw,56px);
   --gold:#e7aa4d;
-  --card:#e9e2c9;      /* people cards: a shade deeper than the page */
+  --card:#f2eedd;      /* the same cream as the page: one cream everywhere */
   --rainbow:linear-gradient(90deg,#1d3866,#2c5494 30%,#5b82c6 65%,#9bb4e4);   /* tone-on-tone blue, for link hovers */
   --net-size:1700px;
   color-scheme:light;
@@ -260,7 +260,7 @@ a.card{text-decoration:none}
 .ev-when{margin:0 0 auto;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
 .ev h3{margin:28px 0 10px;font-weight:700;font-size:clamp(22px,2vw,30px);line-height:1.04;letter-spacing:-.018em}
 .ev-what{margin:0 0 16px;font-size:15px;line-height:1.45;font-weight:300}
-.ev-where{margin:0;font-size:13px;font-weight:500;opacity:.85}
+.ev-where{margin:0;font-size:13px;font-weight:500}
 
 /* footer */
 footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
@@ -360,7 +360,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .r-sage{background:linear-gradient(160deg,#d8de9c,#ccd389 55%,#b5bd6c);color:var(--blue)}   /* sage chartreuse */
 .r-sage .r-kind::before{background:var(--blue)}
 .r-gold{background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--ink)}
-.r-cream{background:#e9e2c9;color:var(--blue)}
+.r-cream{background:var(--cream);color:var(--blue)}
 .r-ink{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
 .r-top{position:relative;height:var(--strip);display:flex;justify-content:space-between;align-items:center;gap:16px}
 /* once a card is covered, its strip shows the card's name, so the whole pile stays readable */
@@ -371,9 +371,9 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .r-kind{display:inline-flex;align-items:center;gap:.5em;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
 .r-kind::before{content:"";width:.7em;height:.7em;border-radius:52% 46% 50% 48%;background:var(--gold)}
 .r-gold .r-kind::before{background:var(--blue)}
-.r-n{font-size:13px;font-weight:300;letter-spacing:.08em;font-variant-numeric:tabular-nums;opacity:.75}
+.r-n{font-size:13px;font-weight:300;letter-spacing:.08em;font-variant-numeric:tabular-nums}
 .r-name{margin-top:clamp(12px,3vh,36px);font-weight:700;font-size:clamp(40px,6.4vw,104px);line-height:1.02;letter-spacing:-.038em;max-width:16ch;text-wrap:balance}
-.r-desc{margin-top:clamp(14px,2vh,22px);font-size:clamp(15px,1.15vw,18px);line-height:1.45;max-width:52ch;opacity:.92}
+.r-desc{margin-top:clamp(14px,2vh,22px);font-size:clamp(15px,1.15vw,18px);line-height:1.45;max-width:52ch}
 .r-go{margin-top:clamp(18px,2.6vh,28px);justify-self:start;font-size:15px;font-weight:600;padding:.6em 1.2em;border-radius:99px;background:color-mix(in srgb,currentColor 14%,transparent);transition:filter .3s,transform .35s cubic-bezier(.3,1.6,.5,1)}
 /* one colour scheme per card colour, shared by the resource cards and the Apply card, and it never changes while you scroll:
    dark cards (blue, deep blue, plum): cream type, gold dot, gold button with dark type
@@ -392,7 +392,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .ev > *{position:relative}
 .ev > .ev-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transition:opacity .35s}
 .ev:hover > .ev-cv{opacity:.35}
-.ev-n{position:absolute;top:clamp(20px,2vw,28px);right:clamp(20px,2vw,28px);font-size:12px;font-weight:300;letter-spacing:.08em;font-variant-numeric:tabular-nums;opacity:.75}
+.ev-n{position:absolute;top:clamp(20px,2vw,28px);right:clamp(20px,2vw,28px);font-size:12px;font-weight:300;letter-spacing:.08em;font-variant-numeric:tabular-nums}
 
 /* contact: the Apply card, in the same style as the resource cards */
 .apply{position:relative;z-index:2;overflow:hidden;display:grid;justify-items:start;margin-top:clamp(48px,7vw,96px);padding:clamp(26px,3.4vw,52px);border-radius:clamp(20px,2vw,32px);
@@ -401,7 +401,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .apply canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .apply:hover,.apply:focus-visible{transform:translateY(-6px) rotate(-.8deg);box-shadow:none}
 /* the small UIC mark, in the cream of the net dots, tucked in the card's bottom right corner (hidden until the image loads) */
-.apply > .ap-uic{position:absolute;bottom:clamp(20px,2.4vw,34px);right:clamp(20px,2.4vw,34px);width:clamp(34px,3.2vw,48px);height:auto;opacity:.9}
+.apply > .ap-uic{position:absolute;bottom:clamp(20px,2.4vw,34px);right:clamp(20px,2.4vw,34px);width:clamp(34px,3.2vw,48px);height:auto}
 .ap-kind{display:inline-flex;align-items:center;gap:.5em;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
 .ap-kind::before{content:"";width:.7em;height:.7em;border-radius:52% 46% 50% 48%;background:var(--blue)}
 .ap-h{margin-top:clamp(18px,3vh,32px);padding-bottom:.14em;font-weight:700;font-size:clamp(72px,12vw,200px);line-height:.82;letter-spacing:-.045em}
@@ -412,7 +412,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .apply.a-blue{background:linear-gradient(160deg,#3a6ab6,#2c5494 50%,#1f3f73);color:var(--cream)}
 .apply.a-deep{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
 .apply.a-plum{background:linear-gradient(160deg,#6b4a6e,#57385a 55%,#3f2742);color:var(--cream)}
-.apply.a-blue .ap-t,.apply.a-deep .ap-t,.apply.a-plum .ap-t{color:var(--cream);opacity:.92}
+.apply.a-blue .ap-t,.apply.a-deep .ap-t,.apply.a-plum .ap-t{color:var(--cream)}
 .apply.a-blue .ap-kind::before,.apply.a-deep .ap-kind::before,.apply.a-plum .ap-kind::before{background:var(--gold)}
 .apply.a-blue .ap-go,.apply.a-deep .ap-go,.apply.a-plum .ap-go{background:var(--gold);color:var(--ink)}
 .apply.a-blue:hover .ap-go,.apply.a-deep:hover .ap-go,.apply.a-plum:hover .ap-go{background:var(--gold);color:var(--ink);filter:brightness(.92)}
@@ -906,7 +906,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
         const drawEv = () => { const r = evs.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
           if (!w || !h) return; cv.width = w; cv.height = h; const g = cv.getContext('2d'); g.clearRect(0, 0, w, h);
           const T = Math.min(3300, Math.max(2100, innerWidth * 2.1)) * dpr, k = T / TILE;
-          g.fillStyle = 'rgba(242,238,221,.88)';
+          g.fillStyle = 'rgb(242,238,221)';
           for (let ty = -1; ty * T < h + T; ty++) for (let tx = -1; tx * T < w + T; tx++) for (const hh of holes) {
             const x = (tx * TILE + hh.cx) * k, y = (ty * TILE + hh.cy) * k; if (x < -60 || y < -60 || x > w + 60 || y > h + 60) continue;
             g.setTransform(k * .82, 0, 0, k * .82, x, y); g.fill(hh.p); }
@@ -924,7 +924,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     // the people cards: the real net in the top of each card, breathing, fading out above the name
     const pcards = [...document.querySelectorAll('.people .card')].map((el, i) => { const cv = document.createElement('canvas'); cv.className = 'cnet'; cv.setAttribute('aria-hidden', 'true'); el.prepend(cv);
       const ph = el.querySelector('.photo'); if (ph) { const wr = document.createElement('span'); wr.className = 'ph-wrap'; ph.before(wr); wr.append(ph); }   // a cream rim and soft shadow so the photo stands out
-      return { el, cv, ph, off: [(i * .37 + .11) % 1, (i * .61 + .29) % 1], ink: 'rgba(242,238,221,.92)' }; });
+      return { el, cv, ph, off: [(i * .37 + .11) % 1, (i * .61 + .29) % 1], ink: 'rgb(242,238,221)' }; });
     const drawPeople = now => {
       const time = reduce ? 0 : now / 1000;
       for (const { el, cv, ph, off, ink } of pcards) {
@@ -1621,7 +1621,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
         card.classList.toggle('covered', cover > .3);
         const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
         const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
-        g.fillStyle = card.classList.contains('r-cream') || card.classList.contains('r-lav') || card.classList.contains('r-sage') ? 'rgba(44,84,148,.85)' : card.classList.contains('r-gold') ? 'rgba(242,238,221,.88)' : 'rgba(242,238,221,.9)';
+        g.fillStyle = card.classList.contains('r-cream') || card.classList.contains('r-lav') || card.classList.contains('r-sage') ? 'rgba(44,84,148,.85)' : card.classList.contains('r-gold') ? 'rgb(242,238,221)' : 'rgb(242,238,221)';
         const boxes = [...card.querySelectorAll('.r-name, .r-desc, .r-go, .r-kind, .r-n')].map(e => { const b = e.getBoundingClientRect(); return [(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr]; });
         const NS = NETS[n % NETS.length], T = (isMobile() ? 700 : 1000) * dpr * NS.k, k = T / TILE, ox = n * 137 * dpr, mob = isMobile(), asp = w / h;
         for (let ty = -1; ty * T < h + T; ty++) for (let tx = -1; tx * T < w + T; tx++) for (const hh of holes) {
@@ -1637,7 +1637,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   { const evs = [...document.querySelectorAll('.ev')];
     const drawEvc = time => evs.forEach((card, n) => { const cv = card.querySelector('.ev-cv'), r = card.getBoundingClientRect(); if (!cv || r.bottom < 0 || r.top > innerHeight || !r.width || !holes.length) return;
       const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
-      const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(242,238,221,.9)';
+      const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h); g.fillStyle = 'rgb(242,238,221)';
       // keep the holes off the words: measure each line of text in the card
       const tb = []; card.querySelectorAll('h3, p').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(b => tb.push([(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr])); });
       const EV = [[1, 0, .62, 1], [1.02, .42, .5, 1.3], [.62, -.04, .5, .8], [1.04, .12, .75, 1.1]][n % 4];   // each card's patch sits somewhere different, with its own hole size
@@ -1658,7 +1658,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const placeUic = () => { if (!apUic || !apUic.isConnected || !apGo) return; apUic.style.bottom = 'auto';
       apUic.style.top = (apGo.offsetTop + apGo.offsetHeight / 2 - apUic.offsetHeight / 2) + 'px'; };
     if (apUic) { apUic.complete ? placeUic() : apUic.addEventListener('load', placeUic); addEventListener('resize', placeUic); document.fonts && document.fonts.ready.then(placeUic); }
-    const apInk = ['a-lav', 'a-sage'].includes(ac) ? 'rgba(44,84,148,.85)' : 'rgba(242,238,221,.9)';
+    const apInk = ['a-lav', 'a-sage'].includes(ac) ? 'rgba(44,84,148,.85)' : 'rgb(242,238,221)';
     const drawAp = time => { if (!cv || !holes.length) return; const r = ap.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
       const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
       const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h); g.fillStyle = apInk;
@@ -1754,7 +1754,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     pills.forEach((d, j) => { const c = d.querySelector('canvas'); if (!d.open) return; const r = d.getBoundingClientRect();
       if (r.bottom < 0 || r.top > innerHeight) return; const dp = Math.min(2, devicePixelRatio || 1), W = r.width, Ht = r.height;
       if (c.width !== Math.round(W * dp) || c.height !== Math.round(Ht * dp)) { c.width = Math.round(W * dp); c.height = Math.round(Ht * dp); }
-      const g = c.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, c.width, c.height); g.fillStyle = 'rgba(242,238,221,.9)';
+      const g = c.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, c.width, c.height); g.fillStyle = 'rgb(242,238,221)';
       const k = W < 600 ? 1.5 : 2.6, ox = -j * 140 - 40, bx = boxes.get(d) || [];
       for (let ty = -1; ty * T * k < Ht + T * k; ty++) for (let tx = -1; tx * T * k < W + T * k; tx++) for (const h of H) {
         const x = ox + (tx * T + h.cx) * k, y = (ty * T + h.cy) * k; if (x < -30 || y < -30 || x > W + 30 || y > Ht + 30) continue;
@@ -1801,7 +1801,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .hm-marq .c-blue{background:linear-gradient(160deg,#3a6ab6,#2c5494 55%,#1f3f73);color:var(--cream)}
 .hm-marq .c-gold{background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--ink)}
 .hm-marq .c-deep{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
-.hm-marq .c-cream{background:#e9e2c9;color:var(--blue)}
+.hm-marq .c-cream{background:var(--cream);color:var(--blue)}
 .hm-marq .c-lav{background:linear-gradient(160deg,#cfc3dd,#bfb1d2 55%,#a998c0);color:var(--blue)}
 .hm-marq .c-sage{background:linear-gradient(160deg,#d8de9c,#ccd389 55%,#b5bd6c);color:var(--ink)}
 .hm-marq .c-plum{background:linear-gradient(160deg,#6b4a6e,#57385a 55%,#3f2742);color:var(--cream)}

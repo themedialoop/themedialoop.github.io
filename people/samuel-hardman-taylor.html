@@ -127,7 +127,7 @@
   --step-3:clamp(2.4rem,1.4rem + 4.6vw,5.6rem);
   --gutter:clamp(16px,4vw,56px);
   --gold:#e7aa4d;
-  --card:#e9e2c9;      /* people cards: a shade deeper than the page */
+  --card:#f2eedd;      /* the same cream as the page: one cream everywhere */
   --rainbow:linear-gradient(90deg,#1d3866,#2c5494 30%,#5b82c6 65%,#9bb4e4);   /* tone-on-tone blue, for link hovers */
   --net-size:1700px;
   color-scheme:light;
@@ -302,7 +302,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .p-topics li.c-gold{background-image:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e)}
 .p-topics li.c-gold strong{color:var(--ink)}
 .p-topics li.c-deep{background-image:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f)}
-.p-topics li.c-cream{background-image:none;background-color:#e9e2c9}
+.p-topics li.c-cream{background-image:none;background-color:var(--cream)}
 .p-topics li.c-cream strong{color:var(--blue)}
 .p-topics li.c-lav{background-image:linear-gradient(160deg,#cfc3dd,#bfb1d2 55%,#a998c0)}
 .p-topics li.c-lav strong{color:var(--blue)}
@@ -377,7 +377,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .side-in{position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;gap:clamp(16px,2.4vh,28px);
   padding:clamp(84px,12vh,130px) clamp(28px,3vw,48px) clamp(44px,8vh,90px);overflow-y:auto;scrollbar-width:none}
 .p-side .back{margin:0;color:var(--cream)}
-.p-side .back .arr,.p-side .p-links .arr{color:#f2eedd99 !important}
+.p-side .back .arr,.p-side .p-links .arr{color:var(--cream) !important}
 .p-side .back:hover .arr,.p-side .p-links a:hover .arr{color:var(--gold) !important}
 .p-side .p-hero{display:flex;flex-direction:column;align-items:flex-start;gap:clamp(14px,2.2vh,24px);padding:0}
 .p-side .p-photo-shadow{width:min(64%,250px);filter:none}
@@ -650,7 +650,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-cream', 'c-lav', 'c-plum'];
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
   const cards = [...document.querySelectorAll('.p-topics li')].map((li, i) => { const c = PAL[i % PAL.length]; li.classList.add(c);
-    return { li, cv: li.querySelector('canvas'), off: [(i * .37 + .11) % 1, (i * .61 + .29) % 1], ink: c === 'c-cream' || c === 'c-lav' ? 'rgba(44,84,148,.85)' : 'rgba(242,238,221,.92)' }; }).filter(c => c.cv);
+    return { li, cv: li.querySelector('canvas'), off: [(i * .37 + .11) % 1, (i * .61 + .29) % 1], ink: c === 'c-cream' || c === 'c-lav' ? 'rgba(44,84,148,.85)' : 'rgb(242,238,221)' }; }).filter(c => c.cv);
   const drawCards = time => {
     for (const { li, cv, off, ink } of cards) {
       const r = li.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) continue;
@@ -687,7 +687,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const boxes = [...sideIn.querySelectorAll('.back, .p-photo-wrap, .p-intro'), document.querySelector('.menu-btn'), document.querySelector('.top .mark')].filter(Boolean).map(el => { const b = el.getBoundingClientRect();
       return [(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr]; });
     const tilePx = (mobile() ? 820 : 1150) * dpr, k = tilePx / TILE, ox = -time * 4 * dpr, pad = 10 * dpr, soft = 46 * dpr;
-    g.fillStyle = 'rgba(242,238,221,.95)';
+    g.fillStyle = 'rgb(242,238,221)';
     for (let ty = -1; ty <= Math.ceil(h / tilePx) + 1; ty++) for (let tx = Math.floor(-ox / tilePx) - 1; tx * tilePx + ox < w + tilePx; tx++)
       for (const hh of holes) {
         const px = ox + tx * tilePx + hh.cx * k, py = ty * tilePx + hh.cy * k;
@@ -819,7 +819,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .p-marq .c-blue{background:linear-gradient(160deg,#3a6ab6,#2c5494 55%,#1f3f73);color:var(--cream)}
 .p-marq .c-gold{background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--ink)}
 .p-marq .c-deep{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
-.p-marq .c-cream{background:#e9e2c9;color:var(--blue)}
+.p-marq .c-cream{background:var(--cream);color:var(--blue)}
 .p-marq .c-lav{background:linear-gradient(160deg,#cfc3dd,#bfb1d2 55%,#a998c0);color:var(--blue)}
 .p-marq .c-sage{background:linear-gradient(160deg,#d8de9c,#ccd389 55%,#b5bd6c);color:var(--ink)}
 .p-marq .c-plum{background:linear-gradient(160deg,#6b4a6e,#57385a 55%,#3f2742);color:var(--cream)}
