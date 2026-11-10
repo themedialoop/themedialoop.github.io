@@ -400,6 +400,8 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .apply > *{position:relative}
 .apply canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .apply:hover,.apply:focus-visible{transform:translateY(-6px) rotate(-.8deg);box-shadow:none}
+/* the small UIC mark, in the cream of the net dots,, tucked in the card's top right corner (hidden until the image loads) */
+.apply > .ap-uic{position:absolute;top:clamp(20px,2.4vw,34px);right:clamp(20px,2.4vw,34px);width:clamp(34px,3.2vw,48px);height:auto;opacity:.9}
 .ap-kind{display:inline-flex;align-items:center;gap:.5em;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
 .ap-kind::before{content:"";width:.7em;height:.7em;border-radius:52% 46% 50% 48%;background:var(--blue)}
 .ap-h{margin-top:clamp(18px,3vh,32px);padding-bottom:.14em;font-weight:700;font-size:clamp(72px,12vw,200px);line-height:.82;letter-spacing:-.045em}
@@ -540,6 +542,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   </div>
   <a class="apply" href="https://comm.uic.edu/academics/graduate-studies/prospective-students/" target="_blank" rel="noopener">
     <canvas aria-hidden="true"></canvas>
+    <img class="ap-uic" src="assets/uic-mark-cream.png" alt="University of Illinois Chicago" onerror="this.remove()">
     <span class="ap-kind">Graduate admissions</span>
     <span class="ap-h">Apply</span>
     <span class="ap-t">We are housed with the Department of Communication at the University of Illinois Chicago. Potential graduate students for PhD programs and Master's degrees are welcome to apply for the upcoming admissions cycle.</span>
