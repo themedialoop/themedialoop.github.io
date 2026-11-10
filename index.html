@@ -1846,11 +1846,14 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const faces = n => { const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * (n - 1)); if (b >= a) b++; return i => { if (i === a) return ' f-corm' + fw(300, 700); if (i === b) return ' f-fig' + fw(300, 900); const r = Math.random(); return r < .03 ? ' f-crete' : r < .05 ? ' f-crete-it' : ''; }; };   // plus about 3% Crete Round and 2% Crete Round italic, at random
   // gold and deep blue pills a little less often: about a third of them hand their turn to one of the other colours
   const lessGD = c => /gold|deep/.test(c) && Math.random() < .35 ? ['c-blue', 'c-lav', 'c-plum', 'c-mist', 'c-mauve'][Math.floor(Math.random() * 5)] : c;
-  const tcol = c => { const r = Math.random();   // blue pills: gold words, sometimes mist blue (and mauve on the deep blue); green: plum; gold: plum only rarely; plum: always cream
+  // green and plum never meet: no plum words on green, no green words on plum, and never a green pill right next to a plum one
+  const unGP = row => { const ps = [...row.querySelectorAll('.pill')]; for (let i = 1; i < ps.length; i++) { const a = ps[i - 1].classList, b = ps[i].classList; if ((a.contains('c-sage') && b.contains('c-plum')) || (a.contains('c-plum') && b.contains('c-sage'))) b.replace(b.contains('c-plum') ? 'c-plum' : 'c-sage', 'c-blue'); } };   // also where a row repeats
+  let lastCol = '';
+  const noGP = c => { if ((c === 'c-sage' && lastCol === 'c-plum') || (c === 'c-plum' && lastCol === 'c-sage')) c = 'c-blue'; lastCol = c; return c; };
+  const tcol = c => { const r = Math.random();   // blue pills: gold words, sometimes mist blue (and mauve on the deep blue); gold: plum only rarely; green: never plum; plum: always cream
     if (c === 'c-deep') return r < .25 ? ' t-gold' : r < .33 ? ' t-mist' : r < .42 ? ' t-mauve' : '';
     if (c === 'c-blue') return r < .27 ? ' t-gold' : r < .37 ? ' t-mist' : '';
     if (c === 'c-gold') return r < .02 ? ' t-plum' : '';
-    if (c === 'c-sage') return r < .3 ? ' t-plum' : '';
     return ''; };
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
   const WT = [200, 300, 400, 500, 600, 700, 800, 900], WTB = [100, 200, 300, 500, 700, 800, 900];
@@ -1861,12 +1864,12 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const face = faces(set.length);
     const one = set.map((t, fi) => { const fun = t[0] === '*', w = fun ? t.slice(1) : t;
       // sage chartreuse turns up only very rarely, as a little surprise
-      const cr = Math.random(), col = cr < .06 ? 'c-sage' : cr < .14 ? 'c-mist' : cr < .22 ? 'c-mauve' : lessGD(PAL[k % PAL.length]), light = /cream|lav|gold|sage|mist/.test(col);
+      const cr = Math.random(), col = noGP(cr < .06 ? 'c-sage' : cr < .14 ? 'c-mist' : cr < .22 ? 'c-mauve' : lessGD(PAL[k % PAL.length])), light = /cream|lav|gold|sage|mist/.test(col);
       // the thinnest weights only on the darker pills, so they stay readable
       let wt = pick(fun ? WTB : WT); if (light && wt < 300) wt = 300; const it = Math.random() < .35;
       const dot = Math.random() < .18 ? '<span class="gdot" aria-hidden="true"></span>' : '';
       k++; return '<span class="pill ' + col + tcol(col) + face(fi) + (fun ? ' fun' : '') + (it ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + w + '</span>' + dot; }).join('');
-    row.innerHTML = one.repeat(5); box.appendChild(row); return { row, dir: r % 2 ? 1 : -1, w: 0, x: Math.random() };
+    row.innerHTML = one.repeat(5); unGP(row); box.appendChild(row); return { row, dir: r % 2 ? 1 : -1, w: 0, x: Math.random() };
   });
   // let people drag or swipe a row left and right (and use a trackpad's sideways scroll); vertical page scrolling still works
   const grab = o => { const el = o.row; o.m = o.m || 0; let sx = 0, sm = 0, id = null;
