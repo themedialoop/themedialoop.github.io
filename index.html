@@ -56,7 +56,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Cedarville+Cursive&family=Schoolbell&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Cedarville+Cursive&family=Crete+Round:ital@0;1&family=Schoolbell&display=swap">
 <style>
 /* Layout: one long scroll over a Kusama-style net pinned to the window. Its holes stay put and
    breathe; a tone-on-tone blue gradient drifts underneath and travels from section to section. */
@@ -1812,6 +1812,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
    so no bold or italic, and their padding is trimmed so the pill keeps the same height as its neighbours */
 .hm-marq .pill.f-cedar{font-family:'Cedarville Cursive',cursive;font-weight:400 !important;font-style:normal;letter-spacing:0;font-size:calc(clamp(19px,2.15vw,30px) * 1.18);line-height:1.1;padding:.55em 1.05em .6em}
 .hm-marq .pill.f-school{font-family:'Schoolbell',cursive;font-weight:400 !important;font-style:normal;letter-spacing:0;font-size:calc(clamp(19px,2.15vw,30px) * 1.12);line-height:1.1;padding:.6em 1.1em .64em}
+.hm-marq .pill.f-crete,.hm-marq .pill.f-crete-it{font-family:'Crete Round',serif;font-weight:400 !important;letter-spacing:-.01em;font-size:calc(clamp(19px,2.15vw,30px) * 1.02)}   /* a soft slab serif, one weight */
+.hm-marq .pill.f-crete{font-style:normal}
+.hm-marq .pill.f-crete-it{font-style:italic}
 /* the events title: cream letters on a deep-blue highlighter band, one band per line, tilted a touch, so it stands out on the gold */
 .ev-h{line-height:1.42 !important;rotate:-1.2deg;transform-origin:left center;letter-spacing:-.022em !important;max-width:15ch !important}
 .ev-h .ev-hl{background:linear-gradient(100deg,#2c5494,#1d3866);color:var(--cream);padding:0 .2em .04em;border-radius:.14em .26em .18em .22em;
@@ -1833,7 +1836,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const per = Math.ceil(all.length / 4); for (let r = 0; r < 4; r++) ROWS[r] = all.slice(r * per, (r + 1) * per); }
   const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-lav', 'c-plum'];   // no cream: it would vanish into the page
   // one word in each row in Cedarville Cursive and one in Schoolbell (about 5% each), different words each visit
-  const faces = n => { const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * (n - 1)); if (b >= a) b++; return i => i === a ? ' f-cedar' : i === b ? ' f-school' : ''; };
+  const faces = n => { const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * (n - 1)); if (b >= a) b++; return i => { if (i === a) return ' f-cedar'; if (i === b) return ' f-school'; const r = Math.random(); return r < .03 ? ' f-crete' : r < .05 ? ' f-crete-it' : ''; }; };   // plus about 3% Crete Round and 2% Crete Round italic, at random
   const tcol = c => /blue|deep/.test(c) ? (Math.random() < .3 ? ' t-gold' : '') : /gold|sage/.test(c) ? (Math.random() < .3 ? ' t-plum' : '') : c === 'c-plum' && Math.random() < .08 ? ' t-sage' : '';   // some blue pills get gold words, some gold and green ones plum, and now and then a plum one green
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
   const WT = [200, 300, 400, 500, 600, 700, 800, 900], WTB = [100, 200, 300, 500, 700, 800, 900];
