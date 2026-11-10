@@ -1588,6 +1588,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
   { const ap = document.querySelector('.apply'), cv = ap && ap.querySelector('canvas');
     // the Apply card's colour is picked at random from these (never sage or lavender: the cream UIC mark gets lost on them)
     const AC = ['a-gold', 'a-blue', 'a-deep', 'a-plum'], ac = AC[Math.floor(Math.random() * AC.length)]; if (ap) ap.classList.add(ac);
+    // the UIC mark sits on the same line as the "More information" button: centred on it vertically
+    const apUic = ap && ap.querySelector('.ap-uic'), apGo = ap && ap.querySelector('.ap-go');
+    const placeUic = () => { if (!apUic || !apUic.isConnected || !apGo) return; apUic.style.bottom = 'auto';
+      apUic.style.top = (apGo.offsetTop + apGo.offsetHeight / 2 - apUic.offsetHeight / 2) + 'px'; };
+    if (apUic) { apUic.complete ? placeUic() : apUic.addEventListener('load', placeUic); addEventListener('resize', placeUic); document.fonts && document.fonts.ready.then(placeUic); }
     const apInk = ['a-lav', 'a-sage'].includes(ac) ? 'rgba(44,84,148,.85)' : 'rgba(242,238,221,.9)';
     const drawAp = time => { if (!cv || !holes.length) return; const r = ap.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
       const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
