@@ -1824,7 +1824,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   // shuffle the research terms together and deal them back out across the first three rows, so themes don't cluster
   { const all = ROWS.flat(); for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
     const per = Math.ceil(all.length / 4); for (let r = 0; r < 4; r++) ROWS[r] = all.slice(r * per, (r + 1) * per); }
-  const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-cream', 'c-lav', 'c-plum'];
+  const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-lav', 'c-plum'];   // no cream: it would vanish into the page
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
   const WT = [200, 300, 400, 500, 600, 700, 800, 900], WTB = [100, 200, 300, 500, 700, 800, 900];
   const pick = a => a[Math.floor(Math.random() * a.length)];

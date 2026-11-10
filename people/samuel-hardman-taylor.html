@@ -647,7 +647,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 
   /* research interest cards: the real net (blue with cream holes, breathing) fills the top of each card and fades out above the words */
   // shuffle the palette so each visit gives the interests a fresh mix of colours, never two the same side by side
-  const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-cream', 'c-lav', 'c-plum'];
+  const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-lav', 'c-plum'];   // no cream: it would vanish into the page
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
   const cards = [...document.querySelectorAll('.p-topics li')].map((li, i) => { const c = PAL[i % PAL.length]; li.classList.add(c);
     return { li, cv: li.querySelector('canvas'), off: [(i * .37 + .11) % 1, (i * .61 + .29) % 1], ink: c === 'c-cream' || c === 'c-lav' ? 'rgba(44,84,148,.85)' : 'rgb(242,238,221)' }; }).filter(c => c.cv);
@@ -828,7 +828,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 (() => {
   const ul = document.querySelector('.p-topics'); if (!ul) return;
   const names = [...ul.querySelectorAll('strong')].map(s => s.textContent.trim());
-  const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-cream', 'c-lav', 'c-plum'];
+  const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-lav', 'c-plum'];   // no cream: it would vanish into the page
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
   // two rows on wider screens, three on phones; rebuilt if the screen crosses that width
   const wrap = document.createElement('div'); wrap.className = 'p-marq'; wrap.setAttribute('aria-label', 'Research interests: ' + names.join(', '));
