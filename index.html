@@ -115,6 +115,11 @@ html.intro body{touch-action:none}
 @keyframes cueBreathe{0%,100%{transform:scale(.94) rotate(-3deg)}50%{transform:scale(1.06) rotate(3deg)}}
 #lace{position:fixed;inset:0;width:100%;height:100%;z-index:21;pointer-events:none}
 #openLock{position:fixed;left:0;top:0;z-index:22;width:min(64vw,880px);display:grid;justify-items:start;gap:clamp(14px,2.2vw,30px);pointer-events:none;animation:olIn 1.1s cubic-bezier(.2,.8,.2,1) both}   /* laid exactly over the home page's blue logo (placed in the script), so the swipe just turns it from cream to blue in place */
+/* the UIC dot that flips out of the opener's net when you swipe up: cream UIC on the front, a gold dot on the back */
+.uic-flip{position:fixed;z-index:40;pointer-events:none;perspective:420px}
+.uic-flip .uf-coin{position:relative;width:100%;height:100%;transform-style:preserve-3d}
+.uic-flip img,.uic-flip i{position:absolute;inset:0;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.uic-flip i{background:var(--gold);border-radius:52% 46% 50% 48% / 48% 52% 47% 53%;transform:rotateY(180deg)}
 #openLock .ol-wrap{position:relative;width:100%;transform-origin:50% 55%;animation:olBreathe 7s ease-in-out infinite}   /* breathes slightly in and out, in time with the dots */
 @keyframes olBreathe{0%,100%{transform:scale(.992)}50%{transform:scale(1.012)}}
 @media (prefers-reduced-motion:reduce){#openLock .ol-wrap{animation:none}}
@@ -1280,12 +1285,50 @@ button,input,select,textarea,optgroup{font-family:inherit}
   // while the opener waits for a swipe, its two blots of net are drawn once into their own layers and then just breathe
   // (a gentle scale in and out around each corner), instead of redrawing every hole every frame: smooth on phones
   const blotC = [document.createElement('canvas'), document.createElement('canvas')]; let blotKey = '', blotCtr = [[0, 0], [0, 0]];
+  /* the UIC mark, hidden in the net as one of its own dots: it takes the place of one of the larger holes deep inside a blot,
+     at that hole's size, so it breathes with the net and never crowds its neighbours. When you swipe up it flips over like a
+     coin (gold on the back, in the hole's own organic shape, like the dot on the i), hops a little, and settles back in. */
+  const uicImg = new Image(); uicImg.onload = () => { blotKey = ''; }; uicImg.src = 'assets/uic-mark-cream.png';
+  let uic = null;
+  function pickUIC(a, tilePx, k, ox, oy) {
+    uic = null; if (!uicImg.complete || !uicImg.naturalWidth || !holes.length) return;
+    const T = a >= 1 ? [.86 * W, .4 * H] : [.74 * W, .27 * H];                 // right of the logo on wide screens, above it on phones
+    const rads = holes.map(h => h.rad).sort((x, y) => x - y), rmin = rads[Math.floor(rads.length * .7)];   // one of the bigger dots
+    let bd = 1e18;
+    for (let ty = Math.floor(-oy / tilePx) - 1; ty <= Math.floor((H - oy) / tilePx); ty++)
+      for (let tx = Math.floor(-ox / tilePx) - 1; tx <= Math.floor((W - ox) / tilePx); tx++)
+        for (const h of holes) {
+          if (h.rad < rmin) continue; const px = ox + tx * tilePx + h.cx * k, py = oy + ty * tilePx + h.cy * k, R = h.rad * k * 2.5;
+          if (px < R || py < R || px > W - R || py > H - R) continue;
+          const d = (px - T[0]) ** 2 + (py - T[1]) ** 2; if (d >= bd) continue;
+          let f = clearF(px, py); for (let t = 0; t < 120 && f >= .97; t += 6) f = Math.min(f, cornerF(px / W, py / H, a, t)); if (f < .97) continue;   // deep inside a blot, whatever its edge is doing
+          bd = d; uic = { tx, ty, i: h.i, x: px, y: py, R: h.rad * k * .95, bi: 0, flown: false };
+        }
+  }
+  const isUIC = (tx, ty, h) => uic && h.i === uic.i && tx === uic.tx && ty === uic.ty;
+  function drawUIC(g, x, y, R, h) {                                           // cream disc with UIC cut out, in place of the hole
+    g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(uicImg, x - R, y - R, R * 2, R * 2);
+  }
+  function flipUIC() {                                                         // the coin flip, as its own little layer so it outlives the opener
+    uic.flown = true; if (uic.sx == null) return; const q = W / innerWidth, x = uic.sx / q, y = uic.sy / q, r = uic.sR / q;
+    const el = document.createElement('div'); el.className = 'uic-flip'; el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<div class="uf-coin"><img src="assets/uic-mark-cream.png" alt=""><i></i></div>';
+    Object.assign(el.style, { left: x - r + 'px', top: y - r + 'px', width: 2 * r + 'px', height: 2 * r + 'px' });
+    document.body.appendChild(el);
+    const up = Math.min(innerHeight * .24, r * 10), side = r * (x > innerWidth / 2 ? -1.2 : 1.2);   // up, with the swipe, and a little in toward the middle
+    el.animate([{ transform: 'translate(0,0) scale(1)', easing: 'cubic-bezier(.2,.8,.3,1)' }, { transform: `translate(${side * .6}px,${-up * .85}px) scale(1.7)`, offset: .42, easing: 'ease-in-out' },
+      { transform: `translate(${side}px,${-up}px) scale(1.35)`, opacity: 1, offset: .78, easing: 'ease-in' }, { transform: `translate(${side * 1.05}px,${-up * 1.05}px) scale(1)`, opacity: 0 }],
+      { duration: 1900, fill: 'forwards' });
+    el.firstChild.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(1080deg)' }], { duration: 1600, easing: 'cubic-bezier(.3,.55,.3,1)', fill: 'forwards' });   // three turns: cream UIC, gold back, cream again
+    setTimeout(() => el.remove(), 2000);
+  }
   function buildBlots() {
     const a = W / H, k1 = a >= 1 ? 1 / a : 1, k2 = a >= 1 ? 1 : a, key = W + 'x' + H + ':' + (lockBox ? lockBox.map(v => Math.round(v)).join(',') : '');
     if (key === blotKey) return; blotKey = key;
     blotCtr = [[.1 * k1 * W, .1 * k2 * H], [(1 - .08 * k1) * W, (1 - .08 * k2) * H]];
     const g = blotC.map(c => { c.width = W; c.height = H; const x = c.getContext('2d'); x.clearRect(0, 0, W, H); x.fillStyle = `rgb(${CREAM_RGB})`; return x; });
     const tilePx = (isMobile() ? 980 : 1500) * DPR, k = tilePx / TILE, ox = W / 2, oy = H / 2;
+    pickUIC(a, tilePx, k, ox, oy);
     for (let ty = Math.floor(-oy / tilePx) - 1; ty <= Math.floor((H - oy) / tilePx); ty++)
       for (let tx = Math.floor(-ox / tilePx) - 1; tx <= Math.floor((W - ox) / tilePx); tx++) {
         const bx = ox + tx * tilePx, by = oy + ty * tilePx;
@@ -1293,6 +1336,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
           const px = bx + h.cx * k, py = by + h.cy * k; if (px < -40 || py < -40 || px > W + 40 || py > H + 40) continue;
           const f = cornerF(px / W, py / H, a, 0) * clearF(px, py), sc = (.62 + .3 * (.5 + .5 * Math.sin(h.ph * 2.7))) * f; if (sc < .08) continue;
           const i = Math.hypot(px - blotCtr[0][0], py - blotCtr[0][1]) / W < Math.hypot(px - blotCtr[1][0], py - blotCtr[1][1]) / W * 1.3 ? 0 : 1;
+          if (isUIC(tx, ty, h)) { uic.bi = i; drawUIC(g[i], px, py, h.rad * k * .95, h); continue; }   // drawn into the blot, so it breathes with it
           g[i].setTransform(k * sc, 0, 0, k * sc, px, py); g[i].fill(h.p);
         }
       }
@@ -1339,7 +1383,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (idle && holes.length) {
       buildBlots();
       blotC.forEach((c, i) => { const s = reduce ? 1 : 1 + .02 * Math.sin(time * .6 + i * 2.1), [cx, cy] = blotCtr[i];
-        l.setTransform(s, 0, 0, s, cx * (1 - s), cy * (1 - s)); l.drawImage(c, 0, 0); });
+        l.setTransform(s, 0, 0, s, cx * (1 - s), cy * (1 - s)); l.drawImage(c, 0, 0);
+        if (uic && uic.bi === i) { uic.sx = cx + (uic.x - cx) * s; uic.sy = cy + (uic.y - cy) * s; uic.sR = uic.R * s; } });   // where the UIC dot is right now
       l.setTransform(1, 0, 0, 1, 0, 0);
     }
     if (!idle && holes.length) {
@@ -1388,6 +1433,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
                 if (d < R) { const q = ease3(1 - d / R) * (1 - e); px += dx / d * q * R * .35; py += dy / d * q * R * .35; sc *= 1 - q * .5; } }
             }
             if (sc < .08) continue;
+            if (isUIC(tx, ty, h)) { if (!uic.flown) flipUIC(); continue; }   // as you swipe, the UIC dot pops out of the net, leaving its place empty
             l.setTransform(k * sc, 0, 0, k * sc, px, py); l.fill(h.p);
           }
         }
@@ -1484,7 +1530,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
       const onMove = e => { if (ty0 == null) return; if (e.cancelable) e.preventDefault(); const y = e.touches[0].clientY; push((ty0 - y) / (innerHeight * .45)); sw0 += ty0 - y; ty0 = y; };   // follows your finger: one ordinary swipe is enough
       const onKey = e => { if (['ArrowDown', 'PageDown', ' ', 'Enter'].includes(e.key)) push(.22); if (['ArrowUp', 'PageUp'].includes(e.key)) push(-.22); };
       addEventListener('wheel', onWheel, { passive: true }); addEventListener('touchstart', onStart, { passive: true });
-      addEventListener('touchmove', onMove, { passive: false });   // not passive, so a phone never scrolls the page underneath the opener addEventListener('touchend', onEnd, { passive: true }); addEventListener('keydown', onKey);
+      addEventListener('touchmove', onMove, { passive: false });   // not passive, so a phone never scrolls the page underneath the opener
+      addEventListener('touchend', onEnd, { passive: true }); addEventListener('keydown', onKey);
       const finish = () => {
         done = true; heroMark.src = markSrc; lock.remove(); requestAnimationFrame(() => requestAnimationFrame(() => cue.remove()));
         removeEventListener('wheel', onWheel); removeEventListener('touchstart', onStart);
