@@ -726,11 +726,13 @@ button,input,select,textarea,optgroup{font-family:inherit}
   // one word in each row in Cormorant Garamond and one in Figtree (about 5% each), different words each visit
   const fw = (lo, hi) => ' f-w' + (lo + 100 * Math.floor(Math.random() * ((hi - lo) / 100 + 1)));   // a random weight the face actually has
   const faces = n => { const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * (n - 1)); if (b >= a) b++; return i => { if (i === a) return ' f-corm' + fw(300, 700); if (i === b) return ' f-fig' + fw(300, 900); const r = Math.random(); return r < .03 ? ' f-crete' : r < .05 ? ' f-crete-it' : ''; }; };   // plus about 3% Crete Round and 2% Crete Round italic, at random
-  const tcol = c => { const r = Math.random();   // blue pills: gold words, sometimes mist blue (and mauve on the deep blue); gold and green: plum; plum: sometimes mist blue (never green)
+  // gold and deep blue pills a little less often: about a third of them hand their turn to one of the other colours
+  const lessGD = c => /gold|deep/.test(c) && Math.random() < .35 ? ['c-blue', 'c-lav', 'c-plum', 'c-mist', 'c-mauve'][Math.floor(Math.random() * 5)] : c;
+  const tcol = c => { const r = Math.random();   // blue pills: gold words, sometimes mist blue (and mauve on the deep blue); green: plum; gold: plum only rarely; plum: always cream
     if (c === 'c-deep') return r < .25 ? ' t-gold' : r < .33 ? ' t-mist' : r < .42 ? ' t-mauve' : '';
     if (c === 'c-blue') return r < .27 ? ' t-gold' : r < .37 ? ' t-mist' : '';
-    if (/gold|sage/.test(c)) return r < .3 ? ' t-plum' : '';
-    if (c === 'c-plum') return r < .12 ? ' t-mist' : '';
+    if (c === 'c-gold') return r < .02 ? ' t-plum' : '';
+    if (c === 'c-sage') return r < .3 ? ' t-plum' : '';
     return ''; };
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
   // two rows on wider screens, three on phones; rebuilt if the screen crosses that width
@@ -754,7 +756,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       // all Inter: each pill its own weight (thin only on darker colours), some italic, and a gold dot after a few
       const face = faces(set.length), fc = face, keep = [r === fr[0] && ' f-corm', r === fr[1] && ' f-fig'];
       const faceR = i => { const v = fc(i); return v && (v.startsWith(' f-crete') || keep.includes(v.split(' f-w')[0])) ? v : ''; };   // fewer words here, so each face turns up in just one row
-      const one = set.map((n, i) => { const cr = Math.random(), col = cr < .07 ? 'c-sage' : cr < .12 ? 'c-mist' : cr < .17 ? 'c-mauve' : PAL[(i + r * per) % PAL.length], light = /cream|lav|gold|sage|mist/.test(col);
+      const one = set.map((n, i) => { const cr = Math.random(), col = cr < .06 ? 'c-sage' : cr < .14 ? 'c-mist' : cr < .22 ? 'c-mauve' : lessGD(PAL[(i + r * per) % PAL.length]), light = /cream|lav|gold|sage|mist/.test(col);
         let wt = [200, 300, 400, 500, 600, 700, 800, 900][Math.floor(Math.random() * 8)]; if (light && wt < 300) wt = 300;
         return '<span class="pill ' + col + tcol(col) + faceR(i) + (Math.random() < .35 ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + n + '</span>' + (Math.random() < .2 ? '<span class="gdot"></span>' : ''); }).join('');
       row.innerHTML = one.repeat(6); wrap.appendChild(row); const o = { row, dir: r % 2 ? 1 : -1, w: 0, m: 0 }; grab(o); return o;
