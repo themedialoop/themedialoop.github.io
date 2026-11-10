@@ -1292,18 +1292,22 @@ button,input,select,textarea,optgroup{font-family:inherit}
   let uic = null;
   function pickUIC(a, tilePx, k, ox, oy) {
     uic = null; if (!uicImg.complete || !uicImg.naturalWidth || !holes.length) return;
-    const T = a >= 1 ? [.86 * W, .4 * H] : [.74 * W, .27 * H];                 // right of the logo on wide screens, above it on phones
-    const rads = holes.map(h => h.rad).sort((x, y) => x - y), rmin = rads[Math.floor(rads.length * .7)];   // one of the bigger dots
-    let bd = 1e18;
-    for (let ty = Math.floor(-oy / tilePx) - 1; ty <= Math.floor((H - oy) / tilePx); ty++)
-      for (let tx = Math.floor(-ox / tilePx) - 1; tx <= Math.floor((W - ox) / tilePx); tx++)
-        for (const h of holes) {
-          if (h.rad < rmin) continue; const px = ox + tx * tilePx + h.cx * k, py = oy + ty * tilePx + h.cy * k, R = h.rad * k * 2.5;
-          if (px < R || py < R || px > W - R || py > H - R) continue;
-          const d = (px - T[0]) ** 2 + (py - T[1]) ** 2; if (d >= bd) continue;
-          let f = clearF(px, py); for (let t = 0; t < 120 && f >= .97; t += 6) f = Math.min(f, cornerF(px / W, py / H, a, t)); if (f < .97) continue;   // deep inside a blot, whatever its edge is doing
-          bd = d; uic = { tx, ty, i: h.i, x: px, y: py, R: h.rad * k * .95, bi: 0, flown: false };
-        }
+    const T = [.9 * W, .88 * H];                                                 // always in the bottom right corner
+    const rads = holes.map(h => h.rad).sort((x, y) => x - y);
+    // the biggest dot deep inside the net there; if this screen has none that deep, settle for a slightly smaller or shallower one
+    for (const [pc, fmin] of [[.7, .93], [.5, .85], [.3, .7], [0, .5]]) {
+      const rmin = rads[Math.floor(rads.length * pc)]; let bd = 1e18;
+      for (let ty = Math.floor(-oy / tilePx) - 1; ty <= Math.floor((H - oy) / tilePx); ty++)
+        for (let tx = Math.floor(-ox / tilePx) - 1; tx <= Math.floor((W - ox) / tilePx); tx++)
+          for (const h of holes) {
+            if (h.rad < rmin) continue; const px = ox + tx * tilePx + h.cx * k, py = oy + ty * tilePx + h.cy * k, R = h.rad * k * 1.7;
+            if (px < W * .62 || py < H * .6 || px > W - R || py > H - R) continue;   // bottom right, right of the swipe button, fully on screen
+            const d = (px - T[0]) ** 2 + (py - T[1]) ** 2; if (d >= bd) continue;
+            let f = clearF(px, py); for (let t = 0; t < 120 && f >= fmin; t += 6) f = Math.min(f, cornerF(px / W, py / H, a, t)); if (f < fmin) continue;   // inside a blot, whatever its edge is doing
+            bd = d; uic = { tx, ty, i: h.i, x: px, y: py, R: h.rad * k * .95, bi: 0, flown: false };
+          }
+      if (uic) return;
+    }
   }
   const isUIC = (tx, ty, h) => uic && h.i === uic.i && tx === uic.tx && ty === uic.ty;
   function drawUIC(g, x, y, R, h) {                                           // cream disc with UIC cut out, in place of the hole
