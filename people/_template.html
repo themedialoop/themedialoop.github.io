@@ -701,12 +701,16 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .p-marq .c-lav{background:linear-gradient(160deg,#cfc3dd,#bfb1d2 55%,#a998c0);color:var(--blue)}
 .p-marq .c-sage{background:linear-gradient(160deg,#d8de9c,#ccd389 55%,#b5bd6c);color:var(--ink)}
 .p-marq .c-plum{background:linear-gradient(160deg,#6b4a6e,#57385a 55%,#3f2742);color:var(--cream)}
+.p-marq .pill.t-gold{color:var(--gold)}
+.p-marq .pill.t-plum{color:#57385a}
+.p-marq .pill.t-sage{color:#ccd389}
 </style>
 <script>
 (() => {
   const ul = document.querySelector('.p-topics'); if (!ul) return;
   const names = [...ul.querySelectorAll('strong')].map(s => s.textContent.trim());
   const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-lav', 'c-plum'];   // no cream: it would vanish into the page
+  const tcol = c => /blue|deep/.test(c) ? (Math.random() < .3 ? ' t-gold' : '') : /gold|sage/.test(c) ? (Math.random() < .3 ? ' t-plum' : '') : c === 'c-plum' && Math.random() < .08 ? ' t-sage' : '';   // some blue pills get gold words, some gold and green ones plum, and now and then a plum one green
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
   // two rows on wider screens, three on phones; rebuilt if the screen crosses that width
   const wrap = document.createElement('div'); wrap.className = 'p-marq'; wrap.setAttribute('aria-label', 'Research interests: ' + names.join(', '));
@@ -728,7 +732,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       // all Inter: each pill its own weight (thin only on darker colours), some italic, and a gold dot after a few
       const one = set.map((n, i) => { const col = Math.random() < .07 ? 'c-sage' : PAL[(i + r * per) % PAL.length], light = /cream|lav|gold|sage/.test(col);
         let wt = [200, 300, 400, 500, 600, 700, 800, 900][Math.floor(Math.random() * 8)]; if (light && wt < 300) wt = 300;
-        return '<span class="pill ' + col + (Math.random() < .35 ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + n + '</span>' + (Math.random() < .2 ? '<span class="gdot"></span>' : ''); }).join('');
+        return '<span class="pill ' + col + tcol(col) + (Math.random() < .35 ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + n + '</span>' + (Math.random() < .2 ? '<span class="gdot"></span>' : ''); }).join('');
       row.innerHTML = one.repeat(6); wrap.appendChild(row); const o = { row, dir: r % 2 ? 1 : -1, w: 0, m: 0 }; grab(o); return o;
     });
     measure();

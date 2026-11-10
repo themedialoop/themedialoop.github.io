@@ -1805,6 +1805,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .hm-marq .c-lav{background:linear-gradient(160deg,#cfc3dd,#bfb1d2 55%,#a998c0);color:var(--blue)}
 .hm-marq .c-sage{background:linear-gradient(160deg,#d8de9c,#ccd389 55%,#b5bd6c);color:var(--ink)}
 .hm-marq .c-plum{background:linear-gradient(160deg,#6b4a6e,#57385a 55%,#3f2742);color:var(--cream)}
+.hm-marq .pill.t-gold{color:var(--gold)}
+.hm-marq .pill.t-plum{color:#57385a}
+.hm-marq .pill.t-sage{color:#ccd389}
 /* the events title: cream letters on a deep-blue highlighter band, one band per line, tilted a touch, so it stands out on the gold */
 .ev-h{line-height:1.42 !important;rotate:-1.2deg;transform-origin:left center;letter-spacing:-.022em !important;max-width:15ch !important}
 .ev-h .ev-hl{background:linear-gradient(100deg,#2c5494,#1d3866);color:var(--cream);padding:0 .2em .04em;border-radius:.14em .26em .18em .22em;
@@ -1825,6 +1828,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   { const all = ROWS.flat(); for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
     const per = Math.ceil(all.length / 4); for (let r = 0; r < 4; r++) ROWS[r] = all.slice(r * per, (r + 1) * per); }
   const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-lav', 'c-plum'];   // no cream: it would vanish into the page
+  const tcol = c => /blue|deep/.test(c) ? (Math.random() < .3 ? ' t-gold' : '') : /gold|sage/.test(c) ? (Math.random() < .3 ? ' t-plum' : '') : c === 'c-plum' && Math.random() < .08 ? ' t-sage' : '';   // some blue pills get gold words, some gold and green ones plum, and now and then a plum one green
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
   const WT = [200, 300, 400, 500, 600, 700, 800, 900], WTB = [100, 200, 300, 500, 700, 800, 900];
   const pick = a => a[Math.floor(Math.random() * a.length)];
@@ -1837,7 +1841,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       // the thinnest weights only on the darker pills, so they stay readable
       let wt = pick(fun ? WTB : WT); if (light && wt < 300) wt = 300; const it = Math.random() < .35;
       const dot = Math.random() < .18 ? '<span class="gdot" aria-hidden="true"></span>' : '';
-      k++; return '<span class="pill ' + col + (fun ? ' fun' : '') + (it ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + w + '</span>' + dot; }).join('');
+      k++; return '<span class="pill ' + col + tcol(col) + (fun ? ' fun' : '') + (it ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + w + '</span>' + dot; }).join('');
     row.innerHTML = one.repeat(5); box.appendChild(row); return { row, dir: r % 2 ? 1 : -1, w: 0, x: Math.random() };
   });
   // let people drag or swipe a row left and right (and use a trackpad's sideways scroll); vertical page scrolling still works
