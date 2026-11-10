@@ -11,7 +11,7 @@
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Cedarville+Cursive&family=Crete+Round:ital@0;1&family=Schoolbell&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Crete+Round:ital@0;1&family=Figtree:ital,wght@0,300..900;1,300..900&display=swap">
 <style>
 /* Layout: one long scroll over a Kusama-style net pinned to the window. Its holes stay put and
    breathe; a tone-on-tone blue gradient drifts underneath and travels from section to section. */
@@ -704,10 +704,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .p-marq .pill.t-gold{color:var(--gold)}
 .p-marq .pill.t-plum{color:#57385a}
 .p-marq .pill.t-sage{color:#ccd389}
-/* now and then a word in a hand-drawn face: Cedarville Cursive (a loose handwritten script) or Schoolbell (a schoolroom hand); both come in one weight only,
-   so no bold or italic, and their padding is trimmed so the pill keeps the same height as its neighbours */
-.p-marq .pill.f-cedar{font-family:'Cedarville Cursive',cursive;font-weight:400 !important;font-style:normal;letter-spacing:0;font-size:calc(clamp(17px,1.7vw,24px) * 1.18);line-height:1.1;padding:.55em 1.05em .6em}
-.p-marq .pill.f-school{font-family:'Schoolbell',cursive;font-weight:400 !important;font-style:normal;letter-spacing:0;font-size:calc(clamp(17px,1.7vw,24px) * 1.12);line-height:1.1;padding:.6em 1.1em .64em}
+/* now and then a word in another face: Cormorant Garamond (an elegant old-style serif, set bigger because it runs small) or Figtree (a friendly sans);
+   each word gets its own weight from what that face offers (Cormorant 300-700, Figtree 300-900), sometimes in italic */
+.p-marq .pill.f-corm{font-family:'Cormorant Garamond',serif;font-weight:var(--fw) !important;letter-spacing:0;font-size:calc(clamp(17px,1.7vw,24px) * 1.28);line-height:1;padding:.5em 1em .54em}
+.p-marq .pill.f-fig{font-family:'Figtree',sans-serif;font-weight:var(--fw) !important;letter-spacing:-.015em}
+.p-marq .f-w300{--fw:300}.p-marq .f-w400{--fw:400}.p-marq .f-w500{--fw:500}.p-marq .f-w600{--fw:600}.p-marq .f-w700{--fw:700}.p-marq .f-w800{--fw:800}.p-marq .f-w900{--fw:900}
 .p-marq .pill.f-crete,.p-marq .pill.f-crete-it{font-family:'Crete Round',serif;font-weight:400 !important;letter-spacing:-.01em;font-size:calc(clamp(17px,1.7vw,24px) * 1.02)}   /* a soft slab serif, one weight */
 .p-marq .pill.f-crete{font-style:normal}
 .p-marq .pill.f-crete-it{font-style:italic}
@@ -717,8 +718,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const ul = document.querySelector('.p-topics'); if (!ul) return;
   const names = [...ul.querySelectorAll('strong')].map(s => s.textContent.trim());
   const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-lav', 'c-plum'];   // no cream: it would vanish into the page
-  // one word in each row in Cedarville Cursive and one in Schoolbell (about 5% each), different words each visit
-  const faces = n => { const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * (n - 1)); if (b >= a) b++; return i => { if (i === a) return ' f-cedar'; if (i === b) return ' f-school'; const r = Math.random(); return r < .03 ? ' f-crete' : r < .05 ? ' f-crete-it' : ''; }; };   // plus about 3% Crete Round and 2% Crete Round italic, at random
+  // one word in each row in Cormorant Garamond and one in Figtree (about 5% each), different words each visit
+  const fw = (lo, hi) => ' f-w' + (lo + 100 * Math.floor(Math.random() * ((hi - lo) / 100 + 1)));   // a random weight the face actually has
+  const faces = n => { const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * (n - 1)); if (b >= a) b++; return i => { if (i === a) return ' f-corm' + fw(300, 700); if (i === b) return ' f-fig' + fw(300, 900); const r = Math.random(); return r < .03 ? ' f-crete' : r < .05 ? ' f-crete-it' : ''; }; };   // plus about 3% Crete Round and 2% Crete Round italic, at random
   const tcol = c => /blue|deep/.test(c) ? (Math.random() < .3 ? ' t-gold' : '') : /gold|sage/.test(c) ? (Math.random() < .3 ? ' t-plum' : '') : c === 'c-plum' && Math.random() < .08 ? ' t-sage' : '';   // some blue pills get gold words, some gold and green ones plum, and now and then a plum one green
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
   // two rows on wider screens, three on phones; rebuilt if the screen crosses that width
@@ -740,8 +742,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
     rows = Array.from({ length: want }, (_, r) => names.slice(r * per, (r + 1) * per)).filter(s => s.length).map((set, r) => {
       const row = document.createElement('div'); row.className = 'row'; row.setAttribute('aria-hidden', 'true');
       // all Inter: each pill its own weight (thin only on darker colours), some italic, and a gold dot after a few
-      const face = faces(set.length), fc = face, keep = (r === fr[0] ? ' f-cedar' : '') + (r === fr[1] ? ' f-school' : '');
-      const faceR = i => { const v = fc(i); return v && (v.startsWith(' f-crete') || keep.includes(v)) ? v : ''; };   // fewer words here, so each face turns up in just one row
+      const face = faces(set.length), fc = face, keep = [r === fr[0] && ' f-corm', r === fr[1] && ' f-fig'];
+      const faceR = i => { const v = fc(i); return v && (v.startsWith(' f-crete') || keep.includes(v.split(' f-w')[0])) ? v : ''; };   // fewer words here, so each face turns up in just one row
       const one = set.map((n, i) => { const col = Math.random() < .07 ? 'c-sage' : PAL[(i + r * per) % PAL.length], light = /cream|lav|gold|sage/.test(col);
         let wt = [200, 300, 400, 500, 600, 700, 800, 900][Math.floor(Math.random() * 8)]; if (light && wt < 300) wt = 300;
         return '<span class="pill ' + col + tcol(col) + faceR(i) + (Math.random() < .35 ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + n + '</span>' + (Math.random() < .2 ? '<span class="gdot"></span>' : ''); }).join('');
