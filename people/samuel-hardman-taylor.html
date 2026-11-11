@@ -128,7 +128,7 @@
   --gutter:clamp(16px,4vw,56px);
   --gold:#e7aa4d;
   --card:#f2eedd;      /* the same cream as the page: one cream everywhere */
-  --rainbow:linear-gradient(90deg,#1d3866,#2c5494 30%,#5b82c6 65%,#9bb4e4);   /* tone-on-tone blue, for link hovers */
+  --rainbow:linear-gradient(#2c5494,#2c5494);   /* tone-on-tone blue, for link hovers */
   --net-size:1700px;
   color-scheme:light;
 }
@@ -289,7 +289,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
    and Apple-like type: a small number above a tight, two-tone headline */
 .p-topics{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,1.6vw,22px)}
 .p-topics li{position:relative;overflow:hidden;aspect-ratio:1;border-radius:clamp(14px,1.4vw,20px);display:flex;flex-direction:column;justify-content:flex-end;
-  padding:clamp(16px,1.9vw,26px);color:var(--cream);background-color:var(--blue);background-image:linear-gradient(165deg,#2c5494 0%,#2c5494 40%,#27508f 72%,#1d3866 100%);
+  padding:clamp(16px,1.9vw,26px);color:var(--cream);background-color:var(--blue);background-image:linear-gradient(#2c5494,#2c5494);
   transition:transform .45s cubic-bezier(.2,.7,.2,1),background-color .35s,color .35s}
 .p-topics li canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 .p-topics .n{position:relative;font-size:clamp(11px,.85vw,13px);font-weight:600;letter-spacing:.02em;font-variant-numeric:tabular-nums;color:var(--gold);margin-bottom:.55em;transition:color .35s}
@@ -301,7 +301,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 /* each interest gets a colour from the palette, shuffled fresh on every visit (set in the script) */
 .p-topics li.c-gold{background-image:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e)}
 .p-topics li.c-gold strong{color:var(--ink)}
-.p-topics li.c-deep{background-image:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f)}
+.p-topics li.c-deep{background-image:linear-gradient(#2c5494,#2c5494)}
 .p-topics li.c-cream{background-image:none;background-color:var(--cream)}
 .p-topics li.c-cream strong{color:var(--blue)}
 .p-topics li.c-lav{background-image:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b)}
@@ -372,7 +372,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 :root{--side:clamp(320px,31vw,460px)}
 #net{display:none}
 .p-side{position:fixed;left:0;top:0;bottom:0;width:var(--side);z-index:4;color:var(--cream);overflow:hidden;
-  background:linear-gradient(165deg,#3a6ab6 0%,#2c5494 45%,#1f3f73 100%)}
+  background:#2c5494}
 .side-net{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 .side-in{position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;gap:clamp(16px,2.4vh,28px);
   padding:clamp(84px,12vh,130px) clamp(28px,3vw,48px) clamp(44px,8vh,90px);overflow-y:auto;scrollbar-width:none}
@@ -607,7 +607,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const pw = ph.closest('.p-photo-wrap'); if (pw && pw.closest('.p-side')) {   // the rim and its shadow follow the photo's shape
       pw.style.webkitMaskImage = pw.style.maskImage = ph.style.maskImage;
       const sh = document.createElement('div'); sh.className = 'p-photo-shadow'; pw.before(sh); sh.append(pw); }
-    if (!ph.querySelector('img')) ph.style.background = 'radial-gradient(circle at 30% 28%, #9bb4e4 0, transparent 58%), radial-gradient(circle at 72% 70%, #d3def2 0, transparent 50%), #5b82c6'; }
+    if (!ph.querySelector('img')) ph.style.background = '#2c5494'; }
 
   /* playful: interests as floating organic pebbles and a bouncy name */
   // each interest sits on one of the net's own holes, stretched long: soft, uneven, rounded ends
@@ -630,7 +630,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   /* the net: a soft glow of tone-on-tone blue in the top-right corner, its cream holes breathing */
   const C = document.getElementById('net'), ctx = C.getContext('2d');
   const OFF = document.createElement('canvas'), octx = OFF.getContext('2d'), ENV = document.createElement('canvas'), ectx = ENV.getContext('2d');
-  const BLUES = [{ c: '#1d3866', a: .4, d: .26, s: .34, sp: .11 }, { c: '#2c5494', a: 2.2, d: .18, s: .36, sp: -.08 }, { c: '#5b82c6', a: 3.9, d: .24, s: .32, sp: .09 }, { c: '#9bb4e4', a: 5.1, d: .28, s: .26, sp: -.12 }, { c: '#d3def2', a: 1.3, d: .30, s: .18, sp: .14 }];
+  const BLUES = [{ c: '#2c5494', a: .4, d: .26, s: .34, sp: .11 }, { c: '#2c5494', a: 2.2, d: .18, s: .36, sp: -.08 }, { c: '#2c5494', a: 3.9, d: .24, s: .32, sp: .09 }, { c: '#2c5494', a: 5.1, d: .28, s: .26, sp: -.12 }, { c: '#2c5494', a: 1.3, d: .30, s: .18, sp: .14 }];
   const SURPRISE = (q, t) => q.rare ? .5 * Math.pow(Math.max(0, Math.sin(t * .24 - .35)), 1.5) : 1;   // swells in a few seconds after load, then comes and goes every ~26 s   // the aubergine only shows now and then, as a surprise
 
   const j = window.NET_HOLES; if (!j) return;
@@ -724,7 +724,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (R > 2 && cy + R * SY * 1.4 > 0 && cy - R * SY * 1.4 < H) {
       const size = Math.ceil(R * 2.6), s2 = Math.ceil(size * .5);
       if (OFF.width !== s2) { OFF.width = OFF.height = ENV.width = ENV.height = s2; }
-      octx.globalCompositeOperation = 'source-over'; octx.fillStyle = '#3a63a8'; octx.fillRect(0, 0, s2, s2);
+      octx.globalCompositeOperation = 'source-over'; octx.fillStyle = '#2c5494'; octx.fillRect(0, 0, s2, s2);
       for (const p of BLUES) {
         const ang = p.a + time * p.sp, dd = s2 * p.d * (1 + .25 * Math.sin(time * .21 + p.a));
         const px = s2 / 2 + Math.cos(ang) * dd, py = s2 / 2 + Math.sin(ang) * dd, rad = s2 * p.s * (1 + .15 * Math.sin(time * .27 + p.a * 2));
@@ -909,7 +909,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 /* publications: hovering a paper inverts the row to blue with cream type (in place of the underline) */
 /* the blue runs the full width of the window, side to side */
 .pubs a,.r-list a{position:relative;isolation:isolate;transition:padding .35s ease,color .3s}
-.pubs a::before,.r-list a::before{content:"";position:absolute;top:0;bottom:0;left:-100vw;right:-100vw;z-index:-1;background:linear-gradient(100deg,#3a6ab6,#2c5494 50%,#24477f);opacity:0;transition:opacity .3s}
+.pubs a::before,.r-list a::before{content:"";position:absolute;top:0;bottom:0;left:-100vw;right:-100vw;z-index:-1;background:#2c5494;opacity:0;transition:opacity .3s}
 .pubs a:hover::before,.pubs a:focus-visible::before,.r-list a:hover::before,.r-list a:focus-visible::before{opacity:1}
 .pubs a:not([href])::before{display:none}
 .pubs a:hover,.pubs a:focus-visible,.r-list a:hover,.r-list a:focus-visible{color:var(--cream) !important;padding-left:14px}
@@ -931,7 +931,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 @media (max-width:900px){.p-marq{margin-left:calc(-1 * (var(--gutter) - 16px)) !important;margin-right:calc(-1 * (var(--gutter) - 16px)) !important}}
 /* desktop: a highlighted paper reads as an extension of the blue sidebar, in the sidebar's own colours */
 @media (min-width:901px){
-  .pubs a::before{left:-100vw;right:-100vw;background:linear-gradient(180deg,#3a6ab6 0%,#2c5494 45%,#1f3f73 100%) fixed}
+  .pubs a::before{left:-100vw;right:-100vw;background:#2c5494 fixed}
 }
 /* profile publications: gold band with blue text on hover */
 .pubs a::before{background:linear-gradient(100deg,#f0bb5f,#e7aa4d 50%,#dc9a3e) !important}

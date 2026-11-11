@@ -75,7 +75,7 @@
   --gutter:clamp(16px,4vw,56px);
   --gold:#e7aa4d;
   --card:#f2eedd;      /* the same cream as the page: one cream everywhere */
-  --rainbow:linear-gradient(90deg,#1d3866,#2c5494 30%,#5b82c6 65%,#9bb4e4);   /* tone-on-tone blue, for link hovers */
+  --rainbow:linear-gradient(#2c5494,#2c5494);   /* tone-on-tone blue, for link hovers */
   --net-size:1700px;
   color-scheme:light;
 }
@@ -183,7 +183,7 @@ section{padding-block:clamp(90px,16vh,180px)}
 /* the word banner: cream medialoop wordmarks gliding right to left on a blue-on-blue band, tilted 10 degrees
    (lower on the left, higher on the right), with a little gold dot between each one */
 .wband{position:absolute;left:-15vw;right:-15vw;top:50%;height:var(--bh);transform:translateY(-50%) rotate(-5deg);overflow:hidden;
-  background:linear-gradient(100deg,#1d3866 0%,#2c5494 30%,#3a63a8 52%,#24477f 76%,#1d3866 100%);background-size:200% 100%;animation:wbg 24s ease-in-out infinite alternate}
+  background:#2c5494;background-size:200% 100%;animation:wbg 24s ease-in-out infinite alternate}
 @keyframes wbg{to{background-position:100% 0}}
 .wtrack{position:absolute;left:0;top:0;bottom:0;display:flex;align-items:center;will-change:transform}
 .wtrack .wm{flex:none;height:calc(100% - clamp(12px,1.4vw,20px));aspect-ratio:4278/1185;background:var(--cream);-webkit-mask:url(assets/medialoop-wordmark.svg) center/contain no-repeat;mask:url(assets/medialoop-wordmark.svg) center/contain no-repeat}
@@ -210,7 +210,7 @@ section{padding-block:clamp(90px,16vh,180px)}
    which sits bottom-left in tight, bold Inter with the role below. They turn gold and lean on hover. */
 .people{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:clamp(12px,1.6vw,24px);align-items:start;padding-bottom:clamp(30px,4vw,60px)}   /* landscape cards: three across on wide screens, two on tablets, one on phones */
 .card{position:relative;overflow:hidden;aspect-ratio:16/10;border-radius:clamp(14px,1.4vw,20px);display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;
-  padding:clamp(14px,1.6vw,22px);text-align:left;color:var(--cream);background-color:var(--blue);background-image:linear-gradient(165deg,#2c5494 0%,#2c5494 40%,#27508f 72%,#1d3866 100%);
+  padding:clamp(14px,1.6vw,22px);text-align:left;color:var(--cream);background-color:var(--blue);background-image:linear-gradient(#2c5494,#2c5494);
   transition:transform .45s cubic-bezier(.2,.7,.2,1),background-color .35s,color .35s}
 .card canvas.cnet{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 a.card{text-decoration:none}
@@ -254,7 +254,7 @@ a.card{text-decoration:none}
 @media (max-width:1000px){.ev-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.ev-cards{grid-template-columns:1fr}}
 .ev{display:flex;flex-direction:column;min-height:clamp(250px,24vw,330px);padding:clamp(20px,2vw,28px);border-radius:clamp(14px,1.4vw,20px);color:var(--cream);
-  background:linear-gradient(165deg,#2c5494 0%,#2c5494 40%,#27508f 72%,#1d3866 100%);box-shadow:none;transition:transform .45s cubic-bezier(.2,.7,.2,1),background .35s,color .35s}
+  background:#2c5494;box-shadow:none;transition:transform .45s cubic-bezier(.2,.7,.2,1),background .35s,color .35s}
 .ev:nth-child(1){--hr:-2deg}.ev:nth-child(2){--hr:1.5deg}.ev:nth-child(3){--hr:-1deg}.ev:nth-child(4){--hr:2deg}
 .ev:hover{transform:translateY(-8px) rotate(var(--hr));background:var(--cream);color:var(--blue)}
 .ev-when{margin:0 0 auto;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
@@ -353,8 +353,8 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
   transform:scale(var(--sc,1)) rotate(var(--rot,0deg));transition:box-shadow .4s, filter .3s;box-shadow:none}
 .res > *{position:relative}
 .res canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.r-blue{background:linear-gradient(160deg,#3a6ab6,#2c5494 50%,#1f3f73);color:var(--cream)}
-.r-blue2{background:linear-gradient(200deg,#3a6ab6,#2c5494 55%,#1f3f73);color:var(--cream)}
+.r-blue{background:#2c5494;color:var(--cream)}
+.r-blue2{background:#2c5494;color:var(--cream)}
 .r-egg{background:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}   /* mauve */
 .r-lav{background:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#152b4f}   /* rose */
 .r-sage{background:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262);color:var(--cream)}   /* lagoon teal */
@@ -363,7 +363,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .r-orange .r-kind::before{background:var(--blue)}
 .r-gold{background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--ink)}
 .r-cream{background:var(--cream);color:var(--blue)}
-.r-ink{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
+.r-ink{background:#2c5494;color:var(--cream)}
 .r-top{position:relative;height:var(--strip);display:flex;justify-content:space-between;align-items:center;gap:16px}
 /* once a card is covered, its strip shows the card's name, so the whole pile stays readable */
 .r-mini{position:absolute;left:0;top:50%;translate:0 -50%;font-weight:700;font-size:clamp(18px,1.7vw,24px);letter-spacing:-.022em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 90px);opacity:0;transition:opacity .35s}
@@ -411,8 +411,8 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .ap-go{margin-top:clamp(20px,3vh,30px);font-size:15px;font-weight:600;padding:.65em 1.3em;border-radius:99px;background:var(--blue);color:var(--cream);transition:transform .35s cubic-bezier(.3,1.6,.5,1),filter .3s,background .3s}
 .apply:hover .ap-go,.apply:focus-visible .ap-go{transform:translateX(4px);filter:brightness(.92)}
 /* the Apply card takes a random colour from the palette on each visit (set in the script) */
-.apply.a-blue{background:linear-gradient(160deg,#3a6ab6,#2c5494 50%,#1f3f73);color:var(--cream)}
-.apply.a-deep{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
+.apply.a-blue{background:#2c5494;color:var(--cream)}
+.apply.a-deep{background:#2c5494;color:var(--cream)}
 .apply.a-plum{background:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}
 .apply.a-blue .ap-t,.apply.a-deep .ap-t,.apply.a-plum .ap-t{color:var(--cream)}
 .apply.a-blue .ap-kind::before,.apply.a-deep .ap-kind::before,.apply.a-plum .ap-kind::before{background:var(--gold)}
@@ -656,7 +656,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, w, h);
     // the gradient: exactly the recipe of the net beside the logo, centred on the visible part of the blot
     const R = Math.max(rx * .6, 120), size = R * 2.6 * dpr, gx = (ax - rx * .55) * dpr, gy = (ay + ry * .5) * dpr;
-    g.fillStyle = '#3a63a8'; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#2c5494'; g.fillRect(0, 0, w, h);
     for (const q of BLUES) {
       const ang = q.a + time * q.sp, dd = size * q.d * (1 + .25 * Math.sin(time * .21 + q.a));
       const px = gx + Math.cos(ang) * dd, py = gy + Math.sin(ang) * dd * (ry / rx * 2.2), rad = size * q.s * (1 + .15 * Math.sin(time * .27 + q.a * 2));
@@ -742,7 +742,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const off = ((wb.x % wb.unit) + wb.unit) % wb.unit;
     wTrack.style.transform = `translateX(${-off}px)`;
   }
-  const RIB_BLUES = ['#1d3866', '#3a63a8', '#5b82c6', '#24477f', '#4870b6'];
+  const RIB_BLUES = ['#2c5494', '#2c5494', '#2c5494', '#2c5494', '#2c5494'];
   const SC = 1.17;                                            // dot size: as big as possible while keeping a cream line between them
   function ribPaint(time) {
     if (ribC.parentNode.dataset.band === 'blur') { blurPaint(time); return; }
@@ -762,7 +762,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       const size = R * 2.6;
       // tone-on-tone blues, drawn in a stretched space so they fill the whole oval
       g.setTransform(dpr * A, 0, 0, dpr, dpr * cx * (1 - A), 0); g.globalCompositeOperation = 'source-over';
-      g.fillStyle = '#3a63a8'; g.fillRect(cx - size / 2, cyy - size / 2, size, size);
+      g.fillStyle = '#2c5494'; g.fillRect(cx - size / 2, cyy - size / 2, size, size);
       for (const q of BLUES) {
         const ang = q.a + time * q.sp + p * 2.4 * (q.sp > 0 ? 1 : -1), dd = size * .5 * q.d * (1 + .25 * Math.sin(time * .21 + q.a));
         const px = cx + Math.cos(ang) * dd, py = cyy + Math.sin(ang) * dd, rad = size * .5 * q.s * (1 + .15 * Math.sin(time * .27 + q.a * 2));
@@ -847,12 +847,12 @@ button,input,select,textarea,optgroup{font-family:inherit}
     el.innerHTML = `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" style="display:block;width:100%;height:100%;overflow:visible"><path d="${d}Z" fill="currentColor"/></svg>`;
   };
   document.querySelectorAll('.blob').forEach(b => vecBlob(b));
-  const pal = ['#5b82c6', '#9bb4e4', '#3a63a8', '#d3def2'];
+  const pal = ['#2c5494', '#2c5494', '#2c5494', '#2c5494'];
   document.querySelectorAll('.photo').forEach((a, i) => {
     shape(a, 0, 2.4, 1);
     const p = () => `${Math.round(15 + rnd() * 70)}% ${Math.round(15 + rnd() * 70)}%`;
     const c1 = pal[i % 4], c2 = pal[(i + 2) % 4];
-    a.style.background = `radial-gradient(circle at ${p()}, #9bb4e4 0, transparent 60%), radial-gradient(circle at ${p()}, #d3def2 0, transparent 55%), #5b82c6`;
+    a.style.background = `#2c5494`;
   });
 
   /* ---------- About statement: words fill in as you read ---------- */
@@ -876,11 +876,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const OFF = document.createElement('canvas'), octx = OFF.getContext('2d');
   const ENV = document.createElement('canvas'), ectx = ENV.getContext('2d');
   const BLUES = [                                         // colour, angle, distance, size, speed
-    { c: '#1d3866', a: .4,  d: .26, s: .34, sp:  .11 },
+    { c: '#2c5494', a: .4,  d: .26, s: .34, sp:  .11 },
     { c: '#2c5494', a: 2.2, d: .18, s: .36, sp: -.08 },
-    { c: '#5b82c6', a: 3.9, d: .24, s: .32, sp:  .09 },
-    { c: '#9bb4e4', a: 5.1, d: .28, s: .26, sp: -.12 },
-    { c: '#d3def2', a: 1.3, d: .30, s: .18, sp:  .14 }
+    { c: '#2c5494', a: 3.9, d: .24, s: .32, sp:  .09 },
+    { c: '#2c5494', a: 5.1, d: .28, s: .26, sp: -.12 },
+    { c: '#2c5494', a: 1.3, d: .30, s: .18, sp:  .14 }
   ];
   const AUB0 = Math.random() * 600;   // a fresh starting point each visit, so the aubergine never opens in the same spot
   const WANDER = t => (t += AUB0, [.7 * Math.cos(t * .19 + .5) + .3 * Math.cos(t * .53 + 2), .7 * Math.sin(t * .23 + 1.7) + .3 * Math.sin(t * .61)]);   // the aubergine roams the whole net, so it turns up somewhere new each time
@@ -1025,7 +1025,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       { const cap = Math.ceil(s2 / 96) * 96; if (OFF.width < s2 || OFF.width > cap + 192) { OFF.width = OFF.height = ENV.width = ENV.height = cap; } }   // resize the scratch canvases only in steps, not every frame as the net breathes
       octx.globalCompositeOperation = 'source-over'; octx.clearRect(0, 0, s2, s2);
       // tone-on-tone blue: five blues drift and trade places
-      octx.fillStyle = '#3a63a8'; octx.fillRect(0, 0, s2, s2);
+      octx.fillStyle = '#2c5494'; octx.fillRect(0, 0, s2, s2);
       for (const p of BLUES) {
         const ang = p.a + time * p.sp, dd = s2 * p.d * (1 + .25 * Math.sin(time * .21 + p.a));
         const px = s2 / 2 + Math.cos(ang) * dd, py = s2 / 2 + Math.sin(ang) * dd, rad = s2 * p.s * (1 + .15 * Math.sin(time * .27 + p.a * 2));
@@ -1372,9 +1372,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const lb = bgx; lb.setTransform(1 / bq, 0, 0, 1 / bq, 0, 0);
     const g0 = lb.createLinearGradient(W / 2 - gx, H / 2 - gy, W / 2 + gx, H / 2 + gy);
     // every shade below is the logo's blue (#2c5494), only lighter or darker: same hue, nothing else mixed in
-    g0.addColorStop(0, '#142643'); g0.addColorStop(.28, '#1e3a66'); g0.addColorStop(.52, '#2c5494'); g0.addColorStop(.76, '#1e3a66'); g0.addColorStop(1, '#142643');
+    g0.addColorStop(0, '#2c5494'); g0.addColorStop(.28, '#2c5494'); g0.addColorStop(.52, '#2c5494'); g0.addColorStop(.76, '#2c5494'); g0.addColorStop(1, '#2c5494');
     lb.fillStyle = g0; lb.fillRect(0, 0, W, H);
-    const pools = [['#2c5494', 'c0', 2.2, -.08], ['#3a6ab6', 'b0', 3.9, .09], ['#6a8ec8', '80', 5.1, -.12], ['#a5b9d9', '55', 1.3, .14], ['#142643', '90', AUB0, .1]];
+    const pools = [['#2c5494', 'c0', 2.2, -.08], ['#2c5494', 'b0', 3.9, .09], ['#2c5494', '80', 5.1, -.12], ['#2c5494', '55', 1.3, .14], ['#2c5494', '90', AUB0, .1]];
     pools.forEach(([c, al, a0, sp], i) => {
       const ang = a0 + time * sp * 4, px = W * (.5 + .42 * Math.cos(ang)), py = H * (.5 + .4 * Math.sin(ang * 1.3 + i)), rad = Math.max(W, H) * (i === 4 ? .4 : .5);
       const gr = lb.createRadialGradient(px, py, 0, px, py, rad); gr.addColorStop(0, c + al); gr.addColorStop(1, c + '00'); lb.fillStyle = gr; lb.fillRect(0, 0, W, H);
@@ -1721,10 +1721,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .ab-pill summary::-webkit-details-marker{display:none}
 .about-grid .ab-pill h3{margin:0;font-weight:700;font-size:clamp(28px,3.4vw,48px);letter-spacing:-.04em;line-height:1.05}
 .ab-pill > p{position:relative;z-index:1;margin:0;padding:0 clamp(22px,3vw,34px) 32px;max-width:52ch;font-size:clamp(18px,1.7vw,23px);line-height:1.42;letter-spacing:-.01em}
-.ab-b1{background:linear-gradient(100deg,#4775c0,#3a6ab6 55%,#2f5ea6)}
-.ab-b2{background:linear-gradient(100deg,#3a6ab6,#2c5494 60%,#2a5190)}
-.ab-b3{background:linear-gradient(100deg,#2c5494,#24477f 60%,#213f74)}
-.ab-b4{background:linear-gradient(100deg,#24477f,#1d3866 60%,#152b4f)}
+.ab-b1{background:#2c5494}
+.ab-b2{background:#2c5494}
+.ab-b3{background:#2c5494}
+.ab-b4{background:#2c5494}
 .ab-pill .pm{position:relative;flex:none;width:48px;height:46px;display:grid;place-items:center;background:var(--gold);color:var(--ink);
   border-radius:63% 37% 54% 46%/42% 61% 39% 58%;animation:abBlob 6s ease-in-out infinite;transition:rotate .45s cubic-bezier(.3,1.6,.5,1),scale .3s}
 /* a slightly wobbly, hand-drawn plus; turned 45 degrees it becomes the close cross */
@@ -1826,7 +1826,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .hm-marq .pill.f-crete-it{font-style:italic}
 /* the events title: cream letters on a deep-blue highlighter band, one band per line, tilted a touch, so it stands out on the gold */
 .ev-h{line-height:1.42 !important;rotate:-1.2deg;transform-origin:left center;letter-spacing:-.022em !important;max-width:15ch !important}
-.ev-h .ev-hl{background:linear-gradient(100deg,#2c5494,#1d3866);color:var(--cream);padding:0 .2em .04em;border-radius:.14em .26em .18em .22em;
+.ev-h .ev-hl{background:#2c5494;color:var(--cream);padding:0 .2em .04em;border-radius:.14em .26em .18em .22em;
   -webkit-box-decoration-break:clone;box-decoration-break:clone;box-shadow:none}
 </style>
 <script>
@@ -1900,7 +1900,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 /* publications: hovering a paper inverts the row to blue with cream type (in place of the underline) */
 /* the blue runs the full width of the window, side to side */
 .pubs a,.r-list a{position:relative;isolation:isolate;transition:padding .35s ease,color .3s}
-.pubs a::before,.r-list a::before{content:"";position:absolute;top:0;bottom:0;left:-100vw;right:-100vw;z-index:-1;background:linear-gradient(100deg,#3a6ab6,#2c5494 50%,#24477f);opacity:0;transition:opacity .3s}
+.pubs a::before,.r-list a::before{content:"";position:absolute;top:0;bottom:0;left:-100vw;right:-100vw;z-index:-1;background:#2c5494;opacity:0;transition:opacity .3s}
 .pubs a:hover::before,.pubs a:focus-visible::before,.r-list a:hover::before,.r-list a:focus-visible::before{opacity:1}
 .pubs a:not([href])::before{display:none}
 .pubs a:hover,.pubs a:focus-visible,.r-list a:hover,.r-list a:focus-visible{color:var(--cream) !important;padding-left:14px}
@@ -1919,7 +1919,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 #contact .mail::after{content:"";width:.85em;height:.85em;flex:none;background:currentColor;-webkit-mask:url(assets/arrow.svg) center/contain no-repeat;mask:url(assets/arrow.svg) center/contain no-repeat}
 #contact .mail-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
 /* the LinkedIn button: blue with cream type, so it sits beside the gold email button without competing */
-#contact .mail.mail-li{color:var(--cream);background:linear-gradient(160deg,#3a6ab6,#2c5494 55%,#1f3f73)}
+#contact .mail.mail-li{color:var(--cream);background:#2c5494}
 #contact .mail.mail-li:hover,#contact .mail.mail-li:focus-visible{transform:translateY(-3px) rotate(1.5deg)}
 </style>
 <style>
