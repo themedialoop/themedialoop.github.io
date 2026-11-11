@@ -65,7 +65,7 @@
   --blue:#2c5494;       /* type, logo */
   --blue-soft:#2c549466;/* rules, muted text */
   --ink:#1d3866;        /* hover / pressed blue */
-  --pink:#d8719f;       /* small accents only */
+  --pink:#d8708e;       /* small accents only */
   --font:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --step--1:clamp(.8rem,.76rem + .2vw,.9rem);
   --step-0:clamp(1rem,.95rem + .25vw,1.15rem);
@@ -355,10 +355,12 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .res canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .r-blue{background:linear-gradient(160deg,#3a6ab6,#2c5494 50%,#1f3f73);color:var(--cream)}
 .r-blue2{background:linear-gradient(200deg,#3a6ab6,#2c5494 55%,#1f3f73);color:var(--cream)}
-.r-egg{background:linear-gradient(160deg,#6b4a6e,#57385a 55%,#3f2742);color:var(--cream)}   /* dusky plum */
-.r-lav{background:linear-gradient(160deg,#cfc3dd,#bfb1d2 55%,#a998c0);color:var(--blue)}   /* lavender mist */
-.r-sage{background:linear-gradient(160deg,#d8de9c,#ccd389 55%,#b5bd6c);color:var(--blue)}   /* sage chartreuse */
-.r-sage .r-kind::before{background:var(--blue)}
+.r-egg{background:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}   /* mauve */
+.r-lav{background:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#152b4f}   /* rose */
+.r-sage{background:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262);color:var(--cream)}   /* lagoon teal */
+.r-sage .r-kind::before{background:var(--gold)}
+.r-orange{background:linear-gradient(160deg,#e8884d,#e0773a 55%,#cf6630);color:#152b4f}   /* orange, a sprinkle */
+.r-orange .r-kind::before{background:var(--blue)}
 .r-gold{background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--ink)}
 .r-cream{background:var(--cream);color:var(--blue)}
 .r-ink{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
@@ -381,7 +383,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
    light cards (lavender, sage, cream): blue type, blue dot, blue button with cream type
    hovering only nudges the button sideways and deepens it a little; it never swaps to another colour */
 .res .r-go{background:var(--gold);color:var(--ink)}
-.r-gold .r-go,.r-lav .r-go,.r-sage .r-go,.r-cream .r-go{background:var(--blue);color:var(--cream)}
+.r-gold .r-go,.r-lav .r-go,.r-cream .r-go,.r-orange .r-go{background:var(--blue);color:var(--cream)}
 .r-lav .r-kind::before,.r-cream .r-kind::before{background:var(--blue)}
 .res:hover .r-go,.res:focus-visible .r-go{transform:translateX(4px);filter:brightness(.92)}
 @media (max-width:560px){.res{min-height:0}.r-name{font-size:clamp(34px,11vw,48px)}}
@@ -411,13 +413,13 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 /* the Apply card takes a random colour from the palette on each visit (set in the script) */
 .apply.a-blue{background:linear-gradient(160deg,#3a6ab6,#2c5494 50%,#1f3f73);color:var(--cream)}
 .apply.a-deep{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
-.apply.a-plum{background:linear-gradient(160deg,#6b4a6e,#57385a 55%,#3f2742);color:var(--cream)}
+.apply.a-plum{background:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}
 .apply.a-blue .ap-t,.apply.a-deep .ap-t,.apply.a-plum .ap-t{color:var(--cream)}
 .apply.a-blue .ap-kind::before,.apply.a-deep .ap-kind::before,.apply.a-plum .ap-kind::before{background:var(--gold)}
 .apply.a-blue .ap-go,.apply.a-deep .ap-go,.apply.a-plum .ap-go{background:var(--gold);color:var(--ink)}
 .apply.a-blue:hover .ap-go,.apply.a-deep:hover .ap-go,.apply.a-plum:hover .ap-go{background:var(--gold);color:var(--ink);filter:brightness(.92)}
-.apply.a-lav{background:linear-gradient(160deg,#cfc3dd,#bfb1d2 55%,#a998c0)}
-.apply.a-sage{background:linear-gradient(160deg,#d8de9c,#ccd389 55%,#b5bd6c)}
+.apply.a-lav{background:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#152b4f}
+.apply.a-sage{background:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262)}
 @media (prefers-reduced-motion:reduce){.apply,.ap-go{transition:none}}
 
 /* section headings: a small kicker with a gold dot above a big, bold, tight heading that ends in a gold full stop
@@ -434,9 +436,9 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 @media (prefers-reduced-motion:reduce){.label .lt{opacity:1;translate:none;transition:none}.label .stop{transform:none;transition:none}}
 
 /* a small surprise: on each visit a few cards light up in lavender or plum instead of their usual hover colour */
-.people .card.s-lav:hover,.ev.s-lav:hover{background-color:#bfb1d2;background-image:linear-gradient(160deg,#cfc3dd,#bfb1d2 55%,#a998c0);color:var(--blue)}
-.people .card.s-chart:hover,.ev.s-chart:hover{background-color:#ccd389;background-image:linear-gradient(160deg,#d8de9c,#ccd389 55%,#b5bd6c);color:var(--ink)}
-.people .card.s-plum:hover,.ev.s-plum:hover{background-color:#57385a;background-image:linear-gradient(160deg,#6b4a6e,#57385a 55%,#3f2742);color:var(--cream)}
+.people .card.s-lav:hover,.ev.s-lav:hover{background-color:#d8708e;background-image:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#152b4f}
+.people .card.s-chart:hover,.ev.s-chart:hover{background-color:#1f7373;background-image:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262);color:var(--cream)}
+.people .card.s-plum:hover,.ev.s-plum:hover{background-color:#8a5a96;background-image:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}
 .pubs a:not([href]){cursor:default}
 /* every piece of text on the site is Inter */
 button,input,select,textarea,optgroup{font-family:inherit}
@@ -526,9 +528,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
       <a class="res r-blue" href="https://docs.google.com/document/d/11GHs-22nEN9UNJ3MVLq-V8ZS8MVtG2FGaQ7hOCoL7hk/edit?usp=sharing" target="_blank" rel="noopener" style="--i:0"><canvas aria-hidden="true"></canvas><span class="r-top"><span class="r-kind">Scale</span><span class="r-mini" aria-hidden="true">Survey Measures</span><span class="r-n">01 / 06</span></span><span class="r-name">Survey Measures</span><span class="r-desc">Our primary survey measure is the Perceived Algorithm Responsiveness and Insensitivity Scale. This 15-item scale measures two variables: perceived algorithm responsiveness (PAR) and perceived algorithm insensitivity (PAI). It is validated for Facebook, Twitter, TikTok and Instagram; more information is in our Social Media + Society publication.</span><span class="r-go">Get the scale</span></a>
       <a class="res r-gold" href="https://osf.io/uvwr6/" target="_blank" rel="noopener" style="--i:1"><canvas aria-hidden="true"></canvas><span class="r-top"><span class="r-kind">Open materials</span><span class="r-mini" aria-hidden="true">Open Science Materials</span><span class="r-n">02 / 06</span></span><span class="r-name">Open Science Materials</span><span class="r-desc">For many studies you can find the preregistration, survey or experiment materials, data and code on the Open Science Framework. If you are looking for a specific scale or procedure used in our research, start here. If it doesn&rsquo;t make sense, we can answer any questions.</span><span class="r-go">Go to OSF</span></a>
       <a class="res r-ink" href="https://github.com/cornellsml/truman" target="_blank" rel="noopener" style="--i:2"><canvas aria-hidden="true"></canvas><span class="r-top"><span class="r-kind">Social Media Experiments</span><span class="r-mini" aria-hidden="true">The Original Social Media Simulation</span><span class="r-n">03 / 06</span></span><span class="r-name">The Original Social Media Simulation</span><span class="r-desc">Truman is a fake social networking site where participants are randomly assigned to conditions when they sign up, and interact with pre-programmed bots the researcher controls. Everything needed to replicate our experiments or run your own is on GitHub. Using Truman takes technical skills, especially JavaScript; more is in our CHI and CSCW papers.</span><span class="r-go">View on GitHub</span></a>
-      <a class="res r-lav" href="https://drive.google.com/drive/folders/1oiKRhQYJuxW4Vn5SB--9bD0lMGeieQBE?usp=sharing" target="_blank" rel="noopener" style="--i:3"><canvas aria-hidden="true"></canvas><span class="r-top"><span class="r-kind">Talks</span><span class="r-mini" aria-hidden="true">Conference Presentations</span><span class="r-n">04 / 06</span></span><span class="r-name">Conference Presentations</span><span class="r-desc">A folder of slides from past conference presentations, colloquiums and job talks. Sometimes our presentations are described as odd or unique, which we love. We think you should develop your own voice in presenting your research. Use these as ideas.</span><span class="r-go">Open the folder</span></a>
-      <a class="res r-sage" href="https://drive.google.com/drive/folders/1oiKRhQYJuxW4Vn5SB--9bD0lMGeieQBE?usp=sharing" target="_blank" rel="noopener" style="--i:4"><canvas aria-hidden="true"></canvas><span class="r-top"><span class="r-kind">Posters</span><span class="r-mini" aria-hidden="true">Poster Presentations</span><span class="r-n">05 / 06</span></span><span class="r-name">Poster Presentations</span><span class="r-desc">A few poster presentations to serve as inspiration for others. Less is more here. Posters make for more intimate conversations about your research, so they are very up our alley. Design them to invite conversation. Some of our best connections have come during a poster session.</span><span class="r-go">Open the folder</span></a>
-      <a class="res r-egg" href="https://drive.google.com/drive/folders/1Q8nxloq3sJVYmZVH6bLl9iFaxhOrnXH9?usp=sharing" target="_blank" rel="noopener" style="--i:5"><canvas aria-hidden="true"></canvas><span class="r-top"><span class="r-kind">Papers</span><span class="r-mini" aria-hidden="true">Research publications</span><span class="r-n">06 / 06</span></span><span class="r-name">Research publications</span><span class="r-desc">As our little gift, we are trying to get as many preprints posted online as possible. We reformatted them into our style, but the content is identical. We are starting with the harder-to-get articles, like book chapters. You can find them linked to our Research webpage. Email us if you cannot find an article. Never, ever pay for one of our articles.</span><span class="r-go">Open the folder</span></a>
+      <a class="res r-blue2" href="https://drive.google.com/drive/folders/1oiKRhQYJuxW4Vn5SB--9bD0lMGeieQBE?usp=sharing" target="_blank" rel="noopener" style="--i:3"><canvas aria-hidden="true"></canvas><span class="r-top"><span class="r-kind">Talks</span><span class="r-mini" aria-hidden="true">Conference Presentations</span><span class="r-n">04 / 06</span></span><span class="r-name">Conference Presentations</span><span class="r-desc">A folder of slides from past conference presentations, colloquiums and job talks. Sometimes our presentations are described as odd or unique, which we love. We think you should develop your own voice in presenting your research. Use these as ideas.</span><span class="r-go">Open the folder</span></a>
+      <a class="res r-orange" href="https://drive.google.com/drive/folders/1oiKRhQYJuxW4Vn5SB--9bD0lMGeieQBE?usp=sharing" target="_blank" rel="noopener" style="--i:4"><canvas aria-hidden="true"></canvas><span class="r-top"><span class="r-kind">Posters</span><span class="r-mini" aria-hidden="true">Poster Presentations</span><span class="r-n">05 / 06</span></span><span class="r-name">Poster Presentations</span><span class="r-desc">A few poster presentations to serve as inspiration for others. Less is more here. Posters make for more intimate conversations about your research, so they are very up our alley. Design them to invite conversation. Some of our best connections have come during a poster session.</span><span class="r-go">Open the folder</span></a>
+      <a class="res r-gold" href="https://drive.google.com/drive/folders/1Q8nxloq3sJVYmZVH6bLl9iFaxhOrnXH9?usp=sharing" target="_blank" rel="noopener" style="--i:5"><canvas aria-hidden="true"></canvas><span class="r-top"><span class="r-kind">Papers</span><span class="r-mini" aria-hidden="true">Research publications</span><span class="r-n">06 / 06</span></span><span class="r-name">Research publications</span><span class="r-desc">As our little gift, we are trying to get as many preprints posted online as possible. We reformatted them into our style, but the content is identical. We are starting with the harder-to-get articles, like book chapters. You can find them linked to our Research webpage. Email us if you cannot find an article. Never, ever pay for one of our articles.</span><span class="r-go">Open the folder</span></a>
     </div>
   </section>
 </div>
@@ -1142,7 +1144,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     a: i / 44 * Math.PI * 2 + Math.sin(i * 7.1) * .3, r0: .62 + (i * .37 % 1) * .35, d: (i * .61 % 1) * .3,
     ea: i * 2.4, er: .12 + (i * .53 % 1) * .5, bend: (i % 2 ? 1 : -1) * (.04 + (i * .29 % 1) * .08),
     s: 6 + (i * .71 % 1) * 12, sx: .88 + (i * .43 % 1) * .26, rot: i, ph: i * 1.7,
-    c: ['#e7aa4d', '#e7aa4d', '#f2eedd', '#9bb4e4', '#e7aa4d', '#d3def2'][i % 6] }));
+    c: ['#e7aa4d', '#e7aa4d', '#f2eedd', '#e0773a', '#e7aa4d', '#d8708e'][i % 6] }));
   /* the opener's wordmark: the net's own bubbles gather and morph into the word. Bubbles near the word are matched to
      points along its strokes; they glide in and swell along the letters, then the crisp cream wordmark comes into focus
      over them and they melt away beneath it. The rest of the net draws back to leave clear blue around the letters. */
@@ -1621,7 +1623,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
         card.classList.toggle('covered', cover > .3);
         const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
         const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
-        g.fillStyle = card.classList.contains('r-cream') || card.classList.contains('r-lav') || card.classList.contains('r-sage') ? 'rgba(44,84,148,.85)' : card.classList.contains('r-gold') ? 'rgb(242,238,221)' : 'rgb(242,238,221)';
+        g.fillStyle = card.classList.contains('r-cream') || card.classList.contains('r-lav') || card.classList.contains('r-orange') ? 'rgba(44,84,148,.85)' : card.classList.contains('r-gold') ? 'rgb(242,238,221)' : 'rgb(242,238,221)';
         const boxes = [...card.querySelectorAll('.r-name, .r-desc, .r-go, .r-kind, .r-n')].map(e => { const b = e.getBoundingClientRect(); return [(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr]; });
         const NS = NETS[n % NETS.length], T = (isMobile() ? 700 : 1000) * dpr * NS.k, k = T / TILE, ox = n * 137 * dpr, mob = isMobile(), asp = w / h;
         for (let ty = -1; ty * T < h + T; ty++) for (let tx = -1; tx * T < w + T; tx++) for (const hh of holes) {
@@ -1652,13 +1654,13 @@ button,input,select,textarea,optgroup{font-family:inherit}
   /* the Apply card: breathing cream net on its right side, clear of the words */
   { const ap = document.querySelector('.apply'), cv = ap && ap.querySelector('canvas');
     // the Apply card's colour is picked at random from these (never sage or lavender: the cream UIC mark gets lost on them)
-    const AC = ['a-gold', 'a-blue', 'a-deep', 'a-plum'], ac = AC[Math.floor(Math.random() * AC.length)]; if (ap) ap.classList.add(ac);
+    const AC = ['a-gold', 'a-blue', 'a-gold', 'a-blue', 'a-deep', 'a-plum'], ac = AC[Math.floor(Math.random() * AC.length)]; if (ap) ap.classList.add(ac);
     // the UIC mark sits on the same line as the "More information" button: centred on it vertically
     const apUic = ap && ap.querySelector('.ap-uic'), apGo = ap && ap.querySelector('.ap-go');
     const placeUic = () => { if (!apUic || !apUic.isConnected || !apGo) return; apUic.style.bottom = 'auto';
       apUic.style.top = (apGo.offsetTop + apGo.offsetHeight / 2 - apUic.offsetHeight / 2) + 'px'; };
     if (apUic) { apUic.complete ? placeUic() : apUic.addEventListener('load', placeUic); addEventListener('resize', placeUic); document.fonts && document.fonts.ready.then(placeUic); }
-    const apInk = ['a-lav', 'a-sage'].includes(ac) ? 'rgba(44,84,148,.85)' : 'rgb(242,238,221)';
+    const apInk = ['a-lav'].includes(ac) ? 'rgba(44,84,148,.85)' : 'rgb(242,238,221)';
     const drawAp = time => { if (!cv || !holes.length) return; const r = ap.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
       const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
       const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h); g.fillStyle = apInk;
@@ -1673,7 +1675,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 
   /* each visit, roughly one card in four quietly swaps its hover colour for lavender mist or dusky plum */
   { const pool = [...document.querySelectorAll('.people .card, .ev')];
-    pool.forEach(el => { if (Math.random() < .26) el.classList.add(Math.random() < .5 ? 's-lav' : 's-plum'); });
+    pool.forEach(el => { if (Math.random() < .12) el.classList.add(Math.random() < .5 ? 's-lav' : 's-plum'); });
     if (pool.length) { const one = pool[Math.floor(Math.random() * pool.length)]; one.classList.remove('s-lav', 's-plum'); one.classList.add('s-chart'); } }   // and exactly one card glows sorbet chartreuse
 
   /* entrances: a gentle, staggered fade-and-rise as things come into view */
@@ -1803,17 +1805,17 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .hm-marq .c-gold{background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--ink)}
 .hm-marq .c-deep{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
 .hm-marq .c-cream{background:#e9e2c9;color:var(--blue)}   /* the pill cream: a shade off the page cream, so the pill still shows */
-.hm-marq .c-lav{background:linear-gradient(160deg,#cfc3dd,#bfb1d2 55%,#a998c0);color:var(--blue)}
-.hm-marq .c-sage{background:linear-gradient(160deg,#d8de9c,#ccd389 55%,#b5bd6c);color:var(--ink)}
-.hm-marq .c-plum{background:linear-gradient(160deg,#6b4a6e,#57385a 55%,#3f2742);color:var(--cream)}
+.hm-marq .c-lav{background:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#152b4f}
+.hm-marq .c-sage{background:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262);color:var(--cream)}
+.hm-marq .c-plum{background:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}
 .hm-marq .pill.t-gold{color:var(--gold)}
-.hm-marq .pill.t-plum{color:#57385a}
-.hm-marq .pill.t-sage{color:#ccd389}
+.hm-marq .pill.t-plum{color:#774a83}
+.hm-marq .pill.t-sage{color:#e0773a}
 /* used very sparingly: mist blue (the blue, lightened) and mauve (the plum, lifted), as rare pills and now and then as words on the darker pills */
-.hm-marq .c-mist{background:linear-gradient(160deg,#c3d1e7,#afc1de 55%,#94a9cf);color:var(--deep, #1d3866)}
-.hm-marq .c-mauve{background:linear-gradient(160deg,#b087b3,#a173a5 55%,#875d8b);color:var(--cream)}
-.hm-marq .pill.t-mist{color:#afc1de}
-.hm-marq .pill.t-mauve{color:#a173a5}
+.hm-marq .c-mist{background:linear-gradient(160deg,#e8884d,#e0773a 55%,#cf6630);color:#152b4f}
+.hm-marq .c-mauve{background:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}
+.hm-marq .pill.t-mist{color:#e3869f}
+.hm-marq .pill.t-mauve{color:#e3869f}
 /* now and then a word in another face: Cormorant Garamond (an elegant old-style serif, set bigger because it runs small) or Figtree (a friendly sans);
    each word gets its own weight from what that face offers (Cormorant 300-700, Figtree 300-900), sometimes in italic */
 .hm-marq .pill.f-corm{font-family:'Cormorant Garamond',serif;font-weight:var(--fw) !important;letter-spacing:0;font-size:calc(clamp(19px,2.15vw,30px) * 1.28);line-height:1;padding:.5em 1em .54em}
@@ -1841,19 +1843,19 @@ button,input,select,textarea,optgroup{font-family:inherit}
   // shuffle the research terms together and deal them back out across the first three rows, so themes don't cluster
   { const all = ROWS.flat(); for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
     const per = Math.ceil(all.length / 4); for (let r = 0; r < 4; r++) ROWS[r] = all.slice(r * per, (r + 1) * per); }
-  const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-cream', 'c-lav', 'c-plum'];
+  const PAL = ['c-blue', 'c-gold', 'c-blue', 'c-cream', 'c-gold', 'c-deep'];
   // one word in each row in Cormorant Garamond and one in Figtree (about 5% each), different words each visit
   const fw = (lo, hi) => ' f-w' + (lo + 100 * Math.floor(Math.random() * ((hi - lo) / 100 + 1)));   // a random weight the face actually has
   const faces = n => { const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * (n - 1)); if (b >= a) b++; return i => { if (i === a) return ' f-corm' + fw(300, 700); if (i === b) return ' f-fig' + fw(300, 900); const r = Math.random(); return r < .03 ? ' f-crete' : r < .05 ? ' f-crete-it' : ''; }; };   // plus about 3% Crete Round and 2% Crete Round italic, at random
   // gold and deep blue pills a little less often: about a third of them hand their turn to one of the other colours
-  const lessGD = c => /gold|deep/.test(c) && Math.random() < .35 ? ['c-blue', 'c-lav', 'c-plum', 'c-mist', 'c-mauve'][Math.floor(Math.random() * 5)] : c;
+  const lessGD = c => /gold|deep/.test(c) && Math.random() < .35 ? ['c-blue', 'c-cream', 'c-blue', 'c-lav', 'c-blue'][Math.floor(Math.random() * 5)] : c;
   // green and plum never meet: no plum words on green, no green words on plum, and never a green pill right next to a plum one
   const unGP = row => { const ps = [...row.querySelectorAll('.pill')]; for (let i = 1; i < ps.length; i++) { const a = ps[i - 1].classList, b = ps[i].classList; if ((a.contains('c-sage') && b.contains('c-plum')) || (a.contains('c-plum') && b.contains('c-sage'))) b.replace(b.contains('c-plum') ? 'c-plum' : 'c-sage', 'c-blue'); } };   // also where a row repeats
   let lastCol = '';
   const noGP = c => { if ((c === 'c-sage' && lastCol === 'c-plum') || (c === 'c-plum' && lastCol === 'c-sage')) c = 'c-blue'; lastCol = c; return c; };
   const tcol = c => { const r = Math.random();   // blue pills: gold words, sometimes mist blue (and mauve on the deep blue); gold: plum only rarely; green: never plum; plum: always cream
     if (c === 'c-deep') return r < .25 ? ' t-gold' : r < .33 ? ' t-mist' : r < .42 ? ' t-mauve' : '';
-    if (c === 'c-blue') return r < .27 ? ' t-gold' : r < .37 ? ' t-mist' : '';
+    if (c === 'c-blue') return r < .27 ? ' t-gold' : '';
     if (c === 'c-gold') return r < .02 ? ' t-plum' : '';
     return ''; };
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
@@ -1865,7 +1867,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const face = faces(set.length);
     const one = set.map((t, fi) => { const fun = t[0] === '*', w = fun ? t.slice(1) : t;
       // sage chartreuse turns up only very rarely, as a little surprise
-      const cr = Math.random(), col = noGP(cr < .12 ? 'c-sage' : cr < .20 ? 'c-mist' : cr < .28 ? 'c-mauve' : lessGD(PAL[k % PAL.length])), light = /cream|lav|gold|sage|mist/.test(col);
+      const cr = Math.random(), col = noGP(cr < .04 ? 'c-sage' : cr < .08 ? 'c-mist' : cr < .11 ? 'c-mauve' : lessGD(PAL[k % PAL.length])), light = /cream|lav|gold|mist/.test(col);
       // the thinnest weights only on the darker pills, so they stay readable
       let wt = pick(fun ? WTB : WT); if (light && wt < 300) wt = 300; const it = Math.random() < .35;
       const dot = Math.random() < .3 ? '<span class="gdot" aria-hidden="true"></span>' + (Math.random() < .45 ? '<img class="gmark" src="assets/medialoop-wordmark.svg" alt="" aria-hidden="true">' : '') : '';   // a gold dot, and after about 45% of them the medialoop logo
