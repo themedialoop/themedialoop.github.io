@@ -2005,22 +2005,23 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const cards = [...res.map(el => ({ el, kind: 'res' })), ...evs.map(el => ({ el, kind: 'ev' })), ...(ap ? [{ el: ap, kind: 'ap' }] : [])]; if (!cards.length) return;
   // each dot: anchored to an edge (r/l, t/b), offset from it and sized in units of the card (its height, capped on narrow cards)
   // c: main (cream on dark cards, blue on light ones), second, dark (a deeper shade of the card), gold, sprinkle
+  // the arrangements: each dot is anchored to an edge (r/l, t/b), offset from it and sized in units of the card.
+  // Some are one or two big moons; others are bubbles, totems, stepping stones, cherries and confetti.
   const OPTS = [
-    { name: 'corner moon', res: [{ ax: 'r', x: .16, ay: 't', y: -.125, s: 1.31, c: 'main' }], ev: [{ ax: 'r', x: .08, ay: 't', y: -.14, s: .78, c: 'main' }] },
-    { name: 'two moons', res: [{ ax: 'r', x: .2, ay: 't', y: -.16, s: 1.0, c: 'main' }, { ax: 'r', x: .1, ay: 'b', y: .12, s: .46, c: 'second' }],
-      ev: [{ ax: 'r', x: .08, ay: 't', y: -.12, s: .62, c: 'main' }, { ax: 'r', x: .0, ay: 'b', y: .06, s: .34, c: 'second' }] },
-    { name: 'rising sun', res: [{ ax: 'r', x: .17, ay: 'b', y: -.28, s: 1.47, c: 'main' }], ev: [{ ax: 'r', x: .12, ay: 'b', y: -.42, s: 1.1, c: 'main' }] },
-    { name: 'gold sun', res: [{ ax: 'r', x: .125, ay: 't', y: .19, s: 1.125, c: 'gold' }], ev: [{ ax: 'r', x: .06, ay: 't', y: -.11, s: .72, c: 'gold' }] },
-    { name: 'neighbours', res: [{ ax: 'r', x: .36, ay: 't', y: .12, s: .66, c: 'main' }, { ax: 'r', x: .03, ay: 'b', y: .1, s: .62, c: 'second' }],
-      ev: [{ ax: 'r', x: .2, ay: 't', y: -.1, s: .5, c: 'main' }, { ax: 'r', x: -.02, ay: 't', y: .3, s: .3, c: 'second' }] },
-    { name: 'eclipse', res: [{ ax: 'r', x: .14, ay: 't', y: .42, s: 1.15, c: 'dark' }, { ax: 'r', x: .62, ay: 't', y: -.04, s: .24, c: 'main' }],
-      ev: [{ ax: 'r', x: .04, ay: 't', y: -.08, s: .66, c: 'dark' }, { ax: 'r', x: .42, ay: 't', y: -.02, s: .14, c: 'main' }] },
-    { name: 'half moon', res: [{ ax: 'r', x: -.03, ay: 't', y: .5, s: 1.125, c: 'main' }], ev: [{ ax: 'r', x: 0, ay: 't', y: .23, s: .53, c: 'main' }] },
-    { name: 'sprinkle', res: [{ ax: 'r', x: .16, ay: 't', y: -.125, s: 1.31, c: 'main' }, { ax: 'r', x: .5, ay: 'b', y: .18, s: .16, c: 'sprinkle' }],
-      ev: [{ ax: 'r', x: .08, ay: 't', y: -.14, s: .78, c: 'main' }, { ax: 'r', x: .45, ay: 't', y: .3, s: .1, c: 'sprinkle' }] },
-    { name: 'deep breath', deep: true, res: [{ ax: 'r', x: .2, ay: 't', y: -.16, s: 1.0, c: 'main' }, { ax: 'r', x: .1, ay: 'b', y: .12, s: .46, c: 'second' }],
-      ev: [{ ax: 'r', x: .1, ay: 'b', y: -.22, s: .66, c: 'main' }, { ax: 'r', x: .36, ay: 't', y: -.06, s: .26, c: 'second' }] },
-    { name: 'peek', res: [{ ax: 'r', x: .5, ay: 't', y: -.34, s: 1.19, c: 'main' }], ev: [{ ax: 'r', x: .33, ay: 't', y: -.23, s: .84, c: 'main' }] }
+    { name: "corner moon", res: [{"ax":"r","x":0.16,"ay":"t","y":-0.125,"s":1.31,"c":"main"}], ev: [{"ax":"r","x":0.08,"ay":"t","y":-0.14,"s":0.78,"c":"main"}] },
+    { name: "two moons", res: [{"ax":"r","x":0.2,"ay":"t","y":-0.16,"s":1.0,"c":"main"},{"ax":"r","x":0.1,"ay":"b","y":0.12,"s":0.46,"c":"main"}], ev: [{"ax":"r","x":0.08,"ay":"t","y":-0.12,"s":0.62,"c":"main"},{"ax":"r","x":0,"ay":"b","y":0.06,"s":0.34,"c":"main"}] },
+    { name: "rising sun", res: [{"ax":"r","x":0.17,"ay":"b","y":-0.28,"s":1.47,"c":"main"}], ev: [{"ax":"r","x":0.12,"ay":"b","y":-0.42,"s":1.1,"c":"main"}] },
+    { name: "half moon", res: [{"ax":"r","x":-0.03,"ay":"t","y":0.5,"s":1.125,"c":"main"}], ev: [{"ax":"r","x":0,"ay":"t","y":0.23,"s":0.53,"c":"main"}] },
+    { name: "peek", res: [{"ax":"r","x":0.5,"ay":"t","y":-0.34,"s":1.19,"c":"main"}], ev: [{"ax":"r","x":0.33,"ay":"t","y":-0.23,"s":0.84,"c":"main"}] },
+    { name: "eclipse", res: [{"ax":"r","x":0.14,"ay":"t","y":0.42,"s":1.15,"c":"dark"},{"ax":"r","x":0.62,"ay":"t","y":-0.04,"s":0.24,"c":"main"}], ev: [{"ax":"r","x":0.04,"ay":"t","y":-0.08,"s":0.66,"c":"dark"},{"ax":"r","x":0.42,"ay":"t","y":-0.02,"s":0.14,"c":"main"}] },
+    { name: "moon and moonlet", res: [{"ax":"r","x":0.12,"ay":"t","y":-0.2,"s":1.1,"c":"main"},{"ax":"r","x":0.78,"ay":"t","y":0.22,"s":0.09,"c":"main"}], ev: [{"ax":"r","x":0.05,"ay":"t","y":-0.15,"s":0.6,"c":"main"},{"ax":"r","x":0.5,"ay":"t","y":0.08,"s":0.07,"c":"main"}] },
+    { name: "bubbles", res: [{"ax":"r","x":0.02,"ay":"b","y":-0.12,"s":0.8,"c":"main"},{"ax":"r","x":0.5,"ay":"b","y":0.5,"s":0.3,"c":"main"},{"ax":"r","x":0.24,"ay":"t","y":0.2,"s":0.2,"c":"main"},{"ax":"r","x":0.58,"ay":"t","y":0.1,"s":0.11,"c":"main"},{"ax":"r","x":0.78,"ay":"t","y":0.34,"s":0.07,"c":"main"}], ev: [{"ax":"r","x":0.02,"ay":"t","y":-0.1,"s":0.42,"c":"main"},{"ax":"r","x":0.3,"ay":"t","y":0.24,"s":0.18,"c":"main"},{"ax":"r","x":0.5,"ay":"t","y":0.08,"s":0.1,"c":"main"},{"ax":"r","x":0.12,"ay":"t","y":0.42,"s":0.07,"c":"main"}] },
+    { name: "totem", res: [{"ax":"r","x":0.12,"ay":"t","y":0.2,"s":0.36,"c":"main"},{"ax":"r","x":0.14,"ay":"t","y":0.58,"s":0.28,"c":"main"},{"ax":"r","x":0.1,"ay":"t","y":0.88,"s":0.22,"c":"main"}], ev: [{"ax":"r","x":0.1,"ay":"t","y":0.12,"s":0.22,"c":"main"},{"ax":"r","x":0.12,"ay":"t","y":0.38,"s":0.17,"c":"main"},{"ax":"r","x":0.06,"ay":"t","y":0.6,"s":0.12,"c":"main"}] },
+    { name: "stepping stones", res: [{"ax":"r","x":0.02,"ay":"b","y":0.02,"s":0.46,"c":"main"},{"ax":"r","x":0.5,"ay":"b","y":-0.02,"s":0.32,"c":"main"},{"ax":"r","x":0.86,"ay":"b","y":0.04,"s":0.22,"c":"main"},{"ax":"r","x":1.15,"ay":"b","y":-0.01,"s":0.15,"c":"main"}], ev: [{"ax":"r","x":0.02,"ay":"b","y":-0.06,"s":0.3,"c":"main"},{"ax":"r","x":0.36,"ay":"t","y":0.06,"s":0.2,"c":"main"},{"ax":"r","x":0.62,"ay":"t","y":-0.02,"s":0.12,"c":"main"}] },
+    { name: "cherries", res: [{"ax":"r","x":0.22,"ay":"t","y":0.32,"s":0.5,"c":"main"},{"ax":"r","x":0.72,"ay":"t","y":0.62,"s":0.42,"c":"main"},{"ax":"r","x":0.5,"ay":"t","y":0.02,"s":0.16,"c":"main"}], ev: [{"ax":"r","x":0.1,"ay":"t","y":0.12,"s":0.3,"c":"main"},{"ax":"r","x":0.42,"ay":"t","y":0.26,"s":0.22,"c":"main"},{"ax":"r","x":0.26,"ay":"t","y":-0.02,"s":0.1,"c":"main"}] },
+    { name: "confetti", res: [{"ax":"r","x":0.1,"ay":"t","y":0.15,"s":0.28,"c":"main"},{"ax":"r","x":0.48,"ay":"t","y":0.3,"s":0.16,"c":"main"},{"ax":"r","x":0.22,"ay":"t","y":0.62,"s":0.2,"c":"main"},{"ax":"r","x":0.62,"ay":"t","y":0.78,"s":0.12,"c":"main"},{"ax":"r","x":0.05,"ay":"b","y":0.06,"s":0.14,"c":"main"},{"ax":"r","x":0.78,"ay":"t","y":0.06,"s":0.09,"c":"main"}], ev: [{"ax":"r","x":0.08,"ay":"t","y":0.1,"s":0.2,"c":"main"},{"ax":"r","x":0.34,"ay":"t","y":0.26,"s":0.12,"c":"main"},{"ax":"r","x":0.16,"ay":"t","y":0.42,"s":0.09,"c":"main"},{"ax":"r","x":0.5,"ay":"t","y":0.04,"s":0.08,"c":"main"}] },
+    { name: "big three", res: [{"ax":"r","x":0.55,"ay":"t","y":-0.38,"s":0.9,"c":"main"},{"ax":"r","x":-0.25,"ay":"t","y":0.5,"s":0.8,"c":"main"},{"ax":"r","x":0.45,"ay":"b","y":-0.4,"s":0.85,"c":"main"}], ev: [{"ax":"r","x":0.4,"ay":"t","y":-0.3,"s":0.6,"c":"main"},{"ax":"r","x":-0.2,"ay":"t","y":0.4,"s":0.5,"c":"main"}] },
+    { name: "sprinkle", res: [{"ax":"r","x":0.16,"ay":"t","y":-0.125,"s":1.31,"c":"main"},{"ax":"r","x":0.5,"ay":"b","y":0.18,"s":0.16,"c":"sprinkle"}], ev: [{"ax":"r","x":0.08,"ay":"t","y":-0.14,"s":0.78,"c":"main"},{"ax":"r","x":0.45,"ay":"t","y":0.3,"s":0.1,"c":"sprinkle"}] },
   ];
   const CREAM = '#f2eedd', BLUE = '#2c5494', GOLD = '#e7aa4d';
   // colours per card: [main, second, dark]. Every card keeps cream, blue and gold apart from the card itself
@@ -2048,9 +2049,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (own === 'teal') banned.add('mauve'); if (own === 'mauve') banned.add('teal');
     const hv = cd.el.classList; if (hv.contains('s-lav')) banned.add('pink'); if (hv.contains('s-chart')) banned.add('teal'); if (hv.contains('s-plum')) banned.add('mauve');
     const used = [];
-    const draw = () => { const pool = Object.keys(COLS).filter(k => !banned.has(k) && !used.includes(k) && !(used.includes('teal') && k === 'mauve') && !(used.includes('mauve') && k === 'teal'));
+    const draw = () => { if (!Object.keys(COLS).some(k => !banned.has(k) && !used.includes(k))) used.length = 0; const pool = Object.keys(COLS).filter(k => !banned.has(k) && !used.includes(k) && !(used.includes('teal') && k === 'mauve') && !(used.includes('mauve') && k === 'teal'));
       let r = Math.random() * pool.reduce((a, k) => a + W8[k], 0); for (const k of pool) { r -= W8[k]; if (r <= 0) { used.push(k); return COLS[k]; } } used.push(pool[0]); return COLS[pool[0]]; };
-    cd.dots = opt[cd.kind === 'ap' ? 'res' : cd.kind].map(d => {
+    const flip = cd.kind !== 'ev' && Math.random() < .5;   // half the wide cards get their arrangement upside down
+    cd.dots = opt[cd.kind === 'ap' ? 'res' : cd.kind].map(d0 => { const d = flip ? { ...d0, ay: d0.ay === 't' ? 'b' : 't' } : d0;
       const el = document.createElement('div'), col = d.c === 'dark' && Math.random() < .5 ? P[2] : draw();
       el.className = 'mdot' + (col === CREAM ? ' k-cream' : col === GOLD ? ' k-gold' : '');
       el.style.background = col; el.style.borderRadius = blob();
