@@ -1868,7 +1868,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       const cr = Math.random(), col = noGP(cr < .12 ? 'c-sage' : cr < .20 ? 'c-mist' : cr < .28 ? 'c-mauve' : lessGD(PAL[k % PAL.length])), light = /cream|lav|gold|sage|mist/.test(col);
       // the thinnest weights only on the darker pills, so they stay readable
       let wt = pick(fun ? WTB : WT); if (light && wt < 300) wt = 300; const it = Math.random() < .35;
-      const dot = Math.random() < .18 ? '<span class="gdot" aria-hidden="true"></span><img class="gmark" src="assets/medialoop-wordmark.svg" alt="" aria-hidden="true">' : '';   // a gold dot, then the medialoop logo
+      const dot = Math.random() < .18 ? '<span class="gdot" aria-hidden="true"></span>' + (Math.random() < .33 ? '<img class="gmark" src="assets/medialoop-wordmark.svg" alt="" aria-hidden="true">' : '') : '';   // a gold dot, and after about a third of them the medialoop logo
       k++; return '<span class="pill ' + col + tcol(col) + face(fi) + (fun ? ' fun' : '') + (it ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + w + '</span>' + dot; }).join('');
     row.innerHTML = one.repeat(5); unGP(row); box.appendChild(row); return { row, dir: r % 2 ? 1 : -1, w: 0, x: Math.random() };
   });
