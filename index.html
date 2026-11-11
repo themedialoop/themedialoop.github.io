@@ -545,7 +545,6 @@ button,input,select,textarea,optgroup{font-family:inherit}
   </div>
   <a class="apply" href="https://comm.uic.edu/academics/graduate-studies/prospective-students/" target="_blank" rel="noopener">
     <canvas aria-hidden="true"></canvas>
-    <img class="ap-uic" src="assets/uic-mark-cream.png" alt="University of Illinois Chicago" onerror="this.remove()">
     <span class="ap-kind">Graduate admissions</span>
     <span class="ap-h">Apply</span>
     <span class="ap-t">We are housed with the Department of Communication at the University of Illinois Chicago. Potential graduate students for PhD programs and Master's degrees are welcome to apply for the upcoming admissions cycle.</span>
@@ -1984,156 +1983,133 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .ab-pill a.ab-inl:hover,.ab-pill a.ab-inl:focus-visible{color:var(--gold)}
 </style>
 <style>
-/* resource, event and Apply cards: big dots instead of the net. Each dot is one of the net's own holes, blown up, so the
-   dots look lifted out of the net. Thirteen arrangements; each card gets its own, chosen so that what shows after the dots make room for the words still looks different from every other card. The dots stay put and
-   breathe exactly like the holes of the net: a slow swell and shrink that ripples out from the middle of the card. They are big and run off the card's edges, but never touch one another, the words or the UIC mark. */
+/* resource, event and Apply cards: a Kusama net on the edges of each card. The net is solid colour (mostly gold on blue,
+   blue on gold, with cream, orange, pink and purple now and then) and its holes are cut through to the card, so the
+   holes are the card's own colour. Four placements (corner, right edge, bottom sweep, two corners) spread across the
+   cards. The net stays still and its holes breathe like the big net. The net never reaches the words. */
 .res canvas,.ev > .ev-cv,.apply > canvas{display:none}
 .res .r-n{display:none}
-.mdots{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0}
-.res > .mdots,.ev > .mdots,.apply > .mdots{position:absolute}
-.mdots canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .6s}
-.mdots.on canvas{opacity:1}
+.knet{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0}
+.res > .knet,.ev > .knet,.apply > .knet{position:absolute}
+.knet canvas{position:absolute;inset:0;width:100%;height:100%;display:block !important;opacity:0;transition:opacity .6s}
+.knet.on canvas{opacity:1}
 </style>
 <script>
 (() => {
   const res = [...document.querySelectorAll('.res-stack .res')], evs = [...document.querySelectorAll('.ev-cards .ev')], ap = document.querySelector('.apply');
   const cards = [...res.map(el => ({ el, kind: 'res' })), ...evs.map(el => ({ el, kind: 'ev' })), ...(ap ? [{ el: ap, kind: 'ap' }] : [])]; if (!cards.length) return;
-  // the arrangements: each dot is anchored to an edge (r/l, t/b), offset from it and sized in units of the card.
-  // Some are one or two big moons; others are bubbles, totems, stepping stones, cherries and confetti.
-  const OPTS = [
-    { name: "corner moon", res: [{"ax":"r","x":0.16,"ay":"t","y":-0.125,"s":1.31,"c":"main"}], ev: [{"ax":"r","x":0.08,"ay":"t","y":-0.14,"s":0.78,"c":"main"}] },
-    { name: "two moons", res: [{"ax":"r","x":0.2,"ay":"t","y":-0.16,"s":1.0,"c":"main"},{"ax":"r","x":0.1,"ay":"b","y":0.12,"s":0.46,"c":"main"}], ev: [{"ax":"r","x":0.08,"ay":"t","y":-0.12,"s":0.62,"c":"main"},{"ax":"r","x":0,"ay":"b","y":0.06,"s":0.34,"c":"main"}] },
-    { name: "rising sun", res: [{"ax":"r","x":0.17,"ay":"b","y":-0.28,"s":1.47,"c":"main"}], ev: [{"ax":"r","x":0.12,"ay":"b","y":-0.42,"s":1.1,"c":"main"}] },
-    { name: "half moon", res: [{"ax":"r","x":-0.03,"ay":"t","y":0.5,"s":1.125,"c":"main"}], ev: [{"ax":"r","x":0,"ay":"t","y":0.23,"s":0.53,"c":"main"}] },
-    { name: "peek", res: [{"ax":"r","x":0.5,"ay":"t","y":-0.34,"s":1.19,"c":"main"}], ev: [{"ax":"r","x":0.33,"ay":"t","y":-0.23,"s":0.84,"c":"main"}] },
-    { name: "eclipse", res: [{"ax":"r","x":0.14,"ay":"t","y":0.42,"s":1.15,"c":"dark"},{"ax":"r","x":0.62,"ay":"t","y":-0.04,"s":0.24,"c":"main"}], ev: [{"ax":"r","x":0.04,"ay":"t","y":-0.08,"s":0.66,"c":"dark"},{"ax":"r","x":0.42,"ay":"t","y":-0.02,"s":0.14,"c":"main"}] },
-    { name: "moon and moonlet", res: [{"ax":"r","x":0.12,"ay":"t","y":-0.2,"s":1.1,"c":"main"},{"ax":"r","x":0.78,"ay":"t","y":0.22,"s":0.09,"c":"main"}], ev: [{"ax":"r","x":0.05,"ay":"t","y":-0.15,"s":0.6,"c":"main"},{"ax":"r","x":0.5,"ay":"t","y":0.08,"s":0.07,"c":"main"}] },
-    { name: "bubbles", res: [{"ax":"r","x":0.02,"ay":"b","y":-0.12,"s":0.8,"c":"main"},{"ax":"r","x":0.5,"ay":"b","y":0.5,"s":0.3,"c":"main"},{"ax":"r","x":0.24,"ay":"t","y":0.2,"s":0.2,"c":"main"},{"ax":"r","x":0.58,"ay":"t","y":0.1,"s":0.11,"c":"main"},{"ax":"r","x":0.78,"ay":"t","y":0.34,"s":0.07,"c":"main"}], ev: [{"ax":"r","x":0.02,"ay":"t","y":-0.1,"s":0.42,"c":"main"},{"ax":"r","x":0.3,"ay":"t","y":0.24,"s":0.18,"c":"main"},{"ax":"r","x":0.5,"ay":"t","y":0.08,"s":0.1,"c":"main"},{"ax":"r","x":0.12,"ay":"t","y":0.42,"s":0.07,"c":"main"}] },
-    { name: "totem", res: [{"ax":"r","x":0.12,"ay":"t","y":0.2,"s":0.36,"c":"main"},{"ax":"r","x":0.14,"ay":"t","y":0.58,"s":0.28,"c":"main"},{"ax":"r","x":0.1,"ay":"t","y":0.88,"s":0.22,"c":"main"}], ev: [{"ax":"r","x":0.1,"ay":"t","y":0.12,"s":0.22,"c":"main"},{"ax":"r","x":0.12,"ay":"t","y":0.38,"s":0.17,"c":"main"},{"ax":"r","x":0.06,"ay":"t","y":0.6,"s":0.12,"c":"main"}] },
-    { name: "stepping stones", res: [{"ax":"r","x":0.02,"ay":"b","y":0.02,"s":0.46,"c":"main"},{"ax":"r","x":0.5,"ay":"b","y":-0.02,"s":0.32,"c":"main"},{"ax":"r","x":0.86,"ay":"b","y":0.04,"s":0.22,"c":"main"},{"ax":"r","x":1.15,"ay":"b","y":-0.01,"s":0.15,"c":"main"}], ev: [{"ax":"r","x":0.02,"ay":"b","y":-0.06,"s":0.3,"c":"main"},{"ax":"r","x":0.36,"ay":"t","y":0.06,"s":0.2,"c":"main"},{"ax":"r","x":0.62,"ay":"t","y":-0.02,"s":0.12,"c":"main"}] },
-    { name: "cherries", res: [{"ax":"r","x":0.22,"ay":"t","y":0.32,"s":0.5,"c":"main"},{"ax":"r","x":0.72,"ay":"t","y":0.62,"s":0.42,"c":"main"},{"ax":"r","x":0.5,"ay":"t","y":0.02,"s":0.16,"c":"main"}], ev: [{"ax":"r","x":0.1,"ay":"t","y":0.12,"s":0.3,"c":"main"},{"ax":"r","x":0.42,"ay":"t","y":0.26,"s":0.22,"c":"main"},{"ax":"r","x":0.26,"ay":"t","y":-0.02,"s":0.1,"c":"main"}] },
-    { name: "confetti", res: [{"ax":"r","x":0.1,"ay":"t","y":0.15,"s":0.28,"c":"main"},{"ax":"r","x":0.48,"ay":"t","y":0.3,"s":0.16,"c":"main"},{"ax":"r","x":0.22,"ay":"t","y":0.62,"s":0.2,"c":"main"},{"ax":"r","x":0.62,"ay":"t","y":0.78,"s":0.12,"c":"main"},{"ax":"r","x":0.05,"ay":"b","y":0.06,"s":0.14,"c":"main"},{"ax":"r","x":0.78,"ay":"t","y":0.06,"s":0.09,"c":"main"}], ev: [{"ax":"r","x":0.08,"ay":"t","y":0.1,"s":0.2,"c":"main"},{"ax":"r","x":0.34,"ay":"t","y":0.26,"s":0.12,"c":"main"},{"ax":"r","x":0.16,"ay":"t","y":0.42,"s":0.09,"c":"main"},{"ax":"r","x":0.5,"ay":"t","y":0.04,"s":0.08,"c":"main"}] },
-    { name: "big three", res: [{"ax":"r","x":0.55,"ay":"t","y":-0.38,"s":0.9,"c":"main"},{"ax":"r","x":-0.25,"ay":"t","y":0.5,"s":0.8,"c":"main"},{"ax":"r","x":0.45,"ay":"b","y":-0.4,"s":0.85,"c":"main"}], ev: [{"ax":"r","x":0.4,"ay":"t","y":-0.3,"s":0.6,"c":"main"},{"ax":"r","x":-0.2,"ay":"t","y":0.4,"s":0.5,"c":"main"}] },
-  ];
-  const CREAM = '#f2eedd', BLUE = '#2c5494', GOLD = '#e7aa4d';
-  // colours per card: [main, second, dark]. Every card keeps cream, blue and gold apart from the card itself
-  const PAL = { blue: [CREAM, GOLD, '#1d3866'], gold: [CREAM, BLUE, '#d0923a'], rose: [BLUE, CREAM, '#c25a79'], orange: [BLUE, CREAM, '#c9642b'],
-                teal: [CREAM, GOLD, '#1f7373'], mauve: [CREAM, GOLD, '#82558e'], cream: [BLUE, GOLD, '#e6e0c8'] };
-  const palOf = el => { const c = el.classList, h = k => c.contains(k);
+  const BLUE = '#2c5494', GOLD = '#e7aa4d', CREAM = '#f2eedd', ORANGE = '#e0773a', PINK = '#d8708e', MAUVE = '#9b6aa6';
+  // which net colours suit each card colour; the first is the usual one, the rest turn up now and then
+  const fam = el => { const c = el.classList, h = k => c.contains(k);
     return h('r-gold') || h('a-gold') ? 'gold' : h('r-lav') || h('a-lav') ? 'rose' : h('r-orange') ? 'orange' : h('r-sage') || h('a-sage') ? 'teal'
-      : h('r-egg') || h('a-plum') ? 'mauve' : h('r-cream') ? 'cream' : el.classList.contains('apply') && !c.contains('a-blue') && !c.contains('a-deep') ? 'gold' : 'blue'; };
-  const COLS = { blue: BLUE, gold: GOLD, cream: CREAM, orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', mauve: '#9b6aa6' };
-  const W8 = { blue: 3, gold: 3, cream: 3, orange: 2, pink: 2, teal: 1.5, mauve: 1.5 };
-  const FAM = { blue: 'blue', gold: 'gold', rose: 'pink', orange: 'orange', teal: 'teal', mauve: 'mauve', cream: 'cream' };
+      : h('r-egg') || h('a-plum') ? 'mauve' : el.classList.contains('apply') && !h('a-blue') && !h('a-deep') ? 'gold' : 'blue'; };
+  const NETS = { blue: [[GOLD, 6], [CREAM, 2], [ORANGE, 1], [PINK, 1]], gold: [[BLUE, 6], [MAUVE, 1.5], [PINK, 1]], rose: [[BLUE, 4], [CREAM, 1.5]],
+                 orange: [[BLUE, 4], [CREAM, 1.5]], teal: [[GOLD, 3], [CREAM, 2]], mauve: [[GOLD, 3], [CREAM, 2]] };
+  const pickW = l => { let r = Math.random() * l.reduce((a, x) => a + x[1], 0); for (const x of l) { r -= x[1]; if (r <= 0) return x[0]; } return l[0][0]; };
 
-  // the net's own hole shapes, so every dot is a hole lifted out of the net
-  let HOLES = [];
-  const holesReady = (window.NET_HOLES ? Promise.resolve(window.NET_HOLES) : fetch('assets/net-holes.json').then(r => r.json())).then(j => {
-    const sc = j.scale;
-    HOLES = j.holes.map(h => { const pts = []; for (let i = 2; i < h.length; i += 2) pts.push([h[i] / sc, h[i + 1] / sc]);
+  // where the net sits. Each gives 0..1 for a point on a card w×h; narrow cards (taller than wide-ish) use a smaller patch
+  const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const MASK = {
+    corner: (x, y, w, h, n) => 1 - sm(.5, 1, n ? Math.hypot((w - x) / (w * .62), y / (h * .46)) : Math.hypot((w - x) / (h * 1.3), y / (h * 1.05))),
+    right: (x, y, w, h, n) => { if (n) return 1 - sm(.5, 1, Math.hypot((w - x) / (w * .42), (y - h * .12) / (h * .32))); const wob = h * (.2 * Math.sin(y / h * 3.4 + .8) + .1 * Math.sin(y / h * 7.1 + 2)); return sm(w - h * 1.05 + wob, w - h * .3 + wob, x); },   // a wavy inner edge, not a straight one
+    bottom: (x, y, w, h, n) => n ? 1 - sm(.5, 1, Math.hypot((w - x) / (w * .42), (h - y) / (h * .2))) : Math.max(sm(h * .5, h * .95, y) * sm(w * .42, w * .82, x), sm(w - h * .75, w - h * .15, x) * sm(h * .05, h * .75, y)),
+    two: (x, y, w, h, n) => Math.max(MASK.corner(x, y, w, h, n), n ? 1 - sm(.5, 1, Math.hypot((w - x) / (w * .35), (h - y) / (h * .18))) : 1 - sm(.45, 1, Math.hypot((w - x) / (h * .9), (h - y) / (h * .62))))
+  };
+  const PLACES = Object.keys(MASK);
+
+  // the net's own hole shapes
+  let H = [], TILE = 1024;
+  const ready = (window.NET_HOLES ? Promise.resolve(window.NET_HOLES) : fetch('assets/net-holes.json').then(r => r.json())).then(j => {
+    TILE = j.tile; const sc = j.scale;
+    H = j.holes.map(h => { const cx = h[0] / sc, cy = h[1] / sc, pts = []; for (let i = 2; i < h.length; i += 2) pts.push([h[i] / sc, h[i + 1] / sc]);
       const p = new Path2D(), n = pts.length, mid = i => [(pts[i % n][0] + pts[(i + 1) % n][0]) / 2, (pts[i % n][1] + pts[(i + 1) % n][1]) / 2];
       let m = mid(0); p.moveTo(m[0], m[1]); for (let i = 1; i <= n; i++) { const c = pts[i % n], q = mid(i); p.quadraticCurveTo(c[0], c[1], q[0], q[1]); } p.closePath();
-      return { p, rad: Math.max(...pts.map(q => Math.hypot(q[0], q[1]))) }; });
-    for (let i = HOLES.length - 1; i > 0; i--) { const k = Math.floor(Math.random() * (i + 1)); [HOLES[i], HOLES[k]] = [HOLES[k], HOLES[i]]; }
-  }).catch(() => {});
-  let holeN = 0; const nextHole = () => HOLES.length ? HOLES[holeN++ % HOLES.length] : null;   // no two dots on the page share a shape
+      return { cx, cy, p, ph: (cx * 12.9898 + cy * 78.233) % 6.283, rad: Math.max(...pts.map(q => Math.hypot(q[0], q[1]))) }; });
+  });
 
-  // each card gets a canvas to paint its dots on
-  cards.forEach(cd => { const box = document.createElement('div'); box.className = 'mdots'; box.setAttribute('aria-hidden', 'true');
+  // spread the four placements over the cards, and give each card its net colour
+  const order = []; while (order.length < cards.length) { const b = PLACES.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } order.push(...b); }
+  cards.forEach((cd, i) => { cd.place = order[i]; cd.off = [Math.random(), Math.random()]; cd.tileF = .9 + Math.random() * .25;
+    const box = document.createElement('div'); box.className = 'knet'; box.setAttribute('aria-hidden', 'true');
     cd.cv = document.createElement('canvas'); box.appendChild(cd.cv); cd.el.prepend(box); cd.box = box; });
+  // a net never takes the colour behind its card, so where it runs off the edge it never melts into the page:
+  // no cream on the cards that sit on the cream page, no gold on the event cards that sit on the gold band
+  const EV_NETS = { blue: [[CREAM, 4], [ORANGE, 1.5], [PINK, 1.5]] };
+  const colourCard = cd => { const f = fam(cd.el); if (cd.fam !== f) { cd.fam = f;
+    const l = cd.kind === 'ev' ? (EV_NETS[f] || NETS[f] || NETS.blue).filter(x => x[0] !== GOLD) : (NETS[f] || NETS.blue).filter(x => x[0] !== CREAM);
+    cd.net = cd.kind === 'ev' && f === 'blue' ? EV_ORDER[evs.indexOf(cd.el) % EV_ORDER.length] : pickW(l.length ? l : [[BLUE, 1]]); return true; } return false; };
+  // the event cards share their colours out: two cream nets, one orange, one pink, in a fresh order each visit
+  const EV_ORDER = [CREAM, CREAM, ORANGE, PINK]; for (let i = 3; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [EV_ORDER[i], EV_ORDER[j]] = [EV_ORDER[j], EV_ORDER[i]]; }
 
-  // keep the dots off the words, the button, the UIC mark and each other, with clear space all round
-  const sel = { res: '.r-kind, .r-name, .r-desc, .r-go, .r-mini', ev: 'h3, p', ap: '.ap-kind, .ap-h, .ap-t, .ap-go' };
-  const rectsOf = cd => { const cr = cd.el.getBoundingClientRect(), out = []; const add = b => b.width && out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
+  // the words, buttons and UIC mark the net keeps away from
+  const sel = { res: '.r-kind, .r-name, .r-desc, .r-mini', ev: 'h3, p', ap: '.ap-kind, .ap-h, .ap-t' };
+  const rectsOf = (cd, cr) => { const out = []; const add = b => b.width && out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
     cd.el.querySelectorAll(sel[cd.kind]).forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(add); });
     cd.el.querySelectorAll('.r-go, .ap-go, .ap-uic').forEach(e => add(e.getBoundingClientRect()));
-    return { W: cr.width, H: cr.height, rects: out }; };
-  const nearText = (cx, cy, R, rects, pad) => rects.some(([x0, y0, x1, y1]) => Math.hypot(Math.max(0, x0 - cx, cx - x1), Math.max(0, y0 - cy, cy - y1)) < R + pad);
+    return out; };
+  const distTo = (x, y, rects) => { let d = 1e9; for (const [x0, y0, x1, y1] of rects) d = Math.min(d, Math.hypot(Math.max(0, x0 - x, x - x1), Math.max(0, y0 - y, y - y1))); return d; };
 
-  // place one arrangement on a card. Big dots run off the edges; a dot in the way of the words slides further off, then shrinks
-  const place = (cd, oi, flip, m) => {
-    const { W, H, rects } = m, u = Math.min(H, W * (cd.kind === 'ev' ? 1 : .5)), pad = Math.max(16, u * .05), gap = Math.max(14, u * .06), placed = [];
-    let want = 0, got = 0;
-    const spec = OPTS[oi][cd.kind === 'ap' ? 'res' : cd.kind].map(d0 => flip ? { ...d0, ay: d0.ay === 't' ? 'b' : 't' } : d0).sort((a, b) => b.s - a.s);
-    const dots = spec.map(d => {
-      let s = d.s * u * 1.35, x = d.ax === 'r' ? W - d.x * u : d.x * u, y = d.ay === 't' ? d.y * u : H - d.y * u, ok = false;
-      const ex = d.ax === 'r' ? 1 : -1, ey = d.ay === 't' ? -1 : 1; want += s * s;
-      for (let i = 0; i < 60; i++) {
-        const R = s / 2;
-        // a good slice of every dot stays on the card: its centre sits only a little past an edge, so no dot shrinks to a sliver
-        const lx = -.15 * R, hx = W + .15 * R, ly = -.15 * R, hy = H + .15 * R;
-        x = Math.min(hx, Math.max(lx, x)); y = Math.min(hy, Math.max(ly, y));
-        if (!nearText(x, y, R, rects, pad) && placed.every(p => Math.hypot(p.x - x, p.y - y) > p.R + R + gap)) { ok = true; break; }
-        const nx = Math.min(hx, Math.max(lx, x + ex * u * .05)), ny = Math.min(hy, Math.max(ly, y + ey * u * .05));
-        if (Math.abs(nx - x) + Math.abs(ny - y) > 1) { x = nx; y = ny; } else s *= .94; }
-      if (ok) { placed.push({ x, y, R: s / 2 }); got += s * s; }
-      return { d, x, y, s, on: ok };
-    });
-    const vis = dots.filter(d => d.on), big = vis[0];
-    // what the card ends up looking like: how many dots show, and where and how big the biggest one is
-    const sig = vis.length + (big ? (big.x > W * .66 ? 'R' : 'M') + (big.y < H * .4 ? 'T' : big.y > H * .6 ? 'B' : 'C') + (big.s > u * .75 ? 'L' : 'S') : '0');
-    return { dots, keep: want ? got / want : 0, sig };
+  // make the net solid: close narrow slits between the collars (grow, then shrink back), then fill every pocket of card colour
+  // that is cut off from the outside. After this the only card colour inside the net is the holes themselves.
+  const solidify = (g, X0, Y0, W, Hh, r) => {
+    if (W < 4 || Hh < 4) return; const id = g.getImageData(X0, Y0, W, Hh), d = id.data, N = W * Hh, a = new Uint8Array(N), t = new Uint8Array(N);
+    for (let i = 0; i < N; i++) a[i] = d[i * 4 + 3] > 127 ? 1 : 0;
+    const pass = (src, dst, horiz, isMax) => { const outer = horiz ? Hh : W, len = horiz ? W : Hh;
+      for (let o = 0; o < outer; o++) { const q = new Int32Array(len + 1); let qh = 0, qt = 0;
+        for (let j = 0; j < len + r; j++) {
+          if (j < len) { const idx = horiz ? o * W + j : j * W + o, v = src[idx]; while (qt > qh && (isMax ? src[q[qt - 1]] <= v : src[q[qt - 1]] >= v)) qt--; q[qt++] = idx; }
+          const c = j - r; if (c < 0) continue; const lo = c - r;
+          while (qt > qh && (horiz ? q[qh] % W : (q[qh] / W | 0)) < lo) qh++;
+          dst[horiz ? o * W + c : c * W + o] = qt > qh ? src[q[qh]] : 0; } } };
+    pass(a, t, true, true); pass(t, a, false, true); pass(a, t, true, false); pass(t, a, false, false);
+    const seen = new Uint8Array(N), st = []; for (let x = 0; x < W; x++) st.push(x, (Hh - 1) * W + x); for (let y = 0; y < Hh; y++) st.push(y * W, y * W + W - 1);
+    while (st.length) { const i = st.pop(); if (seen[i] || a[i]) continue; seen[i] = 1; const x = i % W; if (x > 0) st.push(i - 1); if (x < W - 1) st.push(i + 1); if (i >= W) st.push(i - W); if (i < N - W) st.push(i + W); }
+    let rr = 0, gg = 0, bb = 0; for (let i = 0; i < N; i++) if (d[i * 4 + 3] === 255) { rr = d[i * 4]; gg = d[i * 4 + 1]; bb = d[i * 4 + 2]; break; }
+    for (let i = 0; i < N; i++) if ((a[i] || !seen[i]) && d[i * 4 + 3] < 255) { d[i * 4] = rr; d[i * 4 + 1] = gg; d[i * 4 + 2] = bb; d[i * 4 + 3] = 255; }
+    g.putImageData(id, X0, Y0); };
+
+  // build a card's net: the solid colour layer (still) and the list of holes to cut through it (these breathe)
+  const build = cd => {
+    const cr = cd.el.getBoundingClientRect(), w = cr.width, h = cr.height; if (!w || !h || !H.length) return;
+    const dpr = Math.min(2, devicePixelRatio || 1), W = Math.round(w * dpr), Hh = Math.round(h * dpr), narrow = w < h * 1.7;
+    const rects = rectsOf(cd, cr), pad = Math.max(18, Math.min(w, h) * .06);
+    const T = Math.max(380, Math.min(1300, (narrow ? w * 2.6 : h * 3.4))) * cd.tileF * dpr, k = T / TILE, ox = cd.off[0] * T, oy = cd.off[1] * T, list = [];
+    for (let ty = -1; ty * T < Hh + T; ty++) for (let tx = -1; tx * T < W + T; tx++) for (const hh of H) {
+      const x = ox + tx * T + hh.cx * k, y = oy + ty * T + hh.cy * k; if (x < -120 || y < -120 || x > W + 120 || y > Hh + 120) continue;
+      let m = MASK[cd.place](x / dpr, y / dpr, w, h, narrow); if (m < .22) continue;
+      // keep well clear of the words: the hole's whole gold collar, plus a margin, must stay off every line of text
+      const room = distTo(x / dpr, y / dpr, rects) - hh.rad * k * 2.5 / dpr - pad * .5; if (room < 0) continue;
+      m = Math.min(m, .22 + room / (pad * 2)); if (m < .22) continue;
+      list.push({ hh, x, y, m: Math.min(1, (m - .22) / .6) }); }
+    const lay = document.createElement('canvas'); lay.width = W; lay.height = Hh; const g = lay.getContext('2d');
+    g.fillStyle = cd.net; let x0 = W, y0 = Hh, x1 = 0, y1 = 0;
+    for (const o of list) { const sc = k * 2.5; g.setTransform(sc, 0, 0, sc, o.x, o.y); g.fill(o.hh.p); x0 = Math.min(x0, o.x - 60 * dpr); y0 = Math.min(y0, o.y - 60 * dpr); x1 = Math.max(x1, o.x + 60 * dpr); y1 = Math.max(y1, o.y + 60 * dpr); }
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    x0 = Math.max(0, Math.floor(x0)); y0 = Math.max(0, Math.floor(y0)); x1 = Math.min(W, Math.ceil(x1)); y1 = Math.min(Hh, Math.ceil(y1));
+    if (list.length) solidify(g, x0, y0, x1 - x0, y1 - y0, Math.round(7 * dpr));
+    cd.lay = lay; cd.k = k; cd.list = list; cd.W = W; cd.H = Hh; cd.cv.width = W; cd.cv.height = Hh; cd.box.classList.add('on');
   };
 
-  // colours: every dot on a card has its own colour from the whole palette, never the card's own colour, never the colour behind
-  // the card where it runs off the edge (cream page, gold events band), never the card's hover colour, never teal with mauve.
-  // The biggest dots are spread across the colours, so neighbouring cards differ. Blue, gold and cream come up most.
-  const BIG = {};
-  const paintColours = cd => {
-    const pal = palOf(cd.el), P = PAL[pal], own = FAM[pal], banned = new Set([own, cd.kind === 'ev' ? 'gold' : 'cream']);
-    if (own === 'teal') banned.add('mauve'); if (own === 'mauve') banned.add('teal');
-    const hv = cd.el.classList; if (hv.contains('s-lav')) banned.add('pink'); if (hv.contains('s-chart')) banned.add('teal'); if (hv.contains('s-plum')) banned.add('mauve');
-    if (cd.bigCol) BIG[cd.bigCol]--;
-    const used = []; let first = true;
-    const draw = () => { if (!Object.keys(COLS).some(k => !banned.has(k) && !used.includes(k))) used.length = 0;
-      const pool = Object.keys(COLS).filter(k => !banned.has(k) && !used.includes(k) && !(used.includes('teal') && k === 'mauve') && !(used.includes('mauve') && k === 'teal'));
-      const wt = k => W8[k] / (first ? 1 + 3 * (BIG[k] || 0) : 1); let r = Math.random() * pool.reduce((a, k) => a + wt(k), 0), g = pool[0];
-      for (const k of pool) { r -= wt(k); if (r <= 0) { g = k; break; } }
-      used.push(g); if (first) { BIG[g] = (BIG[g] || 0) + 1; cd.bigCol = g; first = false; } return COLS[g]; };
-    cd.dots.forEach(dot => { dot.col = dot.d.c === 'dark' && Math.random() < .5 ? P[2] : draw(); });
-  };
-  const finish = (cd, r) => { const old = cd.dots || [];
-    cd.dots = r.dots.map((d, i) => ({ ...d, col: old[i] && old[i].col, hole: (old[i] && old[i].hole) || nextHole(), rot: old[i] ? old[i].rot : Math.random() * Math.PI * 2, ph: old[i] ? old[i].ph : Math.random() * 6.283 }));
-    cd.el._dots = cd.dots; };
-
-  // choose an arrangement for every card: each card its own, and among those, one whose visible result looks unlike any other card's
-  let settled = false;
-  const choose = () => {
-    const used = new Set(), sigs = new Set(); Object.keys(BIG).forEach(k => delete BIG[k]); cards.forEach(cd => { cd.dots = null; cd.bigCol = null; });
-    cards.forEach(cd => { const m = rectsOf(cd); if (!m.W || !m.H) return; let best = null;
-      OPTS.forEach((o, oi) => { if (used.has(oi)) return; [false, true].forEach(flip => { const r = place(cd, oi, flip, m);
-        const score = r.keep + (sigs.has(cd.kind + r.sig) ? 0 : 2) + (r.dots.some(d => d.on) ? 0 : -5) + Math.random() * .4;
-        if (!best || score > best.score) best = { ...r, oi, flip, score }; }); });
-      if (!best) return; used.add(best.oi); sigs.add(cd.kind + best.sig); cd.oi = best.oi; cd.flip = best.flip; finish(cd, best); paintColours(cd); });
-  };
-  // after the first choice, a resize only re-places the same arrangement (same shapes and colours)
-  const layout = () => { if (!settled) choose(); else cards.forEach(cd => { if (cd.oi == null) return; const m = rectsOf(cd); if (m.W && m.H) finish(cd, place(cd, cd.oi, cd.flip, m)); });
-    cards.forEach(cd => { const r = cd.el.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); cd.W = r.width; cd.H = r.height;
-      cd.cv.width = Math.round(cd.W * dpr); cd.cv.height = Math.round(cd.H * dpr); cd.box.classList.add('on'); paint(cd, performance.now() / 1000); }); };
-
-  // the breath: like the net's holes, each dot swells and shrinks every ~7 s, in a ripple running out from the middle of the card
-  const reduceMo = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
+  // each frame: lay the still net down, then cut its holes, which swell and shrink in a ripple from the middle like the big net
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
+  const paint = (cd, time) => { if (!cd.lay) return; const g = cd.cv.getContext('2d'), cx = cd.W / 2, cy = cd.H / 2, R = Math.hypot(cx, cy) || 1;
+    g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, cd.W, cd.H); g.drawImage(cd.lay, 0, 0);
+    g.globalCompositeOperation = 'destination-out'; g.fillStyle = '#000';
+    for (const o of cd.list) { const wave = reduce ? .6 : .5 + .5 * Math.sin(time * .9 - Math.hypot(o.x - cx, o.y - cy) / R * 7 + o.hh.ph * .35);
+      const sc = cd.k * (.72 + .42 * (1 - o.m)) * (.8 + .2 * wave); g.setTransform(sc, 0, 0, sc, o.x, o.y); g.fill(o.hh.p); }
+    g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; };
   if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => es.forEach(e => { const cd = cards.find(c => c.el === e.target); if (cd) e.isIntersecting ? seen.add(cd) : seen.delete(cd); }), { rootMargin: '120px' }); cards.forEach(cd => io.observe(cd.el)); } else cards.forEach(cd => seen.add(cd));
-  const paint = (cd, time) => { if (!cd.dots || !cd.W || !cd.cv.width) return; const g = cd.cv.getContext('2d'), dpr = cd.cv.width / cd.W, cx = cd.W / 2, cy = cd.H / 2, R = Math.hypot(cx, cy) || 1;
-    const hover = cd.kind === 'ev' && cd.el.matches(':hover');
-    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height);
-    cd.dots.forEach(dot => { if (!dot.on) return; if (!dot.hole) dot.hole = nextHole(); if (!dot.hole) return;
-      const wave = reduceMo ? 1 : .5 + .5 * Math.sin(time * .9 - Math.hypot(dot.x - cx, dot.y - cy) / R * 7 + dot.ph * .35);
-      const k = dot.s / 2 / dot.hole.rad * (.86 + .14 * wave), c = Math.cos(dot.rot) * k * dpr, s = Math.sin(dot.rot) * k * dpr;
-      g.fillStyle = hover && dot.col === CREAM ? GOLD : hover && dot.col === GOLD ? BLUE : dot.col;
-      g.setTransform(c, s, -s, c, dot.x * dpr, dot.y * dpr); g.fill(dot.hole.p); });
-    g.setTransform(1, 0, 0, 1, 0, 0); };
   const loop = t => { seen.forEach(cd => paint(cd, t / 1000)); requestAnimationFrame(loop); };
 
-  // the Apply card picks its colour in an earlier script; recolour its dots if that changes
-  if (ap) { const apCard = cards.find(c => c.kind === 'ap'); new MutationObserver(() => { if (apCard.dots) { paintColours(apCard); paint(apCard, performance.now() / 1000); } }).observe(ap, { attributes: true, attributeFilter: ['class'] }); }
-
-  let t; const later = () => { clearTimeout(t); t = setTimeout(layout, 120); };
-  layout();
-  // choose again once the fonts and the page have settled (the words' shapes decide what fits), then keep that choice
-  Promise.all([document.fonts ? document.fonts.ready : 0, new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r)), holesReady]).then(() => { layout(); settled = true; requestAnimationFrame(loop); });
-  addEventListener('resize', later);
-  if ('ResizeObserver' in window) { const ro = new ResizeObserver(() => settled && later()); cards.forEach(cd => ro.observe(cd.el)); }
+  // build the cards one at a time so the page never stalls
+  let queue = [];
+  const work = () => { const cd = queue.shift(); if (!cd) return; colourCard(cd); build(cd); paint(cd, performance.now() / 1000); (window.requestIdleCallback || setTimeout)(work); };
+  const rebuildAll = () => { const idle = !queue.length; queue = cards.slice(); if (idle) work(); };
+  if (ap) { const apCard = cards.find(c => c.kind === 'ap'); new MutationObserver(() => { if (colourCard(apCard)) { queue.push(apCard); if (queue.length === 1) work(); } }).observe(ap, { attributes: true, attributeFilter: ['class'] }); }
+  let t, lastW = innerWidth; const later = () => { clearTimeout(t); t = setTimeout(rebuildAll, 200); };
+  Promise.all([ready, document.fonts ? document.fonts.ready : 0]).then(() => { rebuildAll(); requestAnimationFrame(loop); });
+  addEventListener('load', later);
+  addEventListener('resize', () => { if (innerWidth !== lastW) { lastW = innerWidth; later(); } });
 })();
 </script>
 </body>
