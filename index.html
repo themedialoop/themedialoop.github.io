@@ -1633,7 +1633,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 
   /* event cards: their nets are replaced by big dots (see the dots script at the end) */
 
-  /* the Apply card: breathing cream net on its right side, clear of the words */
+  /* the Apply card: its colour and the UIC mark (its dots are set in the dots script at the end) */
   { const ap = document.querySelector('.apply'), cv = ap && ap.querySelector('canvas');
     // the Apply card's colour is picked at random from these (never sage or lavender: the cream UIC mark gets lost on them)
     const AC = ['a-gold', 'a-blue', 'a-gold', 'a-blue', 'a-plum', 'a-lav'], ac = AC[Math.floor(Math.random() * AC.length)]; if (ap) ap.classList.add(ac);
@@ -1642,18 +1642,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const placeUic = () => { if (!apUic || !apUic.isConnected || !apGo) return; apUic.style.bottom = 'auto';
       apUic.style.top = (apGo.offsetTop + apGo.offsetHeight / 2 - apUic.offsetHeight / 2) + 'px'; };
     if (apUic) { apUic.complete ? placeUic() : apUic.addEventListener('load', placeUic); addEventListener('resize', placeUic); document.fonts && document.fonts.ready.then(placeUic); }
-    const apInk = ['a-lav'].includes(ac) ? 'rgba(44,84,148,.85)' : 'rgb(242,238,221)';
-    const drawAp = time => { if (!cv || !holes.length) return; const r = ap.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
-      const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
-      const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h); g.fillStyle = apInk;
-      const T = (isMobile() ? 700 : 1000) * dpr, k = T / TILE, mob = isMobile();
-      const uic = ap.querySelector('.ap-uic'), ur = uic && uic.getBoundingClientRect(), ucx = uic ? (ur.left + ur.width / 2 - r.left) * dpr : 0, ucy = uic ? (ur.top + ur.height / 2 - r.top) * dpr : 0, ucr = uic ? (ur.width / 2 + 10) * dpr : 0;
-      for (let ty = -1; ty * T < h + T; ty++) for (let tx = -1; tx * T < w + T; tx++) for (const hh of holes) {
-        const x = (tx * TILE + hh.cx) * k, y = (ty * TILE + hh.cy) * k; if (x < -30 || y < -30 || x > w + 30 || y > h + 30) continue;
-        const f = mob ? Math.max(0, 1 - y / (h * .28)) * Math.max(0, (x / w - .45) / .55) : Math.max(0, (x / w - .58) / .42); if (f < .05) continue;
-        if (uic && Math.hypot(x - ucx, y - ucy) < ucr) continue;   // keep a little clearing around the UIC mark
-        const s2 = k * .8 * Math.min(1, f * 1.2) * (.85 + .15 * Math.sin(time * .9 + hh.ph)); g.setTransform(s2, 0, 0, s2, x, y); g.fill(hh.p); } };
-    const loopAp = t => { drawAp(reduce ? 0 : t / 1000); requestAnimationFrame(loopAp); }; requestAnimationFrame(loopAp); }
+  }
 
   /* each visit, roughly one card in four quietly swaps its hover colour for lavender mist or dusky plum */
   { const pool = [...document.querySelectorAll('.people .card, .ev')];
@@ -1995,98 +1984,104 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .ab-pill a.ab-inl:hover,.ab-pill a.ab-inl:focus-visible{color:var(--gold)}
 </style>
 <style>
-/* resource and event cards: one or two big, soft-edged dots instead of the net. Ten arrangements, shuffled across the
-   ten cards on every visit so no two cards match. Each dot drifts and swells ever so slightly. */
-.res canvas,.ev > .ev-cv{display:none}
+/* resource, event and Apply cards: one or two big dots instead of the net. Ten arrangements, shuffled across the cards on
+   every visit so no two cards match. The dots stay put and breathe like the holes of the net: a slow swell and shrink,
+   each at its own moment. Dots never touch one another, the words, the UIC mark or the card's edges: colours never meet. */
+.res canvas,.ev > .ev-cv,.apply > canvas{display:none}
+.res .r-n{display:none}
 .mdots{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0}
-.res > .mdots,.ev > .mdots{position:absolute}
-.mdot{position:absolute;opacity:0;transition:opacity .6s,background-color 0s;
-  animation:mdrift var(--dur,11s) ease-in-out var(--del,0s) infinite alternate}
+.res > .mdots,.ev > .mdots,.apply > .mdots{position:absolute}
+.mdot{position:absolute;opacity:0;transition:opacity .6s,background-color 0s;transform-origin:50% 50%;
+  animation:mbreathe var(--dur,3.5s) ease-in-out var(--del,0s) infinite alternate}
 .mdots.on .mdot{opacity:1}
-@keyframes mdrift{
-  0%{transform:translate(0,0) scale(1) rotate(0deg)}
-  50%{transform:translate(var(--dx,4px),calc(var(--dy,4px) * -.6)) scale(var(--ds,1.02)) rotate(var(--dr,2deg))}
-  100%{transform:translate(calc(var(--dx,4px) * -.7),var(--dy,4px)) scale(calc(2 - var(--ds,1.02))) rotate(calc(var(--dr,2deg) * -1))}}
+@keyframes mbreathe{from{transform:scale(var(--lo,.97))}to{transform:scale(var(--hi,1.03))}}
 @media (prefers-reduced-motion:reduce){.mdot{animation:none}}
-.ev:hover .mdot.k-main{background:var(--gold) !important}   /* the card turns cream on hover, so its cream dots turn gold */
-.r-n.on-dot-cream{color:var(--blue) !important}
-.r-n.on-dot-blue{color:var(--cream) !important}
+.ev:hover .mdot.k-cream{background:var(--gold) !important}   /* the card turns cream on hover, so its cream dots turn gold */
+.ev:hover .mdot.k-gold{background:var(--blue) !important}    /* and gold ones turn blue, so the two never meet as the same colour */
 </style>
 <script>
 (() => {
-  const res = [...document.querySelectorAll('.res-stack .res')], evs = [...document.querySelectorAll('.ev-cards .ev')];
-  const cards = [...res.map(el => ({ el, kind: 'res' })), ...evs.map(el => ({ el, kind: 'ev' }))]; if (!cards.length) return;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const res = [...document.querySelectorAll('.res-stack .res')], evs = [...document.querySelectorAll('.ev-cards .ev')], ap = document.querySelector('.apply');
+  const cards = [...res.map(el => ({ el, kind: 'res' })), ...evs.map(el => ({ el, kind: 'ev' })), ...(ap ? [{ el: ap, kind: 'ap' }] : [])]; if (!cards.length) return;
   // each dot: anchored to an edge (r/l, t/b), offset from it and sized in units of the card (its height, capped on narrow cards)
-  // c: main (cream on dark cards, blue on light ones), second (gold, or blue/cream), dark (a deeper shade of the card), gold, sprinkle
+  // c: main (cream on dark cards, blue on light ones), second, dark (a deeper shade of the card), gold, sprinkle
   const OPTS = [
     { name: 'corner moon', res: [{ ax: 'r', x: .16, ay: 't', y: -.125, s: 1.31, c: 'main' }], ev: [{ ax: 'r', x: .08, ay: 't', y: -.14, s: .78, c: 'main' }] },
-    { name: 'two moons', res: [{ ax: 'r', x: .2, ay: 't', y: -.11, s: 1.03, c: 'main' }, { ax: 'r', x: .11, ay: 'b', y: .14, s: .53, c: 'second' }],
-      ev: [{ ax: 'r', x: .08, ay: 't', y: -.11, s: .66, c: 'main' }, { ax: 'r', x: .01, ay: 'b', y: .09, s: .375, c: 'second' }] },
+    { name: 'two moons', res: [{ ax: 'r', x: .2, ay: 't', y: -.16, s: 1.0, c: 'main' }, { ax: 'r', x: .1, ay: 'b', y: .12, s: .46, c: 'second' }],
+      ev: [{ ax: 'r', x: .08, ay: 't', y: -.12, s: .62, c: 'main' }, { ax: 'r', x: .0, ay: 'b', y: .06, s: .34, c: 'second' }] },
     { name: 'rising sun', res: [{ ax: 'r', x: .17, ay: 'b', y: -.28, s: 1.47, c: 'main' }], ev: [{ ax: 'r', x: .12, ay: 'b', y: -.42, s: 1.1, c: 'main' }] },
     { name: 'gold sun', res: [{ ax: 'r', x: .125, ay: 't', y: .19, s: 1.125, c: 'gold' }], ev: [{ ax: 'r', x: .06, ay: 't', y: -.11, s: .72, c: 'gold' }] },
-    { name: 'kissing dots', res: [{ ax: 'r', x: .3, ay: 't', y: .2, s: .78, c: 'main' }, { ax: 'r', x: .05, ay: 'b', y: .14, s: .72, c: 'second' }],
-      ev: [{ ax: 'r', x: .16, ay: 't', y: -.06, s: .56, c: 'main' }, { ax: 'r', x: .02, ay: 't', y: .23, s: .34, c: 'second' }] },
-    { name: 'eclipse', res: [{ ax: 'r', x: .19, ay: 't', y: .34, s: 1.25, c: 'dark' }, { ax: 'r', x: .53, ay: 't', y: -.05, s: .28, c: 'main' }],
-      ev: [{ ax: 'r', x: .09, ay: 't', y: -.06, s: .81, c: 'dark' }, { ax: 'r', x: .2, ay: 't', y: .17, s: .14, c: 'main' }] },
+    { name: 'neighbours', res: [{ ax: 'r', x: .36, ay: 't', y: .12, s: .66, c: 'main' }, { ax: 'r', x: .03, ay: 'b', y: .1, s: .62, c: 'second' }],
+      ev: [{ ax: 'r', x: .2, ay: 't', y: -.1, s: .5, c: 'main' }, { ax: 'r', x: -.02, ay: 't', y: .3, s: .3, c: 'second' }] },
+    { name: 'eclipse', res: [{ ax: 'r', x: .14, ay: 't', y: .42, s: 1.15, c: 'dark' }, { ax: 'r', x: .62, ay: 't', y: -.04, s: .24, c: 'main' }],
+      ev: [{ ax: 'r', x: .04, ay: 't', y: -.08, s: .66, c: 'dark' }, { ax: 'r', x: .42, ay: 't', y: -.02, s: .14, c: 'main' }] },
     { name: 'half moon', res: [{ ax: 'r', x: -.03, ay: 't', y: .5, s: 1.125, c: 'main' }], ev: [{ ax: 'r', x: 0, ay: 't', y: .23, s: .53, c: 'main' }] },
-    { name: 'sprinkle', res: [{ ax: 'r', x: .16, ay: 't', y: -.125, s: 1.31, c: 'main' }, { ax: 'r', x: .45, ay: 'b', y: .2, s: .17, c: 'sprinkle' }],
-      ev: [{ ax: 'r', x: .08, ay: 't', y: -.14, s: .78, c: 'main' }, { ax: 'r', x: .4, ay: 't', y: .3, s: .1, c: 'sprinkle' }] },
-    { name: 'wanderers', wide: true, res: [{ ax: 'r', x: .2, ay: 't', y: -.11, s: 1.03, c: 'main' }, { ax: 'r', x: .11, ay: 'b', y: .14, s: .53, c: 'second' }],
-      ev: [{ ax: 'r', x: .1, ay: 'b', y: -.2, s: .7, c: 'main' }, { ax: 'r', x: .3, ay: 't', y: -.05, s: .3, c: 'second' }] },
+    { name: 'sprinkle', res: [{ ax: 'r', x: .16, ay: 't', y: -.125, s: 1.31, c: 'main' }, { ax: 'r', x: .5, ay: 'b', y: .18, s: .16, c: 'sprinkle' }],
+      ev: [{ ax: 'r', x: .08, ay: 't', y: -.14, s: .78, c: 'main' }, { ax: 'r', x: .45, ay: 't', y: .3, s: .1, c: 'sprinkle' }] },
+    { name: 'deep breath', deep: true, res: [{ ax: 'r', x: .2, ay: 't', y: -.16, s: 1.0, c: 'main' }, { ax: 'r', x: .1, ay: 'b', y: .12, s: .46, c: 'second' }],
+      ev: [{ ax: 'r', x: .1, ay: 'b', y: -.22, s: .66, c: 'main' }, { ax: 'r', x: .36, ay: 't', y: -.06, s: .26, c: 'second' }] },
     { name: 'peek', res: [{ ax: 'r', x: .5, ay: 't', y: -.34, s: 1.19, c: 'main' }], ev: [{ ax: 'r', x: .33, ay: 't', y: -.23, s: .84, c: 'main' }] }
   ];
-  // colours per card: [main, second, dark]
   const CREAM = '#f2eedd', BLUE = '#2c5494', GOLD = '#e7aa4d';
+  // colours per card: [main, second, dark]. Every card keeps cream, blue and gold apart from the card itself
   const PAL = { blue: [CREAM, GOLD, '#1d3866'], gold: [CREAM, BLUE, '#d0923a'], rose: [BLUE, CREAM, '#c25a79'], orange: [BLUE, CREAM, '#c9642b'],
                 teal: [CREAM, GOLD, '#1f7373'], mauve: [CREAM, GOLD, '#82558e'], cream: [BLUE, GOLD, '#e6e0c8'] };
-  const palOf = el => el.classList.contains('r-gold') ? 'gold' : el.classList.contains('r-lav') ? 'rose' : el.classList.contains('r-orange') ? 'orange'
-    : el.classList.contains('r-sage') ? 'teal' : el.classList.contains('r-egg') ? 'mauve' : el.classList.contains('r-cream') ? 'cream' : 'blue';
+  const palOf = el => { const c = el.classList, h = k => c.contains(k);
+    return h('r-gold') || h('a-gold') ? 'gold' : h('r-lav') || h('a-lav') ? 'rose' : h('r-orange') ? 'orange' : h('r-sage') || h('a-sage') ? 'teal'
+      : h('r-egg') || h('a-plum') ? 'mauve' : h('r-cream') ? 'cream' : el.classList.contains('apply') && !c.contains('a-blue') && !c.contains('a-deep') ? 'gold' : 'blue'; };
   const SPRINK = { blue: ['#e0773a', '#d8708e'], gold: ['#d8708e', '#2a8c8c'], rose: ['#e0773a', '#2a8c8c'], orange: ['#d8708e', '#2a8c8c'], teal: ['#e0773a', '#d8708e'], mauve: ['#e0773a', '#d8708e'], cream: ['#e0773a', '#d8708e'] };
   const pick = a => a[Math.floor(Math.random() * a.length)];
   const blob = () => { const r = () => 44 + Math.round(Math.random() * 14); const a = r(), b = r(), c = r(), d = r(); return `${a}% ${100 - a}% ${b}% ${100 - b}% / ${c}% ${d}% ${100 - d}% ${100 - c}%`; };   // a fresh organic outline for every dot
-  // shuffle the ten arrangements across the cards, so each card gets its own
   const order = OPTS.map((o, i) => i); for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
-  cards.forEach((cd, n) => {
+  const build = (cd, n) => {
+    if (cd.box) cd.box.remove();
     const opt = OPTS[order[n % order.length]], pal = palOf(cd.el), P = PAL[pal], box = document.createElement('div');
     box.className = 'mdots'; box.setAttribute('aria-hidden', 'true'); cd.el.prepend(box);
-    cd.box = box; cd.dots = opt[cd.kind].map(d => {
+    cd.box = box; cd.hi = opt.deep ? 1.06 : 1.03;
+    cd.dots = opt[cd.kind === 'ap' ? 'res' : cd.kind].map(d => {
       const el = document.createElement('div'), col = d.c === 'main' ? P[0] : d.c === 'second' ? P[1] : d.c === 'dark' ? P[2] : d.c === 'gold' ? (pal === 'gold' ? CREAM : GOLD) : pick(SPRINK[pal]);
-      el.className = 'mdot k-' + (d.c === 'main' || (d.c === 'gold' && pal === 'gold') ? (col === CREAM ? 'main' : 'mainb') : d.c);
+      el.className = 'mdot' + (col === CREAM ? ' k-cream' : col === GOLD ? ' k-gold' : '');
       el.style.background = col; el.style.borderRadius = blob();
-      const amp = opt.wide ? 2.4 : 1;
-      el.style.setProperty('--dx', ((Math.random() < .5 ? -1 : 1) * (3 + Math.random() * 4) * amp).toFixed(1) + 'px');
-      el.style.setProperty('--dy', ((Math.random() < .5 ? -1 : 1) * (3 + Math.random() * 4) * amp).toFixed(1) + 'px');
-      el.style.setProperty('--ds', (1 + (.012 + Math.random() * .02) * amp).toFixed(3));
-      el.style.setProperty('--dr', ((Math.random() < .5 ? -1 : 1) * (1 + Math.random() * 3)).toFixed(1) + 'deg');
-      el.style.setProperty('--dur', (9 + Math.random() * 7).toFixed(1) + 's'); el.style.setProperty('--del', (-Math.random() * 12).toFixed(1) + 's');
+      el.style.setProperty('--lo', (2 - cd.hi).toFixed(3)); el.style.setProperty('--hi', cd.hi.toFixed(3));
+      el.style.setProperty('--dur', (3.2 + Math.random() * .8).toFixed(2) + 's'); el.style.setProperty('--del', (-Math.random() * 4).toFixed(2) + 's');   // the net's pace: a full breath every ~7 s
       box.appendChild(el); return { d, el, col };
     });
-  });
-  // lay the dots out, keeping them clear of the words: a dot that would touch text shrinks and slides toward its edge, or bows out
-  const textRects = (cd, cr) => { const out = []; cd.el.querySelectorAll(cd.kind === 'res' ? '.r-kind, .r-name, .r-desc, .r-go' : 'h3, p').forEach(e => {
-      const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(b => b.width && out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top])); });
-    cd.el.querySelectorAll('.r-go').forEach(e => { const b = e.getBoundingClientRect(); out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]); });
+  };
+  cards.forEach(build);
+  // the Apply card's colour is set by an earlier script; rebuild its dots once it has one
+  if (ap) { const apCard = cards.find(c => c.kind === 'ap'); new MutationObserver(() => { const k = palOf(ap) + ap.className; if (apCard.k !== k) { apCard.k = k; build(apCard, cards.length - 1); layout(); } }).observe(ap, { attributes: true, attributeFilter: ['class'] }); }
+  // keep the dots off the words, the button, the UIC mark and each other, with clear space all round
+  const sel = { res: '.r-kind, .r-name, .r-desc, .r-go, .r-mini', ev: 'h3, p', ap: '.ap-kind, .ap-h, .ap-t, .ap-go' };
+  const rectsOf = (cd, cr) => { const out = []; const add = b => b.width && out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
+    cd.el.querySelectorAll(sel[cd.kind]).forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(add); });
+    cd.el.querySelectorAll('.r-go, .ap-go, .ap-uic').forEach(e => add(e.getBoundingClientRect()));
     return out; };
-  const hits = (cx, cy, R, rects, pad) => rects.some(([x0, y0, x1, y1]) => Math.hypot(Math.max(0, x0 - pad - cx, cx - x1 - pad), Math.max(0, y0 - pad - cy, cy - y1 - pad)) < R);
+  const nearText = (cx, cy, R, rects, pad) => rects.some(([x0, y0, x1, y1]) => Math.hypot(Math.max(0, x0 - cx, cx - x1), Math.max(0, y0 - cy, cy - y1)) < R + pad);
   const layout = () => cards.forEach(cd => {
-    const cr = cd.el.getBoundingClientRect(), W = cr.width, H = cr.height; if (!W || !H) return;
-    const u = Math.min(H, W * (cd.kind === 'res' ? .5 : 1)), rects = textRects(cd, cr), pad = 14;
-    const cnt = cd.el.querySelector('.r-n'); if (cnt) cnt.classList.remove('on-dot-cream', 'on-dot-blue');
-    cd.dots.forEach(({ d, el, col }) => {
+    if (!cd.dots) return; const cr = cd.el.getBoundingClientRect(), W = cr.width, H = cr.height; if (!W || !H) return;
+    const u = Math.min(H, W * (cd.kind === 'ev' ? 1 : .5)), rects = rectsOf(cd, cr), pad = Math.max(16, u * .05), gap = Math.max(14, u * .06), edge = Math.max(14, u * .05), placed = [];
+    // place the biggest dot first, then fit the others around it
+    [...cd.dots].sort((a, b) => b.d.s - a.d.s).forEach(({ d, el }) => {
       let s = d.s * u, x = d.ax === 'r' ? W - d.x * u : d.x * u, y = d.ay === 't' ? d.y * u : H - d.y * u, ok = false;
       const ex = d.ax === 'r' ? 1 : -1, ey = d.ay === 't' ? -1 : 1;
-      for (let i = 0; i < 16; i++) { if (!hits(x, y, s / 2 + 6, rects, pad)) { ok = true; break; } s *= .93; x += ex * u * .035; y += ey * u * .035; }
+      for (let i = 0; i < 40; i++) {
+        // the whole dot stays inside the card, clear of its edges, so it never meets the page or the band behind the card
+        const maxS = (Math.min(W, H) - 2 * edge) / cd.hi; if (s > maxS) s = maxS;
+        const R = s / 2 * cd.hi;                                             // at its fullest breath
+        x = Math.min(W - edge - R, Math.max(edge + R, x)); y = Math.min(H - edge - R, Math.max(edge + R, y));
+        const clear = !nearText(x, y, R, rects, pad) && placed.every(p => Math.hypot(p.x - x, p.y - y) > p.R + R + gap);
+        if (clear) { ok = true; break; }
+        s *= .94; x += ex * u * .04; y += ey * u * .04; }
       el.style.display = ok ? '' : 'none';
       el.style.width = el.style.height = s.toFixed(1) + 'px'; el.style.left = (x - s / 2).toFixed(1) + 'px'; el.style.top = (y - s / 2).toFixed(1) + 'px';
-      if (ok && cnt && (d.c === 'main' || d.c === 'gold')) { const b = cnt.getBoundingClientRect(), mx = (b.left + b.right) / 2 - cr.left, my = (b.top + b.bottom) / 2 - cr.top;
-        if (Math.hypot(mx - x, my - y) < s / 2) cnt.classList.add(col === BLUE ? 'on-dot-blue' : 'on-dot-cream'); }
+      if (ok) placed.push({ x, y, R: s / 2 * cd.hi });
     });
     cd.box.classList.add('on');
   });
   let t; const later = () => { clearTimeout(t); t = setTimeout(layout, 120); };
   layout(); addEventListener('resize', later); addEventListener('load', layout); document.fonts && document.fonts.ready.then(layout);
   if ('ResizeObserver' in window) { const ro = new ResizeObserver(later); cards.forEach(cd => ro.observe(cd.el)); }
+  document.querySelectorAll('.ap-uic').forEach(i => i.addEventListener('load', later));
 })();
 </script>
 </body>
