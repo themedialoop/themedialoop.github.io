@@ -695,21 +695,21 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .p-marq .pill:hover{animation:var(--wn,wgTilt) var(--wd,.55s) cubic-bezier(.3,1.4,.5,1)}
 @keyframes pWiggle{0%{rotate:0deg;scale:1}20%{rotate:-4deg;scale:1.05}40%{rotate:3deg}60%{rotate:-2deg}80%{rotate:1deg}100%{rotate:0deg;scale:1.03}}
 @media (prefers-reduced-motion:reduce){.p-marq .pill:hover{animation:none}}
-.p-marq .c-blue{background:linear-gradient(160deg,#3a6ab6,#2c5494 55%,#1f3f73);color:var(--cream)}
-.p-marq .c-gold{background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--ink)}
-.p-marq .c-deep{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
+.p-marq .c-blue{background:#2c5494;color:var(--cream)}
+.p-marq .c-gold{background:#e7aa4d;color:var(--blue)}
+.p-marq .c-deep{background:#1d3866;color:var(--cream)}
 .p-marq .c-cream{background:#e9e2c9;color:var(--blue)}   /* the pill cream: a shade off the page cream, so the pill still shows */
-.p-marq .c-lav{background:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#152b4f}
-.p-marq .c-sage{background:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262);color:var(--cream)}
-.p-marq .c-plum{background:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}
+.p-marq .c-lav{background:#d8708e;color:var(--cream)}
+.p-marq .c-sage{background:#2a8c8c;color:var(--cream)}
+.p-marq .c-plum{background:#9b6aa6;color:var(--cream)}
 .p-marq .pill.t-gold{color:var(--gold)}
-.p-marq .pill.t-plum{color:#774a83}
-.p-marq .pill.t-sage{color:#e0773a}
+.p-marq .pill.t-plum{color:var(--blue)}
+.p-marq .pill.t-sage{color:var(--gold)}
 /* used very sparingly: mist blue (the blue, lightened) and mauve (the plum, lifted), as rare pills and now and then as words on the darker pills */
-.p-marq .c-mist{background:linear-gradient(160deg,#e8884d,#e0773a 55%,#cf6630);color:#152b4f}
-.p-marq .c-mauve{background:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}
-.p-marq .pill.t-mist{color:#e3869f}
-.p-marq .pill.t-mauve{color:#e3869f}
+.p-marq .c-mist{background:#e0773a;color:var(--cream)}
+.p-marq .c-mauve{background:#9b6aa6;color:var(--cream)}
+.p-marq .pill.t-mist{color:var(--gold)}
+.p-marq .pill.t-mauve{color:var(--gold)}
 /* now and then a word in another face: Cormorant Garamond (an elegant old-style serif, set bigger because it runs small) or Figtree (a friendly sans);
    each word gets its own weight from what that face offers (Cormorant 300-700, Figtree 300-900), sometimes in italic */
 .p-marq .pill.f-corm{font-family:'Cormorant Garamond',serif;font-weight:var(--fw) !important;letter-spacing:0;font-size:calc(clamp(17px,1.7vw,24px) * 1.28);line-height:1;padding:.5em 1em .54em}
