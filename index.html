@@ -1986,7 +1986,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 <style>
 /* resource, event and Apply cards: one or two big dots instead of the net. Ten arrangements, shuffled across the cards on
    every visit so no two cards match. The dots stay put and breathe like the holes of the net: a slow swell and shrink,
-   each at its own moment. Dots never touch one another, the words, the UIC mark or the card's edges: colours never meet. */
+   each at its own moment. They are big and run off the card's edges, but never touch one another, the words or the UIC mark. */
 .res canvas,.ev > .ev-cv,.apply > canvas{display:none}
 .res .r-n{display:none}
 .mdots{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0}
@@ -2059,19 +2059,22 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const nearText = (cx, cy, R, rects, pad) => rects.some(([x0, y0, x1, y1]) => Math.hypot(Math.max(0, x0 - cx, cx - x1), Math.max(0, y0 - cy, cy - y1)) < R + pad);
   const layout = () => cards.forEach(cd => {
     if (!cd.dots) return; const cr = cd.el.getBoundingClientRect(), W = cr.width, H = cr.height; if (!W || !H) return;
-    const u = Math.min(H, W * (cd.kind === 'ev' ? 1 : .5)), rects = rectsOf(cd, cr), pad = Math.max(16, u * .05), gap = Math.max(14, u * .06), edge = Math.max(14, u * .05), placed = [];
+    const u = Math.min(H, W * (cd.kind === 'ev' ? 1 : .5)), rects = rectsOf(cd, cr), pad = Math.max(16, u * .05), gap = Math.max(14, u * .06), placed = [];
     // place the biggest dot first, then fit the others around it
     [...cd.dots].sort((a, b) => b.d.s - a.d.s).forEach(({ d, el }) => {
       let s = d.s * u, x = d.ax === 'r' ? W - d.x * u : d.x * u, y = d.ay === 't' ? d.y * u : H - d.y * u, ok = false;
       const ex = d.ax === 'r' ? 1 : -1, ey = d.ay === 't' ? -1 : 1;
-      for (let i = 0; i < 40; i++) {
-        // the whole dot stays inside the card, clear of its edges, so it never meets the page or the band behind the card
-        const maxS = (Math.min(W, H) - 2 * edge) / cd.hi; if (s > maxS) s = maxS;
+      s *= 1.35;                                                             // big: the dots run off the card's edges
+      for (let i = 0; i < 60; i++) {
         const R = s / 2 * cd.hi;                                             // at its fullest breath
-        x = Math.min(W - edge - R, Math.max(edge + R, x)); y = Math.min(H - edge - R, Math.max(edge + R, y));
+        // at least a good slice of every dot stays on the card: its centre may sit up to a third of its radius past an edge
+        const lx = -.33 * R, hx = W + .33 * R, ly = -.33 * R, hy = H + .33 * R;
+        x = Math.min(hx, Math.max(lx, x)); y = Math.min(hy, Math.max(ly, y));
         const clear = !nearText(x, y, R, rects, pad) && placed.every(p => Math.hypot(p.x - x, p.y - y) > p.R + R + gap);
         if (clear) { ok = true; break; }
-        s *= .94; x += ex * u * .04; y += ey * u * .04; }
+        // first slide further off the card, toward its own edge; only once it can go no further, shrink
+        const nx = Math.min(hx, Math.max(lx, x + ex * u * .05)), ny = Math.min(hy, Math.max(ly, y + ey * u * .05));
+        if (Math.abs(nx - x) + Math.abs(ny - y) > 1) { x = nx; y = ny; } else s *= .94; }
       el.style.display = ok ? '' : 'none';
       el.style.width = el.style.height = s.toFixed(1) + 'px'; el.style.left = (x - s / 2).toFixed(1) + 'px'; el.style.top = (y - s / 2).toFixed(1) + 'px';
       if (ok) placed.push({ x, y, R: s / 2 * cd.hi });
