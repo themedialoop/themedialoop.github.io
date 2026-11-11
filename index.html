@@ -906,16 +906,22 @@ button,input,select,textarea,optgroup{font-family:inherit}
     { // the cream net over the events band: drawn straight onto a canvas at the screen's own resolution, so every hole is crisp
       const evs = document.getElementById('events');
       if (evs) { const cv = document.createElement('canvas'); cv.className = 'ev-net'; cv.setAttribute('aria-hidden', 'true'); evs.prepend(cv);
-        const drawEv = () => { const r = evs.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
-          if (!w || !h) return; cv.width = w; cv.height = h; const g = cv.getContext('2d'); g.clearRect(0, 0, w, h);
-          const T = Math.min(3300, Math.max(2100, innerWidth * 2.1)) * dpr, k = T / TILE;
+        // the holes stay put and breathe in slow ripples from the middle of the band, exactly like the blue net
+        let ew = 0, eh = 0, evOn = false;
+        const sizeEv = () => { const r = evs.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); ew = Math.round(r.width * dpr); eh = Math.round(r.height * dpr); if (cv.width !== ew || cv.height !== eh) { cv.width = ew; cv.height = eh; } };
+        const drawEv = time => { if (!ew || !eh || !holes.length) return; const g = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1);
+          g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, ew, eh);
+          const T = Math.min(3300, Math.max(2100, innerWidth * 2.1)) * dpr, k = T / TILE, cx = ew / 2, cy = eh / 2, R = Math.hypot(cx, cy);
           g.fillStyle = 'rgb(242,238,221)';
-          for (let ty = -1; ty * T < h + T; ty++) for (let tx = -1; tx * T < w + T; tx++) for (const hh of holes) {
-            const x = (tx * TILE + hh.cx) * k, y = (ty * TILE + hh.cy) * k; if (x < -60 || y < -60 || x > w + 60 || y > h + 60) continue;
-            g.setTransform(k * .82, 0, 0, k * .82, x, y); g.fill(hh.p); }
+          for (let ty = -1; ty * T < eh + T; ty++) for (let tx = -1; tx * T < ew + T; tx++) for (const hh of holes) {
+            const x = (tx * TILE + hh.cx) * k, y = (ty * TILE + hh.cy) * k; if (x < -60 || y < -60 || x > ew + 60 || y > eh + 60) continue;
+            const d = Math.hypot(x - cx, y - cy), wave = .5 + .5 * Math.sin(time * .9 - d / R * 7 + hh.ph * .35), s = reduce ? .82 : Math.min(1, .6 + .34 * wave);
+            g.setTransform(k * s, 0, 0, k * s, x, y); g.fill(hh.p); }
           g.setTransform(1, 0, 0, 1, 0, 0); };
-        drawEv(); let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(drawEv, 150); });
-        if ('ResizeObserver' in window) new ResizeObserver(() => { clearTimeout(rz); rz = setTimeout(drawEv, 150); }).observe(evs); } }
+        sizeEv(); let rz; const onRz = () => { clearTimeout(rz); rz = setTimeout(sizeEv, 150); }; addEventListener('resize', onRz);
+        if ('ResizeObserver' in window) new ResizeObserver(onRz).observe(evs);
+        if ('IntersectionObserver' in window) new IntersectionObserver(es => { evOn = es[0].isIntersecting; }, { rootMargin: '100px' }).observe(evs); else evOn = true;
+        const loopEvBand = t => { if (evOn) drawEv(t / 1000); requestAnimationFrame(loopEvBand); }; requestAnimationFrame(loopEvBand); } }
     const tc = document.createElement('canvas'), tx = tc.getContext('2d'), TS = 880, kk = TS / TILE;
     tc.width = tc.height = TS; tx.fillStyle = 'rgba(242,238,221,.09)';
     for (const h of holes) for (const ox of [-TILE, 0, TILE]) for (const oy of [-TILE, 0, TILE]) {
@@ -1618,39 +1624,14 @@ button,input,select,textarea,optgroup{font-family:inherit}
   ];
   /* resources deck: the net breathes on the right of each card, and cards that have been stacked over ease back and tilt slightly */
   { const cards = [...document.querySelectorAll('.res')], rc = cards.map(c => c.querySelector('canvas'));
-    const drawRes = time => { cards.forEach((card, n) => { const cv = rc[n], r = card.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight || !r.width || !holes.length) return;
+    const drawRes = time => { cards.forEach((card, n) => { const cv = rc[n], r = card.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight || !r.width ) return;
         const next = cards[n + 1], nr = next && next.getBoundingClientRect(), cover = nr ? Math.min(1, Math.max(0, (r.bottom - nr.top) / r.height)) : 0;
         if (!reduce) { card.style.setProperty('--sc', (1 - .02 * cover).toFixed(4)); card.style.setProperty('--rot', '0deg'); card.style.filter = cover > .02 ? `brightness(${(1 - .05 * cover).toFixed(3)})` : ''; }
         card.classList.toggle('covered', cover > .3);
-        const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
-        const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
-        g.fillStyle = card.classList.contains('r-cream') || card.classList.contains('r-lav') || card.classList.contains('r-orange') ? 'rgba(44,84,148,.85)' : card.classList.contains('r-gold') ? 'rgb(242,238,221)' : 'rgb(242,238,221)';
-        const boxes = [...card.querySelectorAll('.r-name, .r-desc, .r-go, .r-kind, .r-n')].map(e => { const b = e.getBoundingClientRect(); return [(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr]; });
-        const NS = NETS[n % NETS.length], T = (isMobile() ? 700 : 1000) * dpr * NS.k, k = T / TILE, ox = n * 137 * dpr, mob = isMobile(), asp = w / h;
-        for (let ty = -1; ty * T < h + T; ty++) for (let tx = -1; tx * T < w + T; tx++) for (const hh of holes) {
-          const x = (tx * TILE + hh.cx) * k - ox % T, y = (ty * TILE + hh.cy) * k; if (x < -30 || y < -30 || x > w + 30 || y > h + 30) continue;
-          let f = mob ? Math.max(0, 1 - y / (h * .3)) * Math.max(0, (x / w - .35) / .65) * NS.f(x / w, .3, asp) * 1.6 : NS.f(x / w, y / h, asp);
-          for (const [x0, y0, x1, y1] of boxes) { const dx = Math.max(0, x0 - x, x - x1), dy = Math.max(0, y0 - y, y - y1); f *= sstep((Math.hypot(dx, dy) - 8 * dpr) / (34 * dpr)); }   // never behind the words
-          const fc = f * Math.min(1, Math.max(0, (y - 70 * dpr) / (50 * dpr))) * (card.classList.contains('covered') ? 0 : 1);   // keeps the corner counter clear
-          if (fc < .05) continue; const f2 = fc;
-          const s2 = k * .8 * Math.min(1, f2 * 1.2) * (.85 + .15 * Math.sin(time * .9 + hh.ph)); g.setTransform(s2, 0, 0, s2, x, y); g.fill(hh.p); } }); };
+      }); };
     const loopRes = t => { drawRes(reduce ? 0 : t / 1000); requestAnimationFrame(loopRes); }; requestAnimationFrame(loopRes); }
 
-  /* event cards: cream net breathing in the top-right corner of each card, clear of the words */
-  { const evs = [...document.querySelectorAll('.ev')];
-    const drawEvc = time => evs.forEach((card, n) => { const cv = card.querySelector('.ev-cv'), r = card.getBoundingClientRect(); if (!cv || r.bottom < 0 || r.top > innerHeight || !r.width || !holes.length) return;
-      const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
-      const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h); g.fillStyle = 'rgb(242,238,221)';
-      // keep the holes off the words: measure each line of text in the card
-      const tb = []; card.querySelectorAll('h3, p').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(b => tb.push([(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr])); });
-      const EV = [[1, 0, .62, 1], [1.02, .42, .5, 1.3], [.62, -.04, .5, .8], [1.04, .12, .75, 1.1]][n % 4];   // each card's patch sits somewhere different, with its own hole size
-      const T = 700 * dpr * EV[3], k = T / TILE, ox = (n * 211 * dpr) % T, cx = w * EV[0], cy = h * EV[1], R = Math.min(w, h) * EV[2];
-      for (let ty = -1; ty * T < h + T; ty++) for (let tx = -1; tx * T < w + T; tx++) for (const hh of holes) {
-        const x = (tx * TILE + hh.cx) * k - ox, y = (ty * TILE + hh.cy) * k; if (x < -30 || y < -30 || x > w + 30 || y > h + 30) continue;
-        let f = Math.max(0, 1 - Math.hypot(x - cx, y - cy) / R); f *= Math.min(1, Math.max(0, (y - 40 * dpr) / (30 * dpr)) + Math.max(0, (w - x - 40 * dpr) / (30 * dpr)) + .4);
-        for (const [x0, y0, x1, y1] of tb) { const dx = Math.max(0, x0 - x, x - x1), dy = Math.max(0, y0 - y, y - y1), dd = Math.hypot(dx, dy) / dpr; f *= Math.min(1, Math.max(0, (dd - 6) / 22)); }
-        if (f < .05) continue; const s2 = k * .8 * Math.min(1, f * 1.6) * (.85 + .15 * Math.sin(time * .9 + hh.ph)); g.setTransform(s2, 0, 0, s2, x, y); g.fill(hh.p); } });
-    const loopEv = t => { drawEvc(reduce ? 0 : t / 1000); requestAnimationFrame(loopEv); }; requestAnimationFrame(loopEv); }
+  /* event cards: their nets are replaced by big dots (see the dots script at the end) */
 
   /* the Apply card: breathing cream net on its right side, clear of the words */
   { const ap = document.querySelector('.apply'), cv = ap && ap.querySelector('canvas');
@@ -2013,5 +1994,100 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .ab-pill a.ab-inl{color:inherit;text-decoration:underline;text-decoration-color:var(--gold);text-decoration-thickness:2px;text-underline-offset:3px}
 .ab-pill a.ab-inl:hover,.ab-pill a.ab-inl:focus-visible{color:var(--gold)}
 </style>
+<style>
+/* resource and event cards: one or two big, soft-edged dots instead of the net. Ten arrangements, shuffled across the
+   ten cards on every visit so no two cards match. Each dot drifts and swells ever so slightly. */
+.res canvas,.ev > .ev-cv{display:none}
+.mdots{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0}
+.res > .mdots,.ev > .mdots{position:absolute}
+.mdot{position:absolute;filter:blur(1.4px);opacity:0;transition:opacity .6s,background-color 0s;
+  animation:mdrift var(--dur,11s) ease-in-out var(--del,0s) infinite alternate}
+.mdots.on .mdot{opacity:1}
+@keyframes mdrift{
+  0%{transform:translate(0,0) scale(1) rotate(0deg)}
+  50%{transform:translate(var(--dx,4px),calc(var(--dy,4px) * -.6)) scale(var(--ds,1.02)) rotate(var(--dr,2deg))}
+  100%{transform:translate(calc(var(--dx,4px) * -.7),var(--dy,4px)) scale(calc(2 - var(--ds,1.02))) rotate(calc(var(--dr,2deg) * -1))}}
+@media (prefers-reduced-motion:reduce){.mdot{animation:none}}
+.ev:hover .mdot.k-main{background:var(--gold) !important}   /* the card turns cream on hover, so its cream dots turn gold */
+.r-n.on-dot-cream{color:var(--blue) !important}
+.r-n.on-dot-blue{color:var(--cream) !important}
+</style>
+<script>
+(() => {
+  const res = [...document.querySelectorAll('.res-stack .res')], evs = [...document.querySelectorAll('.ev-cards .ev')];
+  const cards = [...res.map(el => ({ el, kind: 'res' })), ...evs.map(el => ({ el, kind: 'ev' }))]; if (!cards.length) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // each dot: anchored to an edge (r/l, t/b), offset from it and sized in units of the card (its height, capped on narrow cards)
+  // c: main (cream on dark cards, blue on light ones), second (gold, or blue/cream), dark (a deeper shade of the card), gold, sprinkle
+  const OPTS = [
+    { name: 'corner moon', res: [{ ax: 'r', x: .16, ay: 't', y: -.125, s: 1.31, c: 'main' }], ev: [{ ax: 'r', x: .08, ay: 't', y: -.14, s: .78, c: 'main' }] },
+    { name: 'two moons', res: [{ ax: 'r', x: .2, ay: 't', y: -.11, s: 1.03, c: 'main' }, { ax: 'r', x: .11, ay: 'b', y: .14, s: .53, c: 'second' }],
+      ev: [{ ax: 'r', x: .08, ay: 't', y: -.11, s: .66, c: 'main' }, { ax: 'r', x: .01, ay: 'b', y: .09, s: .375, c: 'second' }] },
+    { name: 'rising sun', res: [{ ax: 'r', x: .17, ay: 'b', y: -.28, s: 1.47, c: 'main' }], ev: [{ ax: 'r', x: .12, ay: 'b', y: -.42, s: 1.1, c: 'main' }] },
+    { name: 'gold sun', res: [{ ax: 'r', x: .125, ay: 't', y: .19, s: 1.125, c: 'gold' }], ev: [{ ax: 'r', x: .06, ay: 't', y: -.11, s: .72, c: 'gold' }] },
+    { name: 'kissing dots', res: [{ ax: 'r', x: .3, ay: 't', y: .2, s: .78, c: 'main' }, { ax: 'r', x: .05, ay: 'b', y: .14, s: .72, c: 'second' }],
+      ev: [{ ax: 'r', x: .16, ay: 't', y: -.06, s: .56, c: 'main' }, { ax: 'r', x: .02, ay: 't', y: .23, s: .34, c: 'second' }] },
+    { name: 'eclipse', res: [{ ax: 'r', x: .19, ay: 't', y: .34, s: 1.25, c: 'dark' }, { ax: 'r', x: .53, ay: 't', y: -.05, s: .28, c: 'main' }],
+      ev: [{ ax: 'r', x: .09, ay: 't', y: -.06, s: .81, c: 'dark' }, { ax: 'r', x: .2, ay: 't', y: .17, s: .14, c: 'main' }] },
+    { name: 'half moon', res: [{ ax: 'r', x: -.03, ay: 't', y: .5, s: 1.125, c: 'main' }], ev: [{ ax: 'r', x: 0, ay: 't', y: .23, s: .53, c: 'main' }] },
+    { name: 'sprinkle', res: [{ ax: 'r', x: .16, ay: 't', y: -.125, s: 1.31, c: 'main' }, { ax: 'r', x: .45, ay: 'b', y: .2, s: .17, c: 'sprinkle' }],
+      ev: [{ ax: 'r', x: .08, ay: 't', y: -.14, s: .78, c: 'main' }, { ax: 'r', x: .4, ay: 't', y: .3, s: .1, c: 'sprinkle' }] },
+    { name: 'wanderers', wide: true, res: [{ ax: 'r', x: .2, ay: 't', y: -.11, s: 1.03, c: 'main' }, { ax: 'r', x: .11, ay: 'b', y: .14, s: .53, c: 'second' }],
+      ev: [{ ax: 'r', x: .1, ay: 'b', y: -.2, s: .7, c: 'main' }, { ax: 'r', x: .3, ay: 't', y: -.05, s: .3, c: 'second' }] },
+    { name: 'peek', res: [{ ax: 'r', x: .5, ay: 't', y: -.34, s: 1.19, c: 'main' }], ev: [{ ax: 'r', x: .33, ay: 't', y: -.23, s: .84, c: 'main' }] }
+  ];
+  // colours per card: [main, second, dark]
+  const CREAM = '#f2eedd', BLUE = '#2c5494', GOLD = '#e7aa4d';
+  const PAL = { blue: [CREAM, GOLD, '#1d3866'], gold: [CREAM, BLUE, '#d0923a'], rose: [BLUE, CREAM, '#c25a79'], orange: [BLUE, CREAM, '#c9642b'],
+                teal: [CREAM, GOLD, '#1f7373'], mauve: [CREAM, GOLD, '#82558e'], cream: [BLUE, GOLD, '#e6e0c8'] };
+  const palOf = el => el.classList.contains('r-gold') ? 'gold' : el.classList.contains('r-lav') ? 'rose' : el.classList.contains('r-orange') ? 'orange'
+    : el.classList.contains('r-sage') ? 'teal' : el.classList.contains('r-egg') ? 'mauve' : el.classList.contains('r-cream') ? 'cream' : 'blue';
+  const SPRINK = { blue: ['#e0773a', '#d8708e'], gold: ['#d8708e', '#2a8c8c'], rose: ['#e0773a', '#2a8c8c'], orange: ['#d8708e', '#2a8c8c'], teal: ['#e0773a', '#d8708e'], mauve: ['#e0773a', '#d8708e'], cream: ['#e0773a', '#d8708e'] };
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const blob = () => { const r = () => 44 + Math.round(Math.random() * 14); const a = r(), b = r(), c = r(), d = r(); return `${a}% ${100 - a}% ${b}% ${100 - b}% / ${c}% ${d}% ${100 - d}% ${100 - c}%`; };   // a fresh organic outline for every dot
+  // shuffle the ten arrangements across the cards, so each card gets its own
+  const order = OPTS.map((o, i) => i); for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  cards.forEach((cd, n) => {
+    const opt = OPTS[order[n % order.length]], pal = palOf(cd.el), P = PAL[pal], box = document.createElement('div');
+    box.className = 'mdots'; box.setAttribute('aria-hidden', 'true'); cd.el.prepend(box);
+    cd.box = box; cd.dots = opt[cd.kind].map(d => {
+      const el = document.createElement('div'), col = d.c === 'main' ? P[0] : d.c === 'second' ? P[1] : d.c === 'dark' ? P[2] : d.c === 'gold' ? (pal === 'gold' ? CREAM : GOLD) : pick(SPRINK[pal]);
+      el.className = 'mdot k-' + (d.c === 'main' || (d.c === 'gold' && pal === 'gold') ? (col === CREAM ? 'main' : 'mainb') : d.c);
+      el.style.background = col; el.style.borderRadius = blob();
+      const amp = opt.wide ? 2.4 : 1;
+      el.style.setProperty('--dx', ((Math.random() < .5 ? -1 : 1) * (3 + Math.random() * 4) * amp).toFixed(1) + 'px');
+      el.style.setProperty('--dy', ((Math.random() < .5 ? -1 : 1) * (3 + Math.random() * 4) * amp).toFixed(1) + 'px');
+      el.style.setProperty('--ds', (1 + (.012 + Math.random() * .02) * amp).toFixed(3));
+      el.style.setProperty('--dr', ((Math.random() < .5 ? -1 : 1) * (1 + Math.random() * 3)).toFixed(1) + 'deg');
+      el.style.setProperty('--dur', (9 + Math.random() * 7).toFixed(1) + 's'); el.style.setProperty('--del', (-Math.random() * 12).toFixed(1) + 's');
+      box.appendChild(el); return { d, el, col };
+    });
+  });
+  // lay the dots out, keeping them clear of the words: a dot that would touch text shrinks and slides toward its edge, or bows out
+  const textRects = (cd, cr) => { const out = []; cd.el.querySelectorAll(cd.kind === 'res' ? '.r-kind, .r-name, .r-desc, .r-go' : 'h3, p').forEach(e => {
+      const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(b => b.width && out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top])); });
+    cd.el.querySelectorAll('.r-go').forEach(e => { const b = e.getBoundingClientRect(); out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]); });
+    return out; };
+  const hits = (cx, cy, R, rects, pad) => rects.some(([x0, y0, x1, y1]) => Math.hypot(Math.max(0, x0 - pad - cx, cx - x1 - pad), Math.max(0, y0 - pad - cy, cy - y1 - pad)) < R);
+  const layout = () => cards.forEach(cd => {
+    const cr = cd.el.getBoundingClientRect(), W = cr.width, H = cr.height; if (!W || !H) return;
+    const u = Math.min(H, W * (cd.kind === 'res' ? .5 : 1)), rects = textRects(cd, cr), pad = 14;
+    const cnt = cd.el.querySelector('.r-n'); if (cnt) cnt.classList.remove('on-dot-cream', 'on-dot-blue');
+    cd.dots.forEach(({ d, el, col }) => {
+      let s = d.s * u, x = d.ax === 'r' ? W - d.x * u : d.x * u, y = d.ay === 't' ? d.y * u : H - d.y * u, ok = false;
+      const ex = d.ax === 'r' ? 1 : -1, ey = d.ay === 't' ? -1 : 1;
+      for (let i = 0; i < 16; i++) { if (!hits(x, y, s / 2 + 6, rects, pad)) { ok = true; break; } s *= .93; x += ex * u * .035; y += ey * u * .035; }
+      el.style.display = ok ? '' : 'none';
+      el.style.width = el.style.height = s.toFixed(1) + 'px'; el.style.left = (x - s / 2).toFixed(1) + 'px'; el.style.top = (y - s / 2).toFixed(1) + 'px';
+      if (ok && cnt && (d.c === 'main' || d.c === 'gold')) { const b = cnt.getBoundingClientRect(), mx = (b.left + b.right) / 2 - cr.left, my = (b.top + b.bottom) / 2 - cr.top;
+        if (Math.hypot(mx - x, my - y) < s / 2) cnt.classList.add(col === BLUE ? 'on-dot-blue' : 'on-dot-cream'); }
+    });
+    cd.box.classList.add('on');
+  });
+  let t; const later = () => { clearTimeout(t); t = setTimeout(layout, 120); };
+  layout(); addEventListener('resize', later); addEventListener('load', layout); document.fonts && document.fonts.ready.then(layout);
+  if ('ResizeObserver' in window) { const ro = new ResizeObserver(later); cards.forEach(cd => ro.observe(cd.el)); }
+})();
+</script>
 </body>
 </html>
