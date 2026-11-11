@@ -808,6 +808,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .p-marq .pill{flex:none;white-space:nowrap;margin-right:14px;padding:.72em 1.2em;border-radius:26px;font-weight:700;font-size:clamp(17px,1.7vw,24px);letter-spacing:-.022em;line-height:1.1;box-shadow:none;transform-origin:50% 60%}
 .p-marq .pill.it{font-style:italic}
 .p-marq .gdot{flex:none;width:clamp(11px,1vw,15px);height:clamp(11px,1vw,15px);margin:0 18px 0 4px;background:var(--gold);border-radius:52% 46% 50% 48%/50% 54% 46% 50%}
+.p-marq .gmark{flex:none;height:clamp(22px,2.3vw,32px);width:auto;margin:0 20px 0 0;pointer-events:none;-webkit-user-drag:none}
 /* same as the home page: a little wiggle when the cursor passes over a pill */
 /* each pill wiggles its own way: a tilt, a hop or a jelly squish, with its own strength and speed (set per pill in the script) */
 @keyframes wgTilt{0%{rotate:0deg;scale:1}20%{rotate:calc(var(--a,4) * -1deg);scale:1.05}40%{rotate:calc(var(--a,4) * .75deg)}60%{rotate:calc(var(--a,4) * -.5deg)}80%{rotate:calc(var(--a,4) * .25deg)}100%{rotate:0deg;scale:1.03}}
@@ -819,7 +820,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .p-marq .c-blue{background:linear-gradient(160deg,#3a6ab6,#2c5494 55%,#1f3f73);color:var(--cream)}
 .p-marq .c-gold{background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--ink)}
 .p-marq .c-deep{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
-.p-marq .c-cream{background:var(--cream);color:var(--blue)}
+.p-marq .c-cream{background:#e9e2c9;color:var(--blue)}   /* the pill cream: a shade off the page cream, so the pill still shows */
 .p-marq .c-lav{background:linear-gradient(160deg,#cfc3dd,#bfb1d2 55%,#a998c0);color:var(--blue)}
 .p-marq .c-sage{background:linear-gradient(160deg,#d8de9c,#ccd389 55%,#b5bd6c);color:var(--ink)}
 .p-marq .c-plum{background:linear-gradient(160deg,#6b4a6e,#57385a 55%,#3f2742);color:var(--cream)}
@@ -844,7 +845,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 (() => {
   const ul = document.querySelector('.p-topics'); if (!ul) return;
   const names = [...ul.querySelectorAll('strong')].map(s => s.textContent.trim());
-  const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-lav', 'c-plum'];   // no cream: it would vanish into the page
+  const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-cream', 'c-lav', 'c-plum'];
   // one word in each row in Cormorant Garamond and one in Figtree (about 5% each), different words each visit
   const fw = (lo, hi) => ' f-w' + (lo + 100 * Math.floor(Math.random() * ((hi - lo) / 100 + 1)));   // a random weight the face actually has
   const faces = n => { const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * (n - 1)); if (b >= a) b++; return i => { if (i === a) return ' f-corm' + fw(300, 700); if (i === b) return ' f-fig' + fw(300, 900); const r = Math.random(); return r < .03 ? ' f-crete' : r < .05 ? ' f-crete-it' : ''; }; };   // plus about 3% Crete Round and 2% Crete Round italic, at random
@@ -881,9 +882,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
       // all Inter: each pill its own weight (thin only on darker colours), some italic, and a gold dot after a few
       const face = faces(set.length), fc = face, keep = [r === fr[0] && ' f-corm', r === fr[1] && ' f-fig'];
       const faceR = i => { const v = fc(i); return v && (v.startsWith(' f-crete') || keep.includes(v.split(' f-w')[0])) ? v : ''; };   // fewer words here, so each face turns up in just one row
-      const one = set.map((n, i) => { const cr = Math.random(), col = noGP(cr < .06 ? 'c-sage' : cr < .14 ? 'c-mist' : cr < .22 ? 'c-mauve' : lessGD(PAL[(i + r * per) % PAL.length])), light = /cream|lav|gold|sage|mist/.test(col);
+      const one = set.map((n, i) => { const cr = Math.random(), col = noGP(cr < .12 ? 'c-sage' : cr < .20 ? 'c-mist' : cr < .28 ? 'c-mauve' : lessGD(PAL[(i + r * per) % PAL.length])), light = /cream|lav|gold|sage|mist/.test(col);
         let wt = [200, 300, 400, 500, 600, 700, 800, 900][Math.floor(Math.random() * 8)]; if (light && wt < 300) wt = 300;
-        return '<span class="pill ' + col + tcol(col) + faceR(i) + (Math.random() < .35 ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + n + '</span>' + (Math.random() < .2 ? '<span class="gdot"></span>' : ''); }).join('');
+        return '<span class="pill ' + col + tcol(col) + faceR(i) + (Math.random() < .35 ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + n + '</span>' + (Math.random() < .2 ? '<span class="gdot"></span><img class="gmark" src="../assets/medialoop-wordmark.svg" alt="" aria-hidden="true">' : ''); }).join('');
       row.innerHTML = one.repeat(6); unGP(row); wrap.appendChild(row); const o = { row, dir: r % 2 ? 1 : -1, w: 0, m: 0 }; grab(o); return o;
     });
     measure();

@@ -1798,10 +1798,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
 @media (prefers-reduced-motion:reduce){.hm-marq .pill:hover{animation:none}}
 .hm-marq .row.buzz .pill{font-size:clamp(22px,2.6vw,38px);padding:.55em 1.15em;border-radius:28px}
 .hm-marq .gdot{flex:none;width:clamp(12px,1.2vw,18px);height:clamp(12px,1.2vw,18px);margin:0 18px 0 4px;background:var(--gold);border-radius:52% 46% 50% 48%/50% 54% 46% 50%}
+.hm-marq .gmark{flex:none;height:clamp(26px,2.9vw,40px);width:auto;margin:0 22px 0 0;pointer-events:none;-webkit-user-drag:none}
 .hm-marq .c-blue{background:linear-gradient(160deg,#3a6ab6,#2c5494 55%,#1f3f73);color:var(--cream)}
 .hm-marq .c-gold{background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--ink)}
 .hm-marq .c-deep{background:linear-gradient(160deg,#24477f,#1d3866 60%,#152b4f);color:var(--cream)}
-.hm-marq .c-cream{background:var(--cream);color:var(--blue)}
+.hm-marq .c-cream{background:#e9e2c9;color:var(--blue)}   /* the pill cream: a shade off the page cream, so the pill still shows */
 .hm-marq .c-lav{background:linear-gradient(160deg,#cfc3dd,#bfb1d2 55%,#a998c0);color:var(--blue)}
 .hm-marq .c-sage{background:linear-gradient(160deg,#d8de9c,#ccd389 55%,#b5bd6c);color:var(--ink)}
 .hm-marq .c-plum{background:linear-gradient(160deg,#6b4a6e,#57385a 55%,#3f2742);color:var(--cream)}
@@ -1840,7 +1841,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   // shuffle the research terms together and deal them back out across the first three rows, so themes don't cluster
   { const all = ROWS.flat(); for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
     const per = Math.ceil(all.length / 4); for (let r = 0; r < 4; r++) ROWS[r] = all.slice(r * per, (r + 1) * per); }
-  const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-lav', 'c-plum'];   // no cream: it would vanish into the page
+  const PAL = ['c-blue', 'c-gold', 'c-deep', 'c-cream', 'c-lav', 'c-plum'];
   // one word in each row in Cormorant Garamond and one in Figtree (about 5% each), different words each visit
   const fw = (lo, hi) => ' f-w' + (lo + 100 * Math.floor(Math.random() * ((hi - lo) / 100 + 1)));   // a random weight the face actually has
   const faces = n => { const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * (n - 1)); if (b >= a) b++; return i => { if (i === a) return ' f-corm' + fw(300, 700); if (i === b) return ' f-fig' + fw(300, 900); const r = Math.random(); return r < .03 ? ' f-crete' : r < .05 ? ' f-crete-it' : ''; }; };   // plus about 3% Crete Round and 2% Crete Round italic, at random
@@ -1864,10 +1865,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const face = faces(set.length);
     const one = set.map((t, fi) => { const fun = t[0] === '*', w = fun ? t.slice(1) : t;
       // sage chartreuse turns up only very rarely, as a little surprise
-      const cr = Math.random(), col = noGP(cr < .06 ? 'c-sage' : cr < .14 ? 'c-mist' : cr < .22 ? 'c-mauve' : lessGD(PAL[k % PAL.length])), light = /cream|lav|gold|sage|mist/.test(col);
+      const cr = Math.random(), col = noGP(cr < .12 ? 'c-sage' : cr < .20 ? 'c-mist' : cr < .28 ? 'c-mauve' : lessGD(PAL[k % PAL.length])), light = /cream|lav|gold|sage|mist/.test(col);
       // the thinnest weights only on the darker pills, so they stay readable
       let wt = pick(fun ? WTB : WT); if (light && wt < 300) wt = 300; const it = Math.random() < .35;
-      const dot = Math.random() < .18 ? '<span class="gdot" aria-hidden="true"></span>' : '';
+      const dot = Math.random() < .18 ? '<span class="gdot" aria-hidden="true"></span><img class="gmark" src="assets/medialoop-wordmark.svg" alt="" aria-hidden="true">' : '';   // a gold dot, then the medialoop logo
       k++; return '<span class="pill ' + col + tcol(col) + face(fi) + (fun ? ' fun' : '') + (it ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + w + '</span>' + dot; }).join('');
     row.innerHTML = one.repeat(5); unGP(row); box.appendChild(row); return { row, dir: r % 2 ? 1 : -1, w: 0, x: Math.random() };
   });
