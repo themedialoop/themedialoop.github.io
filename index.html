@@ -1984,27 +1984,20 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .ab-pill a.ab-inl:hover,.ab-pill a.ab-inl:focus-visible{color:var(--gold)}
 </style>
 <style>
-/* resource, event and Apply cards: one or two big dots instead of the net. Ten arrangements, shuffled across the cards on
-   every visit so no two cards match. The dots stay put and breathe like the holes of the net: a slow swell and shrink,
-   each at its own moment. They are big and run off the card's edges, but never touch one another, the words or the UIC mark. */
+/* resource, event and Apply cards: big dots instead of the net. Each dot is one of the net's own holes, blown up, so the
+   dots look lifted out of the net. Thirteen arrangements; each card gets its own, chosen so that what shows after the dots make room for the words still looks different from every other card. The dots stay put and
+   breathe exactly like the holes of the net: a slow swell and shrink that ripples out from the middle of the card. They are big and run off the card's edges, but never touch one another, the words or the UIC mark. */
 .res canvas,.ev > .ev-cv,.apply > canvas{display:none}
 .res .r-n{display:none}
 .mdots{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0}
 .res > .mdots,.ev > .mdots,.apply > .mdots{position:absolute}
-.mdot{position:absolute;opacity:0;transition:opacity .6s,background-color 0s;transform-origin:50% 50%;
-  animation:mbreathe var(--dur,3.5s) ease-in-out var(--del,0s) infinite alternate}
-.mdots.on .mdot{opacity:1}
-@keyframes mbreathe{from{transform:scale(var(--lo,.97))}to{transform:scale(var(--hi,1.03))}}
-@media (prefers-reduced-motion:reduce){.mdot{animation:none}}
-.ev:hover .mdot.k-cream{background:var(--gold) !important}   /* the card turns cream on hover, so its cream dots turn gold */
-.ev:hover .mdot.k-gold{background:var(--blue) !important}    /* and gold ones turn blue, so the two never meet as the same colour */
+.mdots canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .6s}
+.mdots.on canvas{opacity:1}
 </style>
 <script>
 (() => {
   const res = [...document.querySelectorAll('.res-stack .res')], evs = [...document.querySelectorAll('.ev-cards .ev')], ap = document.querySelector('.apply');
   const cards = [...res.map(el => ({ el, kind: 'res' })), ...evs.map(el => ({ el, kind: 'ev' })), ...(ap ? [{ el: ap, kind: 'ap' }] : [])]; if (!cards.length) return;
-  // each dot: anchored to an edge (r/l, t/b), offset from it and sized in units of the card (its height, capped on narrow cards)
-  // c: main (cream on dark cards, blue on light ones), second, dark (a deeper shade of the card), gold, sprinkle
   // the arrangements: each dot is anchored to an edge (r/l, t/b), offset from it and sized in units of the card.
   // Some are one or two big moons; others are bubbles, totems, stepping stones, cherries and confetti.
   const OPTS = [
@@ -2021,7 +2014,6 @@ button,input,select,textarea,optgroup{font-family:inherit}
     { name: "cherries", res: [{"ax":"r","x":0.22,"ay":"t","y":0.32,"s":0.5,"c":"main"},{"ax":"r","x":0.72,"ay":"t","y":0.62,"s":0.42,"c":"main"},{"ax":"r","x":0.5,"ay":"t","y":0.02,"s":0.16,"c":"main"}], ev: [{"ax":"r","x":0.1,"ay":"t","y":0.12,"s":0.3,"c":"main"},{"ax":"r","x":0.42,"ay":"t","y":0.26,"s":0.22,"c":"main"},{"ax":"r","x":0.26,"ay":"t","y":-0.02,"s":0.1,"c":"main"}] },
     { name: "confetti", res: [{"ax":"r","x":0.1,"ay":"t","y":0.15,"s":0.28,"c":"main"},{"ax":"r","x":0.48,"ay":"t","y":0.3,"s":0.16,"c":"main"},{"ax":"r","x":0.22,"ay":"t","y":0.62,"s":0.2,"c":"main"},{"ax":"r","x":0.62,"ay":"t","y":0.78,"s":0.12,"c":"main"},{"ax":"r","x":0.05,"ay":"b","y":0.06,"s":0.14,"c":"main"},{"ax":"r","x":0.78,"ay":"t","y":0.06,"s":0.09,"c":"main"}], ev: [{"ax":"r","x":0.08,"ay":"t","y":0.1,"s":0.2,"c":"main"},{"ax":"r","x":0.34,"ay":"t","y":0.26,"s":0.12,"c":"main"},{"ax":"r","x":0.16,"ay":"t","y":0.42,"s":0.09,"c":"main"},{"ax":"r","x":0.5,"ay":"t","y":0.04,"s":0.08,"c":"main"}] },
     { name: "big three", res: [{"ax":"r","x":0.55,"ay":"t","y":-0.38,"s":0.9,"c":"main"},{"ax":"r","x":-0.25,"ay":"t","y":0.5,"s":0.8,"c":"main"},{"ax":"r","x":0.45,"ay":"b","y":-0.4,"s":0.85,"c":"main"}], ev: [{"ax":"r","x":0.4,"ay":"t","y":-0.3,"s":0.6,"c":"main"},{"ax":"r","x":-0.2,"ay":"t","y":0.4,"s":0.5,"c":"main"}] },
-    { name: "sprinkle", res: [{"ax":"r","x":0.16,"ay":"t","y":-0.125,"s":1.31,"c":"main"},{"ax":"r","x":0.5,"ay":"b","y":0.18,"s":0.16,"c":"sprinkle"}], ev: [{"ax":"r","x":0.08,"ay":"t","y":-0.14,"s":0.78,"c":"main"},{"ax":"r","x":0.45,"ay":"t","y":0.3,"s":0.1,"c":"sprinkle"}] },
   ];
   const CREAM = '#f2eedd', BLUE = '#2c5494', GOLD = '#e7aa4d';
   // colours per card: [main, second, dark]. Every card keeps cream, blue and gold apart from the card itself
@@ -2030,75 +2022,118 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const palOf = el => { const c = el.classList, h = k => c.contains(k);
     return h('r-gold') || h('a-gold') ? 'gold' : h('r-lav') || h('a-lav') ? 'rose' : h('r-orange') ? 'orange' : h('r-sage') || h('a-sage') ? 'teal'
       : h('r-egg') || h('a-plum') ? 'mauve' : h('r-cream') ? 'cream' : el.classList.contains('apply') && !c.contains('a-blue') && !c.contains('a-deep') ? 'gold' : 'blue'; };
-  const SPRINK = { blue: ['#e0773a', '#d8708e'], gold: ['#d8708e', '#2a8c8c'], rose: ['#e0773a', '#2a8c8c'], orange: ['#d8708e', '#2a8c8c'], teal: ['#e0773a', '#d8708e'], mauve: ['#e0773a', '#d8708e'], cream: ['#e0773a', '#d8708e'] };
-  const pick = a => a[Math.floor(Math.random() * a.length)];
-  const blob = () => { const r = () => 44 + Math.round(Math.random() * 14); const a = r(), b = r(), c = r(), d = r(); return `${a}% ${100 - a}% ${b}% ${100 - b}% / ${c}% ${d}% ${100 - d}% ${100 - c}%`; };   // a fresh organic outline for every dot
-  const order = OPTS.map((o, i) => i); for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
-  const build = (cd, n) => {
-    if (cd.box) cd.box.remove();
-    const opt = OPTS[order[n % order.length]], pal = palOf(cd.el), P = PAL[pal], box = document.createElement('div');
-    box.className = 'mdots'; box.setAttribute('aria-hidden', 'true'); cd.el.prepend(box);
-    cd.box = box; cd.hi = opt.deep ? 1.06 : 1.03;
-    // playful colours: every dot on a card gets its own colour from the whole palette, never the card's own colour,
-    // never the colour behind the card where it runs off the edge (cream page, gold events band), never the card's hover colour,
-    // and never teal with mauve. Blue, gold and cream come up more often than the sprinkle colours.
-    const FAM = { blue: 'blue', gold: 'gold', rose: 'pink', orange: 'orange', teal: 'teal', mauve: 'mauve', cream: 'cream' }, own = FAM[pal];
-    const COLS = { blue: BLUE, gold: GOLD, cream: CREAM, orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', mauve: '#9b6aa6' };
-    const W8 = { blue: 3, gold: 3, cream: 3, orange: 2, pink: 2, teal: 1.5, mauve: 1.5 };
-    const banned = new Set([own, cd.kind === 'ev' ? 'gold' : 'cream']);
-    if (own === 'teal') banned.add('mauve'); if (own === 'mauve') banned.add('teal');
-    const hv = cd.el.classList; if (hv.contains('s-lav')) banned.add('pink'); if (hv.contains('s-chart')) banned.add('teal'); if (hv.contains('s-plum')) banned.add('mauve');
-    const used = [];
-    const draw = () => { if (!Object.keys(COLS).some(k => !banned.has(k) && !used.includes(k))) used.length = 0; const pool = Object.keys(COLS).filter(k => !banned.has(k) && !used.includes(k) && !(used.includes('teal') && k === 'mauve') && !(used.includes('mauve') && k === 'teal'));
-      let r = Math.random() * pool.reduce((a, k) => a + W8[k], 0); for (const k of pool) { r -= W8[k]; if (r <= 0) { used.push(k); return COLS[k]; } } used.push(pool[0]); return COLS[pool[0]]; };
-    const flip = cd.kind !== 'ev' && Math.random() < .5;   // half the wide cards get their arrangement upside down
-    cd.dots = opt[cd.kind === 'ap' ? 'res' : cd.kind].map(d0 => { const d = flip ? { ...d0, ay: d0.ay === 't' ? 'b' : 't' } : d0;
-      const el = document.createElement('div'), col = d.c === 'dark' && Math.random() < .5 ? P[2] : draw();
-      el.className = 'mdot' + (col === CREAM ? ' k-cream' : col === GOLD ? ' k-gold' : '');
-      el.style.background = col; el.style.borderRadius = blob();
-      el.style.setProperty('--lo', (2 - cd.hi).toFixed(3)); el.style.setProperty('--hi', cd.hi.toFixed(3));
-      el.style.setProperty('--dur', (3.2 + Math.random() * .8).toFixed(2) + 's'); el.style.setProperty('--del', (-Math.random() * 4).toFixed(2) + 's');   // the net's pace: a full breath every ~7 s
-      box.appendChild(el); return { d, el, col };
-    });
-  };
-  cards.forEach(build);
-  // the Apply card's colour is set by an earlier script; rebuild its dots once it has one
-  if (ap) { const apCard = cards.find(c => c.kind === 'ap'); new MutationObserver(() => { const k = palOf(ap) + ap.className; if (apCard.k !== k) { apCard.k = k; build(apCard, cards.length - 1); layout(); } }).observe(ap, { attributes: true, attributeFilter: ['class'] }); }
+  const COLS = { blue: BLUE, gold: GOLD, cream: CREAM, orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', mauve: '#9b6aa6' };
+  const W8 = { blue: 3, gold: 3, cream: 3, orange: 2, pink: 2, teal: 1.5, mauve: 1.5 };
+  const FAM = { blue: 'blue', gold: 'gold', rose: 'pink', orange: 'orange', teal: 'teal', mauve: 'mauve', cream: 'cream' };
+
+  // the net's own hole shapes, so every dot is a hole lifted out of the net
+  let HOLES = [];
+  const holesReady = (window.NET_HOLES ? Promise.resolve(window.NET_HOLES) : fetch('assets/net-holes.json').then(r => r.json())).then(j => {
+    const sc = j.scale;
+    HOLES = j.holes.map(h => { const pts = []; for (let i = 2; i < h.length; i += 2) pts.push([h[i] / sc, h[i + 1] / sc]);
+      const p = new Path2D(), n = pts.length, mid = i => [(pts[i % n][0] + pts[(i + 1) % n][0]) / 2, (pts[i % n][1] + pts[(i + 1) % n][1]) / 2];
+      let m = mid(0); p.moveTo(m[0], m[1]); for (let i = 1; i <= n; i++) { const c = pts[i % n], q = mid(i); p.quadraticCurveTo(c[0], c[1], q[0], q[1]); } p.closePath();
+      return { p, rad: Math.max(...pts.map(q => Math.hypot(q[0], q[1]))) }; });
+    for (let i = HOLES.length - 1; i > 0; i--) { const k = Math.floor(Math.random() * (i + 1)); [HOLES[i], HOLES[k]] = [HOLES[k], HOLES[i]]; }
+  }).catch(() => {});
+  let holeN = 0; const nextHole = () => HOLES.length ? HOLES[holeN++ % HOLES.length] : null;   // no two dots on the page share a shape
+
+  // each card gets a canvas to paint its dots on
+  cards.forEach(cd => { const box = document.createElement('div'); box.className = 'mdots'; box.setAttribute('aria-hidden', 'true');
+    cd.cv = document.createElement('canvas'); box.appendChild(cd.cv); cd.el.prepend(box); cd.box = box; });
+
   // keep the dots off the words, the button, the UIC mark and each other, with clear space all round
   const sel = { res: '.r-kind, .r-name, .r-desc, .r-go, .r-mini', ev: 'h3, p', ap: '.ap-kind, .ap-h, .ap-t, .ap-go' };
-  const rectsOf = (cd, cr) => { const out = []; const add = b => b.width && out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
+  const rectsOf = cd => { const cr = cd.el.getBoundingClientRect(), out = []; const add = b => b.width && out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
     cd.el.querySelectorAll(sel[cd.kind]).forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(add); });
     cd.el.querySelectorAll('.r-go, .ap-go, .ap-uic').forEach(e => add(e.getBoundingClientRect()));
-    return out; };
+    return { W: cr.width, H: cr.height, rects: out }; };
   const nearText = (cx, cy, R, rects, pad) => rects.some(([x0, y0, x1, y1]) => Math.hypot(Math.max(0, x0 - cx, cx - x1), Math.max(0, y0 - cy, cy - y1)) < R + pad);
-  const layout = () => cards.forEach(cd => {
-    if (!cd.dots) return; const cr = cd.el.getBoundingClientRect(), W = cr.width, H = cr.height; if (!W || !H) return;
-    const u = Math.min(H, W * (cd.kind === 'ev' ? 1 : .5)), rects = rectsOf(cd, cr), pad = Math.max(16, u * .05), gap = Math.max(14, u * .06), placed = [];
-    // place the biggest dot first, then fit the others around it
-    [...cd.dots].sort((a, b) => b.d.s - a.d.s).forEach(({ d, el }) => {
-      let s = d.s * u, x = d.ax === 'r' ? W - d.x * u : d.x * u, y = d.ay === 't' ? d.y * u : H - d.y * u, ok = false;
-      const ex = d.ax === 'r' ? 1 : -1, ey = d.ay === 't' ? -1 : 1;
-      s *= 1.35;                                                             // big: the dots run off the card's edges
+
+  // place one arrangement on a card. Big dots run off the edges; a dot in the way of the words slides further off, then shrinks
+  const place = (cd, oi, flip, m) => {
+    const { W, H, rects } = m, u = Math.min(H, W * (cd.kind === 'ev' ? 1 : .5)), pad = Math.max(16, u * .05), gap = Math.max(14, u * .06), placed = [];
+    let want = 0, got = 0;
+    const spec = OPTS[oi][cd.kind === 'ap' ? 'res' : cd.kind].map(d0 => flip ? { ...d0, ay: d0.ay === 't' ? 'b' : 't' } : d0).sort((a, b) => b.s - a.s);
+    const dots = spec.map(d => {
+      let s = d.s * u * 1.35, x = d.ax === 'r' ? W - d.x * u : d.x * u, y = d.ay === 't' ? d.y * u : H - d.y * u, ok = false;
+      const ex = d.ax === 'r' ? 1 : -1, ey = d.ay === 't' ? -1 : 1; want += s * s;
       for (let i = 0; i < 60; i++) {
-        const R = s / 2 * cd.hi;                                             // at its fullest breath
-        // at least a good slice of every dot stays on the card: its centre may sit only a little past an edge, so no dot shrinks to a sliver
+        const R = s / 2;
+        // a good slice of every dot stays on the card: its centre sits only a little past an edge, so no dot shrinks to a sliver
         const lx = -.15 * R, hx = W + .15 * R, ly = -.15 * R, hy = H + .15 * R;
         x = Math.min(hx, Math.max(lx, x)); y = Math.min(hy, Math.max(ly, y));
-        const clear = !nearText(x, y, R, rects, pad) && placed.every(p => Math.hypot(p.x - x, p.y - y) > p.R + R + gap);
-        if (clear) { ok = true; break; }
-        // first slide further off the card, toward its own edge; only once it can go no further, shrink
+        if (!nearText(x, y, R, rects, pad) && placed.every(p => Math.hypot(p.x - x, p.y - y) > p.R + R + gap)) { ok = true; break; }
         const nx = Math.min(hx, Math.max(lx, x + ex * u * .05)), ny = Math.min(hy, Math.max(ly, y + ey * u * .05));
         if (Math.abs(nx - x) + Math.abs(ny - y) > 1) { x = nx; y = ny; } else s *= .94; }
-      el.style.display = ok ? '' : 'none';
-      el.style.width = el.style.height = s.toFixed(1) + 'px'; el.style.left = (x - s / 2).toFixed(1) + 'px'; el.style.top = (y - s / 2).toFixed(1) + 'px';
-      if (ok) placed.push({ x, y, R: s / 2 * cd.hi });
+      if (ok) { placed.push({ x, y, R: s / 2 }); got += s * s; }
+      return { d, x, y, s, on: ok };
     });
-    cd.box.classList.add('on');
-  });
+    const vis = dots.filter(d => d.on), big = vis[0];
+    // what the card ends up looking like: how many dots show, and where and how big the biggest one is
+    const sig = vis.length + (big ? (big.x > W * .66 ? 'R' : 'M') + (big.y < H * .4 ? 'T' : big.y > H * .6 ? 'B' : 'C') + (big.s > u * .75 ? 'L' : 'S') : '0');
+    return { dots, keep: want ? got / want : 0, sig };
+  };
+
+  // colours: every dot on a card has its own colour from the whole palette, never the card's own colour, never the colour behind
+  // the card where it runs off the edge (cream page, gold events band), never the card's hover colour, never teal with mauve.
+  // The biggest dots are spread across the colours, so neighbouring cards differ. Blue, gold and cream come up most.
+  const BIG = {};
+  const paintColours = cd => {
+    const pal = palOf(cd.el), P = PAL[pal], own = FAM[pal], banned = new Set([own, cd.kind === 'ev' ? 'gold' : 'cream']);
+    if (own === 'teal') banned.add('mauve'); if (own === 'mauve') banned.add('teal');
+    const hv = cd.el.classList; if (hv.contains('s-lav')) banned.add('pink'); if (hv.contains('s-chart')) banned.add('teal'); if (hv.contains('s-plum')) banned.add('mauve');
+    if (cd.bigCol) BIG[cd.bigCol]--;
+    const used = []; let first = true;
+    const draw = () => { if (!Object.keys(COLS).some(k => !banned.has(k) && !used.includes(k))) used.length = 0;
+      const pool = Object.keys(COLS).filter(k => !banned.has(k) && !used.includes(k) && !(used.includes('teal') && k === 'mauve') && !(used.includes('mauve') && k === 'teal'));
+      const wt = k => W8[k] / (first ? 1 + 3 * (BIG[k] || 0) : 1); let r = Math.random() * pool.reduce((a, k) => a + wt(k), 0), g = pool[0];
+      for (const k of pool) { r -= wt(k); if (r <= 0) { g = k; break; } }
+      used.push(g); if (first) { BIG[g] = (BIG[g] || 0) + 1; cd.bigCol = g; first = false; } return COLS[g]; };
+    cd.dots.forEach(dot => { dot.col = dot.d.c === 'dark' && Math.random() < .5 ? P[2] : draw(); });
+  };
+  const finish = (cd, r) => { const old = cd.dots || [];
+    cd.dots = r.dots.map((d, i) => ({ ...d, col: old[i] && old[i].col, hole: (old[i] && old[i].hole) || nextHole(), rot: old[i] ? old[i].rot : Math.random() * Math.PI * 2, ph: old[i] ? old[i].ph : Math.random() * 6.283 }));
+    cd.el._dots = cd.dots; };
+
+  // choose an arrangement for every card: each card its own, and among those, one whose visible result looks unlike any other card's
+  let settled = false;
+  const choose = () => {
+    const used = new Set(), sigs = new Set(); Object.keys(BIG).forEach(k => delete BIG[k]); cards.forEach(cd => { cd.dots = null; cd.bigCol = null; });
+    cards.forEach(cd => { const m = rectsOf(cd); if (!m.W || !m.H) return; let best = null;
+      OPTS.forEach((o, oi) => { if (used.has(oi)) return; [false, true].forEach(flip => { const r = place(cd, oi, flip, m);
+        const score = r.keep + (sigs.has(cd.kind + r.sig) ? 0 : 2) + (r.dots.some(d => d.on) ? 0 : -5) + Math.random() * .4;
+        if (!best || score > best.score) best = { ...r, oi, flip, score }; }); });
+      if (!best) return; used.add(best.oi); sigs.add(cd.kind + best.sig); cd.oi = best.oi; cd.flip = best.flip; finish(cd, best); paintColours(cd); });
+  };
+  // after the first choice, a resize only re-places the same arrangement (same shapes and colours)
+  const layout = () => { if (!settled) choose(); else cards.forEach(cd => { if (cd.oi == null) return; const m = rectsOf(cd); if (m.W && m.H) finish(cd, place(cd, cd.oi, cd.flip, m)); });
+    cards.forEach(cd => { const r = cd.el.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); cd.W = r.width; cd.H = r.height;
+      cd.cv.width = Math.round(cd.W * dpr); cd.cv.height = Math.round(cd.H * dpr); cd.box.classList.add('on'); paint(cd, performance.now() / 1000); }); };
+
+  // the breath: like the net's holes, each dot swells and shrinks every ~7 s, in a ripple running out from the middle of the card
+  const reduceMo = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
+  if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => es.forEach(e => { const cd = cards.find(c => c.el === e.target); if (cd) e.isIntersecting ? seen.add(cd) : seen.delete(cd); }), { rootMargin: '120px' }); cards.forEach(cd => io.observe(cd.el)); } else cards.forEach(cd => seen.add(cd));
+  const paint = (cd, time) => { if (!cd.dots || !cd.W || !cd.cv.width) return; const g = cd.cv.getContext('2d'), dpr = cd.cv.width / cd.W, cx = cd.W / 2, cy = cd.H / 2, R = Math.hypot(cx, cy) || 1;
+    const hover = cd.kind === 'ev' && cd.el.matches(':hover');
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height);
+    cd.dots.forEach(dot => { if (!dot.on) return; if (!dot.hole) dot.hole = nextHole(); if (!dot.hole) return;
+      const wave = reduceMo ? 1 : .5 + .5 * Math.sin(time * .9 - Math.hypot(dot.x - cx, dot.y - cy) / R * 7 + dot.ph * .35);
+      const k = dot.s / 2 / dot.hole.rad * (.86 + .14 * wave), c = Math.cos(dot.rot) * k * dpr, s = Math.sin(dot.rot) * k * dpr;
+      g.fillStyle = hover && dot.col === CREAM ? GOLD : hover && dot.col === GOLD ? BLUE : dot.col;
+      g.setTransform(c, s, -s, c, dot.x * dpr, dot.y * dpr); g.fill(dot.hole.p); });
+    g.setTransform(1, 0, 0, 1, 0, 0); };
+  const loop = t => { seen.forEach(cd => paint(cd, t / 1000)); requestAnimationFrame(loop); };
+
+  // the Apply card picks its colour in an earlier script; recolour its dots if that changes
+  if (ap) { const apCard = cards.find(c => c.kind === 'ap'); new MutationObserver(() => { if (apCard.dots) { paintColours(apCard); paint(apCard, performance.now() / 1000); } }).observe(ap, { attributes: true, attributeFilter: ['class'] }); }
+
   let t; const later = () => { clearTimeout(t); t = setTimeout(layout, 120); };
-  layout(); addEventListener('resize', later); addEventListener('load', layout); document.fonts && document.fonts.ready.then(layout);
-  if ('ResizeObserver' in window) { const ro = new ResizeObserver(later); cards.forEach(cd => ro.observe(cd.el)); }
-  document.querySelectorAll('.ap-uic').forEach(i => i.addEventListener('load', later));
+  layout();
+  // choose again once the fonts and the page have settled (the words' shapes decide what fits), then keep that choice
+  Promise.all([document.fonts ? document.fonts.ready : 0, new Promise(r => document.readyState === 'complete' ? r() : addEventListener('load', r)), holesReady]).then(() => { layout(); settled = true; requestAnimationFrame(loop); });
+  addEventListener('resize', later);
+  if ('ResizeObserver' in window) { const ro = new ResizeObserver(() => settled && later()); cards.forEach(cd => ro.observe(cd.el)); }
 })();
 </script>
 </body>
