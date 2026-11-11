@@ -2038,8 +2038,20 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const opt = OPTS[order[n % order.length]], pal = palOf(cd.el), P = PAL[pal], box = document.createElement('div');
     box.className = 'mdots'; box.setAttribute('aria-hidden', 'true'); cd.el.prepend(box);
     cd.box = box; cd.hi = opt.deep ? 1.06 : 1.03;
+    // playful colours: every dot on a card gets its own colour from the whole palette, never the card's own colour,
+    // never the colour behind the card where it runs off the edge (cream page, gold events band), never the card's hover colour,
+    // and never teal with mauve. Blue, gold and cream come up more often than the sprinkle colours.
+    const FAM = { blue: 'blue', gold: 'gold', rose: 'pink', orange: 'orange', teal: 'teal', mauve: 'mauve', cream: 'cream' }, own = FAM[pal];
+    const COLS = { blue: BLUE, gold: GOLD, cream: CREAM, orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', mauve: '#9b6aa6' };
+    const W8 = { blue: 3, gold: 3, cream: 3, orange: 2, pink: 2, teal: 1.5, mauve: 1.5 };
+    const banned = new Set([own, cd.kind === 'ev' ? 'gold' : 'cream']);
+    if (own === 'teal') banned.add('mauve'); if (own === 'mauve') banned.add('teal');
+    const hv = cd.el.classList; if (hv.contains('s-lav')) banned.add('pink'); if (hv.contains('s-chart')) banned.add('teal'); if (hv.contains('s-plum')) banned.add('mauve');
+    const used = [];
+    const draw = () => { const pool = Object.keys(COLS).filter(k => !banned.has(k) && !used.includes(k) && !(used.includes('teal') && k === 'mauve') && !(used.includes('mauve') && k === 'teal'));
+      let r = Math.random() * pool.reduce((a, k) => a + W8[k], 0); for (const k of pool) { r -= W8[k]; if (r <= 0) { used.push(k); return COLS[k]; } } used.push(pool[0]); return COLS[pool[0]]; };
     cd.dots = opt[cd.kind === 'ap' ? 'res' : cd.kind].map(d => {
-      const el = document.createElement('div'), col = d.c === 'main' ? P[0] : d.c === 'second' ? P[1] : d.c === 'dark' ? P[2] : d.c === 'gold' ? (pal === 'gold' ? CREAM : GOLD) : pick(SPRINK[pal]);
+      const el = document.createElement('div'), col = d.c === 'dark' && Math.random() < .5 ? P[2] : draw();
       el.className = 'mdot' + (col === CREAM ? ' k-cream' : col === GOLD ? ' k-gold' : '');
       el.style.background = col; el.style.borderRadius = blob();
       el.style.setProperty('--lo', (2 - cd.hi).toFixed(3)); el.style.setProperty('--hi', cd.hi.toFixed(3));
@@ -2067,8 +2079,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
       s *= 1.35;                                                             // big: the dots run off the card's edges
       for (let i = 0; i < 60; i++) {
         const R = s / 2 * cd.hi;                                             // at its fullest breath
-        // at least a good slice of every dot stays on the card: its centre may sit up to a third of its radius past an edge
-        const lx = -.33 * R, hx = W + .33 * R, ly = -.33 * R, hy = H + .33 * R;
+        // at least a good slice of every dot stays on the card: its centre may sit only a little past an edge, so no dot shrinks to a sliver
+        const lx = -.15 * R, hx = W + .15 * R, ly = -.15 * R, hy = H + .15 * R;
         x = Math.min(hx, Math.max(lx, x)); y = Math.min(hy, Math.max(ly, y));
         const clear = !nearText(x, y, R, rects, pad) && placed.every(p => Math.hypot(p.x - x, p.y - y) > p.R + R + gap);
         if (clear) { ok = true; break; }
