@@ -1015,7 +1015,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   }
   let DPR = 1, W = 0, H = 0;
   function resize() {
-    DPR = Math.min(devicePixelRatio || 1, 1.25);   // the soft background net does not need full retina resolution, and this keeps scrolling light
+    DPR = Math.min(devicePixelRatio || 1, 2);   // full screen sharpness, so the dots have crisp edges (was capped at 1.25, which left them jagged on sharp screens)
     W = C.width = Math.round(innerWidth * DPR); H = C.height = Math.round(innerHeight * DPR);
     WP = way();
   }
