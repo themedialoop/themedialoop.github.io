@@ -701,7 +701,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 @media (prefers-reduced-motion:reduce){.p-marq .pill:hover{animation:none}}
 .p-marq .c-blue{background:#2c5494;color:var(--cream)}
 .p-marq .c-gold{background:#e7aa4d;color:var(--blue)}
-.p-marq .c-deep{background:#1d3866;color:var(--cream)}
+.p-marq .c-deep{background:#2c5494;color:var(--cream)}
 .p-marq .c-cream{background:#e9e2c9;color:var(--blue)}   /* the pill cream: a shade off the page cream, so the pill still shows */
 .p-marq .c-lav{background:#d8708e;color:var(--cream)}
 .p-marq .c-sage{background:#2a8c8c;color:var(--cream)}
@@ -810,7 +810,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 <style>
 /* research interests: three rows running edge to edge of the cream area (from the sidebar to the window's right edge) */
 @media (min-width:901px){.p-marq{margin-left:-100vw !important;margin-right:-100vw !important;padding-left:calc(100vw - 20px)}}
-@media (max-width:900px){.p-marq{margin-left:calc(-1 * (var(--gutter) - 16px)) !important;margin-right:calc(-1 * (var(--gutter) - 16px)) !important}}
+@media (max-width:900px){.p-marq{width:100vw;margin-left:calc(50% - 50vw) !important;margin-right:0 !important}}   /* phones: right to both edges of the screen */
 /* desktop: a highlighted paper reads as an extension of the blue sidebar, in the sidebar's own colours */
 @media (min-width:901px){
   .pubs a::before{left:-100vw;right:-100vw;background:#2c5494 fixed}

@@ -1003,7 +1003,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const ih = innerHeight, m = isMobile(), e = ease(Math.min(1, scrollY / (ih * .6)));
     const top = { which: 'top', x: lerp1(m ? .86 : .94, m ? .04 : .06, e), yp: lerp1(m ? .26 : .46, m ? .14 : .1, e) * ih, r: lerp1(m ? .34 : .33, m ? .26 : .24, e) };   // desktop: far enough right that the net stays off the opening paragraph
     const f = footEl.getBoundingClientRect();
-    const ct = { which: 'contact', x: m ? .12 : .14, yp: f.top + scrollY + (m ? .02 : .06) * ih, r: m ? .36 : .33 };   // back on the left, just above the contact heading
+    const ct = { which: 'contact', x: m ? .12 : .14, yp: f.top + scrollY + (m ? .02 : .06) * ih, r: m ? .36 : .33, sx: 1.4 };   // stretched wider, left to right   // back on the left, just above the contact heading
     const mr = mqEl.getBoundingClientRect();
     const mp = Math.max(0, Math.min(1, (ih - mr.top) / (ih + mr.height)));          // how far this space has travelled up the screen
     // between About and Publications: an organic round glow, like the one at Contact, sitting on the right and
