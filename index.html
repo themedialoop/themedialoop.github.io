@@ -2101,9 +2101,12 @@ button,input,select,textarea,optgroup{font-family:inherit}
       const b = cd.el.querySelector('.pm').getBoundingClientRect(); dots.push({ x: b.left - cr.left + b.width / 2, y: b.top - cr.top + b.height / 2, r: 0, R: Math.max(b.width, b.height) / 2, fixed: true });
     }
     const rM = phone ? Math.min(24, rmax) : rmax, gp = phone ? 5 : Math.max(4, rmax * .09);   // the corner is packed full: dots sit close, never touching
-    for (let i = 0; i < (phone ? 12000 : 16000); i++) {
+    const NT = phone ? 14000 : 16000;
+    for (let i = 0; i < NT; i++) {
       const x = rnd() * (w + 60) - 30, y = rnd() * (h + 60) - 30, f = field(x, y); if (f <= .05) continue;
-      const r = rmin + (rM - rmin) * f * (.55 + .45 * rnd()), R = r * 1.1 * BREATH;
+      // first pass places the big dots; the second half of the tries places smaller ones in the gaps between them, so the
+      // cluster reads as packed rather than as big dots with holes
+      const late = i > NT * .45, r = (rmin + (rM - rmin) * f * (.55 + .45 * rnd())) * (late ? .22 + .4 * rnd() : 1), R = r * 1.1 * BREATH; if (r < rmin) continue;
       if (distTo(x, y, rects) < R + pad) continue;
       if (dots.some(p => Math.hypot(p.x - x, p.y - y) < p.R + R + gp)) continue;
       dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283 }); }
