@@ -550,7 +550,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     }
   };
 
-  /* the sidebar's net: cream holes on the blue, in a band along the top and the bottom whose inner edges sway;
+  /* the sidebar's net: cream holes on the blue, filling the whole column;
      it always keeps clear of the photo, the name and the links */
   const side = document.querySelector('.side-net'), sideIn = document.querySelector('.side-in');
   { const topBar = document.getElementById('top'), aside = document.querySelector('.p-side');
@@ -564,7 +564,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const g = side.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
     const boxes = [...sideIn.querySelectorAll('.back, .p-photo-wrap, .p-intro'), document.querySelector('.menu-btn'), document.querySelector('.top .mark')].filter(Boolean).map(el => { const b = el.getBoundingClientRect();
       return [(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr]; });
-    const tilePx = (mobile() ? 820 : 1150) * dpr, k = tilePx / TILE, ox = -time * 4 * dpr, pad = 10 * dpr, soft = 46 * dpr;
+    const tilePx = (mobile() ? 820 : 1150) * dpr, k = tilePx / TILE, ox = -time * 4 * dpr, pad = 12 * dpr, soft = 34 * dpr;
     g.fillStyle = 'rgb(242,238,221)';
     for (let ty = -1; ty <= Math.ceil(h / tilePx) + 1; ty++) for (let tx = Math.floor(-ox / tilePx) - 1; tx * tilePx + ox < w + tilePx; tx++)
       for (const hh of holes) {
@@ -573,7 +573,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
         const xx = px / w, yy = py / h;
         const top = (mobile() ? .38 : .34) + .035 * Math.sin(xx * 5 + time * .5) + .02 * Math.sin(xx * 13 - time * .4),
               bot = .36 + .035 * Math.sin(xx * 6 - time * .45 + 1) + .02 * Math.sin(xx * 12 + time * .35);
-        let f = Math.max(sse((top - yy) / .17), sse((bot - (1 - yy)) / .17)); if (f < .03) continue;
+        let f = 1;   // the net fills the whole column, so there's no bare blue gap; it only draws back around the photo, name and links
         for (const [x0, y0, x1, y1] of boxes) { const dx = Math.max(0, x0 - px, px - x1), dy = Math.max(0, y0 - py, py - y1); f *= sse((Math.hypot(dx, dy) - pad) / soft); }
         if (f < .05) continue;
         const s = (.62 + .3 * (.5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35))) * f;
