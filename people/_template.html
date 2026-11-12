@@ -865,5 +865,19 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .p-side .p-links li a:hover,.p-side .p-links li a:focus-visible{background:var(--gold) !important}
 .p-side .p-links li:nth-child(4n+1) a:hover,.p-side .p-links li:nth-child(4n+1) a:focus-visible{background:var(--cream) !important}
 </style>
+<style>
+/* publications: on hover each row lights up in the next brand colour, in order down the page:
+   blue, gold, orange, pink, teal, purple, then round again. Words turn cream on every colour except gold, where they stay blue. */
+.pubs a[style*="--hl"]::before{background:var(--hl) !important}
+.pubs a[href]:is(:hover,:focus-visible)::before{opacity:1}
+.pubs a[href]:is(:hover,:focus-visible),.pubs a[href]:is(:hover,:focus-visible) *{color:#f2eedd !important}
+.pubs a[href]:is(:hover,:focus-visible) .ttl-main{background-size:0 0 !important}
+.pubs a.hl-gold[href]:is(:hover,:focus-visible),.pubs a.hl-gold[href]:is(:hover,:focus-visible) *{color:#2c5494 !important}
+</style>
+<script>
+(() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6'];
+  [...document.querySelectorAll('.pubs li > a[href]')].forEach((a, i) => { const c = P[i % P.length];
+    a.style.setProperty('--hl', c); if (c === '#e7aa4d') a.classList.add('hl-gold'); }); })();
+</script>
 </body>
 </html>
