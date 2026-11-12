@@ -1003,7 +1003,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const ih = innerHeight, m = isMobile(), e = ease(Math.min(1, scrollY / (ih * .6)));
     const top = { which: 'top', x: lerp1(m ? .86 : .94, m ? .04 : .06, e), yp: lerp1(m ? .26 : .46, m ? .14 : .1, e) * ih, r: lerp1(m ? .34 : .33, m ? .26 : .24, e) };   // desktop: far enough right that the net stays off the opening paragraph
     const f = footEl.getBoundingClientRect();
-    const ct = { which: 'contact', x: m ? .12 : .14, yp: f.top + scrollY + (m ? .02 : .06) * ih, r: m ? .36 : .33 };   // just above the contact heading
+    const ct = { which: 'contact', x: m ? .96 : .94, yp: f.top + scrollY + (m ? .0 : .42) * ih, r: m ? .3 : .33 };   // off to the right of the contact words, like the net beside the logo, so it shows in full blue instead of being washed out behind the text
     const mr = mqEl.getBoundingClientRect();
     const mp = Math.max(0, Math.min(1, (ih - mr.top) / (ih + mr.height)));          // how far this space has travelled up the screen
     // between About and Publications: an organic round glow, like the one at Contact, sitting on the right and
@@ -1091,7 +1091,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
 
       // home page: the net also reaches along the top, over the logo's shoulder, in three soft overlapping lobes that
       // continue the blob's organic edge (the logo's own cream clearing, below, keeps the letters clean)
-      const LOBES = cur.which !== 'top' ? [] : isMobile() ? [[.22, -.8, .62]].map(([a, b, c]) => [cx + R * a, cy + R * b, R * c]) : /* desktop: the net sweeps across the top */ [[-1.5, -1.0, .6], [-1.1, -.95, .62], [-.7, -.82, .66], [-.35, -.62, .7], [-1.9, -1.1, .42], [.25, -.9, .8], [.3, -.35, .6]]   /* the last two keep the top-right corner full blue */.map(([a, b, c], i) =>
+      const LOBES = cur.which === 'contact' ? [[.05, 0, .72], [.12, -.55, .6], [.12, .55, .6]].map(([a, b, c], i) => [cx + R * (a + .03 * Math.sin(time * .13 + i * 2)), cy + R * (b + .03 * Math.sin(time * .11 + i)), R * c])   // the contact net in the same full blue as the top
+        : cur.which !== 'top' ? [] : isMobile() ? [[.22, -.8, .62]].map(([a, b, c]) => [cx + R * a, cy + R * b, R * c]) : /* desktop: the net sweeps across the top */ [[-1.5, -1.0, .6], [-1.1, -.95, .62], [-.7, -.82, .66], [-.35, -.62, .7], [-1.9, -1.1, .42], [.25, -.9, .8], [.3, -.35, .6]]   /* the last two keep the top-right corner full blue */.map(([a, b, c], i) =>
         [cx + R * (a + .03 * Math.sin(time * .13 + i * 2)), cy + R * (b + .03 * Math.sin(time * .11 + i)), R * c * (1 + .04 * Math.sin(time * .17 + i * 3))]);
       for (const [lx, ly, lr] of LOBES) { const gg = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr);
         gg.addColorStop(0, 'rgba(44,84,148,1)'); gg.addColorStop(.55, 'rgba(44,84,148,.8)'); gg.addColorStop(.85, 'rgba(44,84,148,.22)'); gg.addColorStop(1, 'rgba(44,84,148,0)');
@@ -1137,7 +1138,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       }
       const ct = contactEls.map(e => e.getBoundingClientRect());
       if (ct.length) clear({ left: Math.min(...ct.map(r => r.left)), top: Math.min(...ct.map(r => r.top)), right: Math.max(...ct.map(r => r.right)), bottom: Math.max(...ct.map(r => r.bottom)),
-        get width() { return this.right - this.left; }, get height() { return this.bottom - this.top; } }, .95, .95, 1, .97);
+        get width() { return this.right - this.left; }, get height() { return this.bottom - this.top; } }, .64, .78, 1, .97);   // a snug clearing, so the net beside it keeps its full blue
     }
 
     // header, statement words, marquee
