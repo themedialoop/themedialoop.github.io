@@ -1089,20 +1089,29 @@ button,input,select,textarea,optgroup{font-family:inherit}
       const SX = cur.sx || 1, SY = cur.sy || 1;
       ctx.drawImage(OFF, 0, 0, s2, s2, cx - size * SX / 2, cy - size * SY / 2, size * SX, size * SY);
 
+      // home page: the net also reaches along the top, over the logo's shoulder, in three soft overlapping lobes that
+      // continue the blob's organic edge (the logo's own cream clearing, below, keeps the letters clean)
+      const LOBES = cur.which === 'top' && !isMobile() ? [[-1.45, -1.02, .64], [-.98, -1.08, .56], [-1.9, -1.12, .44]].map(([a, b, c], i) =>
+        [cx + R * (a + .03 * Math.sin(time * .13 + i * 2)), cy + R * (b + .03 * Math.sin(time * .11 + i)), R * c * (1 + .04 * Math.sin(time * .17 + i * 3))]) : [];
+      for (const [lx, ly, lr] of LOBES) { const gg = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr);
+        gg.addColorStop(0, 'rgba(44,84,148,1)'); gg.addColorStop(.55, 'rgba(44,84,148,.8)'); gg.addColorStop(.85, 'rgba(44,84,148,.22)'); gg.addColorStop(1, 'rgba(44,84,148,0)');
+        ctx.fillStyle = gg; ctx.fillRect(lx - lr, ly - lr, lr * 2, lr * 2); }
       // the net: cream holes, fixed in place, breathing
       if (holes.length) {
         const tilePx = (isMobile() ? 980 : 1500) * DPR, k = tilePx / TILE;
         const ox = W / 2, oy = H / 2;                         // the net is pinned to the window, not the page
         const reach = R * 1.17 * Math.max(SX, SY);
-        const tx0 = Math.floor((cx - reach - ox) / tilePx), tx1 = Math.floor((cx + reach - ox) / tilePx);
-        const ty0 = Math.floor((cy - reach - oy) / tilePx), ty1 = Math.floor((cy + reach - oy) / tilePx);
+        const lxMin = Math.min(cx - reach, ...LOBES.map(l => l[0] - l[2] * 1.1)), lyMin = Math.min(cy - reach, ...LOBES.map(l => l[1] - l[2] * 1.1));
+        const tx0 = Math.floor((lxMin - ox) / tilePx), tx1 = Math.floor((cx + reach - ox) / tilePx);
+        const ty0 = Math.floor((lyMin - oy) / tilePx), ty1 = Math.floor((cy + reach - oy) / tilePx);
         ctx.fillStyle = CREAM;
         for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
           const bx = ox + tx * tilePx, by = oy + ty * tilePx;
           for (const h of holes) {
             const px = bx + h.cx * k, py = by + h.cy * k;
             const dx = px - cx, dyy = py - cy, d = Math.hypot(dx / SX, dyy / SY);
-            if (d > R * (1.05 + .12 * (cur.flat || 0)) || px < -40 || py < -40 || px > W + 40 || py > H + 40) continue;
+            if (px < -40 || py < -40 || px > W + 40 || py > H + 40) continue;
+            if (d > R * (1.05 + .12 * (cur.flat || 0)) && !LOBES.some(([lx, ly, lr]) => Math.hypot(px - lx, py - ly) < lr * 1.02)) continue;
             const wave = .5 + .5 * Math.sin(time * .9 - d / R * 7 + h.ph * .35);
             const s = Math.min(1, .6 + .34 * wave + .06 * pulse);
             ctx.setTransform(k * s, 0, 0, k * s, px, py);
