@@ -1595,7 +1595,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
         scrollTo(0, 0); let lastWheel = performance.now(), released = false;
         const swallow = ev => { if (released) return; ev.preventDefault(); lastWheel = performance.now(); };
         addEventListener('wheel', swallow, { passive: false });
-        const watch = () => { if (performance.now() - lastWheel > 330) { released = true; removeEventListener('wheel', swallow); } else setTimeout(watch, 60); }; setTimeout(watch, 60);
+        const up = performance.now(); const watch = () => { const now = performance.now(); if (now - lastWheel > 150 || now - up > 600) { released = true; removeEventListener('wheel', swallow); } else setTimeout(watch, 30); }; setTimeout(watch, 30);   // at most 0.6 s
       };
       cue.style.pointerEvents = 'auto'; cue.style.cursor = 'pointer';
       cue.addEventListener('click', () => { pt = 1; idle = 0; });                    // tapping the gold dot also opens the site
