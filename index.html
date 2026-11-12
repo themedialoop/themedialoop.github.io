@@ -2100,8 +2100,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
       // the gold open/close button is one of the dots: the others pack round it at the usual spacing
       const b = cd.el.querySelector('.pm').getBoundingClientRect(); dots.push({ x: b.left - cr.left + b.width / 2, y: b.top - cr.top + b.height / 2, r: 0, R: Math.max(b.width, b.height) / 2, fixed: true });
     }
-    const rM = phone ? Math.min(24, rmax) : rmax, gp = phone ? 7 : gap;
-    for (let i = 0; i < (phone ? 2500 : 6000); i++) {
+    const rM = phone ? Math.min(24, rmax) : rmax, gp = phone ? 5 : Math.max(4, rmax * .09);   // the corner is packed full: dots sit close, never touching
+    for (let i = 0; i < (phone ? 12000 : 16000); i++) {
       const x = rnd() * (w + 60) - 30, y = rnd() * (h + 60) - 30, f = field(x, y); if (f <= .05) continue;
       const r = rmin + (rM - rmin) * f * (.55 + .45 * rnd()), R = r * 1.1 * BREATH;
       if (distTo(x, y, rects) < R + pad) continue;
