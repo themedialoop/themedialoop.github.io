@@ -1992,6 +1992,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .res > .kdots,.ev > .kdots,.apply > .kdots{position:absolute}
 .kdots canvas{position:absolute;inset:0;width:100%;height:100%;display:block !important;opacity:0;transition:opacity .6s}
 .kdots.on canvas{opacity:1}
+/* event cards: the words take the left of the card and the dots get the right, top to bottom */
+@media (min-width:561px){.ev .ev-when,.ev h3,.ev .ev-what,.ev .ev-where{max-width:58%}}
 </style>
 <script>
 (() => {
@@ -2003,6 +2005,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (h('r-gold') || h('a-gold') || h('r-lav') || h('a-lav') || h('r-orange') || (c.contains('apply') && !h('a-blue') && !h('a-deep') && !h('a-plum') && !h('a-sage'))) return BLUE;
     if (h('r-sage') || h('a-sage') || h('r-egg') || h('a-plum')) return CREAM;
     return GOLD; };
+  const EV_DOT = CREAM;   // event cards: cream dots, so where they run off the card they stand apart from the gold band behind
   const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
   const mulberry = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 
@@ -2031,10 +2034,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const build = cd => {
     const cr = cd.el.getBoundingClientRect(), w = cr.width, h = cr.height; if (!w || !h) return;
     const rnd = mulberry(cd.seed), rects = rectsOf(cd, cr), narrow = w < h * 1.7;
-    const rx = narrow ? w * .72 : Math.min(w * .48, h * 1.35), ry = narrow ? h * .5 : h * 1.05, cy = cd.top ? 0 : h;
-    const rmax = Math.max(14, Math.min(46, Math.min(w, h) * .14)), rmin = 2.5, gap = Math.max(4, rmax * .12);
+    const evWide = cd.kind === 'ev' && w > 420;   // wide event cards: a tall cascade filling the right of the card
+    const rx = evWide ? w * .55 : narrow ? w * .72 : Math.min(w * .48, h * 1.35), ry = evWide ? h * 1.35 : narrow ? h * .5 : h * 1.05, cy = cd.top ? 0 : h;
+    const rmax = Math.max(14, Math.min(46, Math.min(w, h) * (evWide ? .12 : .14))), rmin = 2.5, gap = Math.max(4, rmax * .12);
     const pad = Math.max(14, rmax * .45);            // clear space between any dot and the words
-    const inside = cd.kind === 'ev';                 // event cards sit on the gold band: keep their dots wholly on the card
     const field = (x, y) => { const f = 1 - sm(.25, 1, Math.hypot((w - x) / rx, (y - cy) / ry)); if (f <= 0) return 0;
       const d = distTo(x, y, rects); return f * sm(pad, pad + rmax * 2.2, d); };   // thin out well before the words
     const dots = [];
@@ -2042,18 +2045,17 @@ button,input,select,textarea,optgroup{font-family:inherit}
       const x = rnd() * (w + 60) - 30, y = rnd() * (h + 60) - 30, f = field(x, y); if (f <= .05) continue;
       const r = rmin + (rmax - rmin) * f * (.55 + .45 * rnd()), R = r * 1.1 * BREATH;
       if (distTo(x, y, rects) < R + pad) continue;
-      if (inside && (x - R < 6 || y - R < 6 || x + R > w - 6 || y + R > h - 6)) continue;
       if (dots.some(p => Math.hypot(p.x - x, p.y - y) < p.R + R + gap)) continue;
       dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283 }); }
     const dpr = Math.min(2, devicePixelRatio || 1);
-    cd.w = w; cd.h = h; cd.dpr = dpr; cd.dots = dots; cd.col = dotColour(cd.el);
+    cd.w = w; cd.h = h; cd.dpr = dpr; cd.dots = dots; cd.col = cd.kind === 'ev' ? EV_DOT : dotColour(cd.el);
     cd.cv.width = Math.round(w * dpr); cd.cv.height = Math.round(h * dpr); cd.box.classList.add('on');
   };
 
   // each frame the dots swell and shrink a little, in a ripple that runs out from the corner, like the net's holes
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
   const paint = (cd, time) => { if (!cd.dots) return; const g = cd.cv.getContext('2d'), dpr = cd.dpr, ox = cd.w, oy = cd.top ? 0 : cd.h, Rn = Math.hypot(cd.w, cd.h);
-    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.col;
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.matches(':hover') ? GOLD : cd.col;   // the card turns cream on hover; its dots turn gold
     for (const d of cd.dots) { const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .9 - Math.hypot(d.x - ox, d.y - oy) / Rn * 7 + d.ph * .35);
       const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
       g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); g.fill(d.p); }
