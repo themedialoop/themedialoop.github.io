@@ -387,7 +387,13 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .r-lav .r-kind::before,.r-cream .r-kind::before{background:var(--blue)}
 .res:hover .r-go,.res:focus-visible .r-go{transform:translateX(4px);filter:brightness(.92)}
 @media (max-width:560px){.res{min-height:0}.r-name{font-size:clamp(34px,11vw,48px)}}
+/* like the other cards: a slight lift and tilt under the pointer, and a small press when clicked or tapped */
+.res{transition:translate .45s cubic-bezier(.3,1.6,.5,1),rotate .45s cubic-bezier(.3,1.6,.5,1),scale .2s ease}
+.res:nth-child(odd){--rr:-.6deg}.res:nth-child(even){--rr:.6deg}
+@media (hover:hover){.res:hover,.res:focus-visible{translate:0 -6px;rotate:var(--rr)}}
+.res:active{scale:.985;translate:0 -2px;rotate:var(--rr)}
 @media (prefers-reduced-motion:reduce){.res{position:relative;top:auto;transform:none}.r-go{transition:none}}
+@media (prefers-reduced-motion:reduce){.res,.res:hover,.res:active{translate:none;rotate:none;scale:none}}
 
 /* event cards: the breathing net in the top-right corner and a small counter, like the resource cards */
 .ev{position:relative;overflow:hidden}
