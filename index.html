@@ -2044,7 +2044,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (cd.kind === 'pill') cd.el.querySelector('summary').prepend(box); else cd.el.prepend(box); });
 
   // pack the dots: big near the corner, smaller and sparser further in, none touching, none near the words
-  const BREATH = 1.08;   // dots swell to 8% over their resting size; spacing allows for that
+  const BREATH = 1.03;   // dots swell very slightly, 3% over their resting size; spacing allows for that
   const build = cd => {
     const cr = cd.el.getBoundingClientRect(), w = cr.width, h = cr.height; if (!w || !h) return;
     const rnd = mulberry(cd.seed), rects = rectsOf(cd, cr), narrow = w < h * 1.7;
@@ -2076,7 +2076,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
   const paint = (cd, time) => { if (!cd.dots) return; const g = cd.cv.getContext('2d'), dpr = cd.dpr, ox = cd.w, oy = cd.top ? 0 : cd.h, Rn = Math.hypot(cd.w, cd.h);
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.matches(':hover') ? GOLD : cd.col;   // the card turns cream on hover; its dots turn gold
-    for (const d of cd.dots) { if (d.fixed) continue; const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .9 - Math.hypot(d.x - ox, d.y - oy) / Rn * 7 + d.ph * .35);
+    for (const d of cd.dots) { if (d.fixed) continue; const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .3 - Math.hypot(d.x - ox, d.y - oy) / Rn * 5 + d.ph * .35);   // a slow breath, about every 20 s
       const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
       g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); g.fill(d.p); }
     g.setTransform(1, 0, 0, 1, 0, 0); };
