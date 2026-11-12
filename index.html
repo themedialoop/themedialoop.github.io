@@ -1706,7 +1706,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 </style>
 <script>
 (() => {
-  const pills = [...document.querySelectorAll('.ab-pill')]; if (!pills.length || !window.NET_HOLES) return;
+  const pills = [...document.querySelectorAll('.ab-pill')]; if (!pills.length || !window.NET_HOLES || true) return;   // retired: the info cards now carry the dot cascade
   const N = NET_HOLES, T = N.tile, SC = N.scale;
   const H = N.holes.map(h => { const pts = []; for (let i = 2; i < h.length; i += 2) pts.push([h[i] / SC, h[i + 1] / SC]);
     const p = new Path2D(), n = pts.length, m = i => [(pts[i % n][0] + pts[(i + 1) % n][0]) / 2, (pts[i % n][1] + pts[(i + 1) % n][1]) / 2];
@@ -1986,10 +1986,13 @@ button,input,select,textarea,optgroup{font-family:inherit}
 /* resource, event and Apply cards: a Kusama dot cascade. Organic dots, drawn in the hand of the logo, pack into a corner
    of each card and shrink as they near the words. One colour of dot per card. The dots breathe like the net's holes.
    The words are protected: no dot comes near a line of text or a button, and dots thin out well before they get there. */
-.res canvas,.ev > .ev-cv,.apply > canvas{display:none}
+.res canvas,.ev > .ev-cv,.apply > canvas,.ab-pill > canvas{display:none}
 .res .r-n{display:none}
 .kdots{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0}
-.res > .kdots,.ev > .kdots,.apply > .kdots{position:absolute}
+.res > .kdots,.ev > .kdots,.apply > .kdots,.ab-pill .kdots{position:absolute}
+.ab-pill summary{position:static}
+.ab-pill summary > h3{position:relative;z-index:1}
+.ab-pill summary > .pm{z-index:1}
 .kdots canvas{position:absolute;inset:0;width:100%;height:100%;display:block !important;opacity:0;transition:opacity .6s}
 .kdots.on canvas{opacity:1}
 /* event cards: the words take the left of the card and the dots get the right, top to bottom */
@@ -1997,8 +2000,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
 </style>
 <script>
 (() => {
-  const res = [...document.querySelectorAll('.res-stack .res')], evs = [...document.querySelectorAll('.ev-cards .ev')], ap = document.querySelector('.apply');
-  const cards = [...res.map(el => ({ el, kind: 'res' })), ...evs.map(el => ({ el, kind: 'ev' })), ...(ap ? [{ el: ap, kind: 'ap' }] : [])]; if (!cards.length) return;
+  const res = [...document.querySelectorAll('.res-stack .res')], evs = [...document.querySelectorAll('.ev-cards .ev')], ap = document.querySelector('.apply'), pills = [...document.querySelectorAll('.ab-pill')];
+  const cards = [...res.map(el => ({ el, kind: 'res' })), ...evs.map(el => ({ el, kind: 'ev' })), ...(ap ? [{ el: ap, kind: 'ap' }] : []), ...pills.map(el => ({ el, kind: 'pill' }))]; if (!cards.length) return;
   const BLUE = '#2c5494', GOLD = '#e7aa4d', CREAM = '#f2eedd';
   // one dot colour per card: gold on blue cards, blue on gold, pink and orange cards, cream on teal and purple ones
   const dotColour = el => { const c = el.classList, h = k => c.contains(k);
@@ -2018,16 +2021,18 @@ button,input,select,textarea,optgroup{font-family:inherit}
     p.closePath(); return p; };
 
   // the words and buttons the dots keep clear of
-  const sel = { res: '.r-kind, .r-name, .r-desc, .r-mini', ev: 'h3, p', ap: '.ap-kind, .ap-h, .ap-t' };
+  const sel = { res: '.r-kind, .r-name, .r-desc, .r-mini', ev: 'h3, p', ap: '.ap-kind, .ap-h, .ap-t', pill: 'h3, p' };
   const rectsOf = (cd, cr) => { const out = []; const add = b => b.width && out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
     cd.el.querySelectorAll(sel[cd.kind]).forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(add); });
-    cd.el.querySelectorAll('.r-go, .ap-go').forEach(e => add(e.getBoundingClientRect()));
+    cd.el.querySelectorAll('.r-go, .ap-go, .pm').forEach(e => add(e.getBoundingClientRect()));
     return out; };
   const distTo = (x, y, rects) => { let d = 1e9; for (const [x0, y0, x1, y1] of rects) d = Math.min(d, Math.hypot(Math.max(0, x0 - x, x - x1), Math.max(0, y0 - y, y - y1))); return d; };
 
-  cards.forEach((cd, i) => { cd.seed = (Math.random() * 1e9) | 0; cd.top = i % 3 !== 2;   // most cascades pour from the top corner, some from the bottom
+  cards.forEach((cd, i) => { cd.seed = (Math.random() * 1e9) | 0; cd.top = cd.kind === 'pill' ? true : i % 3 !== 2;   // most cascades pour from the top corner, some from the bottom
     const box = document.createElement('div'); box.className = 'kdots'; box.setAttribute('aria-hidden', 'true');
-    cd.cv = document.createElement('canvas'); box.appendChild(cd.cv); cd.el.prepend(box); cd.box = box; });
+    cd.cv = document.createElement('canvas'); box.appendChild(cd.cv); cd.box = box;
+    // a closed <details> only shows its summary, so an info card's dots live in the summary (and still cover the whole card)
+    if (cd.kind === 'pill') cd.el.querySelector('summary').prepend(box); else cd.el.prepend(box); });
 
   // pack the dots: big near the corner, smaller and sparser further in, none touching, none near the words
   const BREATH = 1.08;   // dots swell to 8% over their resting size; spacing allows for that
@@ -2035,8 +2040,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const cr = cd.el.getBoundingClientRect(), w = cr.width, h = cr.height; if (!w || !h) return;
     const rnd = mulberry(cd.seed), rects = rectsOf(cd, cr), narrow = w < h * 1.7;
     const evWide = cd.kind === 'ev' && w > 420;   // wide event cards: a tall cascade filling the right of the card
-    const rx = evWide ? w * .55 : narrow ? w * .72 : Math.min(w * .48, h * 1.35), ry = evWide ? h * 1.35 : narrow ? h * .5 : h * 1.05, cy = cd.top ? 0 : h;
-    const rmax = Math.max(14, Math.min(46, Math.min(w, h) * (evWide ? .12 : .14))), rmin = 2.5, gap = Math.max(4, rmax * .12);
+    const pill = cd.kind === 'pill';
+    const rx = pill ? Math.min(w * .45, 560) : evWide ? w * .55 : narrow ? w * .72 : Math.min(w * .48, h * 1.35), ry = pill ? Math.max(h * 1.1, 170) : evWide ? h * 1.35 : narrow ? h * .5 : h * 1.05, cy = cd.top ? 0 : h;
+    const rmax = pill ? Math.min(34, Math.max(18, Math.min(w, Math.max(h, 190)) * .12)) : Math.max(14, Math.min(46, Math.min(w, h) * (evWide ? .12 : .14))), rmin = 2.5, gap = Math.max(4, rmax * .12);
     const pad = Math.max(14, rmax * .45);            // clear space between any dot and the words
     const field = (x, y) => { const f = 1 - sm(.25, 1, Math.hypot((w - x) / rx, (y - cy) / ry)); if (f <= 0) return 0;
       const d = distTo(x, y, rects); return f * sm(pad, pad + rmax * 2.2, d); };   // thin out well before the words
@@ -2069,6 +2075,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   all(); (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { all(); requestAnimationFrame(loop); });
   addEventListener('load', later);
   addEventListener('resize', () => { if (innerWidth !== lastW) { lastW = innerWidth; later(); } });
+  pills.forEach(el => el.addEventListener('toggle', () => { const cd = cards.find(c => c.el === el); requestAnimationFrame(() => { build(cd); paint(cd, performance.now() / 1000); }); }));
 })();
 </script>
 </body>
