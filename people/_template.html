@@ -743,6 +743,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (c === 'c-gold') return r < .02 ? ' t-plum' : '';
     return ''; };
   for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
+  // every colour of the palette turns up in the pills: blue and gold most, then orange, pink, teal, purple and cream;
+  // teal and purple are never side by side
+  const SEQ = ['c-blue', 'c-gold', 'c-mist', 'c-blue', 'c-lav', 'c-gold', 'c-sage', 'c-blue', 'c-gold', 'c-mauve', 'c-cream'], seqOff = Math.floor(Math.random() * 11);
   // two rows on wider screens, three on phones; rebuilt if the screen crosses that width
   const wrap = document.createElement('div'); wrap.className = 'p-marq'; wrap.setAttribute('aria-label', 'Research interests: ' + names.join(', '));
   ul.after(wrap);
@@ -764,9 +767,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
       // all Inter: each pill its own weight (thin only on darker colours), some italic, and a gold dot after a few
       const face = faces(set.length), fc = face, keep = [r === fr[0] && ' f-corm', r === fr[1] && ' f-fig'];
       const faceR = i => { const v = fc(i); return v && (v.startsWith(' f-crete') || keep.includes(v.split(' f-w')[0])) ? v : ''; };   // fewer words here, so each face turns up in just one row
-      const one = set.map((n, i) => { const cr = Math.random(), col = noGP(cr < .05 ? 'c-sage' : cr < .10 ? 'c-mist' : cr < .15 ? 'c-mauve' : cr < .20 ? 'c-lav' : lessGD(PAL[(i + r * per) % PAL.length])), light = /cream|lav|gold|mist/.test(col);
+      const one = set.map((n, i) => { const cr = Math.random(), col = SEQ[(i + r * 4 + seqOff) % SEQ.length], light = /cream|lav|gold|mist/.test(col);
         let wt = [200, 300, 400, 500, 600, 700, 800, 900][Math.floor(Math.random() * 8)]; if (light && wt < 300) wt = 300;
-        return '<span class="pill ' + col + tcol(col) + faceR(i) + (Math.random() < .35 ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + n + '</span>' + (Math.random() < .3 ? '<span class="gdot"></span>' + (Math.random() < .45 ? '<img class="gmark" src="../assets/medialoop-wordmark.svg" alt="" aria-hidden="true">' : '') : ''); }).join('');
+        return '<span class="pill ' + col + tcol(col) + (Math.random() < .35 ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + n + '</span>' + (Math.random() < .3 ? '<span class="gdot"></span>' + (Math.random() < .45 ? '<img class="gmark" src="../assets/medialoop-wordmark.svg" alt="" aria-hidden="true">' : '') : ''); }).join('');
       row.innerHTML = one.repeat(6); unGP(row); wrap.appendChild(row); const o = { row, dir: r % 2 ? 1 : -1, w: 0, m: 0 }; grab(o); return o;
     });
     measure();
