@@ -1091,8 +1091,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
 
       // home page: the net also reaches along the top, over the logo's shoulder, in three soft overlapping lobes that
       // continue the blob's organic edge (the logo's own cream clearing, below, keeps the letters clean)
-      const LOBES = cur.which === 'top' && !isMobile() ? [[-1.5, -1.0, .6], [-1.1, -.95, .62], [-.7, -.82, .66], [-.35, -.62, .7], [-1.9, -1.1, .42], [.25, -.9, .8], [.3, -.35, .6]]   /* the last two keep the top-right corner full blue */.map(([a, b, c], i) =>
-        [cx + R * (a + .03 * Math.sin(time * .13 + i * 2)), cy + R * (b + .03 * Math.sin(time * .11 + i)), R * c * (1 + .04 * Math.sin(time * .17 + i * 3))]) : [];
+      const LOBES = cur.which !== 'top' ? [] : isMobile() ? [[.22, -.8, .62]].map(([a, b, c]) => [cx + R * a, cy + R * b, R * c]) : /* desktop: the net sweeps across the top */ [[-1.5, -1.0, .6], [-1.1, -.95, .62], [-.7, -.82, .66], [-.35, -.62, .7], [-1.9, -1.1, .42], [.25, -.9, .8], [.3, -.35, .6]]   /* the last two keep the top-right corner full blue */.map(([a, b, c], i) =>
+        [cx + R * (a + .03 * Math.sin(time * .13 + i * 2)), cy + R * (b + .03 * Math.sin(time * .11 + i)), R * c * (1 + .04 * Math.sin(time * .17 + i * 3))]);
       for (const [lx, ly, lr] of LOBES) { const gg = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr);
         gg.addColorStop(0, 'rgba(44,84,148,1)'); gg.addColorStop(.55, 'rgba(44,84,148,.8)'); gg.addColorStop(.85, 'rgba(44,84,148,.22)'); gg.addColorStop(1, 'rgba(44,84,148,0)');
         ctx.fillStyle = gg; ctx.fillRect(lx - lr, ly - lr, lr * 2, lr * 2); }
