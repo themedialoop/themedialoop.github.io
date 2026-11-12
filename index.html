@@ -1983,131 +1983,88 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .ab-pill a.ab-inl:hover,.ab-pill a.ab-inl:focus-visible{color:var(--gold)}
 </style>
 <style>
-/* resource, event and Apply cards: a Kusama net on the edges of each card. The net is solid colour (mostly gold on blue,
-   blue on gold, with cream, orange, pink and purple now and then) and its holes are cut through to the card, so the
-   holes are the card's own colour. Four placements (corner, right edge, bottom sweep, two corners) spread across the
-   cards. The net stays still and its holes breathe like the big net. The net never reaches the words. */
+/* resource, event and Apply cards: a Kusama dot cascade. Organic dots, drawn in the hand of the logo, pack into a corner
+   of each card and shrink as they near the words. One colour of dot per card. The dots breathe like the net's holes.
+   The words are protected: no dot comes near a line of text or a button, and dots thin out well before they get there. */
 .res canvas,.ev > .ev-cv,.apply > canvas{display:none}
 .res .r-n{display:none}
-.knet{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0}
-.res > .knet,.ev > .knet,.apply > .knet{position:absolute}
-.knet canvas{position:absolute;inset:0;width:100%;height:100%;display:block !important;opacity:0;transition:opacity .6s}
-.knet.on canvas{opacity:1}
+.kdots{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0}
+.res > .kdots,.ev > .kdots,.apply > .kdots{position:absolute}
+.kdots canvas{position:absolute;inset:0;width:100%;height:100%;display:block !important;opacity:0;transition:opacity .6s}
+.kdots.on canvas{opacity:1}
 </style>
 <script>
 (() => {
   const res = [...document.querySelectorAll('.res-stack .res')], evs = [...document.querySelectorAll('.ev-cards .ev')], ap = document.querySelector('.apply');
   const cards = [...res.map(el => ({ el, kind: 'res' })), ...evs.map(el => ({ el, kind: 'ev' })), ...(ap ? [{ el: ap, kind: 'ap' }] : [])]; if (!cards.length) return;
-  const BLUE = '#2c5494', GOLD = '#e7aa4d', CREAM = '#f2eedd', ORANGE = '#e0773a', PINK = '#d8708e', MAUVE = '#9b6aa6';
-  // which net colours suit each card colour; the first is the usual one, the rest turn up now and then
-  const fam = el => { const c = el.classList, h = k => c.contains(k);
-    return h('r-gold') || h('a-gold') ? 'gold' : h('r-lav') || h('a-lav') ? 'rose' : h('r-orange') ? 'orange' : h('r-sage') || h('a-sage') ? 'teal'
-      : h('r-egg') || h('a-plum') ? 'mauve' : el.classList.contains('apply') && !h('a-blue') && !h('a-deep') ? 'gold' : 'blue'; };
-  const NETS = { blue: [[GOLD, 6], [CREAM, 2], [ORANGE, 1], [PINK, 1]], gold: [[BLUE, 6], [MAUVE, 1.5], [PINK, 1]], rose: [[BLUE, 4], [CREAM, 1.5]],
-                 orange: [[BLUE, 4], [CREAM, 1.5]], teal: [[GOLD, 3], [CREAM, 2]], mauve: [[GOLD, 3], [CREAM, 2]] };
-  const pickW = l => { let r = Math.random() * l.reduce((a, x) => a + x[1], 0); for (const x of l) { r -= x[1]; if (r <= 0) return x[0]; } return l[0][0]; };
-
-  // where the net sits. Each gives 0..1 for a point on a card w×h; narrow cards (taller than wide-ish) use a smaller patch
+  const BLUE = '#2c5494', GOLD = '#e7aa4d', CREAM = '#f2eedd';
+  // one dot colour per card: gold on blue cards, blue on gold, pink and orange cards, cream on teal and purple ones
+  const dotColour = el => { const c = el.classList, h = k => c.contains(k);
+    if (h('r-gold') || h('a-gold') || h('r-lav') || h('a-lav') || h('r-orange') || (c.contains('apply') && !h('a-blue') && !h('a-deep') && !h('a-plum') && !h('a-sage'))) return BLUE;
+    if (h('r-sage') || h('a-sage') || h('r-egg') || h('a-plum')) return CREAM;
+    return GOLD; };
   const sm = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-  const MASK = {
-    corner: (x, y, w, h, n) => 1 - sm(.5, 1, n ? Math.hypot((w - x) / (w * .62), y / (h * .46)) : Math.hypot((w - x) / (h * 1.3), y / (h * 1.05))),
-    right: (x, y, w, h, n) => { if (n) return 1 - sm(.5, 1, Math.hypot((w - x) / (w * .42), (y - h * .12) / (h * .32))); const wob = h * (.2 * Math.sin(y / h * 3.4 + .8) + .1 * Math.sin(y / h * 7.1 + 2)); return sm(w - h * 1.05 + wob, w - h * .3 + wob, x); },   // a wavy inner edge, not a straight one
-    bottom: (x, y, w, h, n) => n ? 1 - sm(.5, 1, Math.hypot((w - x) / (w * .42), (h - y) / (h * .2))) : Math.max(sm(h * .5, h * .95, y) * sm(w * .42, w * .82, x), sm(w - h * .75, w - h * .15, x) * sm(h * .05, h * .75, y)),
-    two: (x, y, w, h, n) => Math.max(MASK.corner(x, y, w, h, n), n ? 1 - sm(.5, 1, Math.hypot((w - x) / (w * .35), (h - y) / (h * .18))) : 1 - sm(.45, 1, Math.hypot((w - x) / (h * .9), (h - y) / (h * .62))))
-  };
-  const PLACES = Object.keys(MASK);
+  const mulberry = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 
-  // the net's own hole shapes
-  let H = [], TILE = 1024;
-  const ready = (window.NET_HOLES ? Promise.resolve(window.NET_HOLES) : fetch('assets/net-holes.json').then(r => r.json())).then(j => {
-    TILE = j.tile; const sc = j.scale;
-    H = j.holes.map(h => { const cx = h[0] / sc, cy = h[1] / sc, pts = []; for (let i = 2; i < h.length; i += 2) pts.push([h[i] / sc, h[i + 1] / sc]);
-      const p = new Path2D(), n = pts.length, mid = i => [(pts[i % n][0] + pts[(i + 1) % n][0]) / 2, (pts[i % n][1] + pts[(i + 1) % n][1]) / 2];
-      let m = mid(0); p.moveTo(m[0], m[1]); for (let i = 1; i <= n; i++) { const c = pts[i % n], q = mid(i); p.quadraticCurveTo(c[0], c[1], q[0], q[1]); } p.closePath();
-      return { cx, cy, p, ph: (cx * 12.9898 + cy * 78.233) % 6.283, rad: Math.max(...pts.map(q => Math.hypot(q[0], q[1]))) }; });
-  });
+  // an organic dot like the dot on the logo's i: round but never perfect, soft and a little lopsided (unit size, drawn scaled)
+  const dotShape = rnd => { const k1 = rnd() * 6, k2 = rnd() * 6, q = [];
+    for (let i = 0; i < 24; i++) { const t = i / 24 * Math.PI * 2, rr = 1 + .06 * Math.sin(2 * t + k1) + .04 * Math.sin(3 * t + k2); q.push([Math.cos(t) * rr, Math.sin(t) * rr]); }
+    const p = new Path2D(), n = q.length; p.moveTo(q[0][0], q[0][1]);
+    for (let i = 0; i < n; i++) { const p0 = q[(i - 1 + n) % n], p1 = q[i], p2 = q[(i + 1) % n], p3 = q[(i + 2) % n];
+      p.bezierCurveTo(p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6, p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6, p2[0], p2[1]); }
+    p.closePath(); return p; };
 
-  // spread the four placements over the cards, and give each card its net colour
-  const order = []; while (order.length < cards.length) { const b = PLACES.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } order.push(...b); }
-  cards.forEach((cd, i) => { cd.place = order[i]; cd.off = [Math.random(), Math.random()]; cd.tileF = .9 + Math.random() * .25;
-    const box = document.createElement('div'); box.className = 'knet'; box.setAttribute('aria-hidden', 'true');
-    cd.cv = document.createElement('canvas'); box.appendChild(cd.cv); cd.el.prepend(box); cd.box = box; });
-  // a net never takes the colour behind its card, so where it runs off the edge it never melts into the page:
-  // no cream on the cards that sit on the cream page, no gold on the event cards that sit on the gold band
-  const EV_NETS = { blue: [[CREAM, 4], [ORANGE, 1.5], [PINK, 1.5]] };
-  const colourCard = cd => { const f = fam(cd.el); if (cd.fam !== f) { cd.fam = f;
-    const l = cd.kind === 'ev' ? (EV_NETS[f] || NETS[f] || NETS.blue).filter(x => x[0] !== GOLD) : (NETS[f] || NETS.blue).filter(x => x[0] !== CREAM);
-    cd.net = cd.kind === 'ev' && f === 'blue' ? EV_ORDER[evs.indexOf(cd.el) % EV_ORDER.length] : pickW(l.length ? l : [[BLUE, 1]]); return true; } return false; };
-  // the event cards share their colours out: two cream nets, one orange, one pink, in a fresh order each visit
-  const EV_ORDER = [CREAM, CREAM, ORANGE, PINK]; for (let i = 3; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [EV_ORDER[i], EV_ORDER[j]] = [EV_ORDER[j], EV_ORDER[i]]; }
-
-  // the words, buttons and UIC mark the net keeps away from
+  // the words and buttons the dots keep clear of
   const sel = { res: '.r-kind, .r-name, .r-desc, .r-mini', ev: 'h3, p', ap: '.ap-kind, .ap-h, .ap-t' };
   const rectsOf = (cd, cr) => { const out = []; const add = b => b.width && out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
     cd.el.querySelectorAll(sel[cd.kind]).forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(add); });
-    cd.el.querySelectorAll('.r-go, .ap-go, .ap-uic').forEach(e => add(e.getBoundingClientRect()));
+    cd.el.querySelectorAll('.r-go, .ap-go').forEach(e => add(e.getBoundingClientRect()));
     return out; };
   const distTo = (x, y, rects) => { let d = 1e9; for (const [x0, y0, x1, y1] of rects) d = Math.min(d, Math.hypot(Math.max(0, x0 - x, x - x1), Math.max(0, y0 - y, y - y1))); return d; };
 
-  // make the net solid: close narrow slits between the collars (grow, then shrink back), then fill every pocket of card colour
-  // that is cut off from the outside. After this the only card colour inside the net is the holes themselves.
-  const solidify = (g, X0, Y0, W, Hh, r) => {
-    if (W < 4 || Hh < 4) return; const id = g.getImageData(X0, Y0, W, Hh), d = id.data, N = W * Hh, a = new Uint8Array(N), t = new Uint8Array(N);
-    for (let i = 0; i < N; i++) a[i] = d[i * 4 + 3] > 127 ? 1 : 0;
-    const pass = (src, dst, horiz, isMax) => { const outer = horiz ? Hh : W, len = horiz ? W : Hh;
-      for (let o = 0; o < outer; o++) { const q = new Int32Array(len + 1); let qh = 0, qt = 0;
-        for (let j = 0; j < len + r; j++) {
-          if (j < len) { const idx = horiz ? o * W + j : j * W + o, v = src[idx]; while (qt > qh && (isMax ? src[q[qt - 1]] <= v : src[q[qt - 1]] >= v)) qt--; q[qt++] = idx; }
-          const c = j - r; if (c < 0) continue; const lo = c - r;
-          while (qt > qh && (horiz ? q[qh] % W : (q[qh] / W | 0)) < lo) qh++;
-          dst[horiz ? o * W + c : c * W + o] = qt > qh ? src[q[qh]] : 0; } } };
-    pass(a, t, true, true); pass(t, a, false, true); pass(a, t, true, false); pass(t, a, false, false);
-    const seen = new Uint8Array(N), st = []; for (let x = 0; x < W; x++) st.push(x, (Hh - 1) * W + x); for (let y = 0; y < Hh; y++) st.push(y * W, y * W + W - 1);
-    while (st.length) { const i = st.pop(); if (seen[i] || a[i]) continue; seen[i] = 1; const x = i % W; if (x > 0) st.push(i - 1); if (x < W - 1) st.push(i + 1); if (i >= W) st.push(i - W); if (i < N - W) st.push(i + W); }
-    let rr = 0, gg = 0, bb = 0; for (let i = 0; i < N; i++) if (d[i * 4 + 3] === 255) { rr = d[i * 4]; gg = d[i * 4 + 1]; bb = d[i * 4 + 2]; break; }
-    for (let i = 0; i < N; i++) if ((a[i] || !seen[i]) && d[i * 4 + 3] < 255) { d[i * 4] = rr; d[i * 4 + 1] = gg; d[i * 4 + 2] = bb; d[i * 4 + 3] = 255; }
-    g.putImageData(id, X0, Y0); };
+  cards.forEach((cd, i) => { cd.seed = (Math.random() * 1e9) | 0; cd.top = i % 3 !== 2;   // most cascades pour from the top corner, some from the bottom
+    const box = document.createElement('div'); box.className = 'kdots'; box.setAttribute('aria-hidden', 'true');
+    cd.cv = document.createElement('canvas'); box.appendChild(cd.cv); cd.el.prepend(box); cd.box = box; });
 
-  // build a card's net: the solid colour layer (still) and the list of holes to cut through it (these breathe)
+  // pack the dots: big near the corner, smaller and sparser further in, none touching, none near the words
+  const BREATH = 1.08;   // dots swell to 8% over their resting size; spacing allows for that
   const build = cd => {
-    const cr = cd.el.getBoundingClientRect(), w = cr.width, h = cr.height; if (!w || !h || !H.length) return;
-    const dpr = Math.min(2, devicePixelRatio || 1), W = Math.round(w * dpr), Hh = Math.round(h * dpr), narrow = w < h * 1.7;
-    const rects = rectsOf(cd, cr), pad = Math.max(18, Math.min(w, h) * .06);
-    const T = Math.max(380, Math.min(1300, (narrow ? w * 2.6 : h * 3.4))) * cd.tileF * dpr, k = T / TILE, ox = cd.off[0] * T, oy = cd.off[1] * T, list = [];
-    for (let ty = -1; ty * T < Hh + T; ty++) for (let tx = -1; tx * T < W + T; tx++) for (const hh of H) {
-      const x = ox + tx * T + hh.cx * k, y = oy + ty * T + hh.cy * k; if (x < -120 || y < -120 || x > W + 120 || y > Hh + 120) continue;
-      let m = MASK[cd.place](x / dpr, y / dpr, w, h, narrow); if (m < .22) continue;
-      // keep well clear of the words: the hole's whole gold collar, plus a margin, must stay off every line of text
-      const room = distTo(x / dpr, y / dpr, rects) - hh.rad * k * 2.5 / dpr - pad * .5; if (room < 0) continue;
-      m = Math.min(m, .22 + room / (pad * 2)); if (m < .22) continue;
-      list.push({ hh, x, y, m: Math.min(1, (m - .22) / .6) }); }
-    const lay = document.createElement('canvas'); lay.width = W; lay.height = Hh; const g = lay.getContext('2d');
-    g.fillStyle = cd.net; let x0 = W, y0 = Hh, x1 = 0, y1 = 0;
-    for (const o of list) { const sc = k * 2.5; g.setTransform(sc, 0, 0, sc, o.x, o.y); g.fill(o.hh.p); x0 = Math.min(x0, o.x - 60 * dpr); y0 = Math.min(y0, o.y - 60 * dpr); x1 = Math.max(x1, o.x + 60 * dpr); y1 = Math.max(y1, o.y + 60 * dpr); }
-    g.setTransform(1, 0, 0, 1, 0, 0);
-    x0 = Math.max(0, Math.floor(x0)); y0 = Math.max(0, Math.floor(y0)); x1 = Math.min(W, Math.ceil(x1)); y1 = Math.min(Hh, Math.ceil(y1));
-    if (list.length) solidify(g, x0, y0, x1 - x0, y1 - y0, Math.round(7 * dpr));
-    cd.lay = lay; cd.k = k; cd.list = list; cd.W = W; cd.H = Hh; cd.cv.width = W; cd.cv.height = Hh; cd.box.classList.add('on');
+    const cr = cd.el.getBoundingClientRect(), w = cr.width, h = cr.height; if (!w || !h) return;
+    const rnd = mulberry(cd.seed), rects = rectsOf(cd, cr), narrow = w < h * 1.7;
+    const rx = narrow ? w * .72 : Math.min(w * .48, h * 1.35), ry = narrow ? h * .5 : h * 1.05, cy = cd.top ? 0 : h;
+    const rmax = Math.max(14, Math.min(46, Math.min(w, h) * .14)), rmin = 2.5, gap = Math.max(4, rmax * .12);
+    const pad = Math.max(14, rmax * .45);            // clear space between any dot and the words
+    const inside = cd.kind === 'ev';                 // event cards sit on the gold band: keep their dots wholly on the card
+    const field = (x, y) => { const f = 1 - sm(.25, 1, Math.hypot((w - x) / rx, (y - cy) / ry)); if (f <= 0) return 0;
+      const d = distTo(x, y, rects); return f * sm(pad, pad + rmax * 2.2, d); };   // thin out well before the words
+    const dots = [];
+    for (let i = 0; i < 6000; i++) {
+      const x = rnd() * (w + 60) - 30, y = rnd() * (h + 60) - 30, f = field(x, y); if (f <= .05) continue;
+      const r = rmin + (rmax - rmin) * f * (.55 + .45 * rnd()), R = r * 1.1 * BREATH;
+      if (distTo(x, y, rects) < R + pad) continue;
+      if (inside && (x - R < 6 || y - R < 6 || x + R > w - 6 || y + R > h - 6)) continue;
+      if (dots.some(p => Math.hypot(p.x - x, p.y - y) < p.R + R + gap)) continue;
+      dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283 }); }
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    cd.w = w; cd.h = h; cd.dpr = dpr; cd.dots = dots; cd.col = dotColour(cd.el);
+    cd.cv.width = Math.round(w * dpr); cd.cv.height = Math.round(h * dpr); cd.box.classList.add('on');
   };
 
-  // each frame: lay the still net down, then cut its holes, which swell and shrink in a ripple from the middle like the big net
+  // each frame the dots swell and shrink a little, in a ripple that runs out from the corner, like the net's holes
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
-  const paint = (cd, time) => { if (!cd.lay) return; const g = cd.cv.getContext('2d'), cx = cd.W / 2, cy = cd.H / 2, R = Math.hypot(cx, cy) || 1;
-    g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, cd.W, cd.H); g.drawImage(cd.lay, 0, 0);
-    g.globalCompositeOperation = 'destination-out'; g.fillStyle = '#000';
-    for (const o of cd.list) { const wave = reduce ? .6 : .5 + .5 * Math.sin(time * .9 - Math.hypot(o.x - cx, o.y - cy) / R * 7 + o.hh.ph * .35);
-      const sc = cd.k * (.72 + .42 * (1 - o.m)) * (.8 + .2 * wave); g.setTransform(sc, 0, 0, sc, o.x, o.y); g.fill(o.hh.p); }
-    g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; };
+  const paint = (cd, time) => { if (!cd.dots) return; const g = cd.cv.getContext('2d'), dpr = cd.dpr, ox = cd.w, oy = cd.top ? 0 : cd.h, Rn = Math.hypot(cd.w, cd.h);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.col;
+    for (const d of cd.dots) { const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .9 - Math.hypot(d.x - ox, d.y - oy) / Rn * 7 + d.ph * .35);
+      const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
+      g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); g.fill(d.p); }
+    g.setTransform(1, 0, 0, 1, 0, 0); };
   if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => es.forEach(e => { const cd = cards.find(c => c.el === e.target); if (cd) e.isIntersecting ? seen.add(cd) : seen.delete(cd); }), { rootMargin: '120px' }); cards.forEach(cd => io.observe(cd.el)); } else cards.forEach(cd => seen.add(cd));
   const loop = t => { seen.forEach(cd => paint(cd, t / 1000)); requestAnimationFrame(loop); };
 
-  // build the cards one at a time so the page never stalls
-  let queue = [];
-  const work = () => { const cd = queue.shift(); if (!cd) return; colourCard(cd); build(cd); paint(cd, performance.now() / 1000); (window.requestIdleCallback || setTimeout)(work); };
-  const rebuildAll = () => { const idle = !queue.length; queue = cards.slice(); if (idle) work(); };
-  if (ap) { const apCard = cards.find(c => c.kind === 'ap'); new MutationObserver(() => { if (colourCard(apCard)) { queue.push(apCard); if (queue.length === 1) work(); } }).observe(ap, { attributes: true, attributeFilter: ['class'] }); }
-  let t, lastW = innerWidth; const later = () => { clearTimeout(t); t = setTimeout(rebuildAll, 200); };
-  Promise.all([ready, document.fonts ? document.fonts.ready : 0]).then(() => { rebuildAll(); requestAnimationFrame(loop); });
+  const all = () => cards.forEach(cd => { build(cd); paint(cd, performance.now() / 1000); });
+  if (ap) new MutationObserver(() => { const cd = cards.find(c => c.kind === 'ap'); if (cd.dots) { cd.col = dotColour(ap); paint(cd, performance.now() / 1000); } }).observe(ap, { attributes: true, attributeFilter: ['class'] });
+  let t, lastW = innerWidth; const later = () => { clearTimeout(t); t = setTimeout(all, 200); };
+  all(); (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { all(); requestAnimationFrame(loop); });
   addEventListener('load', later);
   addEventListener('resize', () => { if (innerWidth !== lastW) { lastW = innerWidth; later(); } });
 })();
