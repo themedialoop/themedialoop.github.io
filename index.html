@@ -995,7 +995,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const lerp1 = (a, b, t) => a + (b - a) * t;
   function target() {
     const ih = innerHeight, m = isMobile(), e = ease(Math.min(1, scrollY / (ih * .6)));
-    const top = { which: 'top', x: lerp1(m ? .86 : .80, m ? .04 : .06, e), yp: lerp1(m ? .26 : .46, m ? .14 : .1, e) * ih, r: lerp1(m ? .34 : .36, m ? .26 : .24, e) };
+    const top = { which: 'top', x: lerp1(m ? .86 : .94, m ? .04 : .06, e), yp: lerp1(m ? .26 : .46, m ? .14 : .1, e) * ih, r: lerp1(m ? .34 : .33, m ? .26 : .24, e) };   // desktop: far enough right that the net stays off the opening paragraph
     const f = footEl.getBoundingClientRect();
     const ct = { which: 'contact', x: m ? .12 : .14, yp: f.top + scrollY + (m ? .02 : .06) * ih, r: m ? .36 : .33 };   // just above the contact heading
     const mr = mqEl.getBoundingClientRect();
