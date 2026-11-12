@@ -562,9 +562,12 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
     if (side.width !== w || side.height !== h) { side.width = w; side.height = h; }
     const g = side.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
-    const boxes = [...sideIn.querySelectorAll('.back, .p-photo-wrap, .p-intro'), document.querySelector('.menu-btn'), document.querySelector('.top .mark')].filter(Boolean).map(el => { const b = el.getBoundingClientRect();
-      return [(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr]; });
-    const tilePx = (mobile() ? 820 : 1150) * dpr, k = tilePx / TILE, ox = -time * 4 * dpr, pad = 12 * dpr, soft = 34 * dpr;
+    // keep clear of the actual words and pictures, not of their full-width blocks (a block spanning the column left a bare band)
+    const bs = []; const add = b => b.width && bs.push([(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr]);
+    sideIn.querySelectorAll('.back, .p-intro h1, .p-intro p, .p-intro a, .p-intro li, .p-intro span').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(add); });
+    [...sideIn.querySelectorAll('.p-photo-wrap, .p-links a'), document.querySelector('.menu-btn'), document.querySelector('.top .mark')].filter(Boolean).forEach(el => add(el.getBoundingClientRect()));
+    const boxes = bs;
+    const tilePx = (mobile() ? 820 : 1150) * dpr, k = tilePx / TILE, ox = 0, pad = 12 * dpr, soft = 34 * dpr;   // the net stays put: no drifting sideways
     g.fillStyle = 'rgb(242,238,221)';
     for (let ty = -1; ty <= Math.ceil(h / tilePx) + 1; ty++) for (let tx = Math.floor(-ox / tilePx) - 1; tx * tilePx + ox < w + tilePx; tx++)
       for (const hh of holes) {
@@ -575,9 +578,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
               bot = .36 + .035 * Math.sin(xx * 6 - time * .45 + 1) + .02 * Math.sin(xx * 12 + time * .35);
         let f = 1;   // the net fills the whole column, so there's no bare blue gap; it only draws back around the photo, name and links
         for (const [x0, y0, x1, y1] of boxes) { const dx = Math.max(0, x0 - px, px - x1), dy = Math.max(0, y0 - py, py - y1); f *= sse((Math.hypot(dx, dy) - pad) / soft); }
-        if (f < .05) continue;
-        const s = (.62 + .3 * (.5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35))) * f;
-        g.setTransform(k * s, 0, 0, k * s, px, py); g.fill(hh.p);
+        if (f < .3) continue;   // no tiny specks: a dot near the words simply isn't drawn
+        // each dot breathes in and out and turns a little, in place
+        const s = (.62 + .3 * (.5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35))) * (.55 + .45 * f), a = .25 * Math.sin(time * .25 + hh.ph * 2.3), c = Math.cos(a) * k * s, sn = Math.sin(a) * k * s;
+        g.setTransform(c, sn, -sn, c, px, py); g.fill(hh.p);
       }
     g.setTransform(1, 0, 0, 1, 0, 0);
   };
