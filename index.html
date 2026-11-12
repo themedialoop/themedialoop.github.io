@@ -1564,12 +1564,12 @@ button,input,select,textarea,optgroup{font-family:inherit}
       const lockW = lock.querySelector('.ol-wrap'), lockT = lock.querySelector('.ol-tag'), lockD = lock.querySelector('.ol-dot');
       const push = d => { pt = Math.max(.5, clamp(pt + d)); idle = 0; };
       const onWheel = e => { push(e.deltaY / (innerHeight * 2.2)); const x = ptrO.on ? ptrO.x : W / 2, y = ptrO.on ? ptrO.y : H * .85;
-        pulseAt(x, y); fx.fy = y; fx.Lt = Math.max(-90 * DPR, Math.min(140 * DPR, fx.Lt + e.deltaY * .35 * DPR)); };   // a scroll pulls the net up and sends a ripple
+        pulseAt(x, y); };   // a scroll sends a gentle swell through the dots; nothing is pulled or slides
       const onStart = e => { ty0 = e.touches[0].clientY; sw0 = 0; const x = e.touches[0].clientX * DPR, y = ty0 * DPR;
         ptrO.x = x; ptrO.y = y; ptrO.t = performance.now(); ptrO.on = true; fx.fy = y; fx.hold = true; pulseAt(x, y); };   // a touch sends a ripple out from your finger
       const onEnd = () => { fx.hold = false; if (sw0 > 40) pt = 1; else if (sw0 < -40) pt = Math.max(.5, pt); ty0 = null; };   // a swipe up finishes the opener; the page itself stays put
       const onMove = e => { if (ty0 == null) return; if (e.cancelable) e.preventDefault(); const y = e.touches[0].clientY; push((ty0 - y) / (innerHeight * .45));
-        fx.Lt = Math.max(-90 * DPR, Math.min(160 * DPR, fx.Lt + (ty0 - y) * DPR * 1.6)); ptrO.x = e.touches[0].clientX * DPR; ptrO.y = y * DPR; ptrO.t = performance.now(); ptrO.on = true;   // the net follows your finger up
+        ptrO.x = e.touches[0].clientX * DPR; ptrO.y = y * DPR; ptrO.t = performance.now(); ptrO.on = true;   // the net follows your finger up
         sw0 += ty0 - y; ty0 = y; };   // follows your finger: one ordinary swipe is enough
       const onDown = e => { if (e.pointerType === 'mouse') pulseAt(e.clientX * DPR, e.clientY * DPR); };   // a click ripples too
       addEventListener('pointerdown', onDown, { passive: true });
@@ -1639,8 +1639,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
         { const r = heroMark.getBoundingClientRect();                         // sit exactly where the blue logo is ...
           lock.style.left = r.left + 'px'; lock.style.top = r.top + 'px'; lock.style.width = r.width + 'px';
           const k = ease3(clamp((lace.p - .55) / .3)); lock.style.opacity = (1 - k).toFixed(3);
-          const pl = fx.L / DPR; lockW.style.translate = `0 ${(-pl * .5).toFixed(1)}px`; lockT.style.translate = `0 ${(-pl * .3).toFixed(1)}px`;   // the logo rides up with the pull, the tagline a beat behind
-          lockD.style.scale = (1 + Math.min(.6, Math.max(0, pl) / 140)).toFixed(3); }                      // and the gold dot on the i swells   // ... and, as you swipe, hand over to it in place
+          // the logo stays put while you swipe (it used to ride up and spring back, which read as a bounce)
+          lockD.style.scale = ""; }                      // and the gold dot on the i swells   // ... and, as you swipe, hand over to it in place
         if (lace.p > .99) { clearTimeout(guard); finish(); return; }
         requestAnimationFrame(step);
       };
