@@ -949,12 +949,25 @@ button,input,select,textarea,optgroup{font-family:inherit}
             const s = .62 + .3 * (.5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35));
             g.setTransform(k * s, 0, 0, k * s, px, py); g.fill(hh.p);
           }
-        g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'destination-in';
-        const f = g.createRadialGradient(w * .76, h * .5, 0, w * .76, h * .5, w * .5); f.addColorStop(0, 'rgba(0,0,0,0)'); f.addColorStop(.45, 'rgba(0,0,0,0)'); f.addColorStop(.85, '#000'); f.addColorStop(1, '#000');   // clear around the name, bottom right
-        g.fillStyle = f; g.fillRect(0, 0, w, h);
-        if (ph) { const pr = ph.getBoundingClientRect(), px = (pr.left + pr.width / 2 - r.left) * dpr, py = (pr.top + pr.height / 2 - r.top) * dpr, pR = pr.width * .78 * dpr;   // a calm clearing in the net around the photo
-          g.globalCompositeOperation = 'destination-out'; const c = g.createRadialGradient(px, py, 0, px, py, pR);
-          c.addColorStop(0, '#000'); c.addColorStop(.7, '#000'); c.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = c; g.fillRect(0, 0, w, h); }
+        // one calm clearing shaped like a bean (or a soft figure 8) that joins the photo and the name, so the net never runs
+        // between them: two round fields blended together, drawn small and scaled up so its edge is soft
+        g.setTransform(1, 0, 0, 1, 0, 0);
+        const nm = el.querySelector('h3'), nr = nm ? nm.getBoundingClientRect() : null;
+        const A = ph ? (() => { const pr = ph.getBoundingClientRect(); return [(pr.left + pr.width / 2 - r.left) * dpr, (pr.top + pr.height / 2 - r.top) * dpr, pr.width * .64 * dpr]; })() : null;
+        const Bc = nr ? [(nr.left + nr.width / 2 - r.left) * dpr, (nr.top + nr.height / 2 - r.top) * dpr, Math.max(nr.width * .52, nr.height * 1.25) * dpr] : [w * .76, h * .5, w * .3];
+        const q = 8, mw = Math.ceil(w / q), mh = Math.ceil(h / q);
+        if (!el._mask) el._mask = document.createElement('canvas');
+        const mc = el._mask; if (mc.width !== mw || mc.height !== mh) { mc.width = mw; mc.height = mh; }
+        const mg = mc.getContext('2d'), id = mg.createImageData(mw, mh), D = id.data;
+        for (let yy = 0; yy < mh; yy++) for (let xx = 0; xx < mw; xx++) {
+          const X = (xx + .5) * q, Y = (yy + .5) * q;
+          // the name's field is stretched sideways, so the bean is long enough to hold the whole name
+          let fv = Bc[2] * Bc[2] / ((X - Bc[0]) ** 2 / 1.6 + (Y - Bc[1]) ** 2 * 1.2 + 1);
+          if (A) fv += A[2] * A[2] / ((X - A[0]) ** 2 + (Y - A[1]) ** 2 + 1);
+          const a = Math.max(0, Math.min(1, (fv - .55) / .6));           // inside the bean: 1; its rim fades out
+          D[(yy * mw + xx) * 4 + 3] = Math.round(a * 255); }
+        mg.putImageData(id, 0, 0);
+        g.globalCompositeOperation = 'destination-out'; g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(mc, 0, 0, mw * q, mh * q);
         g.globalCompositeOperation = 'source-over';
       }
       requestAnimationFrame(drawPeople);
@@ -1400,15 +1413,17 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const active = !reduce && !!(fx.pulses.length || fx.L || ptrO.on);
     if (idle && holes.length) {
       buildBlots();
-      const bs = [0, 1].map(i => reduce ? 1 : 1 + .02 * Math.sin(time * .6 + i * 2.1));   // each blot breathes in and out around its corner
-      if (!active) blotC.forEach((c, i) => { const s = bs[i], [cx, cy] = blotCtr[i]; l.setTransform(s, 0, 0, s, cx * (1 - s), cy * (1 - s)); l.drawImage(c, -blotM(), -blotM()); });
-      else {                                                                  // the same dots, one by one, so each can react
-        const k = (isMobile() ? 980 : 1500) * DPR / TILE; l.fillStyle = `rgb(${CREAM_RGB})`;
-        for (const d of blotInst) { const s = bs[d.i], [cx, cy] = blotCtr[d.i];
-          const [px, py, sc] = applyFx(cx + (d.px - cx) * s, cy + (d.py - cy) * s, d.sc * s, 1, now); if (sc < .08) continue;
-          if (d.u) { drawUIC(l, px, py, d.h.rad * k * .95 * sc / d.sc, d.h); continue; }
-          l.setTransform(k * sc, 0, 0, k * sc, px, py); l.fill(d.h.p); }
-      }
+      // every dot stays exactly where it is: it only breathes in and out and turns a little, in place, each on its own
+      // rhythm. Nothing slides, so no dot can ever run into another. A swipe sends a gentle swell through them.
+      const k = (isMobile() ? 980 : 1500) * DPR / TILE; l.fillStyle = `rgb(${CREAM_RGB})`; const m = Math.min(W, H);
+      for (const d of blotInst) {
+        let sc = d.sc * (reduce ? 1 : 1 + .05 * Math.sin(time * .5 + d.h.ph * 1.7 + d.px * .002));
+        for (const p of fx.pulses) { const age = (now - p.t) / 1000, R = age * m * 1.1, band = m * .11, dd = Math.hypot(d.px - p.x, d.py - p.y);
+          const gg = Math.exp(-(((dd - R) / band) ** 2)) * Math.max(0, 1 - age / 1.5); sc *= 1 + .1 * gg; }
+        sc = Math.min(sc, .95); if (sc < .08) continue;                           // never big enough to touch a neighbour
+        if (d.u) { drawUIC(l, d.px, d.py, d.h.rad * k * .95 * sc / d.sc, d.h); continue; }
+        const ang = reduce ? 0 : .22 * Math.sin(time * .23 + d.h.ph * 2.3), c = Math.cos(ang) * k * sc, sn = Math.sin(ang) * k * sc;
+        l.setTransform(c, sn, -sn, c, d.px, d.py); l.fill(d.h.p); }
       l.setTransform(1, 0, 0, 1, 0, 0);
     }
     if (!idle && holes.length) {
