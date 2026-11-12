@@ -1568,9 +1568,15 @@ button,input,select,textarea,optgroup{font-family:inherit}
         heroMark.style.transition = 'none'; endIntro();
         // a trackpad keeps sending scroll after the swipe that opened the site: swallow that run-on so the visitor
         // lands on the home page with the logo and net, instead of sliding on down the page
-        scrollTo(0, 0); let quietT = 0;
-        const hold = ev => { ev.preventDefault(); clearTimeout(quietT); quietT = setTimeout(() => removeEventListener('wheel', hold), 380); };
-        addEventListener('wheel', hold, { passive: false }); quietT = setTimeout(() => removeEventListener('wheel', hold), 900);
+        // the home page holds for at least 1.6 s, and then until the scrolling has been still for half a second, so a second
+        // swipe made while the logo is settling doesn't carry on past it either
+        scrollTo(0, 0); const held = performance.now(); let lastWheel = held;
+        const release = () => { removeEventListener('wheel', hold); removeEventListener('keydown', holdKey); removeEventListener('scroll', pin); };
+        const hold = ev => { ev.preventDefault(); lastWheel = performance.now(); };
+        const holdKey = ev => { if (['ArrowDown', 'PageDown', ' ', 'End'].includes(ev.key)) ev.preventDefault(); };
+        const pin = () => { if (scrollY !== 0) scrollTo(0, 0); };
+        addEventListener('wheel', hold, { passive: false }); addEventListener('keydown', holdKey); addEventListener('scroll', pin, { passive: true });
+        const watch = () => { const now = performance.now(); if (now - held > 1600 && now - lastWheel > 500) release(); else setTimeout(watch, 100); }; setTimeout(watch, 100);
       };
       cue.style.pointerEvents = 'auto'; cue.style.cursor = 'pointer';
       cue.addEventListener('click', () => { pt = 1; idle = 0; });                    // tapping the gold dot also opens the site
