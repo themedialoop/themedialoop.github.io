@@ -260,8 +260,9 @@ a.card{text-decoration:none}
 .ev.h-purple:hover{background:#9b6aa6;color:var(--cream)}
 .ev.h-teal:hover{background:#2a8c8c;color:var(--cream)}
 .ev.h-orange:hover{background:#e0773a;color:var(--cream)}
-.ev.h-blue:hover{background:#2c5494;color:var(--gold)}   /* already blue: the words light up gold instead */
-.ev:is(.h-purple,.h-teal,.h-orange,.h-blue):hover *{color:inherit}
+.ev.h-pink:hover{background:#d8708e;color:var(--cream)}
+.ev.h-cream:hover{background:var(--cream);color:var(--blue)}
+.ev:is(.h-purple,.h-teal,.h-orange,.h-pink,.h-cream):hover *{color:inherit}
 .ev-when{margin:0 0 auto;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
 .ev h3{margin:28px 0 10px;font-weight:700;font-size:clamp(22px,2vw,30px);line-height:1.04;letter-spacing:-.018em}
 .ev-what{margin:0 0 16px;font-size:15px;line-height:1.45;font-weight:300}
@@ -1711,8 +1712,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (apUic) { apUic.complete ? placeUic() : apUic.addEventListener('load', placeUic); addEventListener('resize', placeUic); document.fonts && document.fonts.ready.then(placeUic); }
   }
 
-  /* event cards: each gets its own hover colour, never two the same. Purple is the likeliest, then teal, orange and blue */
-  { const evs = [...document.querySelectorAll('.ev-cards .ev')], bag = [['h-purple', 4], ['h-teal', 3], ['h-orange', 2], ['h-blue', 1]];
+  /* event cards: each gets its own hover colour, never two the same: purple likeliest, then teal, with orange, pink and cream mixed in at random */
+  { const evs = [...document.querySelectorAll('.ev-cards .ev')], bag = [['h-purple', 4], ['h-teal', 3], ['h-orange', 2], ['h-pink', 2], ['h-cream', 2]];
     evs.forEach(el => { if (!bag.length) return; let r = Math.random() * bag.reduce((a, b) => a + b[1], 0), k = 0;
       for (; k < bag.length - 1; k++) { r -= bag[k][1]; if (r <= 0) break; } el.classList.add(bag.splice(k, 1)[0][0]); }); }
   /* each visit, roughly one card in four quietly swaps its hover colour for lavender mist or dusky plum */
@@ -2152,7 +2153,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   // each frame the dots swell and shrink a little, in a ripple that runs out from the corner, like the net's holes
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
   const paint = (cd, time) => { if (!cd.dots) return; const g = cd.cv.getContext('2d'), dpr = cd.dpr, ox = cd.w, oy = cd.top ? 0 : cd.h, Rn = Math.hypot(cd.w, cd.h);
-    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.col;   // the card turns cream on hover; its dots turn gold
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.classList.contains('h-cream') && cd.el.matches(':hover') ? GOLD : cd.col;   // cream dots turn gold on the cream hover, so they still show   // the card turns cream on hover; its dots turn gold
     for (const d of cd.dots) { if (d.fixed) continue; const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .3 - Math.hypot(d.x - ox, d.y - oy) / Rn * 5 + d.ph * .35);   // a slow breath, about every 20 s
       const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
       g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); g.fill(d.p); }
