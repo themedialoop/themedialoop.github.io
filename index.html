@@ -64,7 +64,7 @@
   --cream:#f2eedd;      /* page */
   --blue:#2c5494;       /* type, logo */
   --blue-soft:#2c549466;/* rules, muted text */
-  --ink:#1d3866;        /* hover / pressed blue */
+  --ink:#2c5494;        /* was a darker blue; now the main blue everywhere */
   --pink:#d8708e;       /* small accents only */
   --font:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --step--1:clamp(.8rem,.76rem + .2vw,.9rem);
@@ -356,10 +356,10 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .r-blue{background:#2c5494;color:var(--cream)}
 .r-blue2{background:#2c5494;color:var(--cream)}
 .r-egg{background:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}   /* mauve */
-.r-lav{background:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#152b4f}   /* rose */
+.r-lav{background:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#2c5494}   /* rose */
 .r-sage{background:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262);color:var(--cream)}   /* lagoon teal */
 .r-sage .r-kind::before{background:var(--gold)}
-.r-orange{background:linear-gradient(160deg,#e8884d,#e0773a 55%,#cf6630);color:#152b4f}   /* orange, a sprinkle */
+.r-orange{background:linear-gradient(160deg,#e8884d,#e0773a 55%,#cf6630);color:#2c5494}   /* orange, a sprinkle */
 .r-orange .r-kind::before{background:var(--blue)}
 .r-gold{background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--ink)}
 .r-cream{background:var(--cream);color:var(--blue)}
@@ -418,8 +418,8 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .apply.a-blue .ap-kind::before,.apply.a-deep .ap-kind::before,.apply.a-plum .ap-kind::before{background:var(--gold)}
 .apply.a-blue .ap-go,.apply.a-deep .ap-go,.apply.a-plum .ap-go{background:var(--gold);color:var(--ink)}
 .apply.a-blue:hover .ap-go,.apply.a-deep:hover .ap-go,.apply.a-plum:hover .ap-go{background:var(--gold);color:var(--ink);filter:brightness(.92)}
-.apply.a-lav{background:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#152b4f}
-.apply.a-lav .ap-t{color:#152b4f}
+.apply.a-lav{background:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#2c5494}
+.apply.a-lav .ap-t{color:#2c5494}
 .apply.a-sage{background:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262)}
 @media (prefers-reduced-motion:reduce){.apply,.ap-go{transition:none}}
 
@@ -437,7 +437,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 @media (prefers-reduced-motion:reduce){.label .lt{opacity:1;translate:none;transition:none}.label .stop{transform:none;transition:none}}
 
 /* a small surprise: on each visit a few cards light up in lavender or plum instead of their usual hover colour */
-.people .card.s-lav:hover,.ev.s-lav:hover{background-color:#d8708e;background-image:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#152b4f}
+.people .card.s-lav:hover,.ev.s-lav:hover{background-color:#d8708e;background-image:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#2c5494}
 .people .card.s-chart:hover,.ev.s-chart:hover{background-color:#1f7373;background-image:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262);color:var(--cream)}
 .people .card.s-plum:hover,.ev.s-plum:hover{background-color:#8a5a96;background-image:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}
 .pubs a:not([href]){cursor:default}
@@ -1773,7 +1773,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .hm-marq .gmark{flex:none;height:clamp(26px,2.9vw,40px);width:auto;margin:0 22px 0 0;pointer-events:none;-webkit-user-drag:none}
 .hm-marq .c-blue{background:#2c5494;color:var(--cream)}
 .hm-marq .c-gold{background:#e7aa4d;color:var(--blue)}
-.hm-marq .c-deep{background:#1d3866;color:var(--cream)}
+.hm-marq .c-deep{background:#2c5494;color:var(--cream)}
 .hm-marq .c-cream{background:#e9e2c9;color:var(--blue)}   /* the pill cream: a shade off the page cream, so the pill still shows */
 .hm-marq .c-lav{background:#d8708e;color:var(--cream)}
 .hm-marq .c-sage{background:#2a8c8c;color:var(--cream)}
@@ -1897,6 +1897,15 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .pubs li:has(> a:hover),.pubs li:has(> a:focus-visible),.pubs li:has(+ li > a:hover),.pubs li:has(+ li > a:focus-visible),
 .r-list li:has(> a:hover),.r-list li:has(> a:focus-visible),.r-list li:has(+ li > a:hover),.r-list li:has(+ li > a:focus-visible){border-bottom-color:transparent}
 .pubs:has(> li:first-child > a:hover){border-top-color:transparent}
+/* research publications: on hover each row lights up in the next brand colour, in order: blue, gold, orange, pink, teal, purple, then round again.
+   Blue, teal and purple rows take cream words; gold, orange and pink rows take blue words */
+.pubs li:nth-child(6n+2) > a::before{background:#e7aa4d}
+.pubs li:nth-child(6n+3) > a::before{background:#e0773a}
+.pubs li:nth-child(6n+4) > a::before{background:#d8708e}
+.pubs li:nth-child(6n+5) > a::before{background:#2a8c8c}
+.pubs li:nth-child(6n+6) > a::before{background:#9b6aa6}
+.pubs li:is(:nth-child(6n+2),:nth-child(6n+3),:nth-child(6n+4)) > a:is(:hover,:focus-visible),
+.pubs li:is(:nth-child(6n+2),:nth-child(6n+3),:nth-child(6n+4)) > a:is(:hover,:focus-visible) *{color:#2c5494 !important}
 </style>
 <style>
 /* events on desktop: two big cards per row (2 x 2) instead of four small ones, with roomier type */
@@ -2024,7 +2033,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const sel = { res: '.r-kind, .r-name, .r-desc, .r-mini', ev: 'h3, p', ap: '.ap-kind, .ap-h, .ap-t', pill: 'h3, p' };
   const rectsOf = (cd, cr) => { const out = []; const add = b => b.width && out.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
     cd.el.querySelectorAll(sel[cd.kind]).forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(add); });
-    cd.el.querySelectorAll('.r-go, .ap-go, .pm').forEach(e => add(e.getBoundingClientRect()));
+    cd.el.querySelectorAll('.r-go, .ap-go').forEach(e => add(e.getBoundingClientRect()));
     return out; };
   const distTo = (x, y, rects) => { let d = 1e9; for (const [x0, y0, x1, y1] of rects) d = Math.min(d, Math.hypot(Math.max(0, x0 - x, x - x1), Math.max(0, y0 - y, y - y1))); return d; };
 
@@ -2047,6 +2056,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const field = (x, y) => { const f = 1 - sm(.25, 1, Math.hypot((w - x) / rx, (y - cy) / ry)); if (f <= 0) return 0;
       const d = distTo(x, y, rects); return f * sm(pad, pad + rmax * 2.2, d); };   // thin out well before the words
     const dots = [];
+    if (cd.kind === 'pill') {
+      if (!cd.el.open) { cd.dots = []; cd.box.classList.remove('on'); return; }   // closed info cards stay plain
+      // the gold open/close button is one of the dots: the others pack round it at the usual spacing
+      const b = cd.el.querySelector('.pm').getBoundingClientRect(); dots.push({ x: b.left - cr.left + b.width / 2, y: b.top - cr.top + b.height / 2, r: 0, R: Math.max(b.width, b.height) / 2, fixed: true });
+    }
     for (let i = 0; i < 6000; i++) {
       const x = rnd() * (w + 60) - 30, y = rnd() * (h + 60) - 30, f = field(x, y); if (f <= .05) continue;
       const r = rmin + (rmax - rmin) * f * (.55 + .45 * rnd()), R = r * 1.1 * BREATH;
@@ -2062,7 +2076,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
   const paint = (cd, time) => { if (!cd.dots) return; const g = cd.cv.getContext('2d'), dpr = cd.dpr, ox = cd.w, oy = cd.top ? 0 : cd.h, Rn = Math.hypot(cd.w, cd.h);
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.matches(':hover') ? GOLD : cd.col;   // the card turns cream on hover; its dots turn gold
-    for (const d of cd.dots) { const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .9 - Math.hypot(d.x - ox, d.y - oy) / Rn * 7 + d.ph * .35);
+    for (const d of cd.dots) { if (d.fixed) continue; const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .9 - Math.hypot(d.x - ox, d.y - oy) / Rn * 7 + d.ph * .35);
       const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
       g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); g.fill(d.p); }
     g.setTransform(1, 0, 0, 1, 0, 0); };
