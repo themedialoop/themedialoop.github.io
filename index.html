@@ -449,6 +449,15 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .pubs a:not([href]){cursor:default}
 /* every piece of text on the site is Inter */
 button,input,select,textarea,optgroup{font-family:inherit}
+/* va-va-voom: hover (or tap) and the letters dance, one after another, in gold */
+.vvv{display:inline-block;cursor:default;outline:none;white-space:nowrap}
+.vvv span{display:inline-block;transition:color .2s}
+.vvv:is(:hover,:focus-visible,.go) span{color:var(--gold);animation:vvvDance .9s cubic-bezier(.3,1.6,.5,1) both}
+.vvv span:nth-child(1){animation-delay:0s!important}.vvv span:nth-child(2){animation-delay:.05s!important}.vvv span:nth-child(3){animation-delay:.1s!important}
+.vvv span:nth-child(4){animation-delay:.15s!important}.vvv span:nth-child(5){animation-delay:.2s!important}.vvv span:nth-child(6){animation-delay:.25s!important}
+.vvv span:nth-child(7){animation-delay:.3s!important}.vvv span:nth-child(8){animation-delay:.35s!important}.vvv span:nth-child(9){animation-delay:.4s!important}.vvv span:nth-child(10){animation-delay:.45s!important}
+@keyframes vvvDance{0%{transform:none}25%{transform:translateY(-.35em) rotate(-10deg) scale(1.15)}50%{transform:translateY(.05em) rotate(8deg)}75%{transform:translateY(-.12em) rotate(-4deg) scale(1.05)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.vvv:is(:hover,:focus-visible,.go) span{animation:none}}
 </style>
 </head>
 <body>
@@ -472,7 +481,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   <!-- data-net: where the net sits for this section — x, y as fractions of the window, r as a fraction of the window's longer side -->
   <section class="hero" id="home" data-net="0.80 0.46 0.36" data-net-m="0.86 0.26 0.34">
     <h1><img id="heroMark" src="assets/medialoop-wordmark.svg" alt="medialoop" width="4278" height="1185"></h1>
-    <p class="lede">We fancy ourselves a cozy research boutique of scholars specializing in the entanglements of media, communication technology, and human behavior. Our orientation says the most valuable research strives for validity and precision without sacrificing warmth, personality, and va-va-voom.</p>
+    <p class="lede">We fancy ourselves a cozy research boutique of scholars specializing in the entanglements of media, communication technology, and human behavior. Our orientation says the most valuable research strives for validity and precision without sacrificing warmth, personality, and <span class="vvv" tabindex="0"><span>v</span><span>a</span><span>-</span><span>v</span><span>a</span><span>-</span><span>v</span><span>o</span><span>o</span><span>m</span></span>.</p>
   </section>
 
   <section id="about" data-net="-0.03 0.0 0.17" data-net-m="-0.1 0.17 0.18" data-net-at="0 0.35">
@@ -2163,6 +2172,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
 (() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6'];
   [...document.querySelectorAll('.pubs li > a[href], .r-list li > a[href]')].forEach((a, i) => { const c = P[i % P.length];
     a.style.setProperty('--hl', c); if (c === '#e7aa4d') a.classList.add('hl-gold'); }); })();
+</script>
+<script>
+// phones have no hover: a tap on va-va-voom sets it dancing
+document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () => { el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); setTimeout(() => el.classList.remove('go'), 1500); }));
 </script>
 </body>
 </html>
