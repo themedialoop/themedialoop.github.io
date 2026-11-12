@@ -1283,7 +1283,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     return sst((Math.hypot(dx, dy) - pad * .25) / pad);
   }
   const ptrO = { on: false, x: 0, y: 0, t: 0 };
-  addEventListener('pointermove', ev => { ptrO.x = ev.clientX * DPR; ptrO.y = ev.clientY * DPR; ptrO.t = performance.now(); ptrO.on = true; }, { passive: true });
+  // the net no longer reacts to the cursor; only a swipe or scroll stirs it (see the opener and the home-page wheel handler)
   const bgC = document.createElement('canvas'), bgx = bgC.getContext('2d');
   // while the opener waits for a swipe, its two blots of net are drawn once into their own layers and then just breathe
   // (a gentle scale in and out around each corner), instead of redrawing every hole every frame: smooth on phones
@@ -1315,6 +1315,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
   /* the opener's net reacts to you: a touch, click or scroll sends a ripple of swelling dots out from that spot, dots shy
      away from your finger or pointer, and a swipe pulls the whole net up after it, elastic, with the logo riding along */
   const fx = { pulses: [], Lt: 0, L: 0, fy: 0, hold: false };
+  addEventListener('wheel', e => { if (lace.on || scrollY > innerHeight * .9) return;
+    pulseAt((.25 + Math.random() * .5) * W, H * (e.deltaY > 0 ? .85 : .15)); }, { passive: true });   // a swipe on the home page stirs some of the dots
+  addEventListener('touchmove', e => { if (lace.on || scrollY > innerHeight * .9 || !e.touches[0]) return;
+    pulseAt(e.touches[0].clientX * DPR, e.touches[0].clientY * DPR); }, { passive: true });
   const pulseAt = (x, y) => { const now = performance.now(); if (fx.pulses.length && now - fx.pulses[fx.pulses.length - 1].t < 350) return; fx.pulses.push({ x, y, t: now }); };
   function applyFx(px, py, sc, fade, now) {                                    // returns the dot's moved position and size
     const m = Math.min(W, H);
@@ -1562,6 +1566,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
         removeEventListener('touchmove', onMove); removeEventListener('touchend', onEnd); removeEventListener('keydown', onKey);
         fadeEls.forEach(el => { el.style.opacity = ''; el.style.transition = ''; });
         heroMark.style.transition = 'none'; endIntro();
+        // a trackpad keeps sending scroll after the swipe that opened the site: swallow that run-on so the visitor
+        // lands on the home page with the logo and net, instead of sliding on down the page
+        scrollTo(0, 0); let quietT = 0;
+        const hold = ev => { ev.preventDefault(); clearTimeout(quietT); quietT = setTimeout(() => removeEventListener('wheel', hold), 380); };
+        addEventListener('wheel', hold, { passive: false }); quietT = setTimeout(() => removeEventListener('wheel', hold), 900);
       };
       cue.style.pointerEvents = 'auto'; cue.style.cursor = 'pointer';
       cue.addEventListener('click', () => { pt = 1; idle = 0; });                    // tapping the gold dot also opens the site
@@ -1897,15 +1906,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .pubs li:has(> a:hover),.pubs li:has(> a:focus-visible),.pubs li:has(+ li > a:hover),.pubs li:has(+ li > a:focus-visible),
 .r-list li:has(> a:hover),.r-list li:has(> a:focus-visible),.r-list li:has(+ li > a:hover),.r-list li:has(+ li > a:focus-visible){border-bottom-color:transparent}
 .pubs:has(> li:first-child > a:hover){border-top-color:transparent}
-/* research publications: on hover each row lights up in the next brand colour, in order: blue, gold, orange, pink, teal, purple, then round again.
-   Blue, teal and purple rows take cream words; gold, orange and pink rows take blue words */
-.pubs li:nth-child(6n+2) > a::before{background:#e7aa4d}
-.pubs li:nth-child(6n+3) > a::before{background:#e0773a}
-.pubs li:nth-child(6n+4) > a::before{background:#d8708e}
-.pubs li:nth-child(6n+5) > a::before{background:#2a8c8c}
-.pubs li:nth-child(6n+6) > a::before{background:#9b6aa6}
-.pubs li:is(:nth-child(6n+2),:nth-child(6n+3),:nth-child(6n+4)) > a:is(:hover,:focus-visible),
-.pubs li:is(:nth-child(6n+2),:nth-child(6n+3),:nth-child(6n+4)) > a:is(:hover,:focus-visible) *{color:#2c5494 !important}
+
 </style>
 <style>
 /* events on desktop: two big cards per row (2 x 2) instead of four small ones, with roomier type */
@@ -2091,6 +2092,19 @@ button,input,select,textarea,optgroup{font-family:inherit}
   addEventListener('resize', () => { if (innerWidth !== lastW) { lastW = innerWidth; later(); } });
   pills.forEach(el => el.addEventListener('toggle', () => { const cd = cards.find(c => c.el === el); requestAnimationFrame(() => { build(cd); paint(cd, performance.now() / 1000); }); }));
 })();
+</script>
+<style>
+/* publication and resource lists: on hover each row lights up in the next brand colour, in order down the page:
+   blue, gold, orange, pink, teal, purple, then round again. Words turn cream on every colour except gold, where they stay blue. */
+.pubs a[style*="--hl"]::before,.r-list a[style*="--hl"]::before{background:var(--hl) !important}
+.pubs a.hl-gold:is(:hover,:focus-visible),.pubs a.hl-gold:is(:hover,:focus-visible) *,
+.r-list a.hl-gold:is(:hover,:focus-visible),.r-list a.hl-gold:is(:hover,:focus-visible) *{color:#2c5494 !important}
+.r-list a.hl-gold:is(:hover,:focus-visible) .r-type::before{background:#2c5494 !important}
+</style>
+<script>
+(() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6'];
+  [...document.querySelectorAll('.pubs li > a[href], .r-list li > a[href]')].forEach((a, i) => { const c = P[i % P.length];
+    a.style.setProperty('--hl', c); if (c === '#e7aa4d') a.classList.add('hl-gold'); }); })();
 </script>
 </body>
 </html>

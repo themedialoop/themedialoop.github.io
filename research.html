@@ -800,5 +800,18 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .top nav a:hover::before,.top nav a:focus-visible::before,.top nav a.tapped::before{background:var(--blue);transform:none}
 @media (max-width:760px){.top nav a{margin-inline:-40px;padding-inline:40px}}
 </style>
+<style>
+/* publication and resource lists: on hover each row lights up in the next brand colour, in order down the page:
+   blue, gold, orange, pink, teal, purple, then round again. Words turn cream on every colour except gold, where they stay blue. */
+.pubs a[style*="--hl"]::before,.r-list a[style*="--hl"]::before{background:var(--hl) !important}
+.pubs a.hl-gold:is(:hover,:focus-visible),.pubs a.hl-gold:is(:hover,:focus-visible) *,
+.r-list a.hl-gold:is(:hover,:focus-visible),.r-list a.hl-gold:is(:hover,:focus-visible) *{color:#2c5494 !important}
+.r-list a.hl-gold:is(:hover,:focus-visible) .r-type::before{background:#2c5494 !important}
+</style>
+<script>
+(() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6'];
+  [...document.querySelectorAll('.pubs li > a[href], .r-list li > a[href]')].forEach((a, i) => { const c = P[i % P.length];
+    a.style.setProperty('--hl', c); if (c === '#e7aa4d') a.classList.add('hl-gold'); }); })();
+</script>
 </body>
 </html>
