@@ -464,11 +464,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .vvv span:nth-child(7){animation-delay:.3s!important}.vvv span:nth-child(8){animation-delay:.35s!important}.vvv span:nth-child(9){animation-delay:.4s!important}.vvv span:nth-child(10){animation-delay:.45s!important}
 @keyframes vvvDance{0%{transform:none}25%{transform:translateY(-.35em) rotate(-10deg) scale(1.15)}50%{transform:translateY(.05em) rotate(8deg)}75%{transform:translateY(-.12em) rotate(-4deg) scale(1.05)}100%{transform:none}}
 @media (prefers-reduced-motion:reduce){.vvv:is(:hover,:focus-visible,.go) span{animation:none}}
-/* resources: the cards stay plain; a blue net on cream runs behind the whole stack, edge to edge.
-   On hover each card pops into its own colour from the palette (never its resting colour, never two the same). */
-.res-stack{position:relative;isolation:isolate}
-.res-stack::before{content:"";position:absolute;top:-48px;bottom:-48px;left:calc(50% - 50vw);right:calc(50% - 50vw);background:url(assets/net-blue-on-cream.svg) center/1500px repeat;z-index:-1;pointer-events:none}
-@media (max-width:600px){.res-stack::before{background-size:700px}}
+/* resources: plain cards; on hover each card pops into its own colour from the palette (never its resting colour, never two the same). */
 .res{transition:translate .45s cubic-bezier(.3,1.6,.5,1),rotate .45s cubic-bezier(.3,1.6,.5,1),scale .2s ease,background .35s ease,color .35s ease}
 .res.p-orange:is(:hover,:focus-visible){background:#e0773a;color:var(--cream)}
 .res.p-pink:is(:hover,:focus-visible){background:#d8708e;color:var(--cream)}
