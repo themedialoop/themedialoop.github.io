@@ -2145,7 +2145,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const pad = phone ? 14 : Math.max(14, rmax * .45);            // clear space between any dot and the words
     const side = cd.kind === 'pill' || cd.kind === 'ap';   // info cards and Apply: an even field of dots across the whole right side
     const field = side
-      ? (x, y) => { const d = distTo(x, y, rects); return (.55 + .25 * Math.sin(x * .013 + y * .017)) * sm(w * (phone ? .55 : .48), w * (phone ? .66 : .56), x) * sm(pad, pad + 24, d); }
+      ? (x, y) => { const d = distTo(x, y, rects); return (.5 + .2 * Math.sin(x * .013 + y * .017)) * sm(w * (phone ? .66 : .6), w * (phone ? .8 : .72), x) * sm(pad * 2.4, pad * 2.4 + 50, d); }   // a wide clear margin round the words
       : phone
       ? (x, y) => { const c = 1 - sm(.15, 1, Math.hypot((w - x) / (w * .7), (y - cy) / (h * .55))), d = distTo(x, y, rects);   // a calmer cascade from the corner
           return Math.max(0, c) * sm(pad, pad + 30, d); }
@@ -2157,7 +2157,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       // the gold open/close button is one of the dots: the others pack round it at the usual spacing
       const b = cd.el.querySelector('.pm').getBoundingClientRect(); dots.push({ x: b.left - cr.left + b.width / 2, y: b.top - cr.top + b.height / 2, r: 0, R: Math.max(b.width, b.height) / 2, fixed: true });
     }
-    const rM = phone ? Math.min(24, rmax) : rmax, gp = phone ? 5 : Math.max(4, rmax * .09);   // the corner is packed full: dots sit close, never touching
+    const rM = phone ? Math.min(24, rmax) : rmax, gp = side ? Math.max(8, rmax * .26) : phone ? 5 : Math.max(4, rmax * .09);   // side fields are airier   // the corner is packed full: dots sit close, never touching
     const NT = phone ? 14000 : 16000;
     for (let i = 0; i < NT; i++) {
       const x = rnd() * (w + 60) - 30, y = rnd() * (h + 60) - 30, f = field(x, y); if (f <= .05) continue;
