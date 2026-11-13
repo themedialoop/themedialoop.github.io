@@ -2266,7 +2266,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       for (const el of document.elementsFromPoint(x, y)) { const c = el.closest && el.closest('.res'); if (c) { const bg = getComputedStyle(c).backgroundColor; ban.add(bg); if (bg === rgb(M)) ban.add(rgb(T)); } } }
     dots.forEach((e, j) => { if (j !== i && e.col && Math.hypot(e.x - cx, e.y - cy) < e.r + r + 60) { ban.add(rgb(e.col)); if (e.col === M) ban.add(rgb(T)); } });
     return ban; };
-  const pick = (d, i, ban) => { const ok = PAL.filter(c => !ban.has(rgb(c))); const opts = ok.length ? ok : PAL; d.col = opts[(i * 7 + Math.floor(scrollY / 97)) % opts.length]; d.el.style.setProperty('--c', d.col); };
+  const pick = (d, i, ban) => { const ok = PAL.filter(c => !ban.has(rgb(c))); if (!ok.length) return false; d.col = ok[(i * 7 + (d.swaps = (d.swaps || 0) + 1)) % ok.length]; d.el.style.setProperty('--c', d.col); return true; };
   const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   let start = 0, end = 1, ticking = false;
   const measure = () => { const top = sec.getBoundingClientRect().top + scrollY, last = cards[cards.length - 1];
@@ -2281,11 +2281,15 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       d.x = x * innerWidth; d.y = y * innerHeight; d.r = sz * Math.min(innerWidth, innerHeight) / 2;
       // pick a colour as the dot arrives; while it is still small, swap it if a card of the same colour slides behind it, then keep it
       const grow = t < .33 ? t / .33 : t > .67 ? (1 - t) / .33 : 1;
-      if (t <= 0 || t >= 1) { d.col = null; d.k = 1; d.want = 1; }
+      if (t <= 0 || t >= 1) { d.col = null; d.k = 1; d.want = 1; d.lock = 0; }
       else { const ban = bans(d, i);
-        if (!d.col) pick(d, i, ban);
-        else if (ban.has(rgb(d.col))) { if (grow < .45 || d.k < .05) { pick(d, i, ban); d.want = 1; } else d.want = 0; }   // a same-colour card slid behind it: shrink away, swap colour, come back
-        else d.want = 1; }
+        const now = performance.now();
+        if (!d.col) { if (!pick(d, i, ban)) d.want = 0; d.lock = now; }
+        else if (ban.has(rgb(d.col))) {
+          // a same-colour card slid behind it: shrink right away first, and only swap colour once it is gone, then come back.
+          // It never changes colour while it can be seen.
+          if (d.k < .03) { if (pick(d, i, ban)) { d.want = 1; d.lock = now; } } else d.want = 0; }
+        else if (!ban.has(rgb(d.col))) d.want = 1; }
       d.k = d.k == null ? 1 : d.k + (d.want - d.k) * .18; if (Math.abs(d.want - d.k) > .01) more = true;
       // in for the first third, held, out for the last third
       const s = (t <= 0 || t >= 1 ? 0 : t < .33 ? ease(t / .33) : t > .67 ? ease((1 - t) / .33) : 1) * d.k;
