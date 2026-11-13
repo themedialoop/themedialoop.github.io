@@ -464,25 +464,25 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .vvv span:nth-child(7){animation-delay:.3s!important}.vvv span:nth-child(8){animation-delay:.35s!important}.vvv span:nth-child(9){animation-delay:.4s!important}.vvv span:nth-child(10){animation-delay:.45s!important}
 @keyframes vvvDance{0%{transform:none}25%{transform:translateY(-.35em) rotate(-10deg) scale(1.15)}50%{transform:translateY(.05em) rotate(8deg)}75%{transform:translateY(-.12em) rotate(-4deg) scale(1.05)}100%{transform:none}}
 @media (prefers-reduced-motion:reduce){.vvv:is(:hover,:focus-visible,.go) span{animation:none}}
-/* resources: plain cards; on hover each card pops into its own colour from the palette (never its resting colour, never two the same). */
+/* resources: plain cards; when pressed each card pops into its own colour from the palette (never its resting colour, never two the same). */
 .res{transition:translate .45s cubic-bezier(.3,1.6,.5,1),rotate .45s cubic-bezier(.3,1.6,.5,1),scale .2s ease,background .35s ease,color .35s ease}
-.res.p-orange:is(:hover,:focus-visible){background:#e0773a;color:var(--cream)}
-.res.p-pink:is(:hover,:focus-visible){background:#d8708e;color:var(--cream)}
-.res.p-teal:is(:hover,:focus-visible){background:#2a8c8c;color:var(--cream)}
-.res.p-purple:is(:hover,:focus-visible){background:#9b6aa6;color:var(--cream)}
-.res.p-blue:is(:hover,:focus-visible){background:#2c5494;color:var(--cream)}
-.res.p-gold:is(:hover,:focus-visible){background:#e7aa4d;color:var(--blue)}
-.res[class*="p-"]:is(:hover,:focus-visible) :is(.r-kind,.r-name,.r-desc,.r-mini){color:inherit}
-.res:is(.p-orange,.p-pink,.p-teal,.p-purple,.p-blue):is(:hover,:focus-visible) .r-go{background:var(--gold);color:var(--blue)}
-.res.p-gold:is(:hover,:focus-visible) .r-go{background:var(--blue);color:var(--cream)}
+.res.p-orange:active{background:#e0773a;color:var(--cream)}
+.res.p-pink:active{background:#d8708e;color:var(--cream)}
+.res.p-teal:active{background:#2a8c8c;color:var(--cream)}
+.res.p-purple:active{background:#9b6aa6;color:var(--cream)}
+.res.p-blue:active{background:#2c5494;color:var(--cream)}
+.res.p-gold:active{background:#e7aa4d;color:var(--blue)}
+.res[class*="p-"]:active :is(.r-kind,.r-name,.r-desc,.r-mini){color:inherit}
+.res:is(.p-orange,.p-pink,.p-teal,.p-purple,.p-blue):active .r-go{background:var(--gold);color:var(--blue)}
+.res.p-gold:active .r-go{background:var(--blue);color:var(--cream)}
 /* resource card dots */
 .res .rdots{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;border-radius:inherit}
 .res > :not(.rdots){position:relative;z-index:1}
 .res .rdots .main{fill:var(--rd-main)} .res .rdots .acc{fill:var(--rd-acc)}
-.res:is(:hover,:focus-visible) .rdots .main{fill:var(--cream)}
-.res.p-gold:is(:hover,:focus-visible) .rdots .main{fill:var(--blue)}
-.res:is(.p-orange):is(:hover,:focus-visible) .rdots .acc{fill:var(--gold)}
-.res:is(.p-pink):is(:hover,:focus-visible) .rdots .acc{fill:var(--gold)}
+.res:active .rdots .main{fill:var(--cream)}
+.res.p-gold:active .rdots .main{fill:var(--blue)}
+.res:is(.p-orange):active .rdots .acc{fill:var(--gold)}
+.res:is(.p-pink):active .rdots .acc{fill:var(--gold)}
 </style>
 </head>
 <body>
@@ -2143,7 +2143,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
       cd.el.querySelectorAll(sel[cd.kind]).forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); const ls = [...rg.getClientRects()].filter(q => q.width); if (ls.length < 2) return;   // one-line items keep their own short box
         const x1 = Math.max(...ls.map(q => q.right)), b = e.getBoundingClientRect(); rects.push([b.left - cr.left, b.top - cr.top, x1 - cr.left, b.bottom - cr.top]); }); }
     const pad = phone ? 14 : Math.max(14, rmax * .45);            // clear space between any dot and the words
-    const field = phone
+    const side = cd.kind === 'pill' || cd.kind === 'ap';   // info cards and Apply: an even field of dots across the whole right side
+    const field = side
+      ? (x, y) => { const d = distTo(x, y, rects); return (.55 + .25 * Math.sin(x * .013 + y * .017)) * sm(w * (phone ? .55 : .48), w * (phone ? .66 : .56), x) * sm(pad, pad + 24, d); }
+      : phone
       ? (x, y) => { const c = 1 - sm(.15, 1, Math.hypot((w - x) / (w * .7), (y - cy) / (h * .55))), d = distTo(x, y, rects);   // a calmer cascade from the corner
           return Math.max(0, c) * sm(pad, pad + 30, d); }
       : (x, y) => { const f = 1 - sm(.25, 1, Math.hypot((w - x) / rx, (y - cy) / ry)); if (f <= 0) return 0;
