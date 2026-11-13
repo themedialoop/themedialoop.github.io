@@ -476,13 +476,27 @@ button,input,select,textarea,optgroup{font-family:inherit}
 /* resource cards lift on hover but no longer tilt: tilting a card whose dot runs to its edges let a hairline of the card colour flicker round the rim */
 @media (hover:hover){.res:hover,.res:focus-visible{rotate:none !important}}
 .res:active{rotate:none !important}
-/* resource cards: one colour each, with a net in a shade of that colour; neighbours never share a colour */
-.res.bd1{background:#e7aa4d;color:#2c5494;--net:#e49746}.res.bd1 .r-kind::before{background:#2c5494}.res.bd1 .r-go{background:#2c5494;color:#f2eedd}
-.res.bd2{background:#9b6aa6;color:#f2eedd;--net:#ac84b1}.res.bd2 .r-kind::before{background:#d8708e}.res.bd2 .r-go{background:#e7aa4d;color:#2c5494}
-.res.bd3{background:#2c5494;color:#f2eedd;--net:#46689d}.res.bd3 .r-kind::before{background:#e7aa4d}.res.bd3 .r-go{background:#e7aa4d;color:#2c5494}
-.res.bd4{background:#e0773a;color:#f2eedd;--net:#e38c57}.res.bd4 .r-kind::before{background:#2c5494}.res.bd4 .r-go{background:#2c5494;color:#f2eedd}
-.res.bd5{background:#2a8c8c;color:#f2eedd;--net:#4a9c99}.res.bd5 .r-kind::before{background:#e7aa4d}.res.bd5 .r-go{background:#e7aa4d;color:#2c5494}
-.res.bd6{background:#e7aa4d;color:#2c5494;--net:#e49746}.res.bd6 .r-kind::before{background:#2c5494}.res.bd6 .r-go{background:#2c5494;color:#f2eedd}
+/* the big go-dot: the button becomes a large organic dot that bleeds off the bottom-right corner, with the call to action inside.
+   The dot breathes slowly in place; the words inside stay still. Nothing reacts to the cursor beyond the card's usual lift. */
+.res .r-go{position:absolute;right:calc(var(--gd) * -.12);bottom:calc(var(--gd) * -.16);--gd:clamp(180px,19vw,280px);width:var(--gd);height:var(--gd);margin:0;padding:0;
+  background:none !important;border-radius:0;display:grid;place-items:center;font-size:clamp(17px,1.5vw,22px);font-weight:700;line-height:1.1;letter-spacing:-.015em;transform:none !important;filter:none !important;z-index:1}
+.res .r-go::before{content:"";position:absolute;inset:0;background:var(--gd-bg);border-radius:52% 48% 55% 45%/46% 54% 47% 53%;animation:goBreathe 8s ease-in-out infinite alternate;animation-delay:calc(var(--i,0) * -1.4s)}
+.res .r-go .r-label{position:relative;max-width:7.5em;text-align:left;translate:calc(var(--gd) * -.06) calc(var(--gd) * -.07)}
+@keyframes goBreathe{from{transform:scale(1) rotate(0deg)}to{transform:scale(1.035) rotate(4deg)}}
+@media (prefers-reduced-motion:reduce){.res .r-go::before{animation:none}}
+/* room for the dot so the description never runs under it */
+.res .r-desc{max-width:min(52ch, calc(100% - var(--gdw,0px)))}
+@media (min-width:561px){.res{--gdw:clamp(130px,13vw,200px);padding-bottom:clamp(36px,5vw,64px)}}
+/* phones: the dot sits under the words, on the right, bleeding off the corner */
+@media (max-width:560px){.res .r-go{position:relative;--gd:190px;justify-self:end;right:auto;bottom:auto;margin:6px -44px -76px 0;font-size:17px}
+  .res .r-go .r-label{translate:-22px -24px;max-width:6.2em}}
+/* resource cards: one colour each; neighbours never share a colour */
+.res.bd1{background:#e7aa4d;color:#2c5494;--net:#e49746}.res.bd1 .r-kind::before{background:#2c5494}.res.bd1 .r-go{--gd-bg:#2c5494;color:#f2eedd}
+.res.bd2{background:#9b6aa6;color:#f2eedd;--net:#ac84b1}.res.bd2 .r-kind::before{background:#d8708e}.res.bd2 .r-go{--gd-bg:#e7aa4d;color:#2c5494}
+.res.bd3{background:#2c5494;color:#f2eedd;--net:#46689d}.res.bd3 .r-kind::before{background:#e7aa4d}.res.bd3 .r-go{--gd-bg:#e7aa4d;color:#2c5494}
+.res.bd4{background:#e0773a;color:#f2eedd;--net:#e38c57}.res.bd4 .r-kind::before{background:#2c5494}.res.bd4 .r-go{--gd-bg:#2c5494;color:#f2eedd}
+.res.bd5{background:#2a8c8c;color:#f2eedd;--net:#4a9c99}.res.bd5 .r-kind::before{background:#e7aa4d}.res.bd5 .r-go{--gd-bg:#e7aa4d;color:#2c5494}
+.res.bd6{background:#e7aa4d;color:#2c5494;--net:#e49746}.res.bd6 .r-kind::before{background:#2c5494}.res.bd6 .r-go{--gd-bg:#2c5494;color:#f2eedd}
 </style>
 </head>
 <body>
@@ -2212,55 +2226,12 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
 <script>
 </script>
 <script>
-/* resource cards: each card is one colour with the background's own net (same holes, same size, same slow ripple) in a shade of that colour.
-   The words sit in a clearing with no net; the dots grow from small at the clearing's edge to full size further out.
-   Drawn on a canvas; every dot breathes and turns slowly in place, and only cards on screen are redrawn. */
+/* resource cards: each card is one colour, and its button grows into a big organic dot in the bottom-right corner */
 (() => {
-  const cards = [...document.querySelectorAll('.res-stack .res')]; if (!cards.length) return;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!window.NET_HOLES) return;
-  const HT = NET_HOLES.tile, HOLES = NET_HOLES.holes.map(h => { const sc = NET_HOLES.scale, cx = h[0] / sc, cy = h[1] / sc, pts = [];
-    for (let i = 2; i < h.length; i += 2) pts.push([h[i] / sc, h[i + 1] / sc]);
-    const p = new Path2D(), n = pts.length, mid = i => [(pts[i % n][0] + pts[(i + 1) % n][0]) / 2, (pts[i % n][1] + pts[(i + 1) % n][1]) / 2];
-    let m = mid(0); p.moveTo(m[0], m[1]); for (let i = 1; i <= n; i++) { const c = pts[i % n], q = mid(i); p.quadraticCurveTo(c[0], c[1], q[0], q[1]); } p.closePath();
-    return { cx, cy, p, ph: (cx * 12.9898 + cy * 78.233) % 6.283, rad: Math.max(...pts.map(q => Math.hypot(q[0], q[1]))) }; });
-  // eight organic unit shapes, shared by every dot
-  const SHAPES = [...Array(12)].map((_, k) => { const q = [], N = 18; for (let i = 0; i < N; i++) { const t = i / N * Math.PI * 2, f = 1 + .1 * Math.sin(2 * t + k * 1.3) + .07 * Math.sin(3 * t + k * 2.1) + .02 * Math.sin(5 * t + k); q.push([Math.cos(t) * f, Math.sin(t) * f]); }
-    const p = new Path2D(); for (let i = 0; i < N; i++) { const p0 = q[(i - 1 + N) % N], p1 = q[i], p2 = q[(i + 1) % N], p3 = q[(i + 2) % N]; if (!i) p.moveTo(p1[0], p1[1]);
-      p.bezierCurveTo(p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6, p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6, p2[0], p2[1]); } p.closePath(); return p; });
-  const mul = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-  const words = (el, cr) => [...el.querySelectorAll('.r-kind, .r-name, .r-desc, .r-go')].flatMap(e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects(), e.matches('.r-go') ? e.getBoundingClientRect() : null]; })
-    .filter(b => b && b.width).map(b => [b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
-  const state = cards.map((el, i) => {
+  document.querySelectorAll('.res-stack .res').forEach((el, i) => {
     el.classList.add('bd' + (i % 6 + 1));
-    const cv = document.createElement('canvas'); cv.className = 'rnet'; cv.setAttribute('aria-hidden', 'true'); el.prepend(cv);
-    return { el, cv, ctx: cv.getContext('2d'), dots: [], w: 0, h: 0, seed: 11 + i * 97 };
+    const go = el.querySelector('.r-go'); if (go && !go.querySelector('.r-arrow')) { go.innerHTML = `<span class="r-label">${go.innerHTML}<span class="r-arrow" aria-hidden="true">&nbsp;→</span></span>`; }
   });
-  const layout = st => { const cr = st.el.getBoundingClientRect(), w = cr.width, h = cr.height; if (!w || !h) return;
-    // measure the words with the card at rest (no lift or scale from hover or the stack)
-    const k = st.el.offsetWidth / w, rects = words(st.el, cr).map(r => r.map(v => v * k));
-    const W = st.el.offsetWidth, H = st.el.offsetHeight, dpr = Math.min(2, devicePixelRatio || 1);
-    st.cv.width = Math.round(W * dpr); st.cv.height = Math.round(H * dpr); st.w = W; st.h = H; st.dpr = dpr;
-    // the same net as the blue background: its own hole shapes, at the same size, tiled from a different spot on each card
-    const dText = (x, y) => Math.min(...rects.map(([a, b, c, d]) => Math.hypot(Math.max(0, a - x, x - c), Math.max(0, b - y, y - d))));
-    const T = Math.min(3300, Math.max(2100, innerWidth * 2.1)), kh = T / HT, rnd = mul(st.seed), ox = -rnd() * T, oy = -rnd() * T;
-    const CLEAR = W < 560 ? 18 : 40, RAMP = W < 560 ? 60 : 130, dots = [];
-    for (let ty = 0; oy + ty * T < H + T; ty++) for (let tx = 0; ox + tx * T < W + T; tx++) for (const hh of HOLES) {
-      const x = ox + tx * T + hh.cx * kh, y = oy + ty * T + hh.cy * kh, rr = hh.rad * kh; if (x < -rr || y < -rr || x > W + rr || y > H + rr) continue;
-      const f = Math.min(1, Math.max(0, (dText(x, y) - rr - CLEAR) / RAMP)); if (f < .12) continue;   // holes shrink away near the words, leaving a clearing
-      dots.push([x, y, f, hh]); }
-    st.dots = dots; st.k = kh; st.col = getComputedStyle(st.el).getPropertyValue('--net').trim() || 'rgba(255,255,255,.1)'; draw(st, performance.now() / 1000); };
-  const draw = (st, t) => { const c = st.ctx; if (!st.w) return; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, st.cv.width, st.cv.height); c.fillStyle = st.col;
-    const cxm = st.w / 2, cym = st.h / 2, R = Math.hypot(cxm, cym), k = st.k * st.dpr;
-    for (const [x, y, f, hh] of st.dots) { const wave = .5 + .5 * Math.sin(t * .9 - Math.hypot(x - cxm, y - cym) / R * 7 + hh.ph * .35), sc = (reduce ? .82 : Math.min(1, .6 + .34 * wave)) * Math.pow(f, .7) * k;
-      c.setTransform(sc, 0, 0, sc, x * st.dpr, y * st.dpr); c.fill(hh.p); } };
-  const all = () => state.forEach(layout);
-  all(); (document.fonts ? document.fonts.ready : Promise.resolve()).then(all); addEventListener('load', all);
-  if ('ResizeObserver' in window) { const ro = new ResizeObserver(es => es.forEach(e => { const st = state.find(s => s.el === e.target); if (st && (Math.round(st.el.offsetWidth) !== Math.round(st.w) || Math.round(st.el.offsetHeight) !== Math.round(st.h))) layout(st); })); state.forEach(s => ro.observe(s.el)); }
-  if (reduce) return;
-  let lastT = 0; const loop = now => { requestAnimationFrame(loop); if (now - lastT < 33) return; lastT = now; const t = now / 1000;   // about 30 frames a second is plenty for a slow breath
-    for (const st of state) { const r = st.el.getBoundingClientRect(); if (r.bottom > 0 && r.top < innerHeight) draw(st, t); } };
-  requestAnimationFrame(loop);
 })();
 </script>
 </body>
