@@ -464,10 +464,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .vvv span:nth-child(7){animation-delay:.3s!important}.vvv span:nth-child(8){animation-delay:.35s!important}.vvv span:nth-child(9){animation-delay:.4s!important}.vvv span:nth-child(10){animation-delay:.45s!important}
 @keyframes vvvDance{0%{transform:none}25%{transform:translateY(-.35em) rotate(-10deg) scale(1.15)}50%{transform:translateY(.05em) rotate(8deg)}75%{transform:translateY(-.12em) rotate(-4deg) scale(1.05)}100%{transform:none}}
 @media (prefers-reduced-motion:reduce){.vvv:is(:hover,:focus-visible,.go) span{animation:none}}
-/* resources: plain cards. The only colour change is the button: on hover or press it turns one of the sprinkle colours
-   (orange, pink, teal or purple), never the card's own colour, and neighbouring cards never share one */
-.res .r-go{transition:background-color .25s,color .25s}
-.res .r-go:is(:hover,:focus-visible),.res:active .r-go{background:var(--go-hl) !important;color:var(--cream) !important}
+/* resources: plain cards, no colour changes */
 .res{transition:translate .45s cubic-bezier(.3,1.6,.5,1),rotate .45s cubic-bezier(.3,1.6,.5,1),scale .2s ease,background .35s ease,color .35s ease}
 /* resource card dots */
 .res .rdots{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;border-radius:inherit}
@@ -2200,10 +2197,6 @@ button,input,select,textarea,optgroup{font-family:inherit}
 document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () => { el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); setTimeout(() => el.classList.remove('go'), 1500); }));
 </script>
 <script>
-// resource cards: each button gets its own sprinkle colour for hover and press
-(() => { const fam = el => el.classList.contains('r-sage') ? '#2a8c8c' : el.classList.contains('r-egg') ? '#9b6aa6' : '';
-  const P = ['#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6']; let prev = '';
-  document.querySelectorAll('.res-stack .res').forEach(el => { const opts = P.filter(c => c !== fam(el) && c !== prev); const c = opts[Math.floor(Math.random() * opts.length)]; prev = c; el.style.setProperty('--go-hl', c); }); })();
 </script>
 <script>
 /* resource cards: five simple dot designs, shared out so neighbouring cards differ:
