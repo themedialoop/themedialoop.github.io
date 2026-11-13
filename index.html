@@ -475,6 +475,14 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .res[class*="p-"]:is(:hover,:focus-visible) :is(.r-kind,.r-name,.r-desc,.r-mini){color:inherit}
 .res:is(.p-orange,.p-pink,.p-teal,.p-purple,.p-blue):is(:hover,:focus-visible) .r-go{background:var(--gold);color:var(--blue)}
 .res.p-gold:is(:hover,:focus-visible) .r-go{background:var(--blue);color:var(--cream)}
+/* resource card dots */
+.res .rdots{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;border-radius:inherit}
+.res > :not(.rdots){position:relative;z-index:1}
+.res .rdots .main{fill:var(--rd-main)} .res .rdots .acc{fill:var(--rd-acc)}
+.res:is(:hover,:focus-visible) .rdots .main{fill:var(--cream)}
+.res.p-gold:is(:hover,:focus-visible) .rdots .main{fill:var(--blue)}
+.res:is(.p-orange):is(:hover,:focus-visible) .rdots .acc{fill:var(--gold)}
+.res:is(.p-pink):is(:hover,:focus-visible) .rdots .acc{fill:var(--gold)}
 </style>
 </head>
 <body>
@@ -2207,6 +2215,48 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   // not its own colour, not a neighbour's resting colour, and never teal beside purple
   cs.forEach((el, i) => { const near = [cs[i - 1], cs[i + 1]].filter(Boolean).map(own), bad = c => c === own(el) || near.includes(c) || (c === 'p-teal' && near.includes('p-purple')) || (c === 'p-purple' && near.includes('p-teal'));
     let k = left.findIndex(c => !bad(c)); if (k < 0) k = left.findIndex(c => c !== own(el)); if (k >= 0) el.classList.add(left.splice(k, 1)[0]); }); })();
+</script>
+<script>
+/* resource cards: five simple dot designs, shared out so neighbouring cards differ:
+   1 one big dot cropped by the corner · 2 a trail of three · 3 a small polka swatch · 4 a big dot and a tiny moon · 5 a row of dots along the bottom.
+   In 2, 3 and 5 one dot is a different colour, for a bit of play. Every dot is organic and crisp, and keeps clear of the words. */
+(() => {
+  const cards = [...document.querySelectorAll('.res-stack .res')]; if (!cards.length) return;
+  const B = '#2c5494', G = '#e7aa4d', C = '#f2eedd', O = '#e0773a', PK = '#d8708e';
+  const fam = el => el.classList.contains('r-gold') ? 'gold' : el.classList.contains('r-sage') ? 'teal' : el.classList.contains('r-egg') ? 'purple' : 'blue';
+  const MAIN = { blue: G, gold: B, teal: C, purple: C }, ACC = { blue: [PK, O, C], gold: [PK, O, C], teal: [G, O], purple: [G, O] };
+  const mul = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const dot = (rnd, x, y, r) => { const k1 = rnd() * 6, k2 = rnd() * 6, a = rnd() * 6.3, q = [];
+    for (let i = 0; i < 20; i++) { const t = i / 20 * Math.PI * 2, rr = r * (1 + .07 * Math.sin(2 * t + k1) + .05 * Math.sin(3 * t + k2)); q.push([x + Math.cos(t + a) * rr, y + Math.sin(t + a) * rr]); }
+    let d = ''; const n = q.length; for (let i = 0; i < n; i++) { const p0 = q[(i - 1 + n) % n], p1 = q[i], p2 = q[(i + 1) % n], p3 = q[(i + 2) % n]; if (!i) d += `M${p1[0].toFixed(1)},${p1[1].toFixed(1)}`;
+      d += `C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)},${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)} ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)},${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`; } return d + 'Z'; };
+  // each design: a list of [x, y, r, accent?] in px, from the card's width w, height h and scale s
+  const DESIGNS = [
+    (w, h, s) => [[w - s * .28, s * .05, s * .62]],
+    (w, h, s) => [[w - s * .22, s * .24, s * .15], [w - s * .5, s * .15, s * .09, 1], [w - s * .7, s * .09, s * .05]],
+    (w, h, s) => { const o = []; let n = 0; for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) { if (r + k > 4) continue; o.push([w - s * .08 - k * s * .13 - (r % 2) * s * .065, s * .09 + r * s * .12, s * .034, n++ === 5 ? 1 : 0]); } return o; },
+    (w, h, s) => [[w - s * .06, h - s * .02, s * .42], [w - s * .5, h - s * .42, s * .045]],
+    (w, h, s) => { const o = [], step = s * .16, n = Math.floor((w - s * .1) / step), acc = Math.floor(n * .6); for (let k = 0; k < n; k++) o.push([s * .1 + k * step, h + s * .01, s * .07, k === acc ? 1 : 0]); return o; }
+  ];
+  // share the designs out: all five appear, neighbours never match
+  const order = [0, 1, 2, 3, 4]; for (let i = 4; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  const pick = cards.map((_, i) => order[i % 5]); if (cards.length > 5 && pick[5] === pick[4]) pick[5] = order[2];
+  const words = (el, cr) => [...el.querySelectorAll('.r-kind, .r-name, .r-desc, .r-go, .r-mini')].flatMap(e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects(), e.matches('.r-go') ? e.getBoundingClientRect() : null]; })
+    .filter(b => b && b.width).map(b => [b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
+  const clash = (ds, rects, pad) => ds.some(([x, y, r]) => rects.some(([a, b, c, d]) => Math.hypot(Math.max(0, a - x, x - c), Math.max(0, b - y, y - d)) < r * 1.12 + pad));
+  cards.forEach((el, i) => {
+    const f = fam(el), seed = (Math.random() * 1e9) | 0, accCol = ACC[f][Math.floor(Math.random() * ACC[f].length)];
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('class', 'rdots'); svg.setAttribute('aria-hidden', 'true'); el.prepend(svg);
+    el.style.setProperty('--rd-main', MAIN[f]); el.style.setProperty('--rd-acc', accCol);
+    const draw = () => { const cr = el.getBoundingClientRect(), w = cr.width, h = cr.height; if (!w || !h) return;
+      const rects = words(el, cr); let s = Math.min(h, w * .6), ds;
+      for (let k = 0; k < 14; k++) { ds = DESIGNS[pick[i]](w, h, s); if (!clash(ds, rects, 12)) break; s *= .88; }   // shrink until the words are clear
+      if (clash(ds, rects, 12)) ds = [];
+      const rnd = mul(seed); svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      svg.innerHTML = ds.map(([x, y, r, a]) => `<path class="${a ? 'acc' : 'main'}" d="${dot(rnd, x, y, r)}"/>`).join(''); };
+    draw(); if ('ResizeObserver' in window) new ResizeObserver(draw).observe(el); document.fonts && document.fonts.ready.then(draw);
+  });
+})();
 </script>
 </body>
 </html>
