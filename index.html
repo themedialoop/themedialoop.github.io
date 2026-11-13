@@ -464,25 +464,15 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .vvv span:nth-child(7){animation-delay:.3s!important}.vvv span:nth-child(8){animation-delay:.35s!important}.vvv span:nth-child(9){animation-delay:.4s!important}.vvv span:nth-child(10){animation-delay:.45s!important}
 @keyframes vvvDance{0%{transform:none}25%{transform:translateY(-.35em) rotate(-10deg) scale(1.15)}50%{transform:translateY(.05em) rotate(8deg)}75%{transform:translateY(-.12em) rotate(-4deg) scale(1.05)}100%{transform:none}}
 @media (prefers-reduced-motion:reduce){.vvv:is(:hover,:focus-visible,.go) span{animation:none}}
-/* resources: plain cards; when pressed each card pops into its own colour from the palette (never its resting colour, never two the same). */
+/* resources: plain cards. The only colour change is the button: on hover or press it turns one of the sprinkle colours
+   (orange, pink, teal or purple), never the card's own colour, and neighbouring cards never share one */
+.res .r-go{transition:background-color .25s,color .25s}
+.res .r-go:is(:hover,:focus-visible),.res:active .r-go{background:var(--go-hl) !important;color:var(--cream) !important}
 .res{transition:translate .45s cubic-bezier(.3,1.6,.5,1),rotate .45s cubic-bezier(.3,1.6,.5,1),scale .2s ease,background .35s ease,color .35s ease}
-.res.p-orange:active{background:#e0773a;color:var(--cream)}
-.res.p-pink:active{background:#d8708e;color:var(--cream)}
-.res.p-teal:active{background:#2a8c8c;color:var(--cream)}
-.res.p-purple:active{background:#9b6aa6;color:var(--cream)}
-.res.p-blue:active{background:#2c5494;color:var(--cream)}
-.res.p-gold:active{background:#e7aa4d;color:var(--blue)}
-.res[class*="p-"]:active :is(.r-kind,.r-name,.r-desc,.r-mini){color:inherit}
-.res:is(.p-orange,.p-pink,.p-teal,.p-purple,.p-blue):active .r-go{background:var(--gold);color:var(--blue)}
-.res.p-gold:active .r-go{background:var(--blue);color:var(--cream)}
 /* resource card dots */
 .res .rdots{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;border-radius:inherit}
 .res > :not(.rdots){position:relative;z-index:1}
 .res .rdots .main{fill:var(--rd-main)} .res .rdots .acc{fill:var(--rd-acc)}
-.res:active .rdots .main{fill:var(--cream)}
-.res.p-gold:active .rdots .main{fill:var(--blue)}
-.res:is(.p-orange):active .rdots .acc{fill:var(--gold)}
-.res:is(.p-pink):active .rdots .acc{fill:var(--gold)}
 </style>
 </head>
 <body>
@@ -2210,14 +2200,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
 document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () => { el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); setTimeout(() => el.classList.remove('go'), 1500); }));
 </script>
 <script>
-// resource cards: give each card its own hover colour, different from its resting colour and from every other card's
-(() => { const own = el => el.classList.contains('r-gold') ? 'p-gold' : el.classList.contains('r-sage') ? 'p-teal' : el.classList.contains('r-egg') ? 'p-purple' : el.classList.contains('r-lav') ? 'p-pink' : el.classList.contains('r-orange') ? 'p-orange' : 'p-blue';
-  const left = ['p-orange', 'p-pink', 'p-teal', 'p-purple', 'p-gold', 'p-blue'];
-  for (let i = left.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [left[i], left[j]] = [left[j], left[i]]; }
-  const cs = [...document.querySelectorAll('.res-stack .res')];
-  // not its own colour, not a neighbour's resting colour, and never teal beside purple
-  cs.forEach((el, i) => { const near = [cs[i - 1], cs[i + 1]].filter(Boolean).map(own), bad = c => c === own(el) || near.includes(c) || (c === 'p-teal' && near.includes('p-purple')) || (c === 'p-purple' && near.includes('p-teal'));
-    let k = left.findIndex(c => !bad(c)); if (k < 0) k = left.findIndex(c => c !== own(el)); if (k >= 0) el.classList.add(left.splice(k, 1)[0]); }); })();
+// resource cards: each button gets its own sprinkle colour for hover and press
+(() => { const fam = el => el.classList.contains('r-sage') ? '#2a8c8c' : el.classList.contains('r-egg') ? '#9b6aa6' : '';
+  const P = ['#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6']; let prev = '';
+  document.querySelectorAll('.res-stack .res').forEach(el => { const opts = P.filter(c => c !== fam(el) && c !== prev); const c = opts[Math.floor(Math.random() * opts.length)]; prev = c; el.style.setProperty('--go-hl', c); }); })();
 </script>
 <script>
 /* resource cards: five simple dot designs, shared out so neighbouring cards differ:
