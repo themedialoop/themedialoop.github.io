@@ -477,13 +477,15 @@ button,input,select,textarea,optgroup{font-family:inherit}
 /* resource cards lift on hover but no longer tilt: tilting a card whose dot runs to its edges let a hairline of the card colour flicker round the rim */
 @media (hover:hover){.res:hover,.res:focus-visible{rotate:none !important}}
 .res:active{rotate:none !important}
+.res .rdots .moon{fill:var(--rd-main)} .res .rdots .acc{fill:var(--rd-acc)}
+.res .rdots path.acc{animation-duration:calc(var(--bd-dur,9s) * .6)} .res .rdots path.moon{animation-duration:calc(var(--bd-dur,9s) * .45);animation-delay:-2s}
 /* neighbouring cards share no colour, so the collapsed stack never has two of the same colour touching */
-.res.bd1{background:#2c5494;color:#2c5494;--rd-main:#e7aa4d}.res.bd1 .r-kind::before{background:#2c5494}.res.bd1 .r-go{background:#2c5494;color:#f2eedd}
-.res.bd2{background:#d8708e;color:#f2eedd;--rd-main:#9b6aa6}.res.bd2 .r-kind::before{background:#d8708e}.res.bd2 .r-go{background:#e7aa4d;color:#2c5494}
-.res.bd3{background:#e7aa4d;color:#f2eedd;--rd-main:#2c5494}.res.bd3 .r-kind::before{background:#e7aa4d}.res.bd3 .r-go{background:#e7aa4d;color:#2c5494}
-.res.bd4{background:#d8708e;color:#f2eedd;--rd-main:#e0773a}.res.bd4 .r-kind::before{background:#2c5494}.res.bd4 .r-go{background:#2c5494;color:#f2eedd}
-.res.bd5{background:#e7aa4d;color:#f2eedd;--rd-main:#2a8c8c}.res.bd5 .r-kind::before{background:#e7aa4d}.res.bd5 .r-go{background:#e7aa4d;color:#2c5494}
-.res.bd6{background:#e0773a;color:#f2eedd;--rd-main:#2c5494}.res.bd6 .r-kind::before{background:#e0773a}.res.bd6 .r-go{background:#e7aa4d;color:#2c5494}
+.res.bd1{--rd-acc:#f2eedd;background:#2c5494;color:#2c5494;--rd-main:#e7aa4d}.res.bd1 .r-kind::before{background:#2c5494}.res.bd1 .r-go{background:#2c5494;color:#f2eedd}
+.res.bd2{--rd-acc:#e7aa4d;background:#d8708e;color:#f2eedd;--rd-main:#9b6aa6}.res.bd2 .r-kind::before{background:#d8708e}.res.bd2 .r-go{background:#e7aa4d;color:#2c5494}
+.res.bd3{--rd-acc:#d8708e;background:#e7aa4d;color:#f2eedd;--rd-main:#2c5494}.res.bd3 .r-kind::before{background:#e7aa4d}.res.bd3 .r-go{background:#e7aa4d;color:#2c5494}
+.res.bd4{--rd-acc:#2c5494;background:#d8708e;color:#f2eedd;--rd-main:#e0773a}.res.bd4 .r-kind::before{background:#2c5494}.res.bd4 .r-go{background:#2c5494;color:#f2eedd}
+.res.bd5{--rd-acc:#2c5494;background:#e7aa4d;color:#f2eedd;--rd-main:#2a8c8c}.res.bd5 .r-kind::before{background:#e7aa4d}.res.bd5 .r-go{background:#e7aa4d;color:#2c5494}
+.res.bd6{--rd-acc:#f2eedd;background:#e0773a;color:#f2eedd;--rd-main:#2c5494}.res.bd6 .r-kind::before{background:#e0773a}.res.bd6 .r-go{background:#e7aa4d;color:#2c5494}
 @media (max-width:560px){.res[class*="bd"] :is(.r-name,.r-desc){max-width:80%}}
 </style>
 </head>
@@ -2242,7 +2244,18 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       let cx = fx * w, cy = fy * h, rx = frx * w, ry = fry * h;
       for (let k = 0; k < 40 && !pts.every(([x, y]) => inside(x, y, cx, cy, rx, ry, rot, f, w < 560 ? 12 : 22)); k++) { rx *= 1.04; ry *= 1.04; }   // grow until every word sits on the dot
       const key = [w, h, rx, ry].map(Math.round).join(); if (key === last) return; last = key;
-      svg.setAttribute('viewBox', `0 0 ${w} ${h}`); svg.innerHTML = `<path class="main" d="${path(cx, cy, rx, ry, rot, f)}"/>`; };
+      
+      // a little pizzazz: a sprinkle dot (and a tiny moon in the dot's own colour) tucked into the crescent, clear of the big dot and the card's rim
+      const c = Math.cos(rot), sn = Math.sin(rot), rim = [];
+      for (let j = 0; j < 144; j++) { const t = j / 144 * Math.PI * 2, k = f(t), x = Math.cos(t) * rx * k, y = Math.sin(t) * ry * k; rim.push([cx + x*c - y*sn, cy + x*sn + y*c]); }
+      const room = (x, y) => Math.min(x, w - x, y, h - y, ...rim.map(([a, b]) => Math.hypot(a - x, b - y)));
+      const spots = []; for (let x = 6; x < w; x += 6) for (let y = 6; y < h; y += 6) if (!inside(x, y, cx, cy, rx, ry, rot, f, 0)) spots.push([x, y, room(x, y)]);
+      spots.sort((a, b) => b[2] - a[2]); const extra = [], cap = Math.min(h * .11, 46);
+      const a1 = spots[0]; if (a1 && a1[2] > 16) { const r1 = Math.min(cap, a1[2] * .55); extra.push(['acc', a1[0], a1[1], r1, 0]);
+        const a2 = spots.find(([x, y, m]) => m > 9 && Math.hypot(x - a1[0], y - a1[1]) > r1 + m * .5 + 14 && Math.hypot(x - a1[0], y - a1[1]) < r1 * 4.5);
+        if (a2) extra.push(['moon', a2[0], a2[1], Math.min(r1 * .42, a2[2] * .5), 1]); }
+      const small = (x, y, r, sd) => path(x, y, r, r * .94, sd * 1.7 + n, SH[(n + 2 + sd) % 6]);
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`); svg.innerHTML = `<path class="main" d="${path(cx, cy, rx, ry, rot, f)}"/>` + extra.map(([cl, x, y, r, sd]) => `<path class="${cl}" d="${small(x, y, r, sd)}"/>`).join(''); };
     draw(); if ('ResizeObserver' in window) new ResizeObserver(draw).observe(el); document.fonts && document.fonts.ready.then(draw);
   });
 })();
