@@ -243,7 +243,7 @@ a.card{text-decoration:none}
 
 /* events: a full-width cream band with a gold net laid over it */
 .events{position:relative;z-index:1;margin-inline:calc(50% - 50vw);padding-inline:calc(50vw - 50%);overflow:hidden;
-  background:radial-gradient(55% 60% at 18% 22%,#f2be63 0,transparent 70%),radial-gradient(50% 55% at 86% 78%,#d48f33 0,transparent 72%),linear-gradient(160deg,#eeb558 0%,#e7aa4d 45%,#dc9a3e 100%);padding-block:clamp(110px,17vh,190px)}   /* a gold-on-gold gradient: lighter top left, deeper bottom right, all shades of the logo gold */   /* crisp brush-stroke edges top and bottom are set in the script (clip-path), like the word banner */
+  background:#e7aa4d;padding-block:clamp(110px,17vh,190px)}   /* a gold-on-gold gradient: lighter top left, deeper bottom right, all shades of the logo gold */   /* crisp brush-stroke edges top and bottom are set in the script (clip-path), like the word banner */
 .events > .ev-net{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .events > *{position:relative}
 .ev-h .el{display:inline-block;transition:transform .35s cubic-bezier(.3,1.8,.5,1)}          /* like the names on the people pages: hover a letter and it hops */
@@ -361,13 +361,13 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .res canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .r-blue{background:#2c5494;color:var(--cream)}
 .r-blue2{background:#2c5494;color:var(--cream)}
-.r-egg{background:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}   /* mauve */
-.r-lav{background:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#2c5494}   /* rose */
-.r-sage{background:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262);color:var(--cream)}   /* lagoon teal */
+.r-egg{background:#9b6aa6;color:var(--cream)}   /* mauve */
+.r-lav{background:#d8708e;color:#2c5494}   /* rose */
+.r-sage{background:#2a8c8c;color:var(--cream)}   /* lagoon teal */
 .r-sage .r-kind::before{background:var(--gold)}
-.r-orange{background:linear-gradient(160deg,#e8884d,#e0773a 55%,#cf6630);color:#2c5494}   /* orange, a sprinkle */
+.r-orange{background:#e0773a;color:#2c5494}   /* orange, a sprinkle */
 .r-orange .r-kind::before{background:var(--blue)}
-.r-gold{background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--ink)}
+.r-gold{background:#e7aa4d;color:var(--ink)}
 .r-cream{background:var(--cream);color:var(--blue)}
 .r-ink{background:#2c5494;color:var(--cream)}
 .r-top{position:relative;height:var(--strip);display:flex;justify-content:space-between;align-items:center;gap:16px}
@@ -410,7 +410,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 
 /* contact: the Apply card, in the same style as the resource cards */
 .apply{position:relative;z-index:2;overflow:hidden;display:grid;justify-items:start;margin-top:clamp(48px,7vw,96px);padding:clamp(26px,3.4vw,52px);border-radius:clamp(20px,2vw,32px);
-  background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);color:var(--blue);text-decoration:none;box-shadow:none;transition:transform .5s cubic-bezier(.3,1.5,.5,1),box-shadow .4s}
+  background:#e7aa4d;color:var(--blue);text-decoration:none;box-shadow:none;transition:transform .5s cubic-bezier(.3,1.5,.5,1),box-shadow .4s}
 .apply > *{position:relative}
 .apply canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .apply:hover,.apply:focus-visible{transform:translateY(-6px) rotate(-.8deg);box-shadow:none}
@@ -425,14 +425,14 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 /* the Apply card takes a random colour from the palette on each visit (set in the script) */
 .apply.a-blue{background:#2c5494;color:var(--cream)}
 .apply.a-deep{background:#2c5494;color:var(--cream)}
-.apply.a-plum{background:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}
+.apply.a-plum{background:#9b6aa6;color:var(--cream)}
 .apply.a-blue .ap-t,.apply.a-deep .ap-t,.apply.a-plum .ap-t{color:var(--cream)}
 .apply.a-blue .ap-kind::before,.apply.a-deep .ap-kind::before,.apply.a-plum .ap-kind::before{background:var(--gold)}
 .apply.a-blue .ap-go,.apply.a-deep .ap-go,.apply.a-plum .ap-go{background:var(--gold);color:var(--ink)}
 .apply.a-blue:hover .ap-go,.apply.a-deep:hover .ap-go,.apply.a-plum:hover .ap-go{background:var(--gold);color:var(--ink);filter:brightness(.92)}
-.apply.a-lav{background:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#2c5494}
+.apply.a-lav{background:#d8708e;color:#2c5494}
 .apply.a-lav .ap-t{color:#2c5494}
-.apply.a-sage{background:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262)}
+.apply.a-sage{background:#2a8c8c}
 @media (prefers-reduced-motion:reduce){.apply,.ap-go{transition:none}}
 
 /* section headings: a small kicker with a gold dot above a big, bold, tight heading that ends in a gold full stop
@@ -449,9 +449,9 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 @media (prefers-reduced-motion:reduce){.label .lt{opacity:1;translate:none;transition:none}.label .stop{transform:none;transition:none}}
 
 /* a small surprise: on each visit a few cards light up in lavender or plum instead of their usual hover colour */
-.people .card.s-lav:hover,.ev.s-lav:hover{background-color:#d8708e;background-image:linear-gradient(160deg,#e3869f,#d8708e 55%,#c85c7b);color:#2c5494}
-.people .card.s-chart:hover,.ev.s-chart:hover{background-color:#1f7373;background-image:linear-gradient(160deg,#2a8c8c,#1f7373 55%,#186262);color:var(--cream)}
-.people .card.s-plum:hover,.ev.s-plum:hover{background-color:#8a5a96;background-image:linear-gradient(160deg,#9b6aa6,#8a5a96 55%,#774a83);color:var(--cream)}
+.people .card.s-lav:hover,.ev.s-lav:hover{background-color:#d8708e;background-image:none;color:#2c5494}
+.people .card.s-chart:hover,.ev.s-chart:hover{background-color:#2a8c8c;background-image:none;color:var(--cream)}
+.people .card.s-plum:hover,.ev.s-plum:hover{background-color:#9b6aa6;background-image:none;color:var(--cream)}
 .pubs a:not([href]){cursor:default}
 /* every piece of text on the site is Inter */
 button,input,select,textarea,optgroup{font-family:inherit}
@@ -1962,7 +1962,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 <style>
 /* "You can find our email here." as a gold pill that stands out */
 #contact .mail{display:inline-flex;align-items:center;gap:.5em;margin-top:6px;padding:.75em 1.35em;border-radius:999px;text-decoration:none;font-weight:650;font-size:clamp(18px,1.6vw,24px);letter-spacing:-.015em;
-  color:var(--ink);background:linear-gradient(160deg,#f0bb5f,#e7aa4d 55%,#dc9a3e);box-shadow:none;transition:transform .35s cubic-bezier(.3,1.6,.5,1),filter .3s}
+  color:var(--ink);background:#e7aa4d;box-shadow:none;transition:transform .35s cubic-bezier(.3,1.6,.5,1),filter .3s}
 #contact .mail:hover,#contact .mail:focus-visible{transform:translateY(-3px) rotate(-1.5deg);filter:brightness(.95)}
 #contact .mail .glink{background:none !important;padding:0}
 #contact .mail::after{content:"";width:.85em;height:.85em;flex:none;background:currentColor;-webkit-mask:url(assets/arrow.svg) center/contain no-repeat;mask:url(assets/arrow.svg) center/contain no-repeat}
