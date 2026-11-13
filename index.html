@@ -2246,10 +2246,12 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   const B = '#2c5494', G = '#e7aa4d', O = '#e0773a', P = '#d8708e', T = '#2a8c8c';
   // [x, y] as a share of the screen, size as a share of the shorter side, colour, and when it comes and goes (0 = section arrives, 1 = last card settles)
   const SPOTS = [
-    [.06, .30, .34, .00, .34], [.94, .62, .42, .04, .40], [.30, .92, .26, .14, .48], [.86, .16, .22, .20, .56],
+    // already full size as the section arrives (they grew while the section below the publications came up)
+    [.86, .26, .30, -.16, .24], [.97, .70, .34, -.12, .34], [.72, .08, .14, -.14, .20], [.02, .02, .10, -.16, .22], [.94, .62, .42, -.04, .40], [.06, .30, .34, .02, .34],
+    [.30, .92, .26, .14, .48], [.86, .16, .22, .20, .56],
     [.10, .74, .30, .30, .66], [.62, .86, .36, .38, .74], [.96, .36, .24, .48, .80], [.04, .14, .20, .56, .86], [.44, .98, .22, .62, .88],
     // a sprinkle of smaller ones
-    [.97, .86, .09, .02, .28], [.02, .55, .07, .10, .36], [.18, .99, .10, .22, .50], [.98, .05, .08, .26, .54], [.03, .93, .11, .36, .62],
+    [.97, .86, .09, -.08, .28], [.02, .55, .07, -.06, .36], [.18, .99, .10, .22, .50], [.98, .05, .08, .26, .54], [.03, .93, .11, .36, .62],
     [.80, .97, .08, .44, .70], [.97, .52, .07, .52, .78], [.02, .40, .09, .60, .84], [.72, .99, .10, .66, .88]];
   // colours are picked as each dot arrives: never the colour of a card it sits behind, nor of another dot nearby (and teal never by purple)
   const PAL = [B, G, B, G, O, P, T], rgb = h => `rgb(${parseInt(h.slice(1, 3), 16)}, ${parseInt(h.slice(3, 5), 16)}, ${parseInt(h.slice(5, 7), 16)})`;
@@ -2263,7 +2265,8 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const probes = [[0, 0]]; for (let a = 0; a < 12; a++) for (const f of [.7, 1.35]) probes.push([Math.cos(a * Math.PI / 6) * r * f, Math.sin(a * Math.PI / 6) * r * f]);
     for (const [ox, oy] of probes) {
       const x = cx + ox, y = cy + oy; if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) continue;
-      for (const el of document.elementsFromPoint(x, y)) { const c = el.closest && el.closest('.res'); if (c) { const bg = getComputedStyle(c).backgroundColor; ban.add(bg); if (bg === rgb(M)) ban.add(rgb(T)); } } }
+      for (const el of document.elementsFromPoint(x, y)) { if (Math.hypot(ox, oy) <= r && el.closest && !el.closest('.res') && el.closest('p, li, h1, h2, h3, .label, .res-intro, .mail-row')) ban.add('text');
+        const c = el.closest && el.closest('.res'); if (c) { const bg = getComputedStyle(c).backgroundColor; ban.add(bg); if (bg === rgb(M)) ban.add(rgb(T)); } } }
     dots.forEach((e, j) => { if (j !== i && e.col && Math.hypot(e.x - cx, e.y - cy) < e.r + r + 60) { ban.add(rgb(e.col)); if (e.col === M) ban.add(rgb(T)); } });
     return ban; };
   const pick = (d, i, ban) => { const ok = PAL.filter(c => !ban.has(rgb(c))); if (!ok.length) return false; d.col = ok[(i * 7 + (d.swaps = (d.swaps || 0) + 1)) % ok.length]; d.el.style.setProperty('--c', d.col); return true; };
@@ -2273,8 +2276,8 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const stickTop = parseFloat(getComputedStyle(last).top) || 0, st = last.parentElement, stack = st.getBoundingClientRect().top + scrollY;
     // where the last card sits in the flow (sticky cards don't move the layout): the stack's bottom, less its padding and the card itself
     const lastTop = stack + st.offsetHeight - (parseFloat(getComputedStyle(st).paddingBottom) || 0) - last.offsetHeight;
-    start = stack - (parseFloat(getComputedStyle(cards[0]).top) || 0) - innerHeight * .1;
-    end = Math.max(start + 200, lastTop - stickTop);   // begin as the first card settles, once the heading and intro have scrolled away
+    start = top - innerHeight * .9;
+    end = Math.max(start + 200, lastTop - stickTop);   // already there as the section scrolls into view; all gone once the last card settles
     const m = Math.min(innerWidth, innerHeight); dots.forEach(d => d.el.style.setProperty('--d', Math.round(d.sp[2] * m * (innerWidth < 560 ? 1.15 : 1)) + 'px')); update(); };
   const update = () => { ticking = false; let more = false; const p = (scrollY - start) / (end - start);
     dots.forEach((d, i) => { const { el, sp: [x, y, sz, a, b] } = d, t = Math.min(1, Math.max(0, (p - a) / (b - a)));
@@ -2289,7 +2292,8 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
           // a same-colour card slid behind it: shrink right away first, and only swap colour once it is gone, then come back.
           // It never changes colour while it can be seen.
           if (d.k < .03) { if (pick(d, i, ban)) { d.want = 1; d.lock = now; } } else d.want = 0; }
-        else if (!ban.has(rgb(d.col))) d.want = 1; }
+        else if (!ban.has(rgb(d.col))) d.want = 1;
+        if (ban.has('text')) d.want = 0; }   // never behind the heading or any words outside the cards
       d.k = d.k == null ? 1 : d.k + (d.want - d.k) * .18; if (Math.abs(d.want - d.k) > .01) more = true;
       // in for the first third, held, out for the last third
       const s = (t <= 0 || t >= 1 ? 0 : t < .33 ? ease(t / .33) : t > .67 ? ease((1 - t) / .33) : 1) * d.k;
