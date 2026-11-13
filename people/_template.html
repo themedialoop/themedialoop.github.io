@@ -563,10 +563,15 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (side.width !== w || side.height !== h) { side.width = w; side.height = h; }
     const g = side.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
     // keep clear of the actual words and pictures, not of their full-width blocks (a block spanning the column left a bare band)
-    const bs = []; const add = b => b.width && bs.push([(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr]);
-    sideIn.querySelectorAll('.back, .p-intro h1, .p-intro p, .p-intro a, .p-intro li, .p-intro span').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(add); });
-    [...sideIn.querySelectorAll('.p-photo-wrap, .p-links a'), document.querySelector('.menu-btn'), document.querySelector('.top .mark')].filter(Boolean).forEach(el => add(el.getBoundingClientRect()));
-    const boxes = bs;
+    // the clear spaces are measured once the page has settled, then kept: nothing moving on the page (links sliding in,
+    // a button lifting on hover) can make dots pop in or out
+    const key = Math.round(w) + 'x' + Math.round(h);
+    if (!side._boxes || side._key !== key || performance.now() < 2500) {
+      const bs = []; const add = b => b.width && bs.push([(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr]);
+      sideIn.querySelectorAll('.back, .p-intro h1, .p-intro p, .p-intro a, .p-intro li, .p-intro span').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(add); });
+      [...sideIn.querySelectorAll('.p-photo-wrap, .p-links a'), document.querySelector('.menu-btn'), document.querySelector('.top .mark')].filter(Boolean).forEach(el => add(el.getBoundingClientRect()));
+      side._boxes = bs; side._key = key; }
+    const boxes = side._boxes;
     const tilePx = (mobile() ? 820 : 1150) * dpr, k = tilePx / TILE, ox = 0, pad = 12 * dpr, soft = 34 * dpr;   // the net stays put: no drifting sideways
     g.fillStyle = 'rgb(242,238,221)';
     for (let ty = -1; ty <= Math.ceil(h / tilePx) + 1; ty++) for (let tx = Math.floor(-ox / tilePx) - 1; tx * tilePx + ox < w + tilePx; tx++)
@@ -866,11 +871,13 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .p-side .p-links li:nth-child(4n+4) a{background:var(--cream)}
 .p-side .p-links a:hover,.p-side .p-links a:focus-visible{background:var(--cream)}
 .p-side .p-links li:nth-child(4n+2) a:hover,.p-side .p-links li:nth-child(4n+2) a:focus-visible{background:var(--gold)}
+.p-side .p-links li:nth-child(4n+3) a:hover,.p-side .p-links li:nth-child(4n+3) a:focus-visible{background:var(--cream)}   /* every link swaps colour on hover, CV included */
+.p-side .p-links li:nth-child(4n+4) a:hover,.p-side .p-links li:nth-child(4n+4) a:focus-visible{background:var(--gold)}
 </style>
 <style>
 /* pill hover: every pill changes colour (gold ones to cream, the rest to gold) */
 .p-side .p-links li a:hover,.p-side .p-links li a:focus-visible{background:var(--gold) !important}
-.p-side .p-links li:nth-child(4n+1) a:hover,.p-side .p-links li:nth-child(4n+1) a:focus-visible{background:var(--cream) !important}
+.p-side .p-links li:is(:nth-child(4n+1),:nth-child(4n+3)) a:is(:hover,:focus-visible){background:var(--cream) !important}
 </style>
 <style>
 /* publications: on hover each row lights up in the next brand colour, in order down the page:
