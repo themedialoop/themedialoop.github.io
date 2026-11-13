@@ -2199,7 +2199,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
 <script>
 </script>
 <script>
-/* resource cards: five simple dot designs, shared out so neighbouring cards differ:
+/* resource cards: six simple dot designs, one per card (6 = a small cluster of three):
    1 one big dot cropped by the corner · 2 a trail of three · 3 a small polka swatch · 4 a big dot and a tiny moon · 5 a row of dots along the bottom.
    In 2, 3 and 5 one dot is a different colour, for a bit of play. Every dot is organic and crisp, and keeps clear of the words. */
 (() => {
@@ -2218,12 +2218,14 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     (w, h, s) => [[w - s * .22, s * .24, s * .15], [w - s * .5, s * .15, s * .09, 1], [w - s * .7, s * .09, s * .05]],
     (w, h, s) => { const o = []; let n = 0; for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) { if (r + k > 4) continue; o.push([w - s * .08 - k * s * .13 - (r % 2) * s * .065, s * .09 + r * s * .12, s * .034, n++ === 5 ? 1 : 0]); } return o; },
     (w, h, s) => [[w - s * .06, h - s * .02, s * .42], [w - s * .5, h - s * .42, s * .045]],
-    (w, h, s) => { const o = [], step = s * .16, n = Math.floor((w - s * .1) / step), acc = Math.floor(n * .6); for (let k = 0; k < n; k++) o.push([s * .1 + k * step, h + s * .01, s * .07, k === acc ? 1 : 0]); return o; }
+    (w, h, s) => { const o = [], step = s * .16, n = Math.floor((w - s * .1) / step), acc = Math.floor(n * .6); for (let k = 0; k < n; k++) o.push([s * .1 + k * step, h + s * .01, s * .07, k === acc ? 1 : 0]); return o; },
+    // 6 a small cluster of three nestled together in the corner, one in a second colour
+    (w, h, s) => [[w - s * .2, s * .22, s * .11], [w - s * .4, s * .16, s * .07, 1], [w - s * .31, s * .38, s * .06]]
   ];
   // share the designs out: all five appear, neighbours never match
-  // share the five designs out: all appear, neighbours never match
-  const order = [0, 1, 2, 3, 4]; for (let i = 4; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
-  const pick = cards.map((_, i) => order[i % 5]); if (cards.length > 5 && pick[5] === pick[4]) pick[5] = order[2];
+  // six cards, six designs: every card is different
+  const order = [0, 1, 2, 3, 4, 5]; for (let i = 5; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  const pick = cards.map((_, i) => order[i % 6]);
   const words = (el, cr) => [...el.querySelectorAll('.r-kind, .r-name, .r-desc, .r-go, .r-mini')].flatMap(e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects(), e.matches('.r-go') ? e.getBoundingClientRect() : null]; })
     .filter(b => b && b.width).map(b => [b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
   const clash = (ds, rects, pad) => ds.some(([x, y, r]) => rects.some(([a, b, c, d]) => Math.hypot(Math.max(0, a - x, x - c), Math.max(0, b - y, y - d)) < r * 1.12 + pad));
