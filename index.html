@@ -2265,7 +2265,8 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const probes = [[0, 0]]; for (let a = 0; a < 12; a++) for (const f of [.7, 1.35]) probes.push([Math.cos(a * Math.PI / 6) * r * f, Math.sin(a * Math.PI / 6) * r * f]);
     for (const [ox, oy] of probes) {
       const x = cx + ox, y = cy + oy; if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) continue;
-      for (const el of document.elementsFromPoint(x, y)) { if (Math.hypot(ox, oy) <= r && el.closest && !el.closest('.res') && el.closest('p, li, h1, h2, h3, .label, .res-intro, .mail-row')) ban.add('text');
+      for (const el of document.elementsFromPoint(x, y)) { if (el.closest && el.closest('#publications')) ban.add('text');
+        if (Math.hypot(ox, oy) <= r && el.closest && !el.closest('.res') && el.closest('p, li, h1, h2, h3, .label, .res-intro, .mail-row')) ban.add('text');
         const c = el.closest && el.closest('.res'); if (c) { const bg = getComputedStyle(c).backgroundColor; ban.add(bg); if (bg === rgb(M)) ban.add(rgb(T)); } } }
     dots.forEach((e, j) => { if (j !== i && e.col && Math.hypot(e.x - cx, e.y - cy) < e.r + r + 60) { ban.add(rgb(e.col)); if (e.col === M) ban.add(rgb(T)); } });
     return ban; };
@@ -2276,7 +2277,8 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const stickTop = parseFloat(getComputedStyle(last).top) || 0, st = last.parentElement, stack = st.getBoundingClientRect().top + scrollY;
     // where the last card sits in the flow (sticky cards don't move the layout): the stack's bottom, less its padding and the card itself
     const lastTop = stack + st.offsetHeight - (parseFloat(getComputedStyle(st).paddingBottom) || 0) - last.offsetHeight;
-    start = top - innerHeight * .9;
+    const pubs = document.querySelector('#publications .pubs') || document.getElementById('publications');
+    start = pubs ? pubs.getBoundingClientRect().bottom + scrollY - innerHeight * .15 : top - innerHeight * .5;   // only once the publications list has nearly left the screen
     end = Math.max(start + 200, lastTop - stickTop);   // already there as the section scrolls into view; all gone once the last card settles
     const m = Math.min(innerWidth, innerHeight); dots.forEach(d => d.el.style.setProperty('--d', Math.round(d.sp[2] * m * (innerWidth < 560 ? 1.15 : 1)) + 'px')); update(); };
   const update = () => { ticking = false; let more = false; const p = (scrollY - start) / (end - start);
