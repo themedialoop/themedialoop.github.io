@@ -2246,8 +2246,12 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   const B = '#2c5494', G = '#e7aa4d', O = '#e0773a', P = '#d8708e', T = '#2a8c8c';
   // [x, y] as a share of the screen, size as a share of the shorter side, colour, and when it comes and goes (0 = section arrives, 1 = last card settles)
   const SPOTS = [
-    // already full size as the section arrives (they grew while the section below the publications came up)
-    [.86, .26, .30, -.16, .24], [.97, .70, .34, -.12, .34], [.72, .08, .14, -.14, .20], [.02, .02, .10, -.16, .22], [.94, .62, .42, -.04, .40], [.06, .30, .34, .16, .40],
+    // the opening pattern: full size as the section arrives (a start before 0), then each shrinks away in turn as you scroll
+    // these ride on the page (y is measured from the top of the resources section), so they scroll in with it like a printed pattern
+    // placed in the open spaces around the heading and intro, never above the section's top edge
+    [.82, .17, .30, -.4, .16, 1], [.98, .40, .20, -.4, .20, 1], [.66, .03, .10, -.4, .12, 1], [.95, .00, .12, -.4, .10, 1],
+    [1.0, .12, .18, -.4, .14, 1], [.01, .22, .09, -.4, .12, 1], [.00, .55, .14, -.4, .22, 1], [.72, .38, .07, -.4, .18, 1],
+    [.94, .62, .42, .04, .40], [.06, .30, .34, .16, .40],
     [.30, .92, .26, .14, .48], [.86, .16, .22, .20, .56],
     [.10, .74, .30, .30, .66], [.62, .86, .36, .38, .74], [.96, .36, .24, .48, .80], [.04, .14, .20, .56, .86], [.44, .98, .22, .62, .88],
     // a sprinkle of smaller ones
@@ -2260,14 +2264,19 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   const net = document.getElementById('net'); (net ? net.after(layer) : document.body.prepend(layer));
   const dots = SPOTS.map((sp, i) => { const el = document.createElement('i'); el.style.setProperty('--br', RAD[i % 4]); el.style.setProperty('--bt', (8 + i * .7).toFixed(1) + 's'); layer.appendChild(el); return { el, sp, col: null, x: 0, y: 0, r: 0 }; });
   const M = '#9b6aa6';
+  let trCache = null, trAt = -1;
+  const textRects = () => { if (trAt === scrollY && trCache) return trCache; trAt = scrollY;
+    trCache = [...sec.querySelectorAll('h1, h2, h3, p, .label, .eyebrow')].filter(e => !e.closest('.res')).flatMap(e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects()]; })
+      .filter(b => b.width && b.bottom > -50 && b.top < innerHeight + 50).map(b => [b.left, b.top, b.right, b.bottom]); return trCache; };
   const bans = (d, i) => { const ban = new Set(), cx = d.x, cy = d.y, r = d.r;
     // look under the dot and a ring just beyond its edge, so a same-colour card neither sits behind it nor brushes against it
     const probes = [[0, 0]]; for (let a = 0; a < 12; a++) for (const f of [.7, 1.35]) probes.push([Math.cos(a * Math.PI / 6) * r * f, Math.sin(a * Math.PI / 6) * r * f]);
     for (const [ox, oy] of probes) {
       const x = cx + ox, y = cy + oy; if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) continue;
-      for (const el of document.elementsFromPoint(x, y)) { if (el.closest && el.closest('#publications')) ban.add('text');
-        if (Math.hypot(ox, oy) <= r && el.closest && !el.closest('.res') && el.closest('p, li, h1, h2, h3, .label, .res-intro, .mail-row')) ban.add('text');
+      for (const el of document.elementsFromPoint(x, y)) {
         const c = el.closest && el.closest('.res'); if (c) { const bg = getComputedStyle(c).backgroundColor; ban.add(bg); if (bg === rgb(M)) ban.add(rgb(T)); } } }
+    // words outside the cards: test against the text itself (not its full-width block), with a little breathing room
+    if (textRects().some(([l, t, rr, b]) => Math.hypot(Math.max(0, l - cx, cx - rr), Math.max(0, t - cy, cy - b)) < r + 14)) ban.add('text');
     dots.forEach((e, j) => { if (j !== i && e.col && Math.hypot(e.x - cx, e.y - cy) < e.r + r + 60) { ban.add(rgb(e.col)); if (e.col === M) ban.add(rgb(T)); } });
     return ban; };
   const pick = (d, i, ban) => { const ok = PAL.filter(c => !ban.has(rgb(c))); if (!ok.length) return false; d.col = ok[(i * 7 + (d.swaps = (d.swaps || 0) + 1)) % ok.length]; d.el.style.setProperty('--c', d.col); return true; };
@@ -2279,17 +2288,20 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const lastTop = stack + st.offsetHeight - (parseFloat(getComputedStyle(st).paddingBottom) || 0) - last.offsetHeight;
     const pubs = document.getElementById('publications');   // the whole section, including the More research button
     pubEnd = pubs ? pubs.getBoundingClientRect().bottom + scrollY : 0;
-    start = pubs ? pubEnd : top - innerHeight * .5;   // only once the publications list has nearly left the screen
+    start = top - innerHeight;   // the dots are already in place as the section scrolls up into view
     end = Math.max(start + 200, lastTop - stickTop);   // already there as the section scrolls into view; all gone once the last card settles
     const m = Math.min(innerWidth, innerHeight); dots.forEach(d => d.el.style.setProperty('--d', Math.round(d.sp[2] * m * (innerWidth < 560 ? 1.15 : 1)) + 'px')); update(); };
   const update = () => { ticking = false; let more = false; const p = (scrollY - start) / (end - start);
-    // nothing at all while any of the publications section is still on screen, anywhere across its width
-    const pubsShowing = scrollY < pubEnd; layer.style.visibility = pubsShowing ? 'hidden' : '';
-    dots.forEach((d, i) => { const { el, sp: [x, y, sz, a, b] } = d, t = Math.min(1, Math.max(0, (p - a) / (b - a)));
+    // the dots are painted behind the resources section only: the layer is cut off along the bottom of the publications section,
+    // so as you scroll in, the dots are revealed, already there, like a pattern on the page behind
+    const cut = Math.max(0, pubEnd - scrollY); layer.style.clipPath = cut > 0 ? `inset(${cut.toFixed(1)}px 0 0 0)` : '';
+    const secY = sec.getBoundingClientRect().top;
+    dots.forEach((d, i) => { const { el, sp: [x, y0, sz, a, b, onPage] } = d, t = Math.min(1, Math.max(0, (p - a) / (b - a)));
+      const y = onPage ? (secY + y0 * innerHeight) / innerHeight : y0;
       d.x = x * innerWidth; d.y = y * innerHeight; d.r = sz * Math.min(innerWidth, innerHeight) / 2;
       // pick a colour as the dot arrives; while it is still small, swap it if a card of the same colour slides behind it, then keep it
       const grow = t < .33 ? t / .33 : t > .67 ? (1 - t) / .33 : 1;
-      if (t <= 0 || t >= 1) { d.col = null; d.k = 1; d.want = 1; d.lock = 0; }
+      if (onPage ? p >= b : (t <= 0 || t >= 1)) { d.col = null; d.k = 1; d.want = 1; d.lock = 0; }
       else { const ban = bans(d, i);
         const now = performance.now();
         if (!d.col) { if (!pick(d, i, ban)) d.want = 0; d.lock = now; }
@@ -2301,8 +2313,9 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         if (ban.has('text')) d.want = 0; }   // never behind the heading or any words outside the cards
       d.k = d.k == null ? 1 : d.k + (d.want - d.k) * .18; if (Math.abs(d.want - d.k) > .01) more = true;
       // in for the first third, held, out for the last third
-      const s = (t <= 0 || t >= 1 ? 0 : t < .33 ? ease(t / .33) : t > .67 ? ease((1 - t) / .33) : 1) * d.k;
-      el.style.transform = `translate(${(x * innerWidth).toFixed(1)}px, ${(y * innerHeight - (t - .5) * 80).toFixed(1)}px) scale(${s.toFixed(3)})`; });
+      // the opening dots are simply there at full size, then shrink away over the last stretch before their end point
+      const s = (onPage ? (p >= b ? 0 : p <= b - .14 ? 1 : ease((b - p) / .14)) : t <= 0 || t >= 1 ? 0 : t < .33 ? ease(t / .33) : t > .67 ? ease((1 - t) / .33) : 1) * d.k;
+      el.style.transform = `translate(${(x * innerWidth).toFixed(1)}px, ${(y * innerHeight - (onPage ? 0 : (t - .5) * 80)).toFixed(1)}px) scale(${s.toFixed(3)})`; });
     if (more && !ticking) { ticking = true; requestAnimationFrame(update); } };
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
   addEventListener('resize', measure); addEventListener('load', measure); (document.fonts ? document.fonts.ready : Promise.resolve()).then(measure); measure();
