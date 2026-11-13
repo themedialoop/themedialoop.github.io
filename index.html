@@ -464,6 +464,21 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .vvv span:nth-child(7){animation-delay:.3s!important}.vvv span:nth-child(8){animation-delay:.35s!important}.vvv span:nth-child(9){animation-delay:.4s!important}.vvv span:nth-child(10){animation-delay:.45s!important}
 @keyframes vvvDance{0%{transform:none}25%{transform:translateY(-.35em) rotate(-10deg) scale(1.15)}50%{transform:translateY(.05em) rotate(8deg)}75%{transform:translateY(-.12em) rotate(-4deg) scale(1.05)}100%{transform:none}}
 @media (prefers-reduced-motion:reduce){.vvv:is(:hover,:focus-visible,.go) span{animation:none}}
+/* resources: the cards stay plain; a blue net on cream runs behind the whole stack, edge to edge.
+   On hover each card pops into its own colour from the palette (never its resting colour, never two the same). */
+.res-stack{position:relative;isolation:isolate}
+.res-stack::before{content:"";position:absolute;top:-48px;bottom:-48px;left:calc(50% - 50vw);right:calc(50% - 50vw);background:url(assets/net-blue-on-cream.svg) center/1500px repeat;z-index:-1;pointer-events:none}
+@media (max-width:600px){.res-stack::before{background-size:700px}}
+.res{transition:translate .45s cubic-bezier(.3,1.6,.5,1),rotate .45s cubic-bezier(.3,1.6,.5,1),scale .2s ease,background .35s ease,color .35s ease}
+.res.p-orange:is(:hover,:focus-visible){background:#e0773a;color:var(--cream)}
+.res.p-pink:is(:hover,:focus-visible){background:#d8708e;color:var(--cream)}
+.res.p-teal:is(:hover,:focus-visible){background:#2a8c8c;color:var(--cream)}
+.res.p-purple:is(:hover,:focus-visible){background:#9b6aa6;color:var(--cream)}
+.res.p-blue:is(:hover,:focus-visible){background:#2c5494;color:var(--cream)}
+.res.p-gold:is(:hover,:focus-visible){background:#e7aa4d;color:var(--blue)}
+.res[class*="p-"]:is(:hover,:focus-visible) :is(.r-kind,.r-name,.r-desc,.r-mini){color:inherit}
+.res:is(.p-orange,.p-pink,.p-teal,.p-purple,.p-blue):is(:hover,:focus-visible) .r-go{background:var(--gold);color:var(--blue)}
+.res.p-gold:is(:hover,:focus-visible) .r-go{background:var(--blue);color:var(--cream)}
 </style>
 </head>
 <body>
@@ -2075,7 +2090,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 <script>
 (() => {
   const res = [...document.querySelectorAll('.res-stack .res')], evs = [...document.querySelectorAll('.ev-cards .ev')], ap = document.querySelector('.apply'), pills = [...document.querySelectorAll('.ab-pill')];
-  const cards = [...res.map(el => ({ el, kind: 'res' })), ...evs.map(el => ({ el, kind: 'ev' })), ...(ap ? [{ el: ap, kind: 'ap' }] : []), ...pills.map(el => ({ el, kind: 'pill' }))]; if (!cards.length) return;
+  const cards = [...evs.map(el => ({ el, kind: 'ev' })), ...(ap ? [{ el: ap, kind: 'ap' }] : []), ...pills.map(el => ({ el, kind: 'pill' }))]; if (!cards.length) return;
   const BLUE = '#2c5494', GOLD = '#e7aa4d', CREAM = '#f2eedd';
   // one dot colour per card: gold on blue cards, blue on gold, pink and orange cards, cream on teal and purple ones
   const dotColour = el => { const c = el.classList, h = k => c.contains(k);
@@ -2186,6 +2201,16 @@ button,input,select,textarea,optgroup{font-family:inherit}
 <script>
 // phones have no hover: a tap on va-va-voom sets it dancing
 document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () => { el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); setTimeout(() => el.classList.remove('go'), 1500); }));
+</script>
+<script>
+// resource cards: give each card its own hover colour, different from its resting colour and from every other card's
+(() => { const own = el => el.classList.contains('r-gold') ? 'p-gold' : el.classList.contains('r-sage') ? 'p-teal' : el.classList.contains('r-egg') ? 'p-purple' : el.classList.contains('r-lav') ? 'p-pink' : el.classList.contains('r-orange') ? 'p-orange' : 'p-blue';
+  const left = ['p-orange', 'p-pink', 'p-teal', 'p-purple', 'p-gold', 'p-blue'];
+  for (let i = left.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [left[i], left[j]] = [left[j], left[i]]; }
+  const cs = [...document.querySelectorAll('.res-stack .res')];
+  // not its own colour, not a neighbour's resting colour, and never teal beside purple
+  cs.forEach((el, i) => { const near = [cs[i - 1], cs[i + 1]].filter(Boolean).map(own), bad = c => c === own(el) || near.includes(c) || (c === 'p-teal' && near.includes('p-purple')) || (c === 'p-purple' && near.includes('p-teal'));
+    let k = left.findIndex(c => !bad(c)); if (k < 0) k = left.findIndex(c => c !== own(el)); if (k >= 0) el.classList.add(left.splice(k, 1)[0]); }); })();
 </script>
 </body>
 </html>
