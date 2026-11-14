@@ -1999,9 +1999,21 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (!still) { clock += dt / 1000; zl = p * 2.3 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
       const dy = first ? 0 : scrollY - lastY; lastY = scrollY;
       const target = Math.max(-18, Math.min(18, -dy * 1.1)); vel = (vel + (target - sv) * .09) * .78; sv += vel; }
-    tick(); spawn(still ? 0 : Math.ceil(3 * W * H / (1280 * 800)));   // bigger screens fill faster
+    if (p >= .97) passed = true;
+    band.style.opacity = still ? '' : Math.max(0, Math.min(1, (1 - p) / .12)).toFixed(3);   // at the end the bubbles simply fade away
+    tick(); spawn(still || passed ? 0 : Math.ceil(3 * W * H / (1280 * 800)));   // bigger screens fill faster
     requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '100px 0px' }).observe(band);
+  // after one full trip through, the section quietly goes away, so the page is easy to scroll past: once it is out of
+  // sight above you, it collapses and the page is moved by the same amount, so nothing you are looking at jumps
+  let passed = false, gone = false;
+  addEventListener('scroll', () => { if (!passed || gone || still) return;
+    const r = box.getBoundingClientRect(); if (r.bottom > -40) return;
+    gone = true; visible = false; const de = document.documentElement, ref = box.nextElementSibling, t0 = ref.getBoundingClientRect().top;
+    de.style.overflowAnchor = 'none';   // do the correction ourselves, the same way in every browser
+    box.hidden = true; parts.forEach(q => q.el.remove()); parts = [];
+    const t1 = ref.getBoundingClientRect().top; window.scrollTo({ top: scrollY + (t1 - t0), behavior: 'instant' });
+    requestAnimationFrame(() => { de.style.overflowAnchor = ''; }); }, { passive: true });
   let bw = 0; addEventListener('resize', () => { if (Math.abs(band.clientWidth - bw) > 40 || Math.abs(band.clientHeight - H) > 200) { bw = band.clientWidth; build(); } else { W = band.clientWidth; H = band.clientHeight; } });
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { bw = band.clientWidth; build(); });
 })();
