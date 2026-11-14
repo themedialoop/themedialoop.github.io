@@ -476,14 +476,16 @@ button,input,select,textarea,optgroup{font-family:inherit}
 /* resource cards lift on hover but no longer tilt: tilting a card whose dot runs to its edges let a hairline of the card colour flicker round the rim */
 @media (hover:hover){.res:hover,.res:focus-visible{rotate:none !important}}
 .res:active{rotate:none !important}
-/* pink polka dots behind the resource cards. A dense field of organic dots pops in as you scroll down into the stack, and
-   shrinks away quickly, bottom to top, the moment the last card starts to come up. They only ever arrive on the way down: once gone they stay gone
+/* orange polka dots behind the resource cards. A dense field of organic dots pops in as you scroll down into the stack, and
+   are swept away by the last card: as it rises, a wave runs up the screen just ahead of its top edge, and each dot shrinks
+   as the wave reaches it, so the field is gone exactly as the card settles. The wave is tied to your scroll and only runs forward. They only ever arrive on the way down: once gone they stay gone
    while you scroll back up, and come back only after you have scrolled above the section and down again.
    Their movement is their own: a quicker, gentle swell in place (about 5% every few seconds), livelier than the slow breathe of the other dots. */
 #resDots{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 #resDots i{position:absolute;width:var(--d);height:var(--d);transform:scale(0);transition:transform .2s cubic-bezier(.55,0,.9,.4) var(--out,0s)}
 #resDots.on i:not(.clip){transform:scale(1);transition:transform .55s cubic-bezier(.3,1.6,.5,1) var(--in,0s)}
-#resDots i::before{content:"";position:absolute;inset:0;background:#d8708e;border-radius:var(--br);transform:rotate(var(--tw));animation:resSwell var(--jt,2.8s) ease-in-out var(--jd,0s) infinite alternate}
+#resDots.on.sweep i:not(.clip){transform:scale(var(--k,1));transition:transform .12s linear}
+#resDots i::before{content:"";position:absolute;inset:0;background:#e0773a;border-radius:var(--br);transform:rotate(var(--tw));animation:resSwell var(--jt,2.8s) ease-in-out var(--jd,0s) infinite alternate}
 @keyframes resSwell{0%{transform:rotate(var(--tw)) scale(1)}100%{transform:rotate(var(--tw)) scale(1.05)}}
 @media (prefers-reduced-motion:reduce){#resDots i,#resDots.on i:not(.clip){transition:none}#resDots i::before{animation:none}}
 /* the big go-dot: the button becomes a large organic dot that bleeds off the bottom-right corner, with the call to action inside.
@@ -504,7 +506,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .res.bd1{background:#e7aa4d;color:#2c5494;--net:#e49746}.res.bd1 .r-kind::before{background:#2c5494}.res.bd1 .r-go{--gd-bg:#2c5494;color:#f2eedd}
 .res.bd2{background:#9b6aa6;color:#f2eedd;--net:#ac84b1}.res.bd2 .r-kind::before{background:#d8708e}.res.bd2 .r-go{--gd-bg:#e7aa4d;color:#2c5494}
 .res.bd3{background:#2c5494;color:#f2eedd;--net:#46689d}.res.bd3 .r-kind::before{background:#e7aa4d}.res.bd3 .r-go{--gd-bg:#e7aa4d;color:#2c5494}
-.res.bd4{background:#e0773a;color:#f2eedd;--net:#e38c57}.res.bd4 .r-kind::before{background:#2c5494}.res.bd4 .r-go{--gd-bg:#2c5494;color:#f2eedd}
+.res.bd4{background:#d8708e;color:#f2eedd;--net:#df8aa2}.res.bd4 .r-kind::before{background:#2c5494}.res.bd4 .r-go{--gd-bg:#2c5494;color:#f2eedd}
 .res.bd5{background:#2a8c8c;color:#f2eedd;--net:#4a9c99}.res.bd5 .r-kind::before{background:#e7aa4d}.res.bd5 .r-go{--gd-bg:#e7aa4d;color:#2c5494}
 .res.bd6{background:#e7aa4d;color:#2c5494;--net:#e49746}.res.bd6 .r-kind::before{background:#2c5494}.res.bd6 .r-go{--gd-bg:#2c5494;color:#f2eedd}
 </style>
@@ -2243,13 +2245,13 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const go = el.querySelector('.r-go'); if (go && !go.querySelector('.r-arrow')) { go.innerHTML = `<span class="r-label">${go.innerHTML}<span class="r-arrow" aria-hidden="true">&nbsp;→</span></span>`; }
   });
 })();
-/* pink polka dots behind the resource cards (styles above). Built to fill the screen, packed close but never touching. */
+/* orange polka dots behind the resource cards (styles above). Built to fill the screen, packed close but never touching. */
 (() => {
   const sec = document.getElementById('resources'), stack = sec && sec.querySelector('.res-stack'), intro = sec && sec.querySelector('.res-intro');
   const cards = stack ? [...stack.querySelectorAll('.res')] : []; if (!cards.length) return;
   const layer = document.createElement('div'); layer.id = 'resDots'; layer.setAttribute('aria-hidden', 'true');
   const net = document.getElementById('net'); (net ? net.after(layer) : document.body.prepend(layer));
-  let dots = [], builtW = 0, builtH = 0, on = false, armed = true, lastY = scrollY, ticking = false;
+  let dots = [], builtW = 0, builtH = 0, on = false, armed = true, lastY = scrollY, ticking = false, q = 0, qv = 0, t0 = 0;
   const R = (a, b) => a + Math.random() * (b - a), pc = () => Math.round(R(40, 60)) + '%';
   const build = () => {
     builtW = innerWidth; builtH = innerHeight; layer.textContent = ''; dots = [];
@@ -2266,25 +2268,40 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const frag = document.createDocumentFragment();
     dots.forEach(d => { const el = d.el = document.createElement('i');
       el.style.cssText = `left:${(d.x - d.r).toFixed(1)}px;top:${(d.y - d.r).toFixed(1)}px;--d:${(d.r * 2).toFixed(1)}px;--br:${pc()} ${pc()} ${pc()} ${pc()}/${pc()} ${pc()} ${pc()} ${pc()};` +
-        `--in:${R(0, .7).toFixed(2)}s;--out:${((1 - d.y / innerHeight) * .2 + R(0, .05)).toFixed(2)}s;--jt:2.8s;--jd:-${R(0, 2.8).toFixed(2)}s;--tw:${Math.round(R(0, 360))}deg`;
+        `--in:${R(0, .7).toFixed(2)}s;--jt:2.8s;--jd:-${R(0, 2.8).toFixed(2)}s;--tw:${Math.round(R(0, 360))}deg`;
       frag.appendChild(el); });
     layer.appendChild(frag); measure();
   };
-  let tail = 0;   // from the stack's top to where the last card sits in the flow (sticky cards don't move the layout)
+  let tail = 0, stick = 0;   // from the stack's top to where the last card sits in the flow (sticky cards don't move the layout), and where it settles
   const measure = () => { const last = cards[cards.length - 1];
-    tail = stack.offsetHeight - (parseFloat(getComputedStyle(stack).paddingBottom) || 0) - last.offsetHeight; };
+    tail = stack.offsetHeight - (parseFloat(getComputedStyle(stack).paddingBottom) || 0) - last.offsetHeight;
+    stick = parseFloat(getComputedStyle(last).top) || 0; };
+  const smooth = t => t * t * (3 - 2 * t);
+  const sweep = () => {   // the wave line runs from the bottom of the screen to just above the top as the last card travels up
+    const band = innerHeight * .3, L = innerHeight - qv * (innerHeight + band);
+    dots.forEach(d => { const k = smooth(Math.min(1, Math.max(0, (L - d.y) / band))); if (Math.abs(k - (d.k ?? 1)) > .004) { d.k = k; d.el.style.setProperty('--k', k.toFixed(3)); } }); };
+  const finish = () => { on = false; armed = false; layer.classList.remove('on', 'sweep'); };
   const clip = () => {                         // keep the heading and intro clear: no dot above the intro's bottom edge
     const b = intro ? intro.getBoundingClientRect().bottom + 16 : -1e9;
     dots.forEach(d => { const c = d.y - d.r < b; if (c !== d.c) { d.c = c; d.el.classList.toggle('clip', c); } });
   };
   const update = () => { ticking = false; const y = scrollY, down = y > lastY; lastY = y;
     // measured live, as the page above can change height while you scroll
-    const st = stack.getBoundingClientRect().top, past = st <= innerHeight * .7, done = st + tail <= innerHeight;   // the last card's top has just entered the screen
-    if (sec.getBoundingClientRect().top > innerHeight) armed = true;   // scrolled back above the section: ready for the next way down
-    if (done) { if (on) { on = false; layer.classList.remove('on'); } armed = false; }
-    else if (on && !past) { on = false; layer.classList.remove('on'); }   // scrolled back up above the stack before the end
-    else if (!on && armed && down && past) { clip(); on = true; layer.classList.add('on'); }
-    if (on) clip(); };
+    const st = stack.getBoundingClientRect().top, past = st <= innerHeight * .7, lastTop = st + tail;
+    if (sec.getBoundingClientRect().top > innerHeight && !on) { armed = true; q = qv = 0; dots.forEach(d => { d.k = 1; d.el.style.removeProperty('--k'); }); }   // above the section: ready for the next way down
+    if (on && !past && q === 0) { on = false; layer.classList.remove('on'); }   // scrolled back up above the stack before the end
+    else if (!on && armed && down && past && lastTop > innerHeight) { clip(); on = true; layer.classList.add('on'); }
+    else if (!on && lastTop <= innerHeight) armed = false;   // never start once the last card is already coming up
+    if (!on) return;
+    clip();
+    // how far the last card has travelled from the bottom of the screen to its resting place; it only ever moves forward
+    q = Math.max(q, Math.min(1, Math.max(0, (innerHeight - lastTop) / Math.max(1, innerHeight - stick))));
+    if (q > 0 && !layer.classList.contains('sweep')) layer.classList.add('sweep');
+    const now = performance.now(), dt = Math.min(64, now - (t0 || now)) || 16; t0 = now;
+    qv += (q - qv) * (1 - Math.exp(-dt / 140));
+    if (q > 0) sweep();
+    if (qv > .995) { finish(); return; }
+    if (Math.abs(q - qv) > .001) { ticking = true; requestAnimationFrame(update); } else t0 = 0; };
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
   addEventListener('resize', () => { if (Math.abs(innerWidth - builtW) > 40 || Math.abs(innerHeight - builtH) > 160) build(); else measure(); });
   addEventListener('load', measure); (document.fonts ? document.fonts.ready : Promise.resolve()).then(measure);
