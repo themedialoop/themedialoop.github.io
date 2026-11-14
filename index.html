@@ -476,14 +476,14 @@ button,input,select,textarea,optgroup{font-family:inherit}
 /* resource cards lift on hover but no longer tilt: tilting a card whose dot runs to its edges let a hairline of the card colour flicker round the rim */
 @media (hover:hover){.res:hover,.res:focus-visible{rotate:none !important}}
 .res:active{rotate:none !important}
-/* orange polka dots behind the resource cards. A dense field of organic dots pops in as you scroll down into the stack, and
-   shrinks away, bottom to top, as the last card comes up. They only ever arrive on the way down: once gone they stay gone
+/* pink polka dots behind the resource cards. A dense field of organic dots pops in as you scroll down into the stack, and
+   shrinks away quickly, bottom to top, the moment the last card starts to come up. They only ever arrive on the way down: once gone they stay gone
    while you scroll back up, and come back only after you have scrolled above the section and down again.
    Their movement is their own: a quicker, gentle swell in place (about 5% every few seconds), livelier than the slow breathe of the other dots. */
 #resDots{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-#resDots i{position:absolute;width:var(--d);height:var(--d);transform:scale(0);transition:transform .32s cubic-bezier(.55,0,.9,.4) var(--out,0s)}
+#resDots i{position:absolute;width:var(--d);height:var(--d);transform:scale(0);transition:transform .2s cubic-bezier(.55,0,.9,.4) var(--out,0s)}
 #resDots.on i:not(.clip){transform:scale(1);transition:transform .55s cubic-bezier(.3,1.6,.5,1) var(--in,0s)}
-#resDots i::before{content:"";position:absolute;inset:0;background:#e0773a;border-radius:var(--br);transform:rotate(var(--tw));animation:resSwell var(--jt,2.8s) ease-in-out var(--jd,0s) infinite alternate}
+#resDots i::before{content:"";position:absolute;inset:0;background:#d8708e;border-radius:var(--br);transform:rotate(var(--tw));animation:resSwell var(--jt,2.8s) ease-in-out var(--jd,0s) infinite alternate}
 @keyframes resSwell{0%{transform:rotate(var(--tw)) scale(1)}100%{transform:rotate(var(--tw)) scale(1.05)}}
 @media (prefers-reduced-motion:reduce){#resDots i,#resDots.on i:not(.clip){transition:none}#resDots i::before{animation:none}}
 /* the big go-dot: the button becomes a large organic dot that bleeds off the bottom-right corner, with the call to action inside.
@@ -2243,7 +2243,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const go = el.querySelector('.r-go'); if (go && !go.querySelector('.r-arrow')) { go.innerHTML = `<span class="r-label">${go.innerHTML}<span class="r-arrow" aria-hidden="true">&nbsp;→</span></span>`; }
   });
 })();
-/* orange polka dots behind the resource cards (styles above). Built to fill the screen, packed close but never touching. */
+/* pink polka dots behind the resource cards (styles above). Built to fill the screen, packed close but never touching. */
 (() => {
   const sec = document.getElementById('resources'), stack = sec && sec.querySelector('.res-stack'), intro = sec && sec.querySelector('.res-intro');
   const cards = stack ? [...stack.querySelectorAll('.res')] : []; if (!cards.length) return;
@@ -2266,7 +2266,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const frag = document.createDocumentFragment();
     dots.forEach(d => { const el = d.el = document.createElement('i');
       el.style.cssText = `left:${(d.x - d.r).toFixed(1)}px;top:${(d.y - d.r).toFixed(1)}px;--d:${(d.r * 2).toFixed(1)}px;--br:${pc()} ${pc()} ${pc()} ${pc()}/${pc()} ${pc()} ${pc()} ${pc()};` +
-        `--in:${R(0, .7).toFixed(2)}s;--out:${((1 - d.y / innerHeight) * .55 + R(0, .12)).toFixed(2)}s;--jt:2.8s;--jd:-${R(0, 2.8).toFixed(2)}s;--tw:${Math.round(R(0, 360))}deg`;
+        `--in:${R(0, .7).toFixed(2)}s;--out:${((1 - d.y / innerHeight) * .2 + R(0, .05)).toFixed(2)}s;--jt:2.8s;--jd:-${R(0, 2.8).toFixed(2)}s;--tw:${Math.round(R(0, 360))}deg`;
       frag.appendChild(el); });
     layer.appendChild(frag); measure();
   };
@@ -2279,7 +2279,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   };
   const update = () => { ticking = false; const y = scrollY, down = y > lastY; lastY = y;
     // measured live, as the page above can change height while you scroll
-    const st = stack.getBoundingClientRect().top, past = st <= innerHeight * .7, done = st + tail <= innerHeight * .85;
+    const st = stack.getBoundingClientRect().top, past = st <= innerHeight * .7, done = st + tail <= innerHeight;   // the last card's top has just entered the screen
     if (sec.getBoundingClientRect().top > innerHeight) armed = true;   // scrolled back above the section: ready for the next way down
     if (done) { if (on) { on = false; layer.classList.remove('on'); } armed = false; }
     else if (on && !past) { on = false; layer.classList.remove('on'); }   // scrolled back up above the stack before the end
