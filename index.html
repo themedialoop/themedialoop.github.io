@@ -1889,6 +1889,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
 @keyframes bubSway{0%{transform:translateX(-6px)}100%{transform:translateX(6px)}}
 @keyframes bubX{0%{translate:calc(var(--ax) * -1) 0}100%{translate:var(--ax) 0}}
 @keyframes bubY{0%{translate:0 var(--ay)}100%{translate:0 calc(var(--ay) * -1)}}
+/* self-obliteration: fine dust floods every gap as the band reaches the middle of the screen, and drains away as you leave */
+.bub .dust .sc{transform:scale(clamp(0, calc((var(--fill, 0) - var(--th)) * 7), 1));transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
 @keyframes bubSwell{0%{transform:scale(1)}100%{transform:scale(1.05)}}
 @media (prefers-reduced-motion:reduce){.bub .dot,.bub .dy,.bub .blob,.bub .sway{animation:none}.bub .trav{display:none}.bub .sc,.bub .dot.on .sc{transition:none}}
 /* the events title: cream letters on a deep-blue highlighter band, one band per line, tilted a touch, so it stands out on the gold */
@@ -1961,11 +1963,22 @@ button,input,select,textarea,optgroup{font-family:inherit}
       if (ws.length) blob.addEventListener('click', () => swap(slot));
       slots.push(slot);
     });
-    lanes.forEach(cx => { const du = R(11, 17), n = Math.random() < .5 ? 2 : 3, off = R(0, du);
+    lanes.forEach(cx => { const du = R(10, 14), n = 4, off = R(0, du);
       for (let j = 0; j < n; j++) { const d = R(22, 44) * k, t = document.createElement('div'); t.className = 'trav'; t.setAttribute('aria-hidden', 'true');
         t.style.cssText = `left:${(cx - d / 2).toFixed(1)}px;width:${d.toFixed(1)}px;height:${d.toFixed(1)}px;--h:${H}px;--d:${d.toFixed(1)}px;--du:${du.toFixed(2)}s;--dd:-${((off + j * du / n) % du).toFixed(2)}s`;
         t.innerHTML = `<div class="sway" style="--sd:${R(2.6, 4).toFixed(2)}s;--sdd:-${R(0, 4).toFixed(2)}s"><div class="blob" style="--c:${COL[pickCol()]};--br:${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()};--bd:-${R(0, 2.8).toFixed(2)}s"></div></div>`;
         frag.append(t); } });
+    // the dust: tiny dots in every gap left, each one appearing at its own point as the band fills
+    const all = dots.slice(), dust = [];
+    for (let n = 0; n < 26000 && dust.length < 900; n++) {
+      const d = R(5, 12) * k, x = R(0, W), y = R(0, H);
+      if (x - d / 2 < AX + 4 || x + d / 2 > W - AX - 4 || y - d / 2 < AY + PUSH + 4 || y + d / 2 > H - AY - PUSH - 4 || inLane(x, d)) continue;
+      if (all.every(o => Math.hypot(x - o.x, y - o.y) >= d / 2 + o.d / 2 + 6 * k + 3)) { const o = { x, y, d }; all.push(o); dust.push(o); }
+    }
+    dust.forEach(o => { const el = document.createElement('div'); el.className = 'dot dust'; el.setAttribute('aria-hidden', 'true');
+      el.style.cssText = `left:${(o.x - o.d / 2).toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--z:1;--ax:${AX.toFixed(1)}px;--ay:${AY.toFixed(1)}px;--px:-${(((o.x * .0009 + o.y * .0006) % 1) * 7).toFixed(2)}s;--py:-${(((o.x * .0007 - o.y * .0008 + 2) % 1) * 5.3).toFixed(2)}s;--th:${R(0, .85).toFixed(2)}`;
+      el.innerHTML = `<div class="dy"><div class="sc"><div class="blob" style="--c:${COL[pickCol()]};--br:${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()};animation:none"></div></div></div>`;
+      frag.append(el); });
     band.append(frag); update(true);
   };
   const setWord = (slot, keep) => {   // a new word for this bloom, or none: about a third of the time a word dot comes back plain (never right after a tap)
@@ -1997,6 +2010,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
       vel = (vel + (target - sv) * .09) * .78; sv += vel;
       if (Math.abs(sv) < .05 && Math.abs(vel) < .05) sv = 0;
       band.style.setProperty('--sv', sv.toFixed(2)); }
+    { const rc = band.getBoundingClientRect(), c = 1 - Math.abs(rc.top + rc.height / 2 - innerHeight / 2) / (innerHeight / 2 + rc.height / 2);
+      const x = Math.max(0, Math.min(1, (c - .25) / .6)), fill = still ? .6 : x * x * (3 - 2 * x);
+      if (Math.abs(fill - (band._fill || 0)) > .01) { band._fill = fill; band.style.setProperty('--fill', fill.toFixed(3)); } }
     if (acc > 110) { acc = 0; update(); } requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '120px 0px' }).observe(band);
   addEventListener('resize', () => { if (Math.abs(band.clientWidth - builtW) > 40) build(); });
