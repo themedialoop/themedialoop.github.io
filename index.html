@@ -2,7 +2,8 @@
 <html lang="en" class="intro" data-opener="eye">
 <head>
 <meta charset="utf-8">
-<script>try{var r=document.referrer,same=false;try{same=!!r&&new URL(r).origin===location.origin}catch(e){}if(same||(location.hash&&location.hash.length>1))sessionStorage.setItem("ml-opener-seen","1");if(sessionStorage.getItem("ml-opener-seen"))document.documentElement.classList.remove("intro")}catch(e){}</script>
+<script>try{if(sessionStorage.getItem("ml-replay")){sessionStorage.removeItem("ml-replay");sessionStorage.removeItem("ml-opener-seen");sessionStorage.setItem("ml-replay-now","1");document.documentElement.style.background="#2c5494"}}catch(e){}</script>
+<script>try{if(sessionStorage.getItem("ml-replay-now")){sessionStorage.removeItem("ml-replay-now");addEventListener("load",function(){setTimeout(function(){document.documentElement.style.background=""},900)});throw 0}var r=document.referrer,same=false;try{same=!!r&&new URL(r).origin===location.origin}catch(e){}if(same||(location.hash&&location.hash.length>1))sessionStorage.setItem("ml-opener-seen","1");if(sessionStorage.getItem("ml-opener-seen"))document.documentElement.classList.remove("intro")}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>medialoop · A Boutique Research Collective at UIC</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1892,6 +1893,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .rabbit{display:block;padding:0;overflow:visible;position:relative}
 .bub-hold{position:relative;height:calc(100vh + 1000vh);height:calc(100dvh + 1000svh)}   /* the last thing on the page: a long way down (about ten seconds of scrolling) */
 .bub.warp{position:fixed;inset:0;z-index:9999}   /* for the trip back to the top */
+.bub .cover{position:absolute;left:50%;top:50%;background:#2c5494;border-radius:52% 48% 55% 45% / 46% 54% 47% 53%;transform:translate(-50%,-50%) scale(0);transition:transform 1.1s cubic-bezier(.65,0,.35,1)}
 .rabbit{margin-inline:0;width:100vw;margin-left:calc(50% - 50vw)}   /* full bleed on every screen */
 .bub{position:sticky;top:0;width:100%;height:100vh;height:100dvh;overflow:hidden}
 .bub .dot{position:absolute;left:0;top:0;transform-origin:50% 50%}
@@ -2091,17 +2093,17 @@ button,input,select,textarea,optgroup{font-family:inherit}
     zl = progress() * 2.3; fill = still ? .6 : 0;
     for (let i = 0; i < 30; i++) spawn(1); spawn(400); tick();
   };
-  // at the bottom of the rabbit hole the visitor comes out at the top of the page: the field holds the screen while the
-  // page jumps back to the start, then the dots pop away from the middle outward, revealing the landing page
+  // at the bottom of the rabbit hole you fall through: the field rushes outward, one blue dot opens up from the middle
+  // until it fills the screen, and you come out on the blue of the landing page as it opens again
   let warping = false;
   const warp = () => { warping = true; band.classList.add('warp');
-    document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo({ top: 0, behavior: 'instant' }); document.documentElement.style.scrollBehavior = '';
-    const md = Math.hypot(W / 2, H / 2);
-    setTimeout(() => { parts.forEach(q => { const o = screen(q); setTimeout(() => pop(q), Math.hypot(o.x - W / 2, o.y - H / 2) / md * 650); }); }, 250);
-    setTimeout(() => { band.classList.remove('warp'); warping = false; build(); }, 1500); };
+    const c = document.createElement('div'); c.className = 'cover'; const D = Math.hypot(W, H) * 1.15; c.style.width = c.style.height = D + 'px'; band.append(c);
+    requestAnimationFrame(() => requestAnimationFrame(() => { c.style.transform = 'translate(-50%,-50%) scale(1)'; }));
+    setTimeout(() => { document.documentElement.style.background = '#2c5494'; try { sessionStorage.setItem('ml-replay', '1'); } catch (e) {}
+      location.replace(location.pathname); }, 1200); };
   const loop = now => { if (!visible && !warping) { last = 0; sv = vel = 0; return; }
     const first = !last, dt = first ? 16 : Math.min(100, now - last); last = now;
-    if (warping) { clock += dt / 1000; tick(); requestAnimationFrame(loop); return; }
+    if (warping) { clock += dt / 1000; zl += dt / 1000 * 2.2; tick(); requestAnimationFrame(loop); return; }   // falling: the field rushes outward
     const p = progress(), x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
     if (!still && p >= .985) { warp(); requestAnimationFrame(loop); return; }
     if (!still) { clock += dt / 1000; zl = p * 3.4 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
