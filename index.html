@@ -1870,8 +1870,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
    of the words are ever showing; each one bobs and sways like a bubble, and a few travel up through the band and float
    off the top while new ones rise in from below. Tap a word to swap it. Dots never touch, and resting dots are always whole. */
 .marquee.hm-marq{height:auto !important;display:block;padding:clamp(40px,6vw,90px) 0}
-.bub{position:relative;height:clamp(300px,33vw,440px);overflow:hidden}
-.bub .dot{position:absolute;animation:bubFloat var(--du,4s) ease-in-out var(--dd,0s) infinite alternate}
+.bub{position:relative;height:clamp(440px,46vw,660px);overflow:hidden}
+@media (max-width:699px){.marquee.hm-marq{padding:0}.bub{height:100vh;height:100svh}}   /* phones: the bubbles fill the whole screen */
+.bub .dot{position:absolute;animation:bubX 7s ease-in-out var(--px,0s) infinite alternate}
+.bub .dy{width:100%;height:100%;animation:bubY 5.3s ease-in-out var(--py,0s) infinite alternate}
 .bub .sc{width:100%;height:100%;transform:scale(0);transition:transform .35s cubic-bezier(.5,0,.9,.5)}
 .bub .dot.on .sc{transform:scale(1);transition:transform .65s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
 .bub .blob{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;border:none;padding:0;margin:0;font:inherit;background:var(--c);border-radius:var(--br);animation:bubSwell 2.8s ease-in-out var(--bd,0s) infinite alternate;transition:scale .3s cubic-bezier(.3,1.6,.5,1)}
@@ -1885,9 +1887,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .bub .sway{width:100%;height:100%;animation:bubSway var(--sd) ease-in-out var(--sdd) infinite alternate}
 @keyframes bubRise{0%{transform:translateY(var(--h))}100%{transform:translateY(calc(var(--d) * -1))}}
 @keyframes bubSway{0%{transform:translateX(-6px)}100%{transform:translateX(6px)}}
-@keyframes bubFloat{0%{transform:translate(0,0)}50%{transform:translate(var(--sw),calc(var(--dr) * .55))}100%{transform:translate(calc(var(--sw) * -.6),var(--dr))}}
+@keyframes bubX{0%{translate:calc(var(--ax) * -1) 0}100%{translate:var(--ax) 0}}
+@keyframes bubY{0%{translate:0 var(--ay)}100%{translate:0 calc(var(--ay) * -1)}}
 @keyframes bubSwell{0%{transform:scale(1)}100%{transform:scale(1.05)}}
-@media (prefers-reduced-motion:reduce){.bub .dot,.bub .blob,.bub .sway{animation:none}.bub .trav{display:none}.bub .sc,.bub .dot.on .sc{transition:none}}
+@media (prefers-reduced-motion:reduce){.bub .dot,.bub .dy,.bub .blob,.bub .sway{animation:none}.bub .trav{display:none}.bub .sc,.bub .dot.on .sc{transition:none}}
 /* the events title: cream letters on a deep-blue highlighter band, one band per line, tilted a touch, so it stands out on the gold */
 .ev-h{line-height:1.42 !important;rotate:-1.2deg;transform-origin:left center;letter-spacing:-.022em !important;max-width:15ch !important}
 .ev-h .ev-hl{background:#2c5494;color:var(--cream);padding:0 .2em .04em;border-radius:.14em .26em .18em .22em;
@@ -1928,30 +1931,33 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const build = () => {
     band.textContent = ''; slots = []; shown = new Set(); first = true;
     const W = band.clientWidth, H = band.clientHeight; builtW = W; if (!W || !H) return;
-    const k = Math.min(1.1, Math.max(.55, W / 1280));
+    const k = W < 700 ? .74 : Math.min(1.15, Math.max(.8, W / 1100));
+    const AX = 14 * k, AY = 12 * k;   // how far each dot wanders
     const lanes = (W < 700 ? [.27, .75] : [.13, .395, .65, .88]).map(f => f * W), LW = 31 * k;
     const inLane = (x, d) => lanes.some(cx => Math.abs(x - cx) < d / 2 + LW + 6);
-    const specs = [...Array(10)].map(() => [R(110, 150) * k, 'big']).concat([...Array(16)].map(() => [R(66, 92) * k, 'med']), [...Array(900)].map(() => [R(14, 46) * k, 'sm']));
+    const area = W * H / (1280 * 590), nb = Math.round(Math.max(10, 18 * area)), nm = Math.round(Math.max(14, 26 * area));
+    const specs = [...Array(nb)].map(() => [R(108, 146) * k, 'big']).concat([...Array(nm)].map(() => [R(68, 94) * k, 'med']), [...Array(900)].map(() => [R(14, 46) * k, 'sm']));
     const dots = [];
     for (const [d, kind] of specs) for (let n = 0; n < (kind === 'sm' ? 250 : 1500); n++) {
       const x = R(0, W), y = R(0, H);
-      if (x - d / 2 < 14 || x + d / 2 > W - 14 || y - d / 2 < 22 || y + d / 2 > H - 8 || inLane(x, d)) continue;
-      if (dots.every(o => Math.hypot(x - o.x, y - o.y) >= d / 2 + o.d / 2 + Math.max(5, .12 * Math.max(d, o.d) / 2) + 14 * k)) { dots.push({ x, y, d, kind }); break; }
+      if (x - d / 2 < AX + 6 || x + d / 2 > W - AX - 6 || y - d / 2 < AY + 6 || y + d / 2 > H - AY - 6 || inLane(x, d)) continue;
+      if (dots.every(o => Math.hypot(x - o.x, y - o.y) >= d / 2 + o.d / 2 + Math.max(5, .12 * Math.max(d, o.d) / 2) + 12 * k)) { dots.push({ x, y, d, kind }); break; }
     }
     dots.forEach(o => o.col = pickCol());
     dots.forEach(o => dots.forEach(q => { if (o !== q && ((o.col === 'teal' && q.col === 'purple') || (o.col === 'purple' && q.col === 'teal')) && Math.hypot(o.x - q.x, o.y - q.y) < o.d / 2 + q.d / 2 + 40) q.col = 'blue'; }));
     const frag = document.createDocumentFragment();
     dots.forEach(o => {
-      const pool = o.kind === 'big' ? RES : o.kind === 'med' ? FUN : [], fun = o.kind === 'med';
+      const pool = o.kind === 'big' ? RES : o.kind === 'med' || o.d >= 54 ? FUN : [], fun = o.kind !== 'big';
       const ws = pool.map(w => ({ w, f: fit(w, o.d, fun) })).filter(x => x.f);
       const el = document.createElement('div'); el.className = 'dot';
-      el.style.cssText = `left:${(o.x - o.d / 2).toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--dr:-${R(11, 16) * k}px;--sw:${R(4, 6) * k}px;--du:${R(3.4, 5.8).toFixed(2)}s;--dd:-${R(0, 6).toFixed(2)}s;--in:${R(0, .9).toFixed(2)}s`;
+      el.style.cssText = `left:${(o.x - o.d / 2).toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ax:${AX.toFixed(1)}px;--ay:${AY.toFixed(1)}px;--px:-${(((o.x * .0009 + o.y * .0006) % 1) * 7).toFixed(2)}s;--py:-${(((o.x * .0007 - o.y * .0008 + 2) % 1) * 5.3).toFixed(2)}s;--in:${R(0, .9).toFixed(2)}s`;
+      const dy = document.createElement('div'); dy.className = 'dy';
       const sc = document.createElement('div'); sc.className = 'sc';
       const blob = document.createElement(ws.length ? 'button' : 'div'); blob.className = 'blob';
       blob.style.cssText = `--c:${COL[o.col]};--tc:${textCol(o.col)};--br:${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()};--bd:-${R(0, 2.8).toFixed(2)}s`;
       if (ws.length) { blob.type = 'button'; blob.tabIndex = -1; } else blob.setAttribute('aria-hidden', 'true');
-      sc.append(blob); el.append(sc); frag.append(el);
-      const slot = { el, blob, ws, fun, per: R(5, 11), ph: R(0, 11), vis: o.kind === 'sm' ? R(.6, .9) : R(.45, .7), b: 0, n: null, on: false, word: null, busy: false };
+      sc.append(blob); dy.append(sc); el.append(dy); frag.append(el);
+      const slot = { el, blob, ws, fun, per: R(5, 11), ph: R(0, 11), vis: o.kind === 'sm' ? R(.6, .9) : R(.68, .88), b: 0, n: null, on: false, word: null, busy: false };
       if (ws.length) blob.addEventListener('click', () => swap(slot));
       slots.push(slot);
     });
@@ -1965,7 +1971,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const setWord = (slot, keep) => {   // a new word for this bloom, or none: about a third of the time a word dot comes back plain (never right after a tap)
     if (slot.word) shown.delete(slot.word.w);
     slot.word = null; slot.blob.textContent = '';
-    if (!keep && Math.random() < .3) return;
+    if (!keep && Math.random() < .1) return;
     const free = slot.ws.filter(x => !shown.has(x.w)); if (!free.length) return;
     const pick = free[Math.floor(Math.random() * free.length)]; slot.word = pick; shown.add(pick.w);
     const w = document.createElement('span'); w.className = 'w' + (slot.fun ? ' fun' : ''); w.style.setProperty('--fs', pick.f.fs + 'px');
