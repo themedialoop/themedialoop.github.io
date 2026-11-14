@@ -1865,45 +1865,39 @@ button,input,select,textarea,optgroup{font-family:inherit}
   fit(); addEventListener('resize', fit); document.fonts && document.fonts.ready.then(fit); })();
 </script>
 <style>
-/* research interests as bubbles: a band of organic polka dots across the full width, some carrying research terms
-   (bold) or playful words (light italic). Dots bloom in and out as you scroll, and slowly on their own, so only some
-   of the words are ever showing; each one bobs and sways like a bubble, and a few travel up through the band and float
-   off the top while new ones rise in from below. Tap a word to swap it. Dots never touch, and resting dots are always whole. */
-.marquee.hm-marq{height:auto !important;display:block;padding:clamp(40px,6vw,90px) 0}
-.bub{position:relative;height:clamp(440px,46vw,660px);overflow:hidden}
-@media (max-width:699px){.marquee.hm-marq{padding:0}.bub{height:100vh;height:100svh}}   /* phones: the bubbles fill the whole screen */
-.bub .dot{position:absolute;animation:bubX 7s ease-in-out var(--px,0s) infinite alternate;transform:translateY(calc(var(--sv,0) * var(--z,1) * 1px))}
-.bub .dy{width:100%;height:100%;animation:bubY 5.3s ease-in-out var(--py,0s) infinite alternate}
-.bub .sc{width:100%;height:100%;transform:scale(0);transition:transform .35s cubic-bezier(.5,0,.9,.5)}
-.bub .dot.on .sc{transform:scale(1);transition:transform .65s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
+/* research interests: the rabbit hole. The section holds the screen for a while as you scroll: the dots flow slowly
+   outward from the middle, as if you are sinking into the field, new bubbles bloom in every gap that opens (some with
+   research terms in bold, some with playful words in light italic), and fine dust thickens until it envelops you, then lets
+   you go. Everything drifts on one soft breeze and lags a little behind your scroll. Word bubbles pop before they reach an
+   edge, so they are always whole; small dots may float off it. Dots never touch. Tap a word to swap it. */
+.marquee.hm-marq{height:auto !important;display:block;padding:0;overflow:visible}
+.bub-hold{position:relative;height:calc(100vh + 220vh);height:calc(100svh + 220svh)}
+.bub{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.bub .dot{position:absolute;left:0;top:0;transform-origin:50% 50%}
+.bub .sc{width:100%;height:100%;transform:scale(0);transition:transform .38s cubic-bezier(.5,0,.9,.5)}
+.bub .dot.on .sc{transform:scale(1);transition:transform .7s cubic-bezier(.3,1.5,.5,1)}
 .bub .blob{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;border:none;padding:0;margin:0;font:inherit;background:var(--c);border-radius:var(--br);animation:bubSwell 2.8s ease-in-out var(--bd,0s) infinite alternate;transition:scale .3s cubic-bezier(.3,1.6,.5,1)}
+.bub .dot.dust .blob{animation:none}
 .bub button.blob{cursor:pointer;color:var(--tc);-webkit-tap-highlight-color:transparent}
 .bub button.blob:hover,.bub button.blob:focus-visible{scale:1.08}
 .bub button.blob:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 .bub .w{display:block;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
 .bub .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
 .bub .w span{display:block}
-.bub .trav{position:absolute;top:0;animation:bubRise var(--du) linear var(--dd) infinite}
-.bub .sway{width:100%;height:100%;animation:bubSway var(--sd) ease-in-out var(--sdd) infinite alternate}
-@keyframes bubRise{0%{transform:translateY(var(--h))}100%{transform:translateY(calc(var(--d) * -1))}}
-@keyframes bubSway{0%{transform:translateX(-6px)}100%{transform:translateX(6px)}}
-@keyframes bubX{0%{translate:calc(var(--ax) * -1) 0}100%{translate:var(--ax) 0}}
-@keyframes bubY{0%{translate:0 var(--ay)}100%{translate:0 calc(var(--ay) * -1)}}
-/* self-obliteration: fine dust floods every gap as the band reaches the middle of the screen, and drains away as you leave */
-.bub .dust .sc{transform:scale(clamp(0, calc((var(--fill, 0) - var(--th)) * 7), 1));transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
 @keyframes bubSwell{0%{transform:scale(1)}100%{transform:scale(1.05)}}
-@media (prefers-reduced-motion:reduce){.bub .dot,.bub .dy,.bub .blob,.bub .sway{animation:none}.bub .trav{display:none}.bub .sc,.bub .dot.on .sc{transition:none}}
+@media (prefers-reduced-motion:reduce){.bub-hold{height:auto}.bub{position:relative;height:clamp(440px,60vh,660px)}.bub .blob{animation:none}.bub .sc,.bub .dot.on .sc{transition:none}}
 /* the events title: cream letters on a deep-blue highlighter band, one band per line, tilted a touch, so it stands out on the gold */
 .ev-h{line-height:1.42 !important;rotate:-1.2deg;transform-origin:left center;letter-spacing:-.022em !important;max-width:15ch !important}
 .ev-h .ev-hl{background:#2c5494;color:var(--cream);padding:0 .2em .04em;border-radius:.14em .26em .18em .22em;
   -webkit-box-decoration-break:clone;box-decoration-break:clone;box-shadow:none}
 </style>
 <script>
-/* research interests as bubbles (styles above) */
+/* research interests: the rabbit hole (styles above) */
 (() => {
   const box = document.getElementById('marquee'); if (!box) return;
   box.removeAttribute('aria-hidden'); box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Research interests');
-  const band = document.createElement('div'); band.className = 'bub'; box.append(band);
+  const hold = document.createElement('div'); hold.className = 'bub-hold';
+  const band = document.createElement('div'); band.className = 'bub'; hold.append(band); box.append(hold);
   const ROWS = [
     ['Algorithms', 'Perceived algorithm responsiveness', 'Social connectedness', 'Loneliness', 'Close relationships', 'AI-mediated communication', 'Self-disclosure', '*moxie', '*epiphany', '*sparkle', '*tinkering', '*merriment', '*Ferris Wheel'],
     ['Interpersonal communication', 'Social media', 'Subjective well-being', 'Imagined audience', 'Affordances', 'Media multiplexity', 'Algorithm awareness', 'Intimacy', 'Human-machine communication', 'Human-AI relationships', '*snap', '*zesty', '*boldness', '*thrill', '*eagerness', '*cool', '*frisky'],
@@ -1919,7 +1913,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mctx = document.createElement('canvas').getContext('2d');
   const fit = (word, d, fun) => {   // largest size at which the word wraps into the dot in up to three lines
-    for (let fs = 22; fs >= (innerWidth < 700 ? 12 : 14); fs--) {
+    for (let fs = 22; fs >= (innerWidth < 700 ? 12 : 13); fs--) {
       mctx.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif';
       const maxw = d * .74, lines = []; let cur = '', ok = true;
       for (const w of word.split(' ')) { const t = cur ? cur + ' ' + w : w;
@@ -1929,94 +1923,86 @@ button,input,select,textarea,optgroup{font-family:inherit}
     }
     return null;
   };
-  let slots = [], builtW = 0, shown = new Set(), clock = 0, last = 0, acc = 0, visible = false, first = true;
+  let W = 0, H = 0, k = 1, parts = [], shown = new Set(), zl = 0, clock = 0, fill = 0, sv = 0, vel = 0, lastY = scrollY, last = 0, visible = false;
+  const Z = () => Math.exp(zl);
+  // each dot lives in "world" space around the centre; the screen is that world, magnified by the zoom
+  const screen = p => { const z = Z(), A = 7 * k, t = clock;
+    const ph = p.wx * .004 + p.wy * .003;   // neighbours share almost the same phase: one breeze
+    return { x: W / 2 + p.wx * z + A * Math.sin(t * .9 + ph * 6), y: H / 2 + p.wy * z + A * .85 * Math.sin(t * 1.23 + ph * 5 + 1) + sv * p.zf, d: p.ws * z }; };
+  const free = (x, y, d) => parts.every(q => { if (q.dead) return true; const o = screen(q); return Math.hypot(x - o.x, y - o.y) >= d / 2 + o.d / 2 + Math.max(6, .06 * Math.max(d, o.d)) + 10 * k; });
+  const make = (x, y, d, kind) => {
+    const z = Z(), p = { wx: (x - W / 2) / z, wy: (y - H / 2) / z, ws: d / z, base: d, kind, zf: 1 - Math.min(1, d / (160 * k)) * .15, on: false, dead: false, word: null };
+    const el = p.el = document.createElement('div'); el.className = 'dot' + (kind === 'dust' ? ' dust' : '');
+    el.style.width = el.style.height = d.toFixed(1) + 'px';
+    const sc = document.createElement('div'); sc.className = 'sc';
+    const col = pickCol(), wordy = kind === 'res' || kind === 'fun';
+    const blob = p.blob = document.createElement(wordy ? 'button' : 'div'); blob.className = 'blob';
+    blob.style.cssText = `--c:${COL[col]};--tc:${textCol(col)};--br:${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()};--bd:-${R(0, 2.8).toFixed(2)}s`;
+    if (wordy) { blob.type = 'button'; blob.addEventListener('click', () => swap(p)); setWord(p); } else blob.setAttribute('aria-hidden', 'true');
+    sc.append(blob); el.append(sc); band.append(el); parts.push(p);
+    requestAnimationFrame(() => requestAnimationFrame(() => { p.on = true; el.classList.add('on'); }));
+    return p;
+  };
+  const setWord = (p, prev) => {
+    if (p.word) shown.delete(p.word.w);
+    const pool = (p.kind === 'res' ? RES : FUN).filter(w => !shown.has(w) && w !== prev);
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    p.word = null; p.blob.textContent = '';
+    for (const w of pool) { const f = fit(w, p.base, p.kind === 'fun'); if (!f) continue;
+      p.word = { w, f }; shown.add(w);
+      const el = document.createElement('span'); el.className = 'w' + (p.kind === 'fun' ? ' fun' : ''); el.style.setProperty('--fs', f.fs + 'px');
+      f.lines.forEach(l => { const sp = document.createElement('span'); sp.textContent = l; el.append(sp); });
+      p.blob.append(el); p.blob.setAttribute('aria-label', w); return; }
+    p.blob.setAttribute('aria-hidden', 'true'); p.blob.tabIndex = -1;
+  };
+  const pop = p => { if (p.dead) return; p.dead = true; p.on = false; p.el.classList.remove('on'); if (p.word) shown.delete(p.word.w); p.blob.tabIndex = -1;
+    setTimeout(() => { p.el.remove(); parts = parts.filter(q => q !== p); }, 450); };
+  const swap = p => { if (p.dead || p.busy) return; p.busy = true; p.el.classList.remove('on');
+    setTimeout(() => { const prev = p.word && p.word.w; setWord(p, prev); p.el.classList.add('on'); p.busy = false; }, 380); };
+  const coverage = () => parts.reduce((a, p) => p.dead ? a : a + Math.pow(screen(p).d, 2) * .785, 0) / (W * H);
+  const spawn = budget => {   // words come first: keep plenty of them up, then fill what is left with plain dots, then dust
+    const words = parts.filter(p => !p.dead && p.word).length, want = W < 700 ? 13 : 18;
+    for (let n = 0, made = 0; n < 160 && words + made < want && made < 2; n++) {
+      const res = Math.random() < .72, d = (res ? R(96, 134) : R(62, 88)) * k, m = 18 * k, x = R(0, W), y = R(0, H);
+      if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue;
+      const p = make(x, y, d, res ? 'res' : 'fun'); if (!p.word) p.kind = 'plain'; else made++;
+    }
+    const target = (W < 700 ? .2 : .24) + .3 * fill, wordsNow = parts.filter(p => !p.dead && p.word).length;
+    for (let n = 0; n < budget * 10 && budget > 0; n++) {
+      if (coverage() > target) return;
+      if (wordsNow < want * .8) return;   // while words are short, nothing else fills in, so word bubbles still find room
+      const dust = Math.random() < .25 + .55 * fill;
+      const d = (dust ? R(5, 12) : R(16, 38)) * k, x = R(0, W), y = R(0, H);
+      if (x - d / 2 < 4 || x + d / 2 > W - 4 || y - d / 2 < 4 || y + d / 2 > H - 4 || !free(x, y, d)) continue;
+      make(x, y, d, dust ? 'dust' : 'plain'); budget--;
+    }
+  };
+  const tick = () => {
+    for (const p of parts) { if (p.dead) continue; const o = screen(p);
+      p.el.style.transform = `translate(${(o.x - p.base / 2).toFixed(1)}px,${(o.y - p.base / 2).toFixed(1)}px) scale(${(o.d / p.base).toFixed(4)})`;
+      const wordy = !!p.word, edge = wordy ? 14 * k : -o.d * .3;
+      if (o.d < 2.5 || (wordy && (o.x - o.d / 2 < edge || o.x + o.d / 2 > W - edge || o.y - o.d / 2 < edge || o.y + o.d / 2 > H - edge)) || o.d > (wordy ? Math.min(W, H) * .42 : 64 * k) || o.x + o.d / 2 < 0 || o.x - o.d / 2 > W || o.y + o.d / 2 < 0 || o.y - o.d / 2 > H) pop(p);
+      else if (wordy) p.blob.tabIndex = p.on ? 0 : -1; }
+  };
+  const progress = () => { const r = hold.getBoundingClientRect(), span = r.height - innerHeight; return span > 0 ? Math.max(0, Math.min(1, -r.top / span)) : 0; };
   const build = () => {
-    band.textContent = ''; slots = []; shown = new Set(); first = true;
-    const W = band.clientWidth, H = band.clientHeight; builtW = W; if (!W || !H) return;
-    const k = W < 700 ? .74 : Math.min(1.15, Math.max(.8, W / 1100));
-    const AX = 14 * k, AY = 12 * k, PUSH = 18;   // how far each dot wanders, and the most the scroll can push it
-    const lanes = (W < 700 ? [.5] : [.34, .7]).map(f => f * W), LW = 24 * k;
-    const inLane = (x, d) => lanes.some(cx => Math.abs(x - cx) < d / 2 + LW + 4);
-    const area = W * H / (1280 * 590), nb = Math.round(Math.max(12, 20 * area)), nm = Math.round(Math.max(22, 40 * area)), ns = Math.round(Math.max(20, 34 * area));
-    const specs = [...Array(nb)].map(() => [R(100, 136) * k, 'big']).concat([...Array(nm)].map(() => [R(58, 86) * k, 'med']), [...Array(ns)].map(() => [R(16, 40) * k, 'sm']));
-    const dots = [];
-    for (const [d, kind] of specs) for (let n = 0; n < (kind === 'sm' ? 250 : 2500); n++) {
-      const x = R(0, W), y = R(0, H);
-      if (x - d / 2 < AX + 6 || x + d / 2 > W - AX - 6 || y - d / 2 < AY + PUSH + 6 || y + d / 2 > H - AY - PUSH - 6 || inLane(x, d)) continue;
-      if (dots.every(o => Math.hypot(x - o.x, y - o.y) >= d / 2 + o.d / 2 + Math.max(5, .12 * Math.max(d, o.d) / 2) + 12 * k)) { dots.push({ x, y, d, kind }); break; }
-    }
-    dots.forEach(o => o.col = pickCol());
-    dots.forEach(o => dots.forEach(q => { if (o !== q && ((o.col === 'teal' && q.col === 'purple') || (o.col === 'purple' && q.col === 'teal')) && Math.hypot(o.x - q.x, o.y - q.y) < o.d / 2 + q.d / 2 + 40) q.col = 'blue'; }));
-    const frag = document.createDocumentFragment();
-    dots.forEach(o => {
-      const pool = o.kind === 'big' ? RES : o.kind === 'med' || o.d >= 54 ? FUN : [], fun = o.kind !== 'big';
-      const ws = pool.map(w => ({ w, f: fit(w, o.d, fun) })).filter(x => x.f);
-      const el = document.createElement('div'); el.className = 'dot';
-      el.style.cssText = `left:${(o.x - o.d / 2).toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--z:${(1 - Math.min(1, o.d / (150 * k)) * .3).toFixed(2)};--ax:${AX.toFixed(1)}px;--ay:${AY.toFixed(1)}px;--px:-${(((o.x * .0009 + o.y * .0006) % 1) * 7).toFixed(2)}s;--py:-${(((o.x * .0007 - o.y * .0008 + 2) % 1) * 5.3).toFixed(2)}s;--in:${R(0, .9).toFixed(2)}s`;
-      const dy = document.createElement('div'); dy.className = 'dy';
-      const sc = document.createElement('div'); sc.className = 'sc';
-      const blob = document.createElement(ws.length ? 'button' : 'div'); blob.className = 'blob';
-      blob.style.cssText = `--c:${COL[o.col]};--tc:${textCol(o.col)};--br:${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()};--bd:-${R(0, 2.8).toFixed(2)}s`;
-      if (ws.length) { blob.type = 'button'; blob.tabIndex = -1; } else blob.setAttribute('aria-hidden', 'true');
-      sc.append(blob); dy.append(sc); el.append(dy); frag.append(el);
-      const slot = { el, blob, ws, fun, per: R(5, 11), ph: R(0, 11), vis: o.kind === 'sm' ? R(.6, .9) : R(.68, .88), b: 0, n: null, on: false, word: null, busy: false };
-      if (ws.length) blob.addEventListener('click', () => swap(slot));
-      slots.push(slot);
-    });
-    lanes.forEach(cx => { const du = R(10, 14), n = 4, off = R(0, du);
-      for (let j = 0; j < n; j++) { const d = R(22, 44) * k, t = document.createElement('div'); t.className = 'trav'; t.setAttribute('aria-hidden', 'true');
-        t.style.cssText = `left:${(cx - d / 2).toFixed(1)}px;width:${d.toFixed(1)}px;height:${d.toFixed(1)}px;--h:${H}px;--d:${d.toFixed(1)}px;--du:${du.toFixed(2)}s;--dd:-${((off + j * du / n) % du).toFixed(2)}s`;
-        t.innerHTML = `<div class="sway" style="--sd:${R(2.6, 4).toFixed(2)}s;--sdd:-${R(0, 4).toFixed(2)}s"><div class="blob" style="--c:${COL[pickCol()]};--br:${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()};--bd:-${R(0, 2.8).toFixed(2)}s"></div></div>`;
-        frag.append(t); } });
-    // the dust: tiny dots in every gap left, each one appearing at its own point as the band fills
-    const all = dots.slice(), dust = [];
-    for (let n = 0; n < 26000 && dust.length < 900; n++) {
-      const d = R(5, 12) * k, x = R(0, W), y = R(0, H);
-      if (x - d / 2 < AX + 4 || x + d / 2 > W - AX - 4 || y - d / 2 < AY + PUSH + 4 || y + d / 2 > H - AY - PUSH - 4 || inLane(x, d)) continue;
-      if (all.every(o => Math.hypot(x - o.x, y - o.y) >= d / 2 + o.d / 2 + 6 * k + 3)) { const o = { x, y, d }; all.push(o); dust.push(o); }
-    }
-    dust.forEach(o => { const el = document.createElement('div'); el.className = 'dot dust'; el.setAttribute('aria-hidden', 'true');
-      el.style.cssText = `left:${(o.x - o.d / 2).toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--z:1;--ax:${AX.toFixed(1)}px;--ay:${AY.toFixed(1)}px;--px:-${(((o.x * .0009 + o.y * .0006) % 1) * 7).toFixed(2)}s;--py:-${(((o.x * .0007 - o.y * .0008 + 2) % 1) * 5.3).toFixed(2)}s;--th:${R(0, .85).toFixed(2)}`;
-      el.innerHTML = `<div class="dy"><div class="sc"><div class="blob" style="--c:${COL[pickCol()]};--br:${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()};animation:none"></div></div></div>`;
-      frag.append(el); });
-    band.append(frag); update(true);
+    parts.forEach(p => p.el.remove()); parts = []; shown = new Set();
+    W = band.clientWidth; H = band.clientHeight; if (!W || !H) return;
+    k = W < 700 ? .74 : Math.min(1.15, Math.max(.8, W / 1100));
+    zl = progress() * 2.3; fill = still ? .6 : 0;
+    for (let i = 0; i < 30; i++) spawn(1); spawn(400); tick();
   };
-  const setWord = (slot, keep) => {   // a new word for this bloom, or none: about a third of the time a word dot comes back plain (never right after a tap)
-    const prev = slot.word && slot.word.w; if (prev) shown.delete(prev);
-    slot.word = null; slot.blob.textContent = '';
-    if (!keep && Math.random() < .05) return;
-    const free = slot.ws.filter(x => !shown.has(x.w) && x.w !== prev); if (!free.length) return;
-    const pick = free[Math.floor(Math.random() * free.length)]; slot.word = pick; shown.add(pick.w);
-    const w = document.createElement('span'); w.className = 'w' + (slot.fun ? ' fun' : ''); w.style.setProperty('--fs', pick.f.fs + 'px');
-    pick.f.lines.forEach(l => { const sp = document.createElement('span'); sp.textContent = l; w.append(sp); });
-    slot.blob.append(w);
-  };
-  const update = force => {
-    const t = (still ? 0 : scrollY / 150) + clock * .2;
-    for (const s of slots) {
-      const u = (t + s.ph) / s.per + s.b, n = Math.floor(u), f = u - n, on = !s.busy && f >= .06 && f <= .06 + s.vis;
-      if (n !== s.n && !s.on) { s.n = n; if (s.ws.length) setWord(s, s.tapped); s.tapped = false; }
-      if (on !== s.on || force) { s.on = on; s.el.classList.toggle('on', on);
-        if (s.ws.length) { const live = on && !!s.word; s.blob.tabIndex = live ? 0 : -1; s.blob.toggleAttribute('aria-hidden', !live); if (s.word) s.blob.setAttribute('aria-label', s.word.w); } }
-    }
-    if (first && !force) { first = false; setTimeout(() => slots.forEach(s => s.el.style.setProperty('--in', '0s')), 1600); }
-  };
-  const swap = s => { if (s.busy) return; s.busy = true; update(); setTimeout(() => { const u = ((still ? 0 : scrollY / 150) + clock * .2 + s.ph) / s.per + s.b; s.b += (1 - (u - Math.floor(u))) + .06; s.busy = false; s.on = false; s.n = null; s.tapped = true; update(); }, 360); };
-  let lastY = scrollY, sv = 0, vel = 0;   // the bubbles lag behind your scroll like they're in water, then spring back
-  const loop = now => { if (!visible) { last = 0; sv = vel = 0; band.style.setProperty('--sv', 0); return; }
-    const last0 = !last, dt = last ? Math.min(100, now - last) : 16; last = now; if (!still) clock += dt / 1000; acc += dt;
-    if (!still) { const dy = last0 ? 0 : scrollY - lastY; lastY = scrollY;
-      const target = Math.max(-18, Math.min(18, -dy * 1.1));
-      vel = (vel + (target - sv) * .09) * .78; sv += vel;
-      if (Math.abs(sv) < .05 && Math.abs(vel) < .05) sv = 0;
-      band.style.setProperty('--sv', sv.toFixed(2)); }
-    { const rc = band.getBoundingClientRect(), c = 1 - Math.abs(rc.top + rc.height / 2 - innerHeight / 2) / (innerHeight / 2 + rc.height / 2);
-      const x = Math.max(0, Math.min(1, (c - .25) / .6)), fill = still ? .6 : x * x * (3 - 2 * x);
-      if (Math.abs(fill - (band._fill || 0)) > .01) { band._fill = fill; band.style.setProperty('--fill', fill.toFixed(3)); } }
-    if (acc > 110) { acc = 0; update(); } requestAnimationFrame(loop); };
-  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '120px 0px' }).observe(band);
-  addEventListener('resize', () => { if (Math.abs(band.clientWidth - builtW) > 40) build(); });
-  (document.fonts ? document.fonts.ready : Promise.resolve()).then(build);
+  const loop = now => { if (!visible) { last = 0; sv = vel = 0; return; }
+    const first = !last, dt = first ? 16 : Math.min(100, now - last); last = now;
+    const p = progress(), x = Math.max(0, Math.min(1, p / .55)); fill = still ? .6 : x * x * (3 - 2 * x);
+    if (!still) { clock += dt / 1000; zl = p * 2.3 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
+      const dy = first ? 0 : scrollY - lastY; lastY = scrollY;
+      const target = Math.max(-18, Math.min(18, -dy * 1.1)); vel = (vel + (target - sv) * .09) * .78; sv += vel; }
+    tick(); spawn(still ? 0 : 3);
+    requestAnimationFrame(loop); };
+  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '100px 0px' }).observe(band);
+  let bw = 0; addEventListener('resize', () => { if (Math.abs(band.clientWidth - bw) > 40 || Math.abs(band.clientHeight - H) > 160) { bw = band.clientWidth; build(); } });
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { bw = band.clientWidth; build(); });
 })();
 </script>
 <style>
