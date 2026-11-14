@@ -1898,7 +1898,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .bub{position:sticky;top:0;width:100%;height:100vh;height:100lvh;overflow:hidden}   /* the large viewport: it reaches under a phone's toolbars, so the field always meets the bottom of the screen */
 .bub .dot{position:absolute;left:0;top:0;transform-origin:50% 50%}
 .bub .sc{width:100%;height:100%;transform:scale(0);transition:transform .38s cubic-bezier(.5,0,.9,.5)}
-.bub .dot.on .sc{transform:scale(1);transition:transform .7s cubic-bezier(.3,1.5,.5,1)}
+.bub .dot.on .sc{transform:scale(1);transition:transform .45s cubic-bezier(.3,1.5,.5,1)}
 .bub .blob{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;border:none;padding:0;margin:0;font:inherit;background:var(--c);border-radius:var(--br);animation:bubSwell 2.8s ease-in-out var(--bd,0s) infinite alternate;transition:scale .3s cubic-bezier(.3,1.6,.5,1)}
 .bub .dot.dust .blob{animation:none}
 .bub button.blob{cursor:pointer;color:var(--tc);-webkit-tap-highlight-color:transparent}
@@ -1907,9 +1907,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .bub .w{display:block;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
 .bub .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
 .bub .w span{display:block}
-.bub .lg{display:block;width:94%;aspect-ratio:4278/1185;background:var(--lc);-webkit-mask:url(assets/medialoop-wordmark.svg) center/contain no-repeat;mask:url(assets/medialoop-wordmark.svg) center/contain no-repeat;rotate:var(--lt)}   /* the medialoop logo, in any of the colours, at a tilt */
+.bub .blob.shape{background:none;animation:none}
+.bub .blob.shape svg{width:100%;height:100%;overflow:visible;rotate:var(--r0);animation:shSpin var(--sp,20s) linear infinite}   /* swirls, squiggles, stars and petals that turn slowly */
+@keyframes shSpin{to{rotate:calc(var(--r0) + 360deg)}}
 @keyframes bubSwell{0%{transform:scale(1)}100%{transform:scale(1.05)}}
-@media (prefers-reduced-motion:reduce){.bub-hold{height:auto}.bub{position:relative;height:clamp(440px,60vh,660px)}.bub .blob{animation:none}.bub .sc,.bub .dot.on .sc{transition:none}}
+@media (prefers-reduced-motion:reduce){.bub .blob.shape svg{animation:none}.bub-hold{height:auto}.bub{position:relative;height:clamp(440px,60vh,660px)}.bub .blob{animation:none}.bub .sc,.bub .dot.on .sc{transition:none}}
 /* the events title: cream letters on a deep-blue highlighter band, one band per line, tilted a touch, so it stands out on the gold */
 .ev-h{line-height:1.42 !important;rotate:-1.2deg;transform-origin:left center;letter-spacing:-.022em !important;max-width:15ch !important}
 .ev-h .ev-hl{background:#2c5494;color:var(--cream);padding:0 .2em .04em;border-radius:.14em .26em .18em .22em;
@@ -2013,6 +2015,19 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const pickCol = () => { let t = Math.random(); for (const [c, w] of MIX) { t -= w; if (t <= 0) return c; } return 'blue'; };
   const textCol = c => c === 'gold' ? '#2c5494' : c === 'blue' && Math.random() < .25 ? '#e7aa4d' : '#f2eedd';
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const svgw = (c, inner) => `<svg viewBox="0 0 100 100" aria-hidden="true">${inner}</svg>`;
+  const polar = (f, n = 90) => { let d = ''; for (let i = 0; i <= n; i++) { const a = i / n * Math.PI * 2, r = f(a); d += (i ? 'L' : 'M') + (50 + Math.cos(a) * r).toFixed(1) + ' ' + (50 + Math.sin(a) * r).toFixed(1); } return d + 'Z'; };
+  const SHAPES = [
+    c => { let d = ''; for (let i = 0; i <= 120; i++) { const a = i / 120 * Math.PI * 5.2, r = 4 + i / 120 * 38; d += (i ? 'L' : 'M') + (50 + Math.cos(a) * r).toFixed(1) + ' ' + (50 + Math.sin(a) * r).toFixed(1); }
+      return svgw(c, `<path d="${d}" fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round"/>`); },   // a swirl
+    c => svgw(c, `<path d="M10 50 C22 22 34 22 42 50 S62 78 72 50 S86 28 90 40" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`),   // a squiggle
+    c => svgw(c, `<path d="${polar(a => 31 + 15 * Math.sin(5 * a + .3) + 2 * Math.sin(3 * a))}" fill="${c}"/>`),   // a petal flower
+    c => svgw(c, `<path d="${polar(a => 28 + 18 * Math.pow(Math.abs(Math.cos(4 * a)), 3) + 1.5 * Math.sin(5 * a))}" fill="${c}"/>`),   // a soft star
+    c => svgw(c, `<path d="M62 12 C34 16 18 36 20 56 C22 76 42 90 64 86 C46 80 36 66 37 50 C38 34 48 20 62 12Z" fill="${c}"/>`),   // a crescent
+    c => svgw(c, `<path d="M10 62 L24 38 L38 62 L52 38 L66 62 L80 38 L90 52" fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>`),   // a zigzag
+    c => svgw(c, `<path d="${polar(a => 38 + 3 * Math.sin(3 * a + 1) + 2 * Math.sin(5 * a))}" fill="none" stroke="${c}" stroke-width="10"/>`),   // a wobbly ring
+    c => svgw(c, `<path d="M50 14 C58 30 70 42 86 50 C70 58 58 70 50 86 C42 70 30 58 14 50 C30 42 42 30 50 14Z" fill="${c}"/>`)   // a sparkle
+  ];
   const mctx = document.createElement('canvas').getContext('2d');
   const fit = (word, d, fun) => {   // largest size at which the word wraps into the dot in up to three lines
     for (let fs = Math.round(22 * Math.max(1, k)); fs >= (k < .7 ? 12 : 13); fs--) {
@@ -2038,12 +2053,12 @@ button,input,select,textarea,optgroup{font-family:inherit}
     el.style.width = el.style.height = d.toFixed(1) + 'px';
     const sc = document.createElement('div'); sc.className = 'sc';
     const col = pickCol(), wordy = kind === 'res' || kind === 'fun';
-    if (kind === 'logo') p.logo = true;
+    if (kind === 'shape') p.logo = true;   // shapes stay whole, like the word bubbles
     const blob = p.blob = document.createElement(wordy ? 'button' : 'div'); blob.className = 'blob';
     blob.style.cssText = `--c:${COL[col]};--tc:${textCol(col)};--br:${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()};--bd:-${R(0, 2.8).toFixed(2)}s`;
     if (wordy) { blob.type = 'button'; blob.addEventListener('click', () => swap(p)); setWord(p); } else blob.setAttribute('aria-hidden', 'true');
-    if (kind === 'logo') { const lc = ['#f2eedd', '#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6'].filter(c => c !== COL[col] && !(col === 'teal' && c === '#9b6aa6') && !(col === 'purple' && c === '#2a8c8c'));
-      const lg = document.createElement('span'); lg.className = 'lg'; lg.style.setProperty('--lc', lc[Math.floor(Math.random() * lc.length)]); lg.style.setProperty('--lt', R(-22, 22).toFixed(1) + 'deg'); blob.append(lg); }
+    if (kind === 'shape') { blob.classList.add('shape'); blob.innerHTML = SHAPES[Math.floor(Math.random() * SHAPES.length)](COL[col]);
+      blob.style.setProperty('--sp', (R(14, 30) * (Math.random() < .5 ? 1 : -1)).toFixed(1) + 's'); blob.style.setProperty('--r0', R(0, 360).toFixed(0) + 'deg'); }
     sc.append(blob); el.append(sc); band.append(el); parts.push(p);
     requestAnimationFrame(() => requestAnimationFrame(() => { p.on = true; el.classList.add('on'); }));
     return p;
@@ -2066,9 +2081,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
     setTimeout(() => { const prev = p.word && p.word.w; setWord(p, prev); p.el.classList.add('on'); p.busy = false; }, 380); };
   const coverage = () => parts.reduce((a, p) => p.dead ? a : a + Math.pow(screen(p).d, 2) * .785, 0) / (W * H);
   const spawn = budget => {   // words come first: keep plenty of them up, then fill what is left with plain dots, then dust
-    const logos = parts.filter(p => !p.dead && p.logo).length;
-    if (logos < Math.max(3, Math.round(4 * W * H / (1280 * 800)))) for (let n = 0; n < 80; n++) { const d = R(120, 170) * k, m = 18 * k, x = R(0, W), y = R(0, H);
-      if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue; make(x, y, d, 'logo'); break; }
+    const shapes = parts.filter(p => !p.dead && p.logo).length;   // a sprinkle of fun shapes and swirls among the dots
+    if (shapes < Math.max(6, Math.round(9 * W * H / (1280 * 800)))) for (let n = 0; n < 60; n++) { const d = R(44, 104) * k, m = 10 * k, x = R(0, W), y = R(0, H);
+      if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue; make(x, y, d, 'shape'); break; }
     const words = parts.filter(p => !p.dead && p.word).length, want = Math.round(Math.min(30, Math.max(11, 18 * (W * H / (1280 * 800)) / (k * k))));
     for (let n = 0, made = 0; n < 160 && words + made < want && made < Math.ceil(2 * Math.sqrt(W * H / (1280 * 800))); n++) {
       const res = Math.random() < .72, d = (res ? R(96, 134) : R(62, 88)) * k, m = 18 * k, x = R(0, W), y = R(0, H);
@@ -2113,9 +2128,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (warping) { clock += dt / 1000; zl += dt / 1000 * 2.2; tick(); requestAnimationFrame(loop); return; }   // falling: the field rushes outward
     const p = progress(), x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
     if (!still && p >= .985) { warp(); requestAnimationFrame(loop); return; }
-    if (!still) { clock += dt / 1000; zl = p * 3.4 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
+    if (!still) { clock += dt / 1000; zl = p * 5.6 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
       const dy = first ? 0 : scrollY - lastY; lastY = scrollY;
-      const target = Math.max(-18, Math.min(18, -dy * 1.1)); vel = (vel + (target - sv) * .09) * .78; sv += vel; }
+      const target = Math.max(-26, Math.min(26, -dy * 1.6)); vel = (vel + (target - sv) * .2) * .68; sv += vel; }
     tick(); spawn(still ? 0 : Math.ceil(7 * W * H / (1280 * 800)));   // bigger screens fill faster
     requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '100px 0px' }).observe(band);
