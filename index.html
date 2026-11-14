@@ -1890,7 +1890,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
    you go. Everything drifts on one soft breeze and lags a little behind your scroll. Word bubbles pop before they reach an
    edge, so they are always whole; small dots may float off it. Dots never touch. Tap a word to swap it. */
 .rabbit{display:block;padding:0;overflow:visible;position:relative}
-.bub-hold{position:relative;height:calc(100vh + 420vh);height:calc(100dvh + 420svh)}   /* the last thing on the page: a long way down */
+.bub-hold{position:relative;height:calc(100vh + 1000vh);height:calc(100dvh + 1000svh)}   /* the last thing on the page: a long way down (about ten seconds of scrolling) */
+.bub.warp{position:fixed;inset:0;z-index:9999}   /* for the trip back to the top */
 .rabbit{margin-inline:0;width:100vw;margin-left:calc(50% - 50vw)}   /* full bleed on every screen */
 .bub{position:sticky;top:0;width:100%;height:100vh;height:100dvh;overflow:hidden}
 .bub .dot{position:absolute;left:0;top:0;transform-origin:50% 50%}
@@ -2027,7 +2028,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const screen = p => { const z = Z(), A = 7 * k, t = clock;
     const ph = p.wx * .004 + p.wy * .003;   // neighbours share almost the same phase: one breeze
     return { x: W / 2 + p.wx * z + A * Math.sin(t * .9 + ph * 6), y: H / 2 + p.wy * z + A * .85 * Math.sin(t * 1.23 + ph * 5 + 1) + sv * p.zf, d: p.ws * z }; };
-  const free = (x, y, d) => parts.every(q => { if (q.dead) return true; const o = screen(q); return Math.hypot(x - o.x, y - o.y) >= d / 2 + o.d / 2 + Math.max(6, .06 * Math.max(d, o.d)) + 10 * k; });
+  const free = (x, y, d) => parts.every(q => { if (q.dead) return true; const o = screen(q); return Math.hypot(x - o.x, y - o.y) >= d / 2 + o.d / 2 + Math.max(5, .05 * Math.max(d, o.d)) + 8 * k; });
   const make = (x, y, d, kind) => {
     const z = Z(), p = { wx: (x - W / 2) / z, wy: (y - H / 2) / z, ws: d / z, base: d, kind, zf: 1 - Math.min(1, d / (160 * k)) * .15, on: false, dead: false, word: null };
     const el = p.el = document.createElement('div'); el.className = 'dot' + (kind === 'dust' ? ' dust' : '');
@@ -2065,12 +2066,12 @@ button,input,select,textarea,optgroup{font-family:inherit}
       if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue;
       const p = make(x, y, d, res ? 'res' : 'fun'); if (!p.word) p.kind = 'plain'; else made++;
     }
-    const target = (k < .7 ? .2 : .24) + .3 * fill, wordsNow = parts.filter(p => !p.dead && p.word).length;
+    const target = .58 + .2 * fill, wordsNow = parts.filter(p => !p.dead && p.word).length;   // dense from the start: no bare cream
     for (let n = 0; n < budget * 10 && budget > 0; n++) {
       if (coverage() > target) return;
-      if (wordsNow < want * .8) return;   // while words are short, nothing else fills in, so word bubbles still find room
-      const dust = Math.random() < .25 + .55 * fill;
-      const d = (dust ? R(5, 12) : R(16, 38)) * k, x = R(0, W), y = R(0, H);
+      const short = wordsNow < want * .7;   // while words are short, only dust fills in, so word bubbles still find room
+      const dust = short || Math.random() < .14 + .16 * fill;
+      const d = (dust ? R(6, 14) : Math.random() < .5 ? R(40, 72) : R(18, 40)) * k, x = R(0, W), y = R(0, H);
       if (x - d / 2 < 4 || x + d / 2 > W - 4 || y - d / 2 < 4 || y + d / 2 > H - 4 || !free(x, y, d)) continue;
       make(x, y, d, dust ? 'dust' : 'plain'); budget--;
     }
@@ -2079,7 +2080,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     for (const p of parts) { if (p.dead) continue; const o = screen(p);
       p.el.style.transform = `translate(${(o.x - p.base / 2).toFixed(1)}px,${(o.y - p.base / 2).toFixed(1)}px) scale(${(o.d / p.base).toFixed(4)})`;
       const wordy = !!p.word, edge = wordy ? 14 * k : -o.d * .3;
-      if (o.d < 2.5 || (wordy && (o.x - o.d / 2 < edge || o.x + o.d / 2 > W - edge || o.y - o.d / 2 < edge || o.y + o.d / 2 > H - edge)) || o.d > (wordy ? Math.min(W, H) * .42 : 64 * k) || o.x + o.d / 2 < 0 || o.x - o.d / 2 > W || o.y + o.d / 2 < 0 || o.y - o.d / 2 > H) pop(p);
+      if (o.d < 2.5 || (wordy && (o.x - o.d / 2 < edge || o.x + o.d / 2 > W - edge || o.y - o.d / 2 < edge || o.y + o.d / 2 > H - edge)) || o.d > (wordy ? Math.min(W, H) * .42 : 120 * k) || o.x + o.d / 2 < 0 || o.x - o.d / 2 > W || o.y + o.d / 2 < 0 || o.y - o.d / 2 > H) pop(p);
       else if (wordy) p.blob.tabIndex = p.on ? 0 : -1; }
   };
   const progress = () => { const r = hold.getBoundingClientRect(), span = r.height - innerHeight; return span > 0 ? Math.max(0, Math.min(1, -r.top / span)) : 0; };
@@ -2090,13 +2091,23 @@ button,input,select,textarea,optgroup{font-family:inherit}
     zl = progress() * 2.3; fill = still ? .6 : 0;
     for (let i = 0; i < 30; i++) spawn(1); spawn(400); tick();
   };
-  const loop = now => { if (!visible) { last = 0; sv = vel = 0; return; }
+  // at the bottom of the rabbit hole the visitor comes out at the top of the page: the field holds the screen while the
+  // page jumps back to the start, then the dots pop away from the middle outward, revealing the landing page
+  let warping = false;
+  const warp = () => { warping = true; band.classList.add('warp');
+    document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo({ top: 0, behavior: 'instant' }); document.documentElement.style.scrollBehavior = '';
+    const md = Math.hypot(W / 2, H / 2);
+    setTimeout(() => { parts.forEach(q => { const o = screen(q); setTimeout(() => pop(q), Math.hypot(o.x - W / 2, o.y - H / 2) / md * 650); }); }, 250);
+    setTimeout(() => { band.classList.remove('warp'); warping = false; build(); }, 1500); };
+  const loop = now => { if (!visible && !warping) { last = 0; sv = vel = 0; return; }
     const first = !last, dt = first ? 16 : Math.min(100, now - last); last = now;
-    const p = progress(), x = Math.max(0, Math.min(1, p / .55)); fill = still ? .6 : x * x * (3 - 2 * x);
-    if (!still) { clock += dt / 1000; zl = p * 2.3 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
+    if (warping) { clock += dt / 1000; tick(); requestAnimationFrame(loop); return; }
+    const p = progress(), x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
+    if (!still && p >= .985) { warp(); requestAnimationFrame(loop); return; }
+    if (!still) { clock += dt / 1000; zl = p * 3.4 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
       const dy = first ? 0 : scrollY - lastY; lastY = scrollY;
       const target = Math.max(-18, Math.min(18, -dy * 1.1)); vel = (vel + (target - sv) * .09) * .78; sv += vel; }
-    tick(); spawn(still ? 0 : Math.ceil(3 * W * H / (1280 * 800)));   // bigger screens fill faster
+    tick(); spawn(still ? 0 : Math.ceil(7 * W * H / (1280 * 800)));   // bigger screens fill faster
     requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '100px 0px' }).observe(band);
   let bw = 0; addEventListener('resize', () => { if (Math.abs(band.clientWidth - bw) > 40 || Math.abs(band.clientHeight - H) > 200) { bw = band.clientWidth; build(); } else { W = band.clientWidth; H = band.clientHeight; } });
