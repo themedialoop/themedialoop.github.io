@@ -622,6 +622,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
   </div>
 </footer>
 
+<div class="rabbit" id="rabbit"></div>
+
 <script src="assets/net-holes.js"></script>
 <script>
 (() => {
@@ -1865,14 +1867,31 @@ button,input,select,textarea,optgroup{font-family:inherit}
   fit(); addEventListener('resize', fit); document.fonts && document.fonts.ready.then(fit); })();
 </script>
 <style>
-/* research interests: the rabbit hole. The section holds the screen for a while as you scroll: the dots flow slowly
+/* research interests: a simple river of dots drifting left to right, some carrying research terms (bold) or playful
+   words (light italic). It drifts slowly on its own and speeds up while you scroll, like the pills it replaces. Every dot
+   moves together, with a gentle bob shared by its neighbours, so they never touch. */
+.marquee.hm-marq{height:auto !important;display:block;padding:clamp(48px,7vw,100px) 0;margin-inline:0;width:100vw;margin-left:calc(50% - 50vw)}
+.river{position:relative;height:clamp(340px,38vw,520px);overflow:hidden}
+.river .track{position:absolute;left:0;top:0;height:100%;display:flex}
+.river .tile{position:relative;flex:none;height:100%}
+.river .rd{position:absolute;animation:rvBob 6s ease-in-out var(--bp,0s) infinite alternate}
+.river .rs{width:100%;height:100%;transform:scale(0);transition:transform .7s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
+.river.on .rs{transform:scale(1)}
+.river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--c);color:var(--tc);border-radius:var(--br);animation:bubSwell 2.8s ease-in-out var(--bd,0s) infinite alternate}
+.river .w{display:block;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
+.river .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
+.river .w span{display:block}
+.river-words{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@keyframes rvBob{0%{translate:0 var(--ay)}100%{translate:0 calc(var(--ay) * -1)}}
+@media (prefers-reduced-motion:reduce){.river .rd,.river .rb{animation:none}.river .rs{transition:none}}
+/* the rabbit hole, at the very end of the page. It holds the screen for a long while as you scroll: the dots flow slowly
    outward from the middle, as if you are sinking into the field, new bubbles bloom in every gap that opens (some with
    research terms in bold, some with playful words in light italic), and fine dust thickens until it envelops you, then lets
    you go. Everything drifts on one soft breeze and lags a little behind your scroll. Word bubbles pop before they reach an
    edge, so they are always whole; small dots may float off it. Dots never touch. Tap a word to swap it. */
-.marquee.hm-marq{height:auto !important;display:block;padding:0;overflow:visible}
-.bub-hold{position:relative;height:calc(100vh + 220vh);height:calc(100dvh + 220svh)}
-.marquee.hm-marq{margin-inline:0;width:100vw;margin-left:calc(50% - 50vw)}   /* full bleed on every screen */
+.rabbit{display:block;padding:0;overflow:visible;position:relative}
+.bub-hold{position:relative;height:calc(100vh + 420vh);height:calc(100dvh + 420svh)}   /* the last thing on the page: a long way down */
+.rabbit{margin-inline:0;width:100vw;margin-left:calc(50% - 50vw)}   /* full bleed on every screen */
 .bub{position:sticky;top:0;width:100%;height:100vh;height:100dvh;overflow:hidden}
 .bub .dot{position:absolute;left:0;top:0;transform-origin:50% 50%}
 .bub .sc{width:100%;height:100%;transform:scale(0);transition:transform .38s cubic-bezier(.5,0,.9,.5)}
@@ -1893,10 +1912,88 @@ button,input,select,textarea,optgroup{font-family:inherit}
   -webkit-box-decoration-break:clone;box-decoration-break:clone;box-shadow:none}
 </style>
 <script>
-/* research interests: the rabbit hole (styles above) */
+/* research interests: the river of dots (styles above) */
 (() => {
   const box = document.getElementById('marquee'); if (!box) return;
-  box.removeAttribute('aria-hidden'); box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Research interests');
+  box.removeAttribute('aria-hidden');
+  const ROWS = [
+    ['Algorithms', 'Perceived algorithm responsiveness', 'Social connectedness', 'Loneliness', 'Close relationships', 'AI-mediated communication', 'Self-disclosure', '*moxie', '*epiphany', '*sparkle', '*tinkering', '*merriment', '*Ferris Wheel'],
+    ['Interpersonal communication', 'Social media', 'Subjective well-being', 'Imagined audience', 'Affordances', 'Media multiplexity', 'Algorithm awareness', 'Intimacy', 'Human-machine communication', 'Human-AI relationships', '*snap', '*zesty', '*boldness', '*thrill', '*eagerness', '*cool', '*frisky'],
+    ['Cyberbullying', 'Bystander intervention', 'Open science', 'Mobile phones', 'Experience sampling', 'Longitudinal methods', 'Adolescents and young adults', 'LGBTQ+ youth', 'Identity', 'Social comparison', 'Media psychology', 'Social media cognition', 'Mobile phone habits', '*beauty', '*eccentricity', '*artisanal', '*creativity', '*zing'],
+    ['*joy', '*rizz', '*more than vibes', '*whimsy', '*collaborators', '*debate', '*cowboy', '*pizzazz', '*Chicago-style hot dogs', '*Mal\u00f6rt', '*Italian beefs', '*giardiniera', '*cappuccinos', '*soir\u00e9es', '*delight', '*curiosity', '*zeal', '*snappy', '*playful']
+  ];
+  const ALL = ROWS.flat(), RES = ALL.filter(w => w[0] !== '*'), FUN = ALL.filter(w => w[0] === '*').map(w => w.slice(1));
+  // for screen readers: the research interests as a plain list; the river itself is decoration
+  const list = document.createElement('ul'); list.className = 'river-words'; list.setAttribute('aria-label', 'Research interests');
+  RES.forEach(w => { const li = document.createElement('li'); li.textContent = w; list.append(li); }); box.append(list);
+  const river = document.createElement('div'); river.className = 'river'; river.setAttribute('aria-hidden', 'true'); box.append(river);
+  const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', purple: '#9b6aa6' };
+  const MIX = [['blue', .34], ['gold', .3], ['orange', .1], ['pink', .1], ['teal', .08], ['purple', .08]];
+  const R = (a, b) => a + Math.random() * (b - a), pc = () => Math.round(R(42, 58)) + '%';
+  const pickCol = () => { let t = Math.random(); for (const [c, w] of MIX) { t -= w; if (t <= 0) return c; } return 'blue'; };
+  const textCol = c => c === 'gold' ? '#2c5494' : c === 'blue' && Math.random() < .25 ? '#e7aa4d' : '#f2eedd';
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mctx = document.createElement('canvas').getContext('2d');
+  const fit = (word, d, fun, hi) => {
+    for (let fs = hi; fs >= 13; fs--) {
+      mctx.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif';
+      const maxw = d * .74, lines = []; let cur = '', ok = true;
+      for (const w of word.split(' ')) { const t = cur ? cur + ' ' + w : w;
+        if (mctx.measureText(t).width <= maxw) cur = t; else { if (cur) lines.push(cur); cur = w; if (mctx.measureText(w).width > maxw) { ok = false; break; } } }
+      if (!ok) continue; lines.push(cur);
+      if (lines.length <= 3 && lines.length * fs * 1.08 <= d * .62) return { fs, lines };
+    }
+    return null;
+  };
+  let track = null, Tw = 0, off = 0, boost = 0, lastY = scrollY, last = 0, visible = false, builtW = 0;
+  const build = () => {
+    river.textContent = ''; const H = river.clientHeight, W = river.clientWidth; builtW = W; if (!H || !W) return;
+    const k = Math.min(1.25, Math.max(.7, H / 440)), AY = 7 * k, hi = Math.round(20 * k);
+    // every word gets a dot sized to fit it; a few small plain dots go in between
+    const items = [];
+    const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    shuffle(RES.slice()).forEach(w => { for (let d = 100 * k; d <= 170 * k; d += 8 * k) { const f = fit(w, d, false, hi); if (f) { items.push({ d, w, f, fun: false }); break; } } });
+    shuffle(FUN.slice()).forEach(w => { for (let d = 62 * k; d <= 120 * k; d += 6 * k) { const f = fit(w, d, true, hi); if (f) { items.push({ d, w, f, fun: true }); break; } } });
+    const nPlain = Math.round(items.length * .7); for (let i = 0; i < nPlain; i++) items.push({ d: R(14, 38) * k });
+    const area = items.reduce((a, o) => a + o.d * o.d, 0);
+    Tw = Math.max(W * 1.2, area / (H * .62));
+    const placed = [], gap = (a, b) => Math.max(5, .06 * Math.max(a, b)) + 14 * k;
+    const dist = (x1, y1, x2, y2) => { let dx = Math.abs(x1 - x2); dx = Math.min(dx, Tw - dx); return Math.hypot(dx, y1 - y2); };   // the tile wraps around
+    items.sort((a, b) => b.d - a.d);
+    for (const o of items) { for (let n = 0; n < 3000; n++) { const x = R(0, Tw), y = R(o.d / 2 + AY + 6, H - o.d / 2 - AY - 6);
+        if (placed.every(q => dist(x, y, q.x, q.y) >= o.d / 2 + q.d / 2 + gap(o.d, q.d))) { o.x = x; o.y = y; placed.push(o); break; } } }
+    const tile = document.createElement('div'); tile.className = 'tile'; tile.style.width = Tw + 'px';
+    placed.forEach(o => { for (const shift of [0, -Tw, Tw]) {   // a dot over the seam also appears on the other side
+        const left = o.x - o.d / 2 + shift; if (left > Tw || left + o.d < 0) continue;
+        const el = document.createElement('div'); el.className = 'rd';
+        el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${AY.toFixed(1)}px;--bp:-${((((o.x / Tw) * 3) % 1) * 6).toFixed(2)}s;--in:${R(0, .9).toFixed(2)}s`;
+        if (!o.col) { o.col = pickCol(); o.tc = textCol(o.col); o.br = `${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()}`; o.bd = R(0, 2.8).toFixed(2); }
+        const sc = document.createElement('div'); sc.className = 'rs';
+        const b = document.createElement('div'); b.className = 'rb'; b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s`;
+        if (o.w) { const t = document.createElement('span'); t.className = 'w' + (o.fun ? ' fun' : ''); t.style.setProperty('--fs', o.f.fs + 'px');
+          o.f.lines.forEach(l => { const sp = document.createElement('span'); sp.textContent = l; t.append(sp); }); b.append(t); }
+        sc.append(b); el.append(sc); tile.append(el); } });
+    track = document.createElement('div'); track.className = 'track';
+    const copies = Math.ceil(W / Tw) + 1; track.append(tile); for (let i = 0; i < copies; i++) track.append(tile.cloneNode(true));
+    river.append(track); off = R(0, Tw); place();
+  };
+  const place = () => { if (track) track.style.transform = `translateX(${((off % Tw) - Tw).toFixed(1)}px)`; };
+  const loop = now => { if (!visible) { last = 0; return; }
+    const dt = last ? Math.min(100, now - last) / 1000 : 0; last = now;
+    const dy = scrollY - lastY; lastY = scrollY;
+    boost = boost * Math.pow(.04, dt) + Math.abs(dy) * 2.2;   // scrolling pushes the river along, then it eases back to its slow drift
+    off += (22 + boost) * dt; place(); requestAnimationFrame(loop); };
+  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on');
+    if (v && !visible && !still) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '80px 0px' }).observe(river);
+  addEventListener('resize', () => { if (Math.abs(river.clientWidth - builtW) > 40) build(); });
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(build);
+})();
+</script>
+<script>
+/* the rabbit hole at the end of the page (styles above) */
+(() => {
+  const box = document.getElementById('rabbit'); if (!box) return;
+  box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Things we love');
   const hold = document.createElement('div'); hold.className = 'bub-hold';
   const band = document.createElement('div'); band.className = 'bub'; hold.append(band); box.append(hold);
   const ROWS = [
@@ -1999,21 +2096,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (!still) { clock += dt / 1000; zl = p * 2.3 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
       const dy = first ? 0 : scrollY - lastY; lastY = scrollY;
       const target = Math.max(-18, Math.min(18, -dy * 1.1)); vel = (vel + (target - sv) * .09) * .78; sv += vel; }
-    if (p >= .97) passed = true;
-    band.style.opacity = still ? '' : Math.max(0, Math.min(1, (1 - p) / .12)).toFixed(3);   // at the end the bubbles simply fade away
-    tick(); spawn(still || passed ? 0 : Math.ceil(3 * W * H / (1280 * 800)));   // bigger screens fill faster
+    tick(); spawn(still ? 0 : Math.ceil(3 * W * H / (1280 * 800)));   // bigger screens fill faster
     requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '100px 0px' }).observe(band);
-  // after one full trip through, the section quietly goes away, so the page is easy to scroll past: once it is out of
-  // sight above you, it collapses and the page is moved by the same amount, so nothing you are looking at jumps
-  let passed = false, gone = false;
-  addEventListener('scroll', () => { if (!passed || gone || still) return;
-    const r = box.getBoundingClientRect(); if (r.bottom > -40) return;
-    gone = true; visible = false; const de = document.documentElement, ref = box.nextElementSibling, t0 = ref.getBoundingClientRect().top;
-    de.style.overflowAnchor = 'none';   // do the correction ourselves, the same way in every browser
-    box.hidden = true; parts.forEach(q => q.el.remove()); parts = [];
-    const t1 = ref.getBoundingClientRect().top; window.scrollTo({ top: scrollY + (t1 - t0), behavior: 'instant' });
-    requestAnimationFrame(() => { de.style.overflowAnchor = ''; }); }, { passive: true });
   let bw = 0; addEventListener('resize', () => { if (Math.abs(band.clientWidth - bw) > 40 || Math.abs(band.clientHeight - H) > 200) { bw = band.clientWidth; build(); } else { W = band.clientWidth; H = band.clientHeight; } });
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { bw = band.clientWidth; build(); });
 })();
