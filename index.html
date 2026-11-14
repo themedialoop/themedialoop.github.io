@@ -479,12 +479,12 @@ button,input,select,textarea,optgroup{font-family:inherit}
 /* orange polka dots behind the resource cards. A dense field of organic dots pops in as you scroll down into the stack, and
    shrinks away, bottom to top, as the last card comes up. They only ever arrive on the way down: once gone they stay gone
    while you scroll back up, and come back only after you have scrolled above the section and down again.
-   Their movement is their own: a soft jelly wobble (squash, stretch and a little tilt), unlike the slow swell of the other dots. */
+   Their movement is their own: a quicker, gentle swell in place (about 5% every few seconds), livelier than the slow breathe of the other dots. */
 #resDots{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 #resDots i{position:absolute;width:var(--d);height:var(--d);transform:scale(0);transition:transform .32s cubic-bezier(.55,0,.9,.4) var(--out,0s)}
 #resDots.on i:not(.clip){transform:scale(1);transition:transform .55s cubic-bezier(.3,1.6,.5,1) var(--in,0s)}
-#resDots i::before{content:"";position:absolute;inset:0;background:#e0773a;border-radius:var(--br);animation:resJelly var(--jt,3.4s) ease-in-out var(--jd,0s) infinite alternate}
-@keyframes resJelly{0%{transform:rotate(calc(var(--tw) * -1)) scale(1.05,.95)}50%{transform:rotate(0deg) scale(.98,1.02)}100%{transform:rotate(var(--tw)) scale(.95,1.05)}}
+#resDots i::before{content:"";position:absolute;inset:0;background:#e0773a;border-radius:var(--br);transform:rotate(var(--tw));animation:resSwell var(--jt,2.8s) ease-in-out var(--jd,0s) infinite alternate}
+@keyframes resSwell{0%{transform:rotate(var(--tw)) scale(1)}100%{transform:rotate(var(--tw)) scale(1.05)}}
 @media (prefers-reduced-motion:reduce){#resDots i,#resDots.on i:not(.clip){transition:none}#resDots i::before{animation:none}}
 /* the big go-dot: the button becomes a large organic dot that bleeds off the bottom-right corner, with the call to action inside.
    The dot breathes slowly in place; the words inside stay still. Nothing reacts to the cursor beyond the card's usual lift. */
@@ -2266,7 +2266,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const frag = document.createDocumentFragment();
     dots.forEach(d => { const el = d.el = document.createElement('i');
       el.style.cssText = `left:${(d.x - d.r).toFixed(1)}px;top:${(d.y - d.r).toFixed(1)}px;--d:${(d.r * 2).toFixed(1)}px;--br:${pc()} ${pc()} ${pc()} ${pc()}/${pc()} ${pc()} ${pc()} ${pc()};` +
-        `--in:${R(0, .7).toFixed(2)}s;--out:${((1 - d.y / innerHeight) * .55 + R(0, .12)).toFixed(2)}s;--jt:${R(2.6, 4.4).toFixed(2)}s;--jd:-${R(0, 4).toFixed(2)}s;--tw:${R(3, 7).toFixed(1)}deg`;
+        `--in:${R(0, .7).toFixed(2)}s;--out:${((1 - d.y / innerHeight) * .55 + R(0, .12)).toFixed(2)}s;--jt:2.8s;--jd:-${R(0, 2.8).toFixed(2)}s;--tw:${Math.round(R(0, 360))}deg`;
       frag.appendChild(el); });
     layer.appendChild(frag); measure();
   };
