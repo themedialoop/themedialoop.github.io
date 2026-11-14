@@ -1871,8 +1871,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
    you go. Everything drifts on one soft breeze and lags a little behind your scroll. Word bubbles pop before they reach an
    edge, so they are always whole; small dots may float off it. Dots never touch. Tap a word to swap it. */
 .marquee.hm-marq{height:auto !important;display:block;padding:0;overflow:visible}
-.bub-hold{position:relative;height:calc(100vh + 220vh);height:calc(100svh + 220svh)}
-.bub{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+.bub-hold{position:relative;height:calc(100vh + 220vh);height:calc(100dvh + 220svh)}
+.marquee.hm-marq{margin-inline:0;width:100vw;margin-left:calc(50% - 50vw)}   /* full bleed on every screen */
+.bub{position:sticky;top:0;width:100%;height:100vh;height:100dvh;overflow:hidden}
 .bub .dot{position:absolute;left:0;top:0;transform-origin:50% 50%}
 .bub .sc{width:100%;height:100%;transform:scale(0);transition:transform .38s cubic-bezier(.5,0,.9,.5)}
 .bub .dot.on .sc{transform:scale(1);transition:transform .7s cubic-bezier(.3,1.5,.5,1)}
@@ -1913,7 +1914,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mctx = document.createElement('canvas').getContext('2d');
   const fit = (word, d, fun) => {   // largest size at which the word wraps into the dot in up to three lines
-    for (let fs = 22; fs >= (innerWidth < 700 ? 12 : 13); fs--) {
+    for (let fs = Math.round(22 * Math.max(1, k)); fs >= (k < .7 ? 12 : 13); fs--) {
       mctx.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif';
       const maxw = d * .74, lines = []; let cur = '', ok = true;
       for (const w of word.split(' ')) { const t = cur ? cur + ' ' + w : w;
@@ -1961,13 +1962,13 @@ button,input,select,textarea,optgroup{font-family:inherit}
     setTimeout(() => { const prev = p.word && p.word.w; setWord(p, prev); p.el.classList.add('on'); p.busy = false; }, 380); };
   const coverage = () => parts.reduce((a, p) => p.dead ? a : a + Math.pow(screen(p).d, 2) * .785, 0) / (W * H);
   const spawn = budget => {   // words come first: keep plenty of them up, then fill what is left with plain dots, then dust
-    const words = parts.filter(p => !p.dead && p.word).length, want = W < 700 ? 13 : 18;
-    for (let n = 0, made = 0; n < 160 && words + made < want && made < 2; n++) {
+    const words = parts.filter(p => !p.dead && p.word).length, want = Math.round(Math.min(30, Math.max(11, 18 * (W * H / (1280 * 800)) / (k * k))));
+    for (let n = 0, made = 0; n < 160 && words + made < want && made < Math.ceil(2 * Math.sqrt(W * H / (1280 * 800))); n++) {
       const res = Math.random() < .72, d = (res ? R(96, 134) : R(62, 88)) * k, m = 18 * k, x = R(0, W), y = R(0, H);
       if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue;
       const p = make(x, y, d, res ? 'res' : 'fun'); if (!p.word) p.kind = 'plain'; else made++;
     }
-    const target = (W < 700 ? .2 : .24) + .3 * fill, wordsNow = parts.filter(p => !p.dead && p.word).length;
+    const target = (k < .7 ? .2 : .24) + .3 * fill, wordsNow = parts.filter(p => !p.dead && p.word).length;
     for (let n = 0; n < budget * 10 && budget > 0; n++) {
       if (coverage() > target) return;
       if (wordsNow < want * .8) return;   // while words are short, nothing else fills in, so word bubbles still find room
@@ -1988,7 +1989,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const build = () => {
     parts.forEach(p => p.el.remove()); parts = []; shown = new Set();
     W = band.clientWidth; H = band.clientHeight; if (!W || !H) return;
-    k = W < 700 ? .74 : Math.min(1.15, Math.max(.8, W / 1100));
+    k = Math.min(1.6, Math.max(.62, Math.sqrt(W * H / (1280 * 800))));   // dot sizes follow the screen, phone to wall display
     zl = progress() * 2.3; fill = still ? .6 : 0;
     for (let i = 0; i < 30; i++) spawn(1); spawn(400); tick();
   };
@@ -1998,10 +1999,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (!still) { clock += dt / 1000; zl = p * 2.3 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
       const dy = first ? 0 : scrollY - lastY; lastY = scrollY;
       const target = Math.max(-18, Math.min(18, -dy * 1.1)); vel = (vel + (target - sv) * .09) * .78; sv += vel; }
-    tick(); spawn(still ? 0 : 3);
+    tick(); spawn(still ? 0 : Math.ceil(3 * W * H / (1280 * 800)));   // bigger screens fill faster
     requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '100px 0px' }).observe(band);
-  let bw = 0; addEventListener('resize', () => { if (Math.abs(band.clientWidth - bw) > 40 || Math.abs(band.clientHeight - H) > 160) { bw = band.clientWidth; build(); } });
+  let bw = 0; addEventListener('resize', () => { if (Math.abs(band.clientWidth - bw) > 40 || Math.abs(band.clientHeight - H) > 200) { bw = band.clientWidth; build(); } else { W = band.clientWidth; H = band.clientHeight; } });
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { bw = band.clientWidth; build(); });
 })();
 </script>
