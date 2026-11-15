@@ -1908,7 +1908,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .bub .w{display:block;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
 .bub .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
 .bub .w span{display:block}
-.bub .fly{position:absolute;left:0;top:0;height:auto;pointer-events:none;z-index:2;user-select:none}   /* the medialoop logo, flying about on its own */
+.bub .fly{position:absolute;left:0;top:0;height:auto;max-width:none;pointer-events:none;z-index:2;user-select:none;transform-origin:50% 50%}   /* the medialoop logo, zooming past like the dots */
 .bub .blob.shape{background:none;animation:none}
 .bub .blob.shape svg{width:100%;height:100%;overflow:visible;rotate:var(--r0);animation:shSpin var(--sp,20s) linear infinite}   /* swirls, squiggles, stars and petals that turn slowly */
 @keyframes shSpin{to{rotate:calc(var(--r0) + 360deg)}}
@@ -1995,8 +1995,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const loop = now => { if (!visible) { last = 0; return; }
     const dt = last ? Math.min(100, now - last) / 1000 : 0; last = now;
     const dy = scrollY - lastY; lastY = scrollY;
-    boost = boost * Math.pow(.04, dt) + Math.abs(dy) * 2.2;   // scrolling pushes the river along, then it eases back to its slow drift
-    off += (22 + boost) * dt; place(); requestAnimationFrame(loop); };
+    const sc = Math.min(1, Math.max(.4, innerWidth / 1280));   // on a phone the river keeps to a phone-sized pace
+    boost = Math.min(260 * sc, boost * Math.pow(.04, dt) + Math.abs(dy) * 1.5 * sc);   // scrolling pushes the river along, then it eases back to its slow drift
+    off += (22 * sc + boost) * dt; place(); requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on');
     if (v && !visible && !still) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '80px 0px' }).observe(river);
   addEventListener('resize', () => { if (Math.abs(river.clientWidth - builtW) > 40) build(); });
@@ -2056,7 +2057,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     }
     return null;
   };
-  let fly = null, prog = 0, W = 0, H = 0, k = 1, parts = [], shown = new Set(), zl = 0, clock = 0, fill = 0, sv = 0, vel = 0, lastY = scrollY, last = 0, visible = false;
+  let marks = [], nextMark = 0, prog = 0, W = 0, H = 0, k = 1, parts = [], shown = new Set(), zl = 0, clock = 0, fill = 0, sv = 0, vel = 0, lastY = scrollY, last = 0, visible = false;
   const Z = () => Math.exp(zl);
   // each dot lives in "world" space around the centre; the screen is that world, magnified by the zoom
   const screen = p => { const z = Z(), A = 7 * k, t = clock;
@@ -2118,11 +2119,20 @@ button,input,select,textarea,optgroup{font-family:inherit}
       make(x, y, d, dust ? 'dust' : 'plain'); budget--;
     }
   };
-  const flyTo = () => { if (!fly) return; const fw = fly.offsetWidth, fh = fw * 1185 / 4278, t = clock * .16 + prog * 9;
-    const x = (W - fw) / 2 + (W - fw) / 2 * Math.sin(t * 1.0 + .4) * Math.cos(t * .37), y = (H - fh) / 2 + (H - fh) / 2 * .9 * Math.sin(t * 1.43 + 1.1);
-    const bank = 9 * Math.cos(t * 1.0 + .4) + 5 * Math.sin(t * .61);
-    fly.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) rotate(${bank.toFixed(2)}deg)`; };
-  const tick = () => { flyTo();
+  // the medialoop logo lives in the field too: it appears small near the middle at a dozen points on the way down,
+  // then grows and sails off the screen as you sink, like everything else
+  const MARK_AT = [...Array(12)].map((_, i) => .03 + i * .08);
+  const addMark = () => { const z = Z(), w0 = R(.12, .2) * Math.min(W, 900), a = R(0, Math.PI * 2), rr = R(.04, .16) * Math.min(W, H);
+    const x = W / 2 + Math.cos(a) * rr, y = H / 2 + Math.sin(a) * rr, B = Math.max(W, H) * 1.6;
+    const el = document.createElement('img'); el.className = 'fly'; el.src = 'assets/medialoop-wordmark.svg'; el.alt = ''; el.setAttribute('aria-hidden', 'true');
+    el.style.width = B.toFixed(0) + 'px'; el.style.opacity = '0'; el.style.transition = 'opacity .5s'; band.append(el);
+    requestAnimationFrame(() => { el.style.opacity = '1'; });
+    marks.push({ el, B, wx: (x - W / 2) / z, wy: (y - H / 2) / z, ww: w0 / z, tilt: R(-14, 14), spin: R(-6, 6) }); };
+  const moveMarks = () => { const z = Z();
+    marks = marks.filter(m => { const w = m.ww * z, x = W / 2 + m.wx * z, y = H / 2 + m.wy * z, h = w * 1185 / 4278;
+      if (w < 3 || x - w / 2 > W + 40 || x + w / 2 < -40 || y - h / 2 > H + 40 || y + h / 2 < -40) { m.el.remove(); return false; }
+      m.el.style.transform = `translate(${(x - m.B / 2).toFixed(1)}px,${(y - m.B * 1185 / 4278 / 2).toFixed(1)}px) scale(${(w / m.B).toFixed(4)}) rotate(${(m.tilt + m.spin * clock * .1).toFixed(2)}deg)`; return true; }); };
+  const tick = () => { moveMarks();
     for (const p of parts) { if (p.dead) continue; const o = screen(p);
       p.el.style.transform = `translate(${(o.x - p.B / 2).toFixed(1)}px,${(o.y - p.B / 2).toFixed(1)}px) scale(${(o.d / p.B).toFixed(4)})`;
       if (p.logo && prog < .74) { pop(p); continue; }   // scrolling back up, the shapes go
@@ -2135,8 +2145,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     parts.forEach(p => p.el.remove()); parts = []; shown = new Set();
     W = band.clientWidth; H = band.clientHeight; if (!W || !H) return;
     k = Math.min(1.6, Math.max(.62, Math.sqrt(W * H / (1280 * 800))));   // dot sizes follow the screen, phone to wall display
-    if (!fly) { fly = document.createElement('img'); fly.className = 'fly'; fly.src = 'assets/medialoop-wordmark.svg'; fly.alt = ''; fly.setAttribute('aria-hidden', 'true'); }
-    fly.style.width = Math.min(W * .46, 520).toFixed(0) + 'px'; band.append(fly);
+    marks.forEach(m => m.el.remove()); marks = []; nextMark = 0;
     zl = progress() * 2.3; fill = still ? .6 : 0;
     for (let i = 0; i < 30; i++) spawn(1); spawn(400); tick();
   };
@@ -2154,6 +2163,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (warping) { clock += dt / 1000; zl += dt / 1000 * 2.2; tick(); requestAnimationFrame(loop); return; }   // falling: the field rushes outward
     const p = progress(); prog = p; const x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
     if (!still && p >= .985) { warp(); requestAnimationFrame(loop); return; }
+    while (nextMark < MARK_AT.length && p >= MARK_AT[nextMark]) { if (p - MARK_AT[nextMark] < .04) addMark(); nextMark++; }
+    while (nextMark > 0 && p < MARK_AT[nextMark - 1] - .02) nextMark--;   // scrolling back up re-arms them
     if (!still) { clock += dt / 1000; zl = p * 5.6 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
       const dy = first ? 0 : scrollY - lastY; lastY = scrollY;
       const target = Math.max(-26, Math.min(26, -dy * 1.6)); vel = (vel + (target - sv) * .2) * .68; sv += vel; }
