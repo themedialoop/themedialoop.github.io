@@ -1878,12 +1878,15 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .river .rd{position:absolute;animation:rvBob 6s ease-in-out var(--bp,0s) infinite alternate}
 .river .rs{width:100%;height:100%;transform:scale(0);transition:transform .7s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
 .river.on .rs{transform:scale(1)}
-.river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--c);color:var(--tc);border-radius:var(--br);animation:bubSwell 2.8s ease-in-out var(--bd,0s) infinite alternate}
+.river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--c);color:var(--tc);border-radius:var(--br);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace */
+@keyframes rvGrow{0%{transform:scale(var(--g0,.94))}100%{transform:scale(var(--g1,1.07))}}
+.river .rd.hv .rs{animation:rvHop .9s cubic-bezier(.3,1.4,.5,1)}   /* touch or hover a bubble and it hops and jiggles */
+@keyframes rvHop{0%{translate:0 0;rotate:0deg}25%{translate:0 -16px;rotate:-8deg}50%{translate:0 2px;rotate:6deg}70%{translate:0 -5px;rotate:-3deg}100%{translate:0 0;rotate:0deg}}
 .river .w{display:block;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
 .river .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
 .river .w span{display:block}
 .river-words{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.river .rd.pp .rb{animation:bubSwell 2.8s ease-in-out var(--bd,0s) infinite alternate,rvPop var(--pd,11s) ease-in-out var(--pdd,0s) infinite}   /* a few little dots pop out and back now and then */
+.river .rd.pp .rb{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,rvPop var(--pd,11s) ease-in-out var(--pdd,0s) infinite}   /* a few little dots pop out and back now and then */
 @keyframes rvPop{0%,80%{scale:1}85%,90%{scale:0}96%{scale:1.18}100%{scale:1}}
 @keyframes rvBob{0%{translate:0 var(--ay)}100%{translate:0 calc(var(--ay) * -1)}}
 @media (prefers-reduced-motion:reduce){.river .rd,.river .rb,.river .rd.pp .rb{animation:none}.river{rotate:-3.5deg}.river .rs{transition:none}}
@@ -1980,13 +1983,16 @@ button,input,select,textarea,optgroup{font-family:inherit}
         el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${AY.toFixed(1)}px;--bp:-${((((o.x / Tw) * 3) % 1) * 6).toFixed(2)}s;--in:${R(0, .9).toFixed(2)}s`;
         if (!o.col) { o.col = pickCol(); o.tc = textCol(o.col); o.br = `${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()}`; o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
-        const b = document.createElement('div'); b.className = 'rb'; b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s;--pd:${o.pd}s;--pdd:-${o.pdd}s`;
+        if (!o.gd) { o.gd = R(3, 8).toFixed(2); o.g0 = R(.9, .96).toFixed(3); o.g1 = R(1.04, 1.09).toFixed(3); }
+        const b = document.createElement('div'); b.className = 'rb'; b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s;--pd:${o.pd}s;--pdd:-${o.pdd}s;--gd:${o.gd}s;--g0:${o.g0};--g1:${o.g1}`;
         if (o.w) { const t = document.createElement('span'); t.className = 'w' + (o.fun ? ' fun' : ''); t.style.setProperty('--fs', o.f.fs + 'px');
           o.f.lines.forEach(l => { const sp = document.createElement('span'); sp.textContent = l; t.append(sp); }); b.append(t); }
         sc.append(b); el.append(sc); tile.append(el); } });
     track = document.createElement('div'); track.className = 'track';
     const copies = Math.ceil(W / Tw) + 1; track.append(tile); for (let i = 0; i < copies; i++) track.append(tile.cloneNode(true));
     river.append(track); off = R(0, Tw); place();
+    const hop = e => { const d = e.target.closest && e.target.closest('.rd'); if (!d || d.classList.contains('hv') || still) return; d.classList.add('hv'); setTimeout(() => d.classList.remove('hv'), 950); };
+    track.addEventListener('pointerover', hop); track.addEventListener('pointerdown', hop);
   };
   const place = () => { if (track) track.style.transform = `translateX(${((off % Tw) - Tw).toFixed(1)}px)`; };
   const loop = now => { if (!visible) { last = 0; return; }
@@ -2022,17 +2028,25 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const svgw = (c, inner) => `<svg viewBox="0 0 100 100" aria-hidden="true">${inner}</svg>`;
   const polar = (f, n = 90) => { let d = ''; for (let i = 0; i <= n; i++) { const a = i / n * Math.PI * 2, r = f(a); d += (i ? 'L' : 'M') + (50 + Math.cos(a) * r).toFixed(1) + ' ' + (50 + Math.sin(a) * r).toFixed(1); } return d + 'Z'; };
+  // cut-paper shapes after Matisse's late cut-outs: stars, waves, crescents, swirls and bulbous forms, with the slightly
+  // wobbly edges of something cut by hand (no leaves, seaweed or flowers)
+  const jit = (pts, j) => pts.map(([x, y]) => [x + R(-j, j), y + R(-j, j)]);
+  const smooth = pts => { let d = `M${((pts[0][0] + pts[1][0]) / 2).toFixed(1)} ${((pts[0][1] + pts[1][1]) / 2).toFixed(1)}`;
+    for (let i = 1; i <= pts.length; i++) { const p = pts[i % pts.length], q = pts[(i + 1) % pts.length]; d += `Q${p[0].toFixed(1)} ${p[1].toFixed(1)} ${((p[0] + q[0]) / 2).toFixed(1)} ${((p[1] + q[1]) / 2).toFixed(1)}`; } return d + 'Z'; };
+  const sharp = pts => 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L') + 'Z';
+  const ring = (n, f) => [...Array(n)].map((_, i) => { const a = i / n * Math.PI * 2 - Math.PI / 2, r = f(i, a); return [50 + Math.cos(a) * r, 50 + Math.sin(a) * r]; });
   const SHAPES = [
-    c => { let d = ''; for (let i = 0; i <= 120; i++) { const a = i / 120 * Math.PI * 5.2, r = 4 + i / 120 * 38; d += (i ? 'L' : 'M') + (50 + Math.cos(a) * r).toFixed(1) + ' ' + (50 + Math.sin(a) * r).toFixed(1); }
-      return svgw(c, `<path d="${d}" fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round"/>`); },   // a swirl
-    c => svgw(c, `<path d="M10 50 C22 22 34 22 42 50 S62 78 72 50 S86 28 90 40" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round"/>`),   // a squiggle
-    c => svgw(c, `<path d="${polar(a => 31 + 15 * Math.sin(5 * a + .3) + 2 * Math.sin(3 * a))}" fill="${c}"/>`),   // a petal flower
-    c => svgw(c, `<path d="${polar(a => 28 + 18 * Math.pow(Math.abs(Math.cos(4 * a)), 3) + 1.5 * Math.sin(5 * a))}" fill="${c}"/>`),   // a soft star
-    c => svgw(c, `<path d="M62 12 C34 16 18 36 20 56 C22 76 42 90 64 86 C46 80 36 66 37 50 C38 34 48 20 62 12Z" fill="${c}"/>`),   // a crescent
-    c => svgw(c, `<path d="M10 62 L24 38 L38 62 L52 38 L66 62 L80 38 L90 52" fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>`),   // a zigzag
-    c => svgw(c, `<path d="${polar(a => 38 + 3 * Math.sin(3 * a + 1) + 2 * Math.sin(5 * a))}" fill="none" stroke="${c}" stroke-width="10"/>`),   // a wobbly ring
-    c => svgw(c, `<path d="M50 14 C58 30 70 42 86 50 C70 58 58 70 50 86 C42 70 30 58 14 50 C30 42 42 30 50 14Z" fill="${c}"/>`)   // a sparkle
+    c => svgw(c, `<path d="${sharp(jit(ring(10, i => i % 2 ? R(14, 19) : R(40, 47)), 2.2))}" fill="${c}"/>`),   // a jagged cut-paper star (Icarus, Jazz)
+    c => svgw(c, `<path d="${sharp(jit(ring(16, i => i % 2 ? R(26, 30) : R(43, 47)), 1.8))}" fill="${c}"/>`),   // a many-pointed burst
+    c => svgw(c, `<path d="M64 8 C30 12 12 36 14 58 C16 80 40 94 66 90 C44 82 32 68 33 50 C34 32 46 18 64 8Z" fill="${c}"/>`),   // a crescent
+    c => svgw(c, `<path d="${smooth(jit(ring(7, () => R(30, 46)), 3))}" fill="${c}"/>`),   // a bulbous, lumpy form
+    c => svgw(c, `<path d="M6 40 Q18 22 30 40 T54 40 T78 40 T96 38 L96 60 Q84 74 72 60 T48 60 T24 60 T6 62 Z" fill="${c}"/>`),   // a wavy ribbon
+    c => { let d = ''; const w = 9; for (let i = 0; i <= 80; i++) { const a = i / 80 * Math.PI * 3.2, rr = 6 + i / 80 * 36; d += (i ? 'L' : 'M') + (50 + Math.cos(a) * rr).toFixed(1) + ' ' + (50 + Math.sin(a) * rr).toFixed(1); }
+      return svgw(c, `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`); },   // a fat cut-paper spiral
+    c => svgw(c, `<path d="${sharp(jit([[8, 66], [22, 30], [36, 66], [50, 30], [64, 66], [78, 30], [92, 66], [92, 80], [78, 46], [64, 82], [50, 46], [36, 82], [22, 46], [8, 82]], 1.5))}" fill="${c}"/>`),   // a zigzag strip
+    c => svgw(c, `<path d="${smooth(jit([[50, 6], [74, 30], [90, 58], [74, 88], [50, 94], [26, 88], [10, 58], [26, 30]], 3))}" fill="${c}"/>`)   // a fat teardrop
   ];
+
   const mctx = document.createElement('canvas').getContext('2d');
   const fit = (word, d, fun) => {   // largest size at which the word wraps into the dot in up to three lines
     for (let fs = Math.round(22 * Math.max(1, k)); fs >= (k < .7 ? 12 : 13); fs--) {
@@ -2045,7 +2059,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     }
     return null;
   };
-  let W = 0, H = 0, k = 1, parts = [], shown = new Set(), zl = 0, clock = 0, fill = 0, sv = 0, vel = 0, lastY = scrollY, last = 0, visible = false;
+  let prog = 0, W = 0, H = 0, k = 1, parts = [], shown = new Set(), zl = 0, clock = 0, fill = 0, sv = 0, vel = 0, lastY = scrollY, last = 0, visible = false;
   const Z = () => Math.exp(zl);
   // each dot lives in "world" space around the centre; the screen is that world, magnified by the zoom
   const screen = p => { const z = Z(), A = 7 * k, t = clock;
@@ -2087,7 +2101,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const coverage = () => parts.reduce((a, p) => p.dead ? a : a + Math.pow(screen(p).d, 2) * .785, 0) / (W * H);
   const spawn = budget => {   // words come first: keep plenty of them up, then fill what is left with plain dots, then dust
     const shapes = parts.filter(p => !p.dead && p.logo).length;   // a sprinkle of fun shapes and swirls among the dots
-    if (shapes < Math.max(6, Math.round(9 * W * H / (1280 * 800)))) for (let n = 0; n < 60; n++) { const d = R(44, 104) * k, m = 10 * k, x = R(0, W), y = R(0, H);
+    const deep = Math.max(0, (prog - .78) / .2);   // the shapes only turn up near the very end
+    if (shapes < Math.round(deep * Math.max(6, 10 * W * H / (1280 * 800)))) for (let n = 0; n < 60; n++) { const d = R(44, 104) * k, m = 10 * k, x = R(0, W), y = R(0, H);
       if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue; make(x, y, d, 'shape'); break; }
     const words = parts.filter(p => !p.dead && p.word).length, want = Math.round(Math.min(30, Math.max(11, 18 * (W * H / (1280 * 800)) / (k * k))));
     for (let n = 0, made = 0; n < 160 && words + made < want && made < Math.ceil(2 * Math.sqrt(W * H / (1280 * 800))); n++) {
@@ -2108,6 +2123,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const tick = () => {
     for (const p of parts) { if (p.dead) continue; const o = screen(p);
       p.el.style.transform = `translate(${(o.x - p.base / 2).toFixed(1)}px,${(o.y - p.base / 2).toFixed(1)}px) scale(${(o.d / p.base).toFixed(4)})`;
+      if (p.logo && prog < .74) { pop(p); continue; }   // scrolling back up, the shapes go
       const wordy = !!p.word || !!p.logo, edge = wordy ? 14 * k : -o.d * .3;
       if (o.d < 2.5 || (wordy && (o.x - o.d / 2 < edge || o.x + o.d / 2 > W - edge || o.y - o.d / 2 < edge || o.y + o.d / 2 > H - edge)) || o.d > (wordy ? Math.min(W, H) * .42 : 120 * k) || o.x + o.d / 2 < 0 || o.x - o.d / 2 > W || o.y + o.d / 2 < 0 || o.y - o.d / 2 > H) pop(p);
       else if (p.word) p.blob.tabIndex = p.on ? 0 : -1; }
@@ -2131,7 +2147,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const loop = now => { if (!visible && !warping) { last = 0; sv = vel = 0; return; }
     const first = !last, dt = first ? 16 : Math.min(100, now - last); last = now;
     if (warping) { clock += dt / 1000; zl += dt / 1000 * 2.2; tick(); requestAnimationFrame(loop); return; }   // falling: the field rushes outward
-    const p = progress(), x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
+    const p = progress(); prog = p; const x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
     if (!still && p >= .985) { warp(); requestAnimationFrame(loop); return; }
     if (!still) { clock += dt / 1000; zl = p * 5.6 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
       const dy = first ? 0 : scrollY - lastY; lastY = scrollY;
