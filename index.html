@@ -1875,6 +1875,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .river .rs{width:100%;height:100%;transform:scale(0);transition:transform .7s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
 .river.on .rs{transform:scale(1)}
 .river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--c);color:var(--tc);border-radius:var(--br);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace */
+.river .rb.ring{background:transparent;box-shadow:inset 0 0 0 var(--rw,3px) var(--c)}   /* an open circle */
+.river{cursor:grab;touch-action:pan-y}.river.drag{cursor:grabbing}
 @keyframes rvGrow{0%{transform:scale(var(--g0,.94))}100%{transform:scale(var(--g1,1.07))}}
 .river .rd.hv .rs{animation:rvHop .9s cubic-bezier(.3,1.4,.5,1)}   /* touch or hover a bubble and it hops and jiggles */
 @keyframes rvHop{0%{translate:0 0;rotate:0deg}25%{translate:0 -16px;rotate:-8deg}50%{translate:0 2px;rotate:6deg}70%{translate:0 -5px;rotate:-3deg}100%{translate:0 0;rotate:0deg}}
@@ -1908,7 +1910,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .bub .w{display:block;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
 .bub .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
 .bub .w span{display:block}
-.bub .fly{position:absolute;left:0;top:0;height:auto;max-width:none;pointer-events:none;z-index:2;user-select:none;transform-origin:50% 50%}   /* the medialoop logo, zooming past like the dots */
+.bub .fly{position:absolute;left:0;top:0;max-width:none;pointer-events:none;z-index:2;user-select:none;transform-origin:50% 50%;-webkit-mask:url(assets/medialoop-wordmark.svg) center/contain no-repeat;mask:url(assets/medialoop-wordmark.svg) center/contain no-repeat}   /* the medialoop logo, zooming past like the dots */
 .bub .blob.shape{background:none;animation:none}
 .bub .blob.shape svg{width:100%;height:100%;overflow:visible;rotate:var(--r0);animation:shSpin var(--sp,20s) linear infinite}   /* swirls, squiggles, stars and petals that turn slowly */
 @keyframes shSpin{to{rotate:calc(var(--r0) + 360deg)}}
@@ -1981,7 +1983,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
         if (!o.col) { o.col = pickCol(); o.tc = textCol(o.col); o.br = `${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()}`; o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
         if (!o.gd) { o.gd = R(3, 8).toFixed(2); o.g0 = R(.9, .96).toFixed(3); o.g1 = R(1.04, 1.09).toFixed(3); }
-        const b = document.createElement('div'); b.className = 'rb'; b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s;--pd:${o.pd}s;--pdd:-${o.pdd}s;--gd:${o.gd}s;--g0:${o.g0};--g1:${o.g1}`;
+        if (o.ring === undefined) o.ring = !o.w && Math.random() < .3;
+        const b = document.createElement('div'); b.className = 'rb' + (o.ring ? ' ring' : ''); b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s;--pd:${o.pd}s;--pdd:-${o.pdd}s;--gd:${o.gd}s;--g0:${o.g0};--g1:${o.g1};--rw:${Math.max(2, o.d * .15).toFixed(1)}px`;
         if (o.w) { const t = document.createElement('span'); t.className = 'w' + (o.fun ? ' fun' : ''); t.style.setProperty('--fs', o.f.fs + 'px');
           o.f.lines.forEach(l => { const sp = document.createElement('span'); sp.textContent = l; t.append(sp); }); b.append(t); }
         sc.append(b); el.append(sc); tile.append(el); } });
@@ -1992,8 +1995,16 @@ button,input,select,textarea,optgroup{font-family:inherit}
     track.addEventListener('pointerover', hop); track.addEventListener('pointerdown', hop);
   };
   const place = () => { if (track) track.style.transform = `translateX(${((off % Tw) - Tw).toFixed(1)}px)`; };
+  let dragX = null, fling = 0, lastMove = 0, moveV = 0;
+  river.addEventListener('pointerdown', e => { if (e.button > 0) return; dragX = e.clientX; fling = 0; moveV = 0; lastMove = performance.now(); river.classList.add('drag'); try { river.setPointerCapture(e.pointerId); } catch (_) {} });
+  river.addEventListener('pointermove', e => { if (dragX == null) return; const dx = e.clientX - dragX, now = performance.now(); dragX = e.clientX;
+    off += dx; moveV = dx / Math.max(8, now - lastMove) * 1000; lastMove = now; place(); });
+  const endDrag = () => { if (dragX == null) return; dragX = null; river.classList.remove('drag'); fling = Math.max(-2500, Math.min(2500, moveV)); };
+  river.addEventListener('pointerup', endDrag); river.addEventListener('pointercancel', endDrag); river.addEventListener('lostpointercapture', endDrag);
   const loop = now => { if (!visible) { last = 0; return; }
     const dt = last ? Math.min(100, now - last) / 1000 : 0; last = now;
+    if (dragX != null) { requestAnimationFrame(loop); return; }   // while you hold it, the river is yours
+    off += fling * dt; fling *= Math.pow(.05, dt); if (Math.abs(fling) < 2) fling = 0;
     const dy = scrollY - lastY; lastY = scrollY;
     const sc = Math.min(1, Math.max(.4, innerWidth / 1280));   // on a phone the river keeps to a phone-sized pace
     boost = Math.min(260 * sc, boost * Math.pow(.04, dt) + Math.abs(dy) * 1.5 * sc);   // scrolling pushes the river along, then it eases back to its slow drift
@@ -2075,6 +2086,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const blob = p.blob = document.createElement(wordy ? 'button' : 'div'); blob.className = 'blob';
     blob.style.cssText = `--c:${COL[col]};--tc:${textCol(col)};--br:${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()};--bd:-${R(0, 2.8).toFixed(2)}s`;
     if (wordy) { blob.type = 'button'; blob.addEventListener('click', () => swap(p)); setWord(p); } else blob.setAttribute('aria-hidden', 'true');
+    if ((kind === 'plain' || kind === 'dust') && Math.random() < .28) { blob.style.background = 'transparent'; blob.style.boxShadow = `inset 0 0 0 ${Math.max(2, B * R(.1, .16)).toFixed(1)}px ${COL[col]}`; }   // an open circle
     if (kind === 'shape') { blob.classList.add('shape'); blob.innerHTML = SHAPES[Math.floor(Math.random() * SHAPES.length)](COL[col]);
       blob.style.setProperty('--sp', (R(14, 30) * (Math.random() < .5 ? 1 : -1)).toFixed(1) + 's'); blob.style.setProperty('--r0', R(0, 360).toFixed(0) + 'deg'); }
     sc.append(blob); el.append(sc); band.append(el); parts.push(p);
@@ -2122,12 +2134,19 @@ button,input,select,textarea,optgroup{font-family:inherit}
   // the medialoop logo lives in the field too: it appears small near the middle at a dozen points on the way down,
   // then grows and sails off the screen as you sink, like everything else
   const MARK_AT = [...Array(12)].map((_, i) => .03 + i * .08);
-  const addMark = () => { const z = Z(), w0 = R(.12, .2) * Math.min(W, 900), a = R(0, Math.PI * 2), rr = R(.04, .16) * Math.min(W, H);
-    const x = W / 2 + Math.cos(a) * rr, y = H / 2 + Math.sin(a) * rr, B = Math.max(W, H) * 1.6;
-    const el = document.createElement('img'); el.className = 'fly'; el.src = 'assets/medialoop-wordmark.svg'; el.alt = ''; el.setAttribute('aria-hidden', 'true');
-    el.style.width = B.toFixed(0) + 'px'; el.style.opacity = '0'; el.style.transition = 'opacity .5s'; band.append(el);
+  const MARK_COLS = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6'];
+  // logos never overlap one another: each takes a spot whose circle is clear of the others, and since the whole field grows
+  // evenly from the middle, two logos that start apart stay apart (their slow turn stays inside their own circle)
+  const addMark = () => { const z = Z(), w0 = R(.07, .14) * Math.min(W, 900); let x, y, ok = false;
+    for (let n = 0; n < 50 && !ok; n++) { const a = R(0, Math.PI * 2), rr = R(.03, .3) * Math.min(W, H); x = W / 2 + Math.cos(a) * rr; y = H / 2 + Math.sin(a) * rr;
+      ok = marks.every(m => { const w = m.ww * z; return Math.hypot(x - (W / 2 + m.wx * z), y - (H / 2 + m.wy * z)) > w0 / 2 + w / 2 + 12; }); }
+    if (!ok) return false; const B = Math.max(W, H) * 1.6;
+    const el = document.createElement('div'); el.className = 'fly'; el.setAttribute('aria-hidden', 'true');
+    el.style.width = B.toFixed(0) + 'px'; el.style.height = (B * 1185 / 4278).toFixed(0) + 'px'; el.style.background = MARK_COLS[Math.floor(Math.random() * MARK_COLS.length)];
+    el.style.opacity = '0'; el.style.transition = 'opacity .5s';
+    if (Math.random() < .5) { el.style.zIndex = '0'; band.prepend(el); } else band.append(el);   // some pass behind the dots, some in front
     requestAnimationFrame(() => { el.style.opacity = '1'; });
-    marks.push({ el, B, wx: (x - W / 2) / z, wy: (y - H / 2) / z, ww: w0 / z, tilt: R(-14, 14), spin: R(-6, 6) }); };
+    marks.push({ el, B, wx: (x - W / 2) / z, wy: (y - H / 2) / z, ww: w0 / z, tilt: R(-14, 14), spin: R(-6, 6) }); return true; };
   const moveMarks = () => { const z = Z();
     marks = marks.filter(m => { const w = m.ww * z, x = W / 2 + m.wx * z, y = H / 2 + m.wy * z, h = w * 1185 / 4278;
       if (w < 3 || x - w / 2 > W + 40 || x + w / 2 < -40 || y - h / 2 > H + 40 || y + h / 2 < -40) { m.el.remove(); return false; }
@@ -2163,7 +2182,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (warping) { clock += dt / 1000; zl += dt / 1000 * 2.2; tick(); requestAnimationFrame(loop); return; }   // falling: the field rushes outward
     const p = progress(); prog = p; const x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
     if (!still && p >= .985) { warp(); requestAnimationFrame(loop); return; }
-    while (nextMark < MARK_AT.length && p >= MARK_AT[nextMark]) { if (p - MARK_AT[nextMark] < .04) addMark(); nextMark++; }
+    while (nextMark < MARK_AT.length && p >= MARK_AT[nextMark]) { if (p - MARK_AT[nextMark] < .04 && !addMark()) break; nextMark++; }   // no room yet: try again next frame
     while (nextMark > 0 && p < MARK_AT[nextMark - 1] - .02) nextMark--;   // scrolling back up re-arms them
     if (!still) { clock += dt / 1000; zl = p * 5.6 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
       const dy = first ? 0 : scrollY - lastY; lastY = scrollY;
