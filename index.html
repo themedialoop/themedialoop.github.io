@@ -270,7 +270,7 @@ a.card{text-decoration:none}
 .ev-where{margin:0;font-size:13px;font-weight:500}
 
 /* footer */
-footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
+footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) clamp(80px,12vh,140px)}
 .contact{font-size:clamp(28px,3.4vw,48px);line-height:1.1;letter-spacing:-.02em;margin:0 0 24px;max-width:20ch;text-wrap:balance}
 .mail-note{margin:0 0 6px;font-size:var(--step-0);opacity:.75}
 .mail{display:inline-flex;align-items:center;gap:10px;font-size:var(--step-1);text-decoration:underline;text-decoration-color:var(--gold);text-decoration-thickness:2px;text-underline-offset:5px}
@@ -617,10 +617,6 @@ button,input,select,textarea,optgroup{font-family:inherit}
     <span class="ap-t">We are housed with the Department of Communication at the University of Illinois Chicago. Potential graduate students for PhD programs and Master's degrees are welcome to apply for the upcoming admissions cycle.</span>
     <span class="ap-go">More information</span>
   </a>
-  <div class="foot">
-    <img src="assets/medialoop-wordmark.svg" alt="medialoop">
-    <span>© <span id="yr">2026</span> medialoop</span>
-  </div>
 </footer>
 
 <div class="rabbit" id="rabbit"></div>
@@ -629,7 +625,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 <script>
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  document.getElementById('yr').textContent = new Date().getFullYear();
+  { const yr = document.getElementById('yr'); if (yr) yr.textContent = new Date().getFullYear(); }
   const top = document.getElementById('top');
 
   /* ---------- organic shapes: no two round things on the page are the same ---------- */
@@ -2068,8 +2064,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const free = (x, y, d) => parts.every(q => { if (q.dead) return true; const o = screen(q); return Math.hypot(x - o.x, y - o.y) >= d / 2 + o.d / 2 + Math.max(5, .05 * Math.max(d, o.d)) + 8 * k; });
   const make = (x, y, d, kind) => {
     const z = Z(), p = { wx: (x - W / 2) / z, wy: (y - H / 2) / z, ws: d / z, base: d, kind, zf: 1 - Math.min(1, d / (160 * k)) * .15, on: false, dead: false, word: null };
+    const wordy0 = kind === 'res' || kind === 'fun' || kind === 'shape', B = p.B = Math.max(d, wordy0 ? Math.min(W, H) * .44 : 124 * k);   // the largest it will ever be on screen
     const el = p.el = document.createElement('div'); el.className = 'dot' + (kind === 'dust' ? ' dust' : '');
-    el.style.width = el.style.height = d.toFixed(1) + 'px';
+    el.style.width = el.style.height = B.toFixed(1) + 'px'; p.ts = B / d;   // text and shapes are laid out at full size too
     const sc = document.createElement('div'); sc.className = 'sc';
     const col = pickCol(), wordy = kind === 'res' || kind === 'fun';
     if (kind === 'shape') p.logo = true;   // shapes stay whole, like the word bubbles
@@ -2089,7 +2086,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     p.word = null; p.blob.textContent = '';
     for (const w of pool) { const f = fit(w, p.base, p.kind === 'fun'); if (!f) continue;
       p.word = { w, f }; shown.add(w);
-      const el = document.createElement('span'); el.className = 'w' + (p.kind === 'fun' ? ' fun' : ''); el.style.setProperty('--fs', f.fs + 'px');
+      const el = document.createElement('span'); el.className = 'w' + (p.kind === 'fun' ? ' fun' : ''); el.style.setProperty('--fs', (f.fs * (p.ts || 1)).toFixed(1) + 'px');
       f.lines.forEach(l => { const sp = document.createElement('span'); sp.textContent = l; el.append(sp); });
       p.blob.append(el); p.blob.setAttribute('aria-label', w); return; }
     p.blob.setAttribute('aria-hidden', 'true'); p.blob.tabIndex = -1;
@@ -2122,7 +2119,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   };
   const tick = () => {
     for (const p of parts) { if (p.dead) continue; const o = screen(p);
-      p.el.style.transform = `translate(${(o.x - p.base / 2).toFixed(1)}px,${(o.y - p.base / 2).toFixed(1)}px) scale(${(o.d / p.base).toFixed(4)})`;
+      p.el.style.transform = `translate(${(o.x - p.B / 2).toFixed(1)}px,${(o.y - p.B / 2).toFixed(1)}px) scale(${(o.d / p.B).toFixed(4)})`;
       if (p.logo && prog < .74) { pop(p); continue; }   // scrolling back up, the shapes go
       const wordy = !!p.word || !!p.logo, edge = wordy ? 14 * k : -o.d * .3;
       if (o.d < 2.5 || (wordy && (o.x - o.d / 2 < edge || o.x + o.d / 2 > W - edge || o.y - o.d / 2 < edge || o.y + o.d / 2 > H - edge)) || o.d > (wordy ? Math.min(W, H) * .42 : 120 * k) || o.x + o.d / 2 < 0 || o.x - o.d / 2 > W || o.y + o.d / 2 < 0 || o.y - o.d / 2 > H) pop(p);
