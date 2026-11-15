@@ -2,8 +2,8 @@
 <html lang="en" class="intro" data-opener="eye">
 <head>
 <meta charset="utf-8">
-<script>try{if(sessionStorage.getItem("ml-replay")){try{history.scrollRestoration="manual"}catch(e){}scrollTo(0,0);addEventListener("pageshow",function(){scrollTo(0,0)});sessionStorage.removeItem("ml-replay");sessionStorage.removeItem("ml-opener-seen");sessionStorage.setItem("ml-replay-now","1");document.documentElement.style.background="#2c5494"}}catch(e){}</script>
-<script>try{if(sessionStorage.getItem("ml-replay-now")){sessionStorage.removeItem("ml-replay-now");addEventListener("load",function(){setTimeout(function(){document.documentElement.style.background=""},900)});throw 0}var r=document.referrer,same=false;try{same=!!r&&new URL(r).origin===location.origin}catch(e){}if(same||(location.hash&&location.hash.length>1))sessionStorage.setItem("ml-opener-seen","1");if(sessionStorage.getItem("ml-opener-seen"))document.documentElement.classList.remove("intro")}catch(e){}</script>
+<script>try{if(sessionStorage.getItem("ml-replay")){try{history.scrollRestoration="manual"}catch(e){}scrollTo(0,0);addEventListener("pageshow",function(){scrollTo(0,0)});sessionStorage.removeItem("ml-replay");sessionStorage.removeItem("ml-opener-seen");window.mlReplay=true}}catch(e){}</script>
+<script>try{if(window.mlReplay)throw 0;var r=document.referrer,same=false;try{same=!!r&&new URL(r).origin===location.origin}catch(e){}if(same||(location.hash&&location.hash.length>1))sessionStorage.setItem("ml-opener-seen","1");if(sessionStorage.getItem("ml-opener-seen"))document.documentElement.classList.remove("intro")}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>medialoop · A Boutique Research Collective at UIC</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1894,7 +1894,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .rabbit{display:block;padding:0;overflow:visible;position:relative}
 .bub-hold{position:relative;height:calc(100vh + 1000vh);height:calc(100lvh + 1000svh)}   /* the last thing on the page: a long way down (about ten seconds of scrolling) */
 .bub.warp{position:fixed;inset:0;z-index:9999}   /* for the trip back to the top */
-.bub .cover{position:absolute;left:50%;top:50%;background:#2c5494;border-radius:52% 48% 55% 45% / 46% 54% 47% 53%;transform:translate(-50%,-50%) scale(0);transition:transform 1.1s cubic-bezier(.65,0,.35,1)}
+.bub .cover{position:absolute;z-index:3;left:50%;top:50%;background:#2c5494;border-radius:52% 48% 55% 45% / 46% 54% 47% 53%;transform:translate(-50%,-50%) scale(0);transition:transform 1.1s cubic-bezier(.65,0,.35,1)}
 .rabbit{margin-inline:0;width:100vw;margin-left:calc(50% - 50vw)}   /* full bleed on every screen */
 .bub{position:sticky;top:0;width:100%;height:100vh;height:100lvh;overflow:hidden}   /* the large viewport: it reaches under a phone's toolbars, so the field always meets the bottom of the screen */
 .bub .dot{position:absolute;left:0;top:0;transform-origin:50% 50%}
@@ -1908,6 +1908,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .bub .w{display:block;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
 .bub .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
 .bub .w span{display:block}
+.bub .fly{position:absolute;left:0;top:0;height:auto;pointer-events:none;z-index:2;user-select:none}   /* the medialoop logo, flying about on its own */
 .bub .blob.shape{background:none;animation:none}
 .bub .blob.shape svg{width:100%;height:100%;overflow:visible;rotate:var(--r0);animation:shSpin var(--sp,20s) linear infinite}   /* swirls, squiggles, stars and petals that turn slowly */
 @keyframes shSpin{to{rotate:calc(var(--r0) + 360deg)}}
@@ -2055,7 +2056,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     }
     return null;
   };
-  let prog = 0, W = 0, H = 0, k = 1, parts = [], shown = new Set(), zl = 0, clock = 0, fill = 0, sv = 0, vel = 0, lastY = scrollY, last = 0, visible = false;
+  let fly = null, prog = 0, W = 0, H = 0, k = 1, parts = [], shown = new Set(), zl = 0, clock = 0, fill = 0, sv = 0, vel = 0, lastY = scrollY, last = 0, visible = false;
   const Z = () => Math.exp(zl);
   // each dot lives in "world" space around the centre; the screen is that world, magnified by the zoom
   const screen = p => { const z = Z(), A = 7 * k, t = clock;
@@ -2117,7 +2118,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
       make(x, y, d, dust ? 'dust' : 'plain'); budget--;
     }
   };
-  const tick = () => {
+  const flyTo = () => { if (!fly) return; const fw = fly.offsetWidth, fh = fw * 1185 / 4278, t = clock * .16 + prog * 9;
+    const x = (W - fw) / 2 + (W - fw) / 2 * Math.sin(t * 1.0 + .4) * Math.cos(t * .37), y = (H - fh) / 2 + (H - fh) / 2 * .9 * Math.sin(t * 1.43 + 1.1);
+    const bank = 9 * Math.cos(t * 1.0 + .4) + 5 * Math.sin(t * .61);
+    fly.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) rotate(${bank.toFixed(2)}deg)`; };
+  const tick = () => { flyTo();
     for (const p of parts) { if (p.dead) continue; const o = screen(p);
       p.el.style.transform = `translate(${(o.x - p.B / 2).toFixed(1)}px,${(o.y - p.B / 2).toFixed(1)}px) scale(${(o.d / p.B).toFixed(4)})`;
       if (p.logo && prog < .74) { pop(p); continue; }   // scrolling back up, the shapes go
@@ -2130,6 +2135,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
     parts.forEach(p => p.el.remove()); parts = []; shown = new Set();
     W = band.clientWidth; H = band.clientHeight; if (!W || !H) return;
     k = Math.min(1.6, Math.max(.62, Math.sqrt(W * H / (1280 * 800))));   // dot sizes follow the screen, phone to wall display
+    if (!fly) { fly = document.createElement('img'); fly.className = 'fly'; fly.src = 'assets/medialoop-wordmark.svg'; fly.alt = ''; fly.setAttribute('aria-hidden', 'true'); }
+    fly.style.width = Math.min(W * .46, 520).toFixed(0) + 'px'; band.append(fly);
     zl = progress() * 2.3; fill = still ? .6 : 0;
     for (let i = 0; i < 30; i++) spawn(1); spawn(400); tick();
   };
