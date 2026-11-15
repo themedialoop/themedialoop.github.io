@@ -2,7 +2,7 @@
 <html lang="en" class="intro" data-opener="eye">
 <head>
 <meta charset="utf-8">
-<script>try{if(sessionStorage.getItem("ml-replay")){sessionStorage.removeItem("ml-replay");sessionStorage.removeItem("ml-opener-seen");sessionStorage.setItem("ml-replay-now","1");document.documentElement.style.background="#2c5494"}}catch(e){}</script>
+<script>try{if(sessionStorage.getItem("ml-replay")){try{history.scrollRestoration="manual"}catch(e){}scrollTo(0,0);addEventListener("pageshow",function(){scrollTo(0,0)});sessionStorage.removeItem("ml-replay");sessionStorage.removeItem("ml-opener-seen");sessionStorage.setItem("ml-replay-now","1");document.documentElement.style.background="#2c5494"}}catch(e){}</script>
 <script>try{if(sessionStorage.getItem("ml-replay-now")){sessionStorage.removeItem("ml-replay-now");addEventListener("load",function(){setTimeout(function(){document.documentElement.style.background=""},900)});throw 0}var r=document.referrer,same=false;try{same=!!r&&new URL(r).origin===location.origin}catch(e){}if(same||(location.hash&&location.hash.length>1))sessionStorage.setItem("ml-opener-seen","1");if(sessionStorage.getItem("ml-opener-seen"))document.documentElement.classList.remove("intro")}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>medialoop · A Boutique Research Collective at UIC</title>
@@ -2140,9 +2140,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
   // until it fills the screen, and you come out on the blue of the landing page as it opens again
   let warping = false;
   const warp = () => { warping = true; band.classList.add('warp');
-    const c = document.createElement('div'); c.className = 'cover'; const D = Math.hypot(W, H) * 1.15; c.style.width = c.style.height = D + 'px'; band.append(c);
+    const c = document.createElement('div'); c.className = 'cover'; const D = Math.hypot(W, H) * 1.35; c.style.width = c.style.height = D + 'px'; band.append(c);
     requestAnimationFrame(() => requestAnimationFrame(() => { c.style.transform = 'translate(-50%,-50%) scale(1)'; }));
-    setTimeout(() => { document.documentElement.style.background = '#2c5494'; try { sessionStorage.setItem('ml-replay', '1'); } catch (e) {}
+    setTimeout(() => { document.documentElement.style.background = '#2c5494'; try { sessionStorage.setItem('ml-replay', '1'); history.scrollRestoration = 'manual'; } catch (e) {}
+      window.scrollTo({ top: 0, behavior: 'instant' });   // under the blue, so a phone can never restore the old place at the bottom
       location.replace(location.pathname); }, 1200); };
   const loop = now => { if (!visible && !warping) { last = 0; sv = vel = 0; return; }
     const first = !last, dt = first ? 16 : Math.min(100, now - last); last = now;
