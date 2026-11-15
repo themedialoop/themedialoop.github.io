@@ -1379,7 +1379,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const blotC = [document.createElement('canvas'), document.createElement('canvas')]; let blotKey = '', blotCtr = [[0, 0], [0, 0]];
   /* the UIC mark, hidden in the net as one of its own dots: it takes the place of one of the larger holes deep inside a blot
      in the bottom right, at that hole's size, and from then on does exactly what every other dot does. */
-  const uicImg = new Image(); uicImg.onload = () => { blotKey = ''; }; uicImg.src = 'assets/uic-mark-cream.png';
+  const uicImg = new Image();   // the UIC mark is switched off: no image is loaded, so no hole is ever swapped for it
   let uic = null;
   function pickUIC(a, tilePx, k, ox, oy) {
     uic = null; if (!uicImg.complete || !uicImg.naturalWidth || !holes.length) return;
