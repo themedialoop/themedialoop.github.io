@@ -2213,7 +2213,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
     const dy = scrollY - lastY; lastY = scrollY;
     const sc = Math.min(1, Math.max(.4, innerWidth / 1280));   // on a phone the river keeps to a phone-sized pace
     boost = 0;   // no push from scrolling: a river that surges sideways while the page moves up made people queasy
-    { const rb = river.getBoundingClientRect(); river.classList.toggle('gone', rb.bottom < innerHeight * .38); }   // risen off the top: the dots pop away; back down: they pop in again
+    { const rb = river.getBoundingClientRect(); river.classList.toggle('gone', rb.bottom < innerHeight * .55); }   // risen off the top: the dots pop away; back down: they pop in again
     if (!still) sy += (scrollY * .32 * sc - sy) * Math.min(1, dt * 7);   // eased, so it glides rather than jerks
     off += 16 * sc * dt; place(); requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on'); river.classList.toggle('run', v);
