@@ -908,8 +908,12 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
         const d = Math.min(2 * rr, d0 * .3); if (d >= d0 * .08) placed.push({ x, y, d, small: true }); })));
       for (let n = 0; n < cols * ROWS * 10; n++) { const d = d0 * R(.07, .2), o = { x: R(0, Tw), y: R(d / 2 + 2, H - d / 2 - 2), d, small: true };   // tiny ones in any spare corner, mostly along the edges
         if (placed.every(q => wrapD(o, q) >= d / 2 + q.d / 2 + gapN * .55)) placed.push(o); } }
-    for (const wd of words) {   // each word: a weight and style of its own (thin only where the type is big enough to read)
-      for (const o of slots) { if (o.w) continue;
+    // research terms first, longest first, each into the smallest opening it fits, so every one of them finds a home;
+    // the playful words then take what is left, anywhere
+    const bySize = slots.filter(o => !o.small).sort((p, q) => p.d - q.d);
+    const ordered = words.filter(w => !w.fun).sort((p, q) => q.w.length - p.w.length).concat(words.filter(w => w.fun));
+    for (const wd of ordered) {   // each word: a weight and style of its own (thin only where the type is big enough to read)
+      for (const o of (wd.fun ? slots : bySize)) { if (o.w || o.small) continue;
         const it = wd.fun ? Math.random() < .75 : Math.random() < .25;
         let wt = WTS[Math.floor(Math.random() * WTS.length)];
         const f = fit(wd.w, o.d, wt, it, hi); if (!f) continue;
