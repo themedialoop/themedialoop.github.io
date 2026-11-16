@@ -2817,7 +2817,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   const open = () => {   // the landing comes up (on arrival, or from the rabbit hole)
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     root.style.scrollBehavior = 'auto'; scrollTo(0, 0); root.style.scrollBehavior = '';
-    pv = 0; going = false; on = true; idle = 0; lastT = 0; t0 = performance.now(); root.classList.add('st-lock'); listen(true);
+    pv = 0; going = false; on = true; idle = 0; lastT = 0; t0 = performance.now(); root.classList.remove('st-home'); root.classList.add('st-lock'); listen(true);   // (st-home hid the gold dot on a straight arrival: the landing needs it back)
     cue.style.visibility = ''; cue.tabIndex = 0; clearTimeout(guard); guard = setTimeout(() => { if (on) finish(); }, 14000);   // never a trap
     go(); };
   const finish = () => {
