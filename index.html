@@ -2431,7 +2431,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
   let warping = false;
   let lastHush = 0; const hush = e => { if (e.cancelable) e.preventDefault(); e.stopImmediatePropagation(); lastHush = performance.now(); };
   const holdInput = on => ['wheel', 'touchstart', 'touchmove', 'keydown'].forEach(t => (on ? addEventListener : removeEventListener)(t, hush, { capture: true, passive: false }));
-  const warp = () => { warping = true; band.classList.add('warp'); holdInput(true);   // no scrolling until 0.4 s after the blue starts to lift
+  const warp = () => { warping = true; auto = false; av = 0; inAt = 0; document.documentElement.style.scrollBehavior = ''; band.classList.add('warp'); holdInput(true);   // no scrolling until 0.4 s after the blue starts to lift
     const c = document.createElement('div'); c.className = 'cover'; const D = Math.hypot(W, H) * 1.35; c.style.width = c.style.height = D + 'px'; band.append(c);
     requestAnimationFrame(() => requestAnimationFrame(() => { c.style.transform = 'translate(-50%,-50%) scale(1)'; }));
     setTimeout(() => {   // the screen is all blue now: behind it, back to the top and the opener begins
@@ -2443,12 +2443,25 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
       setTimeout(() => { band.style.transition = 'opacity .9s cubic-bezier(.4,0,.2,1)'; band.style.opacity = '0'; const t0 = performance.now(); const release = () => { const now = performance.now(); if (now - t0 >= 400 && (now - lastHush > 250 || now - t0 > 1600)) holdInput(false); else setTimeout(release, 60); }; setTimeout(release, 400);   // at least 0.4 s, and until any coasting scroll has stopped   // the blue melts away into the opener's blue net
         setTimeout(() => { band.classList.remove('warp'); c.remove(); band.style.transition = ''; band.style.opacity = ''; warping = false; visible = false; nextMark = 0; build(); }, 950); }, 120);
     }, 1050); };
+  // once you are in, the rabbit hole takes over: after about three scrolls or two seconds it carries you down on its own,
+  // gathering speed, to the fall at the bottom. Scrolling back up hands control back to you.
+  let inAt = 0, gestures = 0, lastGest = 0, auto = false, av = 0, aA = 0, autoOff = 0;
+  const gesture = () => { const n = performance.now(); if (n - lastGest > 280) gestures++; lastGest = n; };
+  addEventListener('wheel', e => { if (!inAt) return; if (e.deltaY < -2) { auto = false; av = 0; autoOff = performance.now(); gestures = 0; inAt = performance.now(); } else if (e.deltaY > 0) gesture(); }, { passive: true });
+  let tY = null; addEventListener('touchstart', e => { tY = e.touches[0].clientY; }, { passive: true });
+  addEventListener('touchend', e => { if (!inAt || tY == null) return; const dy = tY - (e.changedTouches[0] || {}).clientY; if (dy < -20) { auto = false; av = 0; autoOff = performance.now(); gestures = 0; inAt = performance.now(); } else if (dy > 10) gesture(); tY = null; }, { passive: true });
+  const drive = (p, dt, now) => {
+    if (still || warping) return;
+    if (p > .004 && p < .985) { if (!inAt) { inAt = now; gestures = 0; } } else if (p <= .004) { inAt = 0; auto = false; av = 0; return; }
+    if (!auto && inAt && now - autoOff > 1500 && (gestures >= 3 || now - inAt > 2000)) { auto = true; av = .15; aA = 2 * Math.max(1, holdTop + holdSpan - scrollY) / (3600 * 3600); }   // about 3.5 seconds to the bottom, speeding up all the way
+    if (!auto) return;
+    av = Math.min(av + aA * dt, 7); document.documentElement.style.scrollBehavior = 'auto'; scrollBy(0, av * dt); };
   const loop = now => { if (!visible && !warping) { last = 0; sv = vel = 0; window.mlRabbitCovers = false; return; }
     if (!warping && (++frameN % 90 === 0)) measureHold();   // now and then, in case the page above changed height
     window.mlRabbitCovers = scrollY >= holdTop && scrollY <= holdTop + holdSpan;   // the field fills the screen: the net behind can rest
     const first = !last, dt = first ? 16 : Math.min(100, now - last); last = now;
     if (warping) { clock += dt / 1000; zl += dt / 1000 * 2.2; tick(); requestAnimationFrame(loop); return; }   // falling: the field rushes outward
-    const p = progress(); prog = p; const x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
+    const p = progress(); prog = p; drive(p, dt, now); const x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
     if (!still && p >= .985) { warp(); requestAnimationFrame(loop); return; }
     while (nextMark < MARK_AT.length && p >= MARK_AT[nextMark]) { if (p - MARK_AT[nextMark] < .04 && !addMark()) break; nextMark++; }   // no room yet: try again next frame
     while (nextMark > 0 && p < MARK_AT[nextMark - 1] - .02) nextMark--;   // scrolling back up re-arms them
