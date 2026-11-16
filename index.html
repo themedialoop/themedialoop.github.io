@@ -2997,7 +2997,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       }
       if (m < .02) continue;
       let c = 1; for (const b of reg.boxes) { const g = Math.max(b.left - d.x, d.x - b.right, b.top - d.y, d.y - b.bottom, 0), pp = b.wide ? pad * 3.5 : pad; if (g < pp + d.r) { c *= ss(0, pp + d.r, g); if (c < .02) break; } }   // headings and text get a wide berth
-      if (reg.kind === 'res') { const lb = document.querySelector('#resources .label'); if (lb) { const q = lb.getBoundingClientRect(); m *= ss(q.bottom, q.bottom + 80, d.y); if (m < .02) continue; } }   // no dots above or beside the heading: the field starts below it
+      if (reg.kind === 'res') { const lb = document.querySelector('#resources .res-stack .res') || document.querySelector('#resources .label'); if (lb) { const q = lb.getBoundingClientRect(); m *= ss(q.top - 10, q.top + 70, d.y); if (m < .02) continue; } }   // no dots above or beside the heading or its description: the field starts at the first card
       if (reg.kind === 'res' && d.thin) { const st = reg.boxes.find(b => !b.wide); if (!st || d.y < st.top) continue; }   // and the space around them is lighter
       const s = d.r * m * c * (reduce ? .97 : .84 + .16 * Math.sin(t * 1.5 + d.ph * .6 - (d.x + d.y) * .004)); if (s < .4) continue;
       const px = d.x + AMP * Math.sin(t * d.fx + d.ph), py = d.y + AMP * Math.cos(t * d.fy + d.ph * 1.3);
