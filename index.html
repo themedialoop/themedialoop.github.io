@@ -2953,23 +2953,26 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   };
   // what each section keeps clear of
   const clearOf = { res: el => [...el.querySelectorAll('.label, .res-intro, .res')].map(e => Object.assign(e, { _wide: !e.classList.contains('res') })), ct: el => { const g = [...el.querySelectorAll('.label, .contact, .mail-row')].map(e => e.getBoundingClientRect()).filter(b => b.width);   // one clearing around them all
-      const u = g.length ? { getBoundingClientRect: () => { const bs = [...el.querySelectorAll('.label, .contact, .mail-row')].map(e => e.getBoundingClientRect()).filter(b => b.width);
+      const u = g.length ? { getBoundingClientRect: () => { const bs = [...el.querySelectorAll('.label .lt, .label .kick, .contact, .mail')].flatMap(e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects()]; }).concat([...el.querySelectorAll('.mail')].map(e => e.getBoundingClientRect())).filter(b => b.width);   // the words themselves, not their full-width boxes
         return { left: Math.min(...bs.map(b => b.left)), right: Math.max(...bs.map(b => b.right)), top: Math.min(...bs.map(b => b.top)), bottom: Math.max(...bs.map(b => b.bottom)), width: 1 }; }, _wide: false } : null;
       return [u, ...el.querySelectorAll('.apply')].filter(Boolean); } };
-  let active = 0, raf = 0, blank = true;
+  let active = 0, raf = 0, blank = true, ctEdge = .5;
   const frame = now => { raf = 0; if (!active) { if (!blank) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); blank = true; } return; }
     const t = reduce ? 0 : now / 1000, F = Math.min(240, H * .28), pad = Math.min(W, H) * .03;
     const regs = secs.map(q => { let r = q.el.getBoundingClientRect();
       if (q.kind === 'res') { const cl = document.querySelector('#contact .label'); if (cl) { const c = cl.getBoundingClientRect(); r = { top: r.top, bottom: c.top - 30, height: c.top - 30 - r.top, resBot: r.bottom }; } }   // the field carries on down to Contact ...
       if (q.kind === 'ct') { const ap = q.el.querySelector('.apply'); if (ap) { const a = ap.getBoundingClientRect(); r = { top: r.top, bottom: a.top + Math.min(90, a.height * .25), height: a.top - r.top }; } }   // at Contact the dots end by the top of the Apply card
       return r.bottom < -F || r.top > H + F ? null : { r, kind: q.kind, boxes: clearOf[q.kind](q.el).map(e => { const b = e.getBoundingClientRect(); return { left: b.left, right: b.right, top: b.top, bottom: b.bottom, width: b.width, wide: !!e._wide }; }).filter(b => b.width && b.bottom > -40 && b.top < H + 40) }; }).filter(Boolean);
+    { const cs = [...document.querySelectorAll('#contact .label .lt, #contact .contact, #contact .mail')].map(e => { const rg = document.createRange(); rg.selectNodeContents(e); return Math.max(0, ...[...rg.getClientRects()].map(b => b.right)); });
+      ctEdge = cs.length ? Math.max(...cs) / W : .5; }   // where the words at Contact end, on the right
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); blank = false;
     for (const d of dots) {
       let m = 0, reg = null;
       for (const g of regs) {   // inside this section, with a soft, wavy margin at its top and bottom
         const wv = F * .35 * Math.sin(d.x * .006 + t * .1 + (g.kind === 'ct' ? 2 : 0));
         let w = ss(g.r.top - F * .1 + wv, g.r.top + F + wv, d.y) * (1 - ss(g.r.bottom - F + wv, g.r.bottom + F * .1 + wv, d.y));
-        if (g.kind === 'ct') w = 0;   // Contact keeps just its own pair of dots (drawn below)
+        if (g.kind === 'ct') { const u = d.x / W, ed = (mob ? .8 : Math.min(.8, Math.max(.5, ctEdge + .05))) + .025 * Math.sin(d.y * .012 + t * .15);   // Contact: dots on the right side only,
+          w *= ss(ed, ed + .08, u); }                                                                                      // with plenty of cream between them and the words
         if (g.kind === 'res' && g.r.resBot !== undefined && d.y > g.r.resBot - F) {   // ... past the cards it thins out and drifts over to the right, clear of the words
           const f = Math.min(1, Math.max(0, (d.y - g.r.resBot + F) / Math.max(1, g.r.bottom - g.r.resBot + F))), u = d.x / W, edge = (mob ? .62 : .56) + .3 * f + .03 * Math.sin(d.y * .01 + t * .2);
           w *= ss(edge, edge + .08, u) * (d.thin && f > .3 ? 0 : 1) * (1 - .35 * f); }
@@ -2983,15 +2986,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       ctx.setTransform(s * DPR, 0, 0, s * DPR, px * DPR, py * DPR); ctx.rotate(d.rot + t * d.sp);
       if (d.ring) { ctx.lineWidth = .28; ctx.strokeStyle = d.col; ctx.stroke(d.s); } else { ctx.fillStyle = d.col; ctx.fill(d.s); }
     }
-    // Contact: just two dots beside the heading, a blue one and a small gold one, breathing and drifting a little
-    { const ct = secs.find(q => q.kind === 'ct'), lab = ct && ct.el.querySelector('.label .lt');
-      if (lab) { const rg = document.createRange(); rg.selectNodeContents(lab); const ls = [...rg.getClientRects()].filter(b => b.width > 4);
-        if (ls.length && ls[0].bottom > -80 && ls[0].top < H + 80) {
-          const L0 = ls[0], hgt = L0.height, R1 = Math.min(30, hgt * .26), R2 = R1 * .42;
-          const ph2 = W < 760, x1 = W - Math.max(ph2 ? 48 : 70, W * (ph2 ? .13 : .13)), y1 = ph2 ? L0.top - hgt * .55 : L0.top + hgt * .4, x2 = Math.min(x1 + R1 * 1.6, W - R2 - 12), y2 = y1 + R1 * 1.9;   // floating on the far right of the screen, well clear of the words
-          [[x1, y1, R1, '#2c5494', 0], [x2, y2, R2, '#e7aa4d', 2.1]].forEach(([x, y, rr, col, ph]) => {
-            const sb = rr * (reduce ? 1 : .9 + .1 * Math.sin(t * 1.5 + ph)), px = x + (reduce ? 0 : 3 * Math.sin(t * .45 + ph)), py = y + (reduce ? 0 : 3 * Math.cos(t * .38 + ph));
-            ctx.setTransform(sb * DPR, 0, 0, sb * DPR, px * DPR, py * DPR); ctx.rotate(ph + t * .1); ctx.fillStyle = col; ctx.fill(shapes[ph ? 3 : 5]); }); } } }
+
     raf = requestAnimationFrame(frame); };
   const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
   const seen = new Set();
