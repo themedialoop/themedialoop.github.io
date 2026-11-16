@@ -553,7 +553,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
      it always keeps clear of the photo, the name and the links */
   const side = document.querySelector('.side-net'), sideIn = document.querySelector('.side-in');
   { const topBar = document.getElementById('top'), aside = document.querySelector('.p-side');
-    const over = () => { if (!topBar || !aside) return; const b = aside.getBoundingClientRect(); topBar.classList.toggle('over-side', b.bottom > 70); };
+    const over = () => { if (!topBar || !aside) return; const b = aside.getBoundingClientRect(); topBar.classList.toggle('over-side', b.bottom > 70); topBar.classList.toggle('lift', scrollY > 6); };
     addEventListener('scroll', over, { passive: true }); addEventListener('resize', over); over(); }
   const sse = v => { v = Math.min(1, Math.max(0, v)); return v * v * (3 - 2 * v); };
   const drawSide = time => {
@@ -568,9 +568,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
     if (!side._boxes || side._key !== key || performance.now() < 2500) {
       const bs = []; const add = b => b.width && bs.push([(b.left - r.left) * dpr, (b.top - r.top) * dpr, (b.right - r.left) * dpr, (b.bottom - r.top) * dpr]);
       sideIn.querySelectorAll('.back, .p-intro h1, .p-intro p, .p-intro a, .p-intro li, .p-intro span').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); [...rg.getClientRects()].forEach(add); });
-      [...sideIn.querySelectorAll('.p-photo-wrap, .p-links a'), document.querySelector('.menu-btn'), document.querySelector('.top .mark')].filter(Boolean).forEach(el => add(el.getBoundingClientRect()));
+      [...sideIn.querySelectorAll('.p-photo-wrap, .p-links a')].filter(Boolean).forEach(el => add(el.getBoundingClientRect()));
       side._boxes = bs; side._key = key; }
-    const boxes = side._boxes;
+    // the menu button and logo sit in the fixed bar, so as the page scrolls the net slides under them: their clear space is re-measured every frame
+    const boxes = side._boxes.slice(); [document.querySelector('.menu-btn'), document.querySelector('.top .mark')].forEach(el => { if (!el) return; const b = el.getBoundingClientRect();
+      if (b.width) boxes.push([(b.left - r.left - 6) * dpr, (b.top - r.top - 6) * dpr, (b.right - r.left + 6) * dpr, (b.bottom - r.top + 6) * dpr]); });
     const tilePx = (mobile() ? 820 : 1150) * dpr, k = tilePx / TILE, ox = 0, pad = 12 * dpr, soft = 34 * dpr;   // the net stays put: no drifting sideways
     g.fillStyle = 'rgb(242,238,221)';
     for (let ty = -1; ty <= Math.ceil(h / tilePx) + 1; ty++) for (let tx = Math.floor(-ox / tilePx) - 1; tx * tilePx + ox < w + tilePx; tx++)
@@ -998,6 +1000,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .top.solid:not(.open){background:color-mix(in srgb, var(--cream) 86%, transparent) !important;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .menu-btn{color:var(--blue)}
 .top.over-side:not(.open){background:transparent !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+.top.over-side.lift:not(.open){background:#2c5494 !important}   /* once the page moves, the bar turns solid blue so the name and photo slide under it cleanly */
 .top.over-side:not(.open) .menu-btn{color:var(--cream)}
 .top.over-side:not(.open) .mark{filter:brightness(0) invert(94%) sepia(9%) saturate(390%) hue-rotate(10deg)}
 .top .mark,.top{transition:background .35s, filter .35s}
