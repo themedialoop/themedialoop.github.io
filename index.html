@@ -2644,7 +2644,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
     const side = cd.kind === 'pill' || cd.kind === 'ap';   // info cards and Apply: an even field of dots across the whole right side
     const field = side
       ? (x, y) => { const d = distTo(x, y, rects), cy2 = cd.kind === 'pill' ? 0 : h;   // the pills and Apply: the same packed dots, but only a small cluster tucked into one corner
-          const c = 1 - sm(.35, 1, Math.hypot((w - x) / (w * (phone ? .3 : .22)), (y - cy2) / (h * (phone ? .45 : .6))));
+          const c = 1 - sm(.35, 1, Math.hypot((w - x) / (w * (phone ? .3 : .34)), (y - cy2) / (h * (phone ? .45 : .95))));   // desktop: a fuller corner cluster
           return Math.max(0, c) * (.5 + .2 * Math.sin(x * .013 + y * .017)) * sm(pad * 2.4, pad * 2.4 + 50, d); }
       : phone
       ? (x, y) => { const c = 1 - sm(.15, 1, Math.hypot((w - x) / (w * .7), (y - cy) / (h * .55))), d = distTo(x, y, rects);   // a calmer cascade from the corner
