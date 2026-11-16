@@ -642,6 +642,14 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 .bz-h{font-weight:700 !important;letter-spacing:-.055em}
 .bz-h .bz-a{color:#e7aa4d}.bz-h .bz-b{color:#e0773a}
 </style>
+<style>
+/* cards fly in as they come into view: up from below with a little tilt and a springy settle, one after another.
+   (an animation that only fills backwards, so once it ends the cards' own hover lift and tilt work as before) */
+.fw{opacity:0}
+.fly{animation:flyIn .95s cubic-bezier(.22,1.25,.36,1) var(--fd,0s) backwards}
+@keyframes flyIn{0%{opacity:0;translate:0 70px;rotate:var(--ft,-3deg);scale:.94}55%{opacity:1}100%{opacity:1;translate:0 0;rotate:0deg;scale:1}}
+@media (prefers-reduced-motion:reduce){.fw{opacity:1}.fly{animation:none}}
+</style>
 </head>
 <body>
 <canvas id="net" aria-hidden="true"></canvas>
@@ -3002,6 +3010,21 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   secs.forEach(q => io.observe(q.el));
   addEventListener('resize', () => { if (Math.abs(innerWidth - builtW) > 30 || Math.abs(innerHeight - H) > 160) build(); else { H = innerHeight; C.height = Math.round(H * DPR); } go(); });
   build();
+})();
+</script>
+<script>
+/* the fly-in: people, event, resource, About and Apply cards, and the publication list */
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  const groups = ['.people > .card', '.ev-cards > .ev', '.res-stack > .res', '.about-grid > *', '.apply', '.pubs li'];
+  const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const el = e.target; io.unobserve(el);
+    el.classList.remove('fw'); el.classList.add('fly'); el.addEventListener('animationend', () => el.classList.remove('fly'), { once: true }); }), { threshold: .12, rootMargin: '0px 0px -5% 0px' });
+  groups.forEach(sel => document.querySelectorAll(sel).forEach((el, i) => {
+    if (el.getBoundingClientRect().top < innerHeight * .9) return;   // already on screen when the page opens: leave it be
+    el.classList.remove('rv', 'in');
+    const k = [...el.parentNode.children].indexOf(el);
+    el.style.setProperty('--fd', (Math.min(k, 5) * .08).toFixed(2) + 's'); el.style.setProperty('--ft', (k % 2 ? 3 : -3) + 'deg');
+    el.classList.add('fw'); io.observe(el); }));
 })();
 </script>
 </body>
