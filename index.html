@@ -10,13 +10,21 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="medialoop is a boutique research collective at the University of Illinois Chicago studying how media, algorithms, and AI shape the ways people connect.">
 <link rel="canonical" href="https://themedialoop.github.io/">
-<meta name="robots" content="index, follow, max-image-preview:large">
-<meta property="og:type" content="website">
 <meta property="og:site_name" content="medialoop">
-<meta property="og:title" content="medialoop · A Boutique Research Collective">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="website">
+<meta property="og:title" content="medialoop · A Boutique Research Collective at UIC">
 <meta property="og:description" content="medialoop is a boutique research collective at the University of Illinois Chicago studying how media, algorithms, and AI shape the ways people connect.">
 <meta property="og:url" content="https://themedialoop.github.io/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://themedialoop.github.io/assets/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The medialoop wordmark ringed by colourful dots">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="medialoop · A Boutique Research Collective at UIC">
+<meta name="twitter:description" content="medialoop is a boutique research collective at the University of Illinois Chicago studying how media, algorithms, and AI shape the ways people connect.">
+<meta name="twitter:image" content="https://themedialoop.github.io/assets/share.png">
+<meta name="robots" content="index, follow, max-image-preview:large">
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -52,7 +60,41 @@
    "name": "Samuel Hardman Taylor",
    "url": "https://themedialoop.github.io/people/samuel-hardman-taylor.html"
   }
- ]
+ ],
+ "knowsAbout": [
+  "Algorithms",
+  "Perceived algorithm responsiveness",
+  "Social connectedness",
+  "Loneliness",
+  "Close relationships",
+  "AI-mediated communication",
+  "Self-disclosure",
+  "Interpersonal communication",
+  "Social media",
+  "Subjective well-being",
+  "Imagined audience",
+  "Affordances",
+  "Media multiplexity",
+  "Algorithm awareness",
+  "Intimacy",
+  "Human-machine communication",
+  "Human-AI relationships",
+  "Cyberbullying",
+  "Bystander intervention",
+  "Open science",
+  "Mobile phones",
+  "Experience sampling",
+  "Longitudinal methods",
+  "Adolescents and young adults",
+  "LGBTQ+ youth",
+  "Identity",
+  "Social comparison",
+  "Media psychology",
+  "Social media cognition",
+  "Mobile phone habits"
+ ],
+ "image": "https://themedialoop.github.io/assets/share.png",
+ "sameAs": []
 }
 </script>
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
@@ -549,7 +591,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   </section>
 </main>
 
-<div class="marquee hm-marq" id="marquee" aria-hidden="true" data-band="none"><canvas id="ribbonC" hidden></canvas></div>
+<div class="marquee hm-marq" id="marquee" data-band="none"><canvas id="ribbonC" hidden></canvas><h2 class="river-words">Research interests</h2><ul class="river-words"><li>Algorithms</li><li>Perceived algorithm responsiveness</li><li>Social connectedness</li><li>Loneliness</li><li>Close relationships</li><li>AI-mediated communication</li><li>Self-disclosure</li><li>Interpersonal communication</li><li>Social media</li><li>Subjective well-being</li><li>Imagined audience</li><li>Affordances</li><li>Media multiplexity</li><li>Algorithm awareness</li><li>Intimacy</li><li>Human-machine communication</li><li>Human-AI relationships</li><li>Cyberbullying</li><li>Bystander intervention</li><li>Open science</li><li>Mobile phones</li><li>Experience sampling</li><li>Longitudinal methods</li><li>Adolescents and young adults</li><li>LGBTQ+ youth</li><li>Identity</li><li>Social comparison</li><li>Media psychology</li><li>Social media cognition</li><li>Mobile phone habits</li></ul></div>
 
 <div class="wrap">
   <section id="people" data-net="-0.03 0.0 0.17" data-net-m="-0.1 0.17 0.18" data-net-at="1 0.7">
@@ -1979,8 +2021,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   ];
   const ALL = ROWS.flat(), RES = ALL.filter(w => w[0] !== '*'), FUN = ALL.filter(w => w[0] === '*').map(w => w.slice(1));
   // for screen readers: the research interests as a plain list; the river itself is decoration
-  const list = document.createElement('ul'); list.className = 'river-words'; list.setAttribute('aria-label', 'Research interests');
-  RES.forEach(w => { const li = document.createElement('li'); li.textContent = w; list.append(li); }); box.append(list);
+  // (the research interests are also written into the page as a plain list, for screen readers and search engines)
   const river = document.createElement('div'); river.className = 'river'; river.setAttribute('aria-hidden', 'true'); box.append(river);
   const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', purple: '#9b6aa6' };
   const MIX = [['blue', .46], ['gold', .4], ['orange', .04], ['pink', .04], ['teal', .03], ['purple', .03]];   // mostly blue and gold, a few sprinkles

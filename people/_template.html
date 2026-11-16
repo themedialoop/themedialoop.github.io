@@ -685,7 +685,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 
 <style>
 /* research interests as two slow rows of coloured tags drifting past each other; the drift follows the page scroll */
-.p-topics{display:none !important}
+.p-topics{position:absolute !important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}   /* kept as plain text for screen readers and search engines; the river shows them */
 .p-marq{display:grid;gap:16px;overflow:hidden;margin-inline:calc(-1 * clamp(16px,3vw,40px));padding:6px 0 10px;}
 .p-marq .row{display:flex;width:max-content;will-change:transform}
 .p-marq .row{touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
