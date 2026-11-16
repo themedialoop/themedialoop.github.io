@@ -847,7 +847,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       for (const o of placed.filter(o => !o.small && !o.w).sort((a, b) => b.d - a.d)) {
         if (logos.length >= nLogo) break; if (logos.some(q => wrapD(o, q) < Tw / 3)) continue; o.logo = true; o.lr = R(-4, 10).toFixed(1); logos.push(o); }
       placed.forEach(o => { if (o.w || o.logo) return; const t = Math.random();
-        if (t < (o.small ? .16 : .32)) o.ring = true; else if (t < (o.small ? .3 : .5) && o.d < d0 * .85) o.idot = true;   // (i-dots only on the smaller ones: a big one leaves a gap in the net) }); }
+        if (t < (o.small ? .16 : .32)) o.ring = true; else if (t < (o.small ? .3 : .5) && o.d < d0 * .85) o.idot = true; }); }   // (i-dots only on the smaller ones: a big one leaves a gap in the net)
     const tile = document.createElement('div'); tile.className = 'tile'; tile.style.width = Tw + 'px';
     placed.forEach(o => { for (const shift of [0, -Tw, Tw]) {   // a dot over the seam also appears on the other side
         const left = o.x - o.d / 2 + shift; if (left > Tw || left + o.d < 0) continue;
