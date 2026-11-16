@@ -570,7 +570,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 @keyframes stIdot{from{transform:scale(.9)}to{transform:scale(1.08)}}
 @media (prefers-reduced-motion:reduce){.st-idot{animation:none}}
 .st-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.st-tag{position:absolute;left:0;top:0;margin:0;font-weight:300;letter-spacing:-.015em;line-height:1.1;white-space:nowrap;will-change:transform;animation:stIn 1.2s .35s cubic-bezier(.2,.8,.2,1) both}
+.st-tag{position:absolute;left:0;top:0;margin:0;font-weight:200;letter-spacing:.005em !important;letter-spacing:-.015em;line-height:1.1;white-space:nowrap;will-change:transform;animation:stIn 1.2s .35s cubic-bezier(.2,.8,.2,1) both}
 .st-tag em{font-style:italic;font-weight:300}
 .st-lede{position:absolute;left:0;top:0;margin:0;max-width:min(44ch,86vw);font-size:var(--step-1);line-height:1.35;opacity:0;will-change:transform,opacity}
 @keyframes stIn{from{opacity:0;translate:0 14px}to{opacity:1;translate:0 0}}
@@ -592,8 +592,9 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
 .top .menu-btn{transition:color .3s}
 @media (prefers-reduced-motion:reduce){.st-h1,.st-tag,.st-cue{animation:none}.st-cue-dot,.st-cue-up{animation:none}}
 .ev > .ev-dot{position:absolute;right:clamp(14px,1.6vw,24px);bottom:clamp(14px,1.6vw,24px);width:clamp(150px,15vw,210px);height:clamp(150px,15vw,210px);z-index:0;pointer-events:none;
-  background:radial-gradient(circle at 18% 78%, #f2eedd 0 7%, transparent 7.5%);animation:edBreathe 8s ease-in-out infinite alternate}   /* two open cream rings and a small dot, inside the card */
-.ev > .ev-dot::before,.ev > .ev-dot::after{content:"";position:absolute;box-sizing:border-box;border:solid #f2eedd}
+  background:radial-gradient(circle at 18% 78%, var(--ring,#f2eedd) 0 7%, transparent 7.5%);animation:edBreathe 8s ease-in-out infinite alternate}   /* two open cream rings and a small dot, inside the card */
+.ev > .ev-dot::before,.ev > .ev-dot::after{content:"";position:absolute;box-sizing:border-box;border:solid var(--ring,#f2eedd);transition:border-color .35s}
+.ev.h-cream:hover > .ev-dot{--ring:#2c5494}   /* on the cream highlight the rings turn blue */
 .ev > .ev-dot::before{width:62%;height:62%;right:0;bottom:0;border-width:clamp(7px,.7vw,10px);border-radius:52% 48% 55% 45%/46% 54% 47% 53%}
 .ev > .ev-dot::after{width:30%;height:30%;left:8%;top:12%;border-width:clamp(5px,.5vw,7px);border-radius:47% 53% 45% 55%/55% 46% 54% 45%}
 .ev:nth-child(2) > .ev-dot{animation-delay:-3s}.ev:nth-child(3) > .ev-dot{animation-delay:-5s}.ev:nth-child(4) > .ev-dot{animation-delay:-1.5s}
@@ -601,6 +602,18 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
 @keyframes edBreathe{from{transform:scale(1)}to{transform:scale(1.04)}}
 @media (max-width:560px){.ev > .ev-dot{width:84px;height:84px;top:12px;right:12px;bottom:auto}}
 @media (prefers-reduced-motion:reduce){.ev > .ev-dot{animation:none}}
+</style>
+<style>
+/* the full stop at the end of a section heading: an organic gold dot, not a typed period */
+.label .stop{width:.19em;height:.18em;margin-left:.06em;background:var(--gold,#e7aa4d);color:transparent;border-radius:52% 48% 55% 45%/46% 54% 47% 53%;vertical-align:baseline;font-size:inherit}
+</style>
+<style>
+/* "Our Buzzwords": big chunky type above the river, at the river's slant; its o is a blue dot */
+.bz-h{position:relative;z-index:2;margin:0 0 clamp(4px,1vw,14px);padding-left:max(var(--gutter,24px), env(safe-area-inset-left, 0px));font-weight:900;font-size:clamp(40px,11.5vw,168px);line-height:.9;letter-spacing:-.055em;color:var(--blue,#2c5494);
+  rotate:-3.5deg;transform-origin:0 100%;white-space:nowrap}
+.bz-o{display:inline-block;width:.52em;height:.5em;margin:0 .03em 0 .02em;background:var(--blue,#2c5494);border-radius:52% 48% 55% 45%/46% 54% 47% 53%;vertical-align:baseline;animation:bzO 4.2s ease-in-out infinite alternate}
+@keyframes bzO{from{transform:scale(.92)}to{transform:scale(1.06)}}
+@media (prefers-reduced-motion:reduce){.bz-o{animation:none}}
 </style>
 </head>
 <body>
@@ -646,7 +659,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
   </section>
 </main>
 
-<div class="marquee hm-marq" id="marquee" data-band="none"><canvas id="ribbonC" hidden></canvas><h2 class="river-words">Research interests</h2><ul class="river-words"><li>Algorithms</li><li>Perceived algorithm responsiveness</li><li>Social connectedness</li><li>Loneliness</li><li>Close relationships</li><li>AI-mediated communication</li><li>Self-disclosure</li><li>Interpersonal communication</li><li>Social media</li><li>Subjective well-being</li><li>Imagined audience</li><li>Affordances</li><li>Media multiplexity</li><li>Algorithm awareness</li><li>Intimacy</li><li>Human-machine communication</li><li>Human-AI relationships</li><li>Cyberbullying</li><li>Bystander intervention</li><li>Open science</li><li>Mobile phones</li><li>Experience sampling</li><li>Longitudinal methods</li><li>Adolescents and young adults</li><li>LGBTQ+ youth</li><li>Identity</li><li>Social comparison</li><li>Media psychology</li><li>Social media cognition</li><li>Mobile phone habits</li></ul></div>
+<div class="marquee hm-marq" id="marquee" data-band="none"><canvas id="ribbonC" hidden></canvas><h2 class="bz-h"><span class="st-sr">Our Buzzwords: research interests</span><span aria-hidden="true">Our Buzzw<span class="bz-o"></span>rds</span></h2><ul class="river-words"><li>Algorithms</li><li>Perceived algorithm responsiveness</li><li>Social connectedness</li><li>Loneliness</li><li>Close relationships</li><li>AI-mediated communication</li><li>Self-disclosure</li><li>Interpersonal communication</li><li>Social media</li><li>Subjective well-being</li><li>Imagined audience</li><li>Affordances</li><li>Media multiplexity</li><li>Algorithm awareness</li><li>Intimacy</li><li>Human-machine communication</li><li>Human-AI relationships</li><li>Cyberbullying</li><li>Bystander intervention</li><li>Open science</li><li>Mobile phones</li><li>Experience sampling</li><li>Longitudinal methods</li><li>Adolescents and young adults</li><li>LGBTQ+ youth</li><li>Identity</li><li>Social comparison</li><li>Media psychology</li><li>Social media cognition</li><li>Mobile phone habits</li></ul></div>
 
 <div class="wrap">
   <section id="people" data-net="-0.03 0.0 0.17" data-net-m="-0.1 0.17 0.18" data-net-at="1 0.7">
@@ -762,7 +775,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
     document.querySelectorAll('.label').forEach(l => {
       const t = document.createElement('span'); t.className = 'lt'; t.textContent = l.textContent.trim(); l.textContent = ''; 
       const b = document.createElement('span'); b.className = 'blob'; l.append(b, t);
-      const st = document.createElement('span'); st.className = 'stop'; st.setAttribute('aria-hidden', 'true'); st.textContent = '.'; if (!/[?!.]$/.test(t.textContent)) l.append(st);
+      const st = document.createElement('span'); st.className = 'stop'; st.setAttribute('aria-hidden', 'true'); st.textContent = ''; if (!/[?!.]$/.test(t.textContent)) l.append(st);
       if (l.dataset.kicker) { const kk = document.createElement('span'); kk.className = 'kick'; kk.textContent = l.dataset.kicker; l.prepend(kk); }
       io ? io.observe(l) : l.classList.add('on');
     });
@@ -1993,7 +2006,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
    words (light italic). It drifts slowly on its own and speeds up while you scroll, like the pills it replaces. Every dot
    moves together, with a gentle bob shared by its neighbours, so they never touch. */
 .marquee.hm-marq{height:auto !important;display:block;padding:clamp(80px,10vw,140px) 0;margin-inline:0;width:100vw;margin-left:calc(50% - 50vw);overflow-x:clip}
-.river{position:relative;height:clamp(420px,46vw,620px);overflow:hidden;width:112vw;margin-left:-6vw;rotate:-3.5deg}   /* four rows of the net */   /* tilted a little; wider than the screen so its ends never show */
+.river{position:relative;height:clamp(540px,64vw,900px);overflow:hidden;width:112vw;margin-left:-6vw;rotate:-3.5deg}   /* four rows of the net */   /* tilted a little; wider than the screen so its ends never show */
 .river .track{position:absolute;left:0;top:0;height:100%;display:flex}
 .river .tile{position:relative;flex:none;height:100%}   /* (not clipped: a dot over a tile's edge simply overhangs into the next one, whole) */
 .river:not(.run) .track{content-visibility:hidden}   /* and none of it while the river is off screen */
@@ -2007,6 +2020,8 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
 @keyframes rvDrift{0%{translate:-1.5px 1.5px}100%{translate:1.5px -1.5px}}
 .river .rs{width:100%;height:100%;transform:scale(0);transition:transform .7s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
 .river.on .rs{transform:none}
+.river.on.gone .rs{transform:scale(0);transition:transform .26s cubic-bezier(.45,-.9,.7,.5) var(--out,0s)}   /* a quick swell, then gone: pop */
+.river .track{transform-origin:50% 50%}
 .river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;isolation:isolate;color:var(--tc);border-radius:var(--br)}
 .river .rb::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--c);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace: only its colour does, so the words are never scaled (scaled type turns grainy) */
 .river .rb.ring::before{background:transparent;box-shadow:inset 0 0 0 var(--rw,3px) var(--c)}   /* an open circle */
@@ -2106,7 +2121,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
     // an inverted infinity net: openings of about the same size, in staggered rows, with a narrow cream mesh between them.
     // Each research term takes an opening of its own; the rest of the openings are left plain.
     const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-    const ROWS = 4, m = 6 * k, d0 = (H - 2 * m) / (1 + (ROWS - 1) * .9526) * 1.02, s = d0 * 1.08, py = s * .866;
+    const ROWS = W < 760 ? 4 : 5, m = 6 * k, d0 = (H - 2 * m) / (1 + (ROWS - 1) * .9526) * 1.02, s = d0 * 1.08, py = s * .866;
     const words = shuffle(RES.slice()).map(w => ({ w, fun: false })).concat(shuffle(FUN.slice()).map(w => ({ w, fun: true })));
     const cols = Math.max(Math.ceil(W * 1.2 / s), Math.ceil(words.length * 1.4 / ROWS)); Tw = cols * s;
     const hi = Math.round(Math.min(22, d0 * .17));
@@ -2115,7 +2130,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
     for (let rr = 0; rr < ROWS; rr++) for (let c = 0; c < cols; c++) placed.push({ x: c * s + (rr % 2) * s / 2 + R(-.14, .14) * d0, y: m + d0 / 2 + rr * py + R(-.12, .12) * d0, d: d0 });
     // like a hand-painted infinity net: the openings are jostled a little, and each one grows to fill its own space,
     // so the cream lines between them stay thin and even while no two openings are quite alike
-    const gapN = d0 * .11, wrapD = (a, b) => { let dx = Math.abs(a.x - b.x); dx = Math.min(dx, Tw - dx); return Math.hypot(dx, a.y - b.y); };
+    const gapN = d0 * .2, wrapD = (a, b) => { let dx = Math.abs(a.x - b.x); dx = Math.min(dx, Tw - dx); return Math.hypot(dx, a.y - b.y); };
     // sizes vary a lot: some openings are big, some small; the big ones claim their room first and their neighbours make
     // do with what is left, so the cream line between any two stays the same thin width
     placed.forEach(o => { o.t = d0 * (Math.random() < .25 ? R(1.15, 1.45) : R(.55, 1.0)); o.d = 0; });
@@ -2157,7 +2172,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
         if (!o.hv) o.hv = ['rvHop', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 6)];
         if (o.pp === undefined) { o.pp = false; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
         const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '') + (o.small ? ' sm' : '');
-        el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(2 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
+        el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(2 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s;--out:${R(0, .28).toFixed(2)}s`;
         if (!o.col) { const t = Math.random(); o.col = o.small ? (t < .62 ? 'blue' : t < .86 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)]) : t < .68 ? 'blue' : t < .93 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)];
           o.tc = o.col === 'gold' ? '#2c5494' : o.col === 'blue' && Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
@@ -2173,7 +2188,8 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
     const hop = e => { const d = e.target.closest && e.target.closest('.rd'); if (!d || d.classList.contains('hv') || still) return; d.classList.add('hv'); setTimeout(() => d.classList.remove('hv'), 950); };
     track.addEventListener('pointerover', hop); track.addEventListener('pointerdown', hop);
   };
-  const place = () => { if (track) track.style.transform = `translateX(${((off % Tw) - Tw).toFixed(1)}px)`; };
+  let sq = 0, sqv = 0;
+  const place = () => { if (track) track.style.transform = `translateX(${((off % Tw) - Tw).toFixed(1)}px) scale(${(1 + sq * .35).toFixed(4)},${(1 - sq).toFixed(4)})`; };
   let dragX = null, fling = 0, lastMove = 0, moveV = 0;
   river.addEventListener('pointerdown', e => { if (e.button > 0) return; dragX = e.clientX; fling = 0; moveV = 0; lastMove = performance.now(); river.classList.add('drag'); try { river.setPointerCapture(e.pointerId); } catch (_) {} });
   river.addEventListener('pointermove', e => { if (dragX == null) return; const dx = e.clientX - dragX, now = performance.now(); dragX = e.clientX;
@@ -2187,6 +2203,9 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
     const dy = scrollY - lastY; lastY = scrollY;
     const sc = Math.min(1, Math.max(.4, innerWidth / 1280));   // on a phone the river keeps to a phone-sized pace
     boost = 0;   // no push from scrolling: a river that surges sideways while the page moves up made people queasy
+    { const want = still ? 0 : Math.max(-.07, Math.min(.07, Math.abs(dy) * .0016));   // a quick scroll squashes the band a touch; it springs back like jelly
+      sqv = (sqv + (want - sq) * .22) * .72; sq += sqv; }
+    { const rb = river.getBoundingClientRect(); river.classList.toggle('gone', rb.bottom < innerHeight * .38); }   // risen off the top: the dots pop away; back down: they pop in again
     off += 16 * sc * dt; place(); requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on'); river.classList.toggle('run', v);
     if (v && !visible && !still) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '80px 0px' }).observe(river);
@@ -2295,7 +2314,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
     if (shapes < Math.round(deep * Math.max(6, 10 * W * H / (1280 * 800)))) for (let n = 0; n < 60; n++) { const d = R(44, 104) * k, m = 10 * k, x = R(0, W), y = R(0, H);
       if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue; make(x, y, d, 'shape'); break; }
     // the field starts empty and fills as you scroll in: over the first stretch of the trip, more and more dots and words arrive
-    const ramp = Math.max(0, Math.min(1, prog / .14)); if (ramp <= 0) return;
+    const ramp = Math.max(.2, Math.min(1, prog / .14));   // never empty: a few dots and words already float there as you arrive, to draw you in
     const words = parts.filter(p => !p.dead && p.word).length, want = Math.round(ramp * Math.min(30, Math.max(11, 18 * (W * H / (1280 * 800)) / (k * k))));
     for (let n = 0, made = 0; n < 160 && words + made < want && made < Math.ceil(2 * Math.sqrt(W * H / (1280 * 800))); n++) {
       const res = Math.random() < .72, d = (res ? R(96, 134) : R(62, 88)) * k, m = 18 * k, x = R(0, W), y = R(0, H);
@@ -2813,10 +2832,10 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       if (pv >= 1) finish(); }
     const e = ss(0, 1, pv), ce = ss(.38, .58, pv), asp = 1185 / 4278, gx = colX;
     // the logo stays where it has always been: on the page's left edge, low on the screen, the words beneath it
-    const big = mob ? W * .88 : Math.min(W * .64, 880), ww = big, fs = mob ? 17 : Math.min(26, Math.max(19, big * .03));
+    const big = mob ? W * .88 : Math.min(W * .64, 880), ww = big, fs = mob ? 14 : Math.min(21, Math.max(15, big * .023));
     const below = fs * 3.3 + ledeH, wx = gx, wy = Math.max(H * .2, H * (mob ? .86 : .88) - below - big * asp);
     h1.style.setProperty('--st-w', big + 'px'); h1.style.transform = `translate(${wx.toFixed(1)}px,${wy.toFixed(1)}px)`;
-    tag.style.fontSize = fs.toFixed(2) + 'px'; const ty = wy + ww * asp * .93; tag.style.transform = `translate(${wx.toFixed(1)}px,${ty.toFixed(1)}px)`;   // tucked up close under the logo
+    tag.style.fontSize = fs.toFixed(2) + 'px'; const ty = wy + ww * asp * .86; tag.style.transform = `translate(${wx.toFixed(1)}px,${ty.toFixed(1)}px)`;   // tucked up close under the logo
     const lo = ss(.62, .96, pv); lede.style.opacity = lo; lede.style.transform = `translate(${gx}px,${(ty + fs * 2.4 + (1 - lo) * 22).toFixed(1)}px)`;
     const ink = mix('#f2eedd', '#2c5494', ce); pin.style.setProperty('--st-bg', mix('#2c5494', '#f2eedd', ce)); pin.style.setProperty('--st-ink', ink);
     const sr = stage.getBoundingClientRect(); root.classList.toggle('st-blue', ce < .5 && sr.bottom > 60); root.classList.toggle('st-on', on || sr.bottom > H * .45);
