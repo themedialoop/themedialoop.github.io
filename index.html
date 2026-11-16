@@ -2961,8 +2961,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       for (const g of regs) {   // inside this section, with a soft, wavy margin at its top and bottom
         const wv = F * .35 * Math.sin(d.x * .006 + t * .1 + (g.kind === 'ct' ? 2 : 0));
         let w = ss(g.r.top - F * .1 + wv, g.r.top + F + wv, d.y) * (1 - ss(g.r.bottom - F + wv, g.r.bottom + F * .1 + wv, d.y));
-        if (g.kind === 'ct') { const u = d.x / W, v = (d.y - g.r.top) / Math.max(1, g.r.height);   // at Contact: a lighter scatter, down the left side only
-          w *= (1 - ss(mob ? .1 : .14, mob ? .22 : .3, u + .04 * Math.sin(v * 9 - t * .12))) * (d.thin ? 0 : 1); }
+        if (g.kind === 'ct') w = 0;   // Contact keeps just its own pair of dots (drawn below)
         if (w > m) { m = w; reg = g; }
       }
       if (m < .02) continue;
@@ -2973,6 +2972,15 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       ctx.setTransform(s * DPR, 0, 0, s * DPR, px * DPR, py * DPR); ctx.rotate(d.rot + t * d.sp);
       if (d.ring) { ctx.lineWidth = .28; ctx.strokeStyle = d.col; ctx.stroke(d.s); } else { ctx.fillStyle = d.col; ctx.fill(d.s); }
     }
+    // Contact: just two dots beside the heading, a blue one and a small gold one, breathing and drifting a little
+    { const ct = secs.find(q => q.kind === 'ct'), lab = ct && ct.el.querySelector('.label .lt');
+      if (lab) { const rg = document.createRange(); rg.selectNodeContents(lab); const ls = [...rg.getClientRects()].filter(b => b.width > 4);
+        if (ls.length && ls[0].bottom > -80 && ls[0].top < H + 80) {
+          const L0 = ls[0], hgt = L0.height, R1 = Math.min(30, hgt * .26), R2 = R1 * .42;
+          const x1 = Math.min(L0.right + hgt * .55 + R1, W - R1 - 14), y1 = L0.top + hgt * .42, x2 = Math.min(x1 + R1 * 1.9, W - R2 - 10), y2 = y1 + R1 * 1.5;
+          [[x1, y1, R1, '#2c5494', 0], [x2, y2, R2, '#e7aa4d', 2.1]].forEach(([x, y, rr, col, ph]) => {
+            const sb = rr * (reduce ? 1 : .9 + .1 * Math.sin(t * 1.5 + ph)), px = x + (reduce ? 0 : 3 * Math.sin(t * .45 + ph)), py = y + (reduce ? 0 : 3 * Math.cos(t * .38 + ph));
+            ctx.setTransform(sb * DPR, 0, 0, sb * DPR, px * DPR, py * DPR); ctx.rotate(ph + t * .1); ctx.fillStyle = col; ctx.fill(shapes[ph ? 3 : 5]); }); } } }
     raf = requestAnimationFrame(frame); };
   const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
   const seen = new Set();
