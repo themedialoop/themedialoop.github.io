@@ -937,17 +937,18 @@ button,input,select,textarea,optgroup{font-family:inherit}
     placed.forEach(o => { let nd = 1e9; for (const q of placed) if (q !== o) { const dd = wrapD(o, q); if (dd < nd) nd = dd; }
       const edge = Math.min(o.y - 2, H - 2 - o.y) * 2; o.d = Math.max(d0 * .8, Math.min(nd - gapN, edge, d0 * 1.2)); });
     const slots = shuffle(placed.slice());
-    { // little dots in the nooks of the net, where three openings meet; about half the nooks get one
+    { // little dots in every nook of the net, where three openings meet, and more wherever else there is room
       const big = placed.slice(), near = big.map(o => big.filter(q => q !== o && wrapD(o, q) < s * 1.35)), seen = new Set();
       big.forEach((o, i) => near[i].forEach(q => near[i].forEach(p => { if (p === q || wrapD(p, q) > s * 1.35) return;
         const key = [o, q, p].map(t => big.indexOf(t)).sort((a, b) => a - b).join(); if (seen.has(key)) return; seen.add(key);
-        if (Math.random() > .5) return;
         // the nook's centre (allowing for the wrap at the tile's ends)
         const ux = v => { let dx = v.x - o.x; if (dx > Tw / 2) dx -= Tw; if (dx < -Tw / 2) dx += Tw; return o.x + dx; };
         let x = (o.x + ux(q) + ux(p)) / 3; const y = (o.y + q.y + p.y) / 3; x = (x + Tw) % Tw;
         const c = { x, y }; let rr = Math.min(y - 3, H - 3 - y);
         for (const t of placed) rr = Math.min(rr, wrapD(c, t) - t.d / 2 - gapN * .55);
-        const d = Math.min(2 * rr, d0 * .3); if (d >= d0 * .1) placed.push({ x, y, d, small: true }); }))); }
+        const d = Math.min(2 * rr, d0 * .3); if (d >= d0 * .08) placed.push({ x, y, d, small: true }); })));
+      for (let n = 0; n < cols * ROWS * 60; n++) { const d = d0 * R(.07, .2), o = { x: R(0, Tw), y: R(d / 2 + 2, H - d / 2 - 2), d, small: true };   // tiny ones in any spare corner, mostly along the edges
+        if (placed.every(q => wrapD(o, q) >= d / 2 + q.d / 2 + gapN * .55)) placed.push(o); } }
     for (const wd of words) {   // each word: a weight and style of its own (thin only where the type is big enough to read)
       for (const o of slots) { if (o.w) continue;
         const it = wd.fun ? Math.random() < .75 : Math.random() < .25;
