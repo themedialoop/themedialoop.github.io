@@ -1895,7 +1895,6 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .river{cursor:grab;touch-action:pan-y}.river.drag{cursor:grabbing}
 @keyframes rvGrow{0%{transform:scale(var(--g0,.94))}100%{transform:scale(var(--g1,1.07))}}
 .river .rd.hv .rs{animation:var(--hv,rvHop) .9s cubic-bezier(.3,1.4,.5,1)}   /* touch or hover a bubble: each has its own reaction */
-@keyframes rvSpin{0%{rotate:0deg}100%{rotate:360deg}}
 @keyframes rvJelly{0%{scale:1 1}20%{scale:1.22 .8}40%{scale:.86 1.16}60%{scale:1.08 .94}80%{scale:.97 1.03}100%{scale:1 1}}
 @keyframes rvPulse{0%{scale:1}35%{scale:1.28}65%{scale:.94}100%{scale:1}}
 @keyframes rvShake{0%,100%{translate:0 0}15%{translate:-8px 0}30%{translate:7px 0}45%{translate:-5px 0}60%{translate:4px 0}75%{translate:-2px 0}}
@@ -2002,7 +2001,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     placed.forEach(o => { for (const shift of [0, -Tw, Tw]) {   // a dot over the seam also appears on the other side
         const left = o.x - o.d / 2 + shift; if (left > Tw || left + o.d < 0) continue;
         if (!o.mv) { const m = ['rvBob', 'rvSway', 'rvLoop', 'rvRock', 'rvSquish', 'rvDrift'][Math.floor(Math.random() * 6)]; o.mv = m; o.md = (m === 'rvLoop' ? R(4, 7) : R(2.2, 4.8)).toFixed(2); o.mp = R(0, 6).toFixed(2); }
-        if (!o.hv) o.hv = ['rvHop', 'rvSpin', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 7)];
+        if (!o.hv) o.hv = ['rvHop', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 6)];
         if (o.pp === undefined) { o.pp = !o.w && Math.random() < .3; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
         const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '');
         el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${AY.toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
