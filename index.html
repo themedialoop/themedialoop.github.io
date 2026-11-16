@@ -1896,6 +1896,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .river.on .rs{transform:scale(1)}
 .river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--c);color:var(--tc);border-radius:var(--br);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace */
 .river .rb.ring{background:transparent;box-shadow:inset 0 0 0 var(--rw,3px) var(--c)}   /* an open circle */
+.river .rb.idot{border-radius:0;-webkit-mask:url(assets/idot.svg) center/contain no-repeat;mask:url(assets/idot.svg) center/contain no-repeat}   /* the logo's own i-dot */
+.river .rb.logo{border-radius:0;background:url(assets/medialoop-wordmark.svg) center/contain no-repeat;rotate:var(--lr,0deg)}   /* the medialoop logo, on its own */
 .river{cursor:grab;touch-action:pan-y}.river.drag{cursor:grabbing}
 @keyframes rvGrow{0%{transform:scale(var(--g0,.94))}100%{transform:scale(var(--g1,1.07))}}
 .river .rd.hv .rs{animation:var(--hv,rvHop) .9s cubic-bezier(.3,1.4,.5,1)}   /* touch or hover a bubble: each has its own reaction */
@@ -2027,6 +2029,12 @@ button,input,select,textarea,optgroup{font-family:inherit}
         const f = fit(wd.w, o.d, wt, it, hi); if (!f) continue;
         if (wt < 300 && f.fs < 18) { wt = 300 + 100 * Math.floor(Math.random() * 3); const f2 = fit(wd.w, o.d, wt, it, hi); if (!f2) continue; Object.assign(f, f2); }
         o.w = wd.w; o.fun = wd.fun; o.f = f; o.wt = wt; o.it = it; break; } }
+    { // the empty openings: once or twice the medialoop logo itself, and among the rest some open circles and some i-dots
+      const nLogo = Tw > 2200 ? 2 : 1, logos = [];
+      for (const o of placed.filter(o => !o.small && !o.w).sort((a, b) => b.d - a.d)) {
+        if (logos.length >= nLogo) break; if (logos.some(q => wrapD(o, q) < Tw / 3)) continue; o.logo = true; o.lr = R(-4, 10).toFixed(1); logos.push(o); }
+      placed.forEach(o => { if (o.w || o.logo) return; const t = Math.random();
+        if (t < (o.small ? .16 : .32)) o.ring = true; else if (t < (o.small ? .3 : .5) && o.d < d0 * .85) o.idot = true;   // (i-dots only on the smaller ones: a big one leaves a gap in the net) }); }
     const tile = document.createElement('div'); tile.className = 'tile'; tile.style.width = Tw + 'px';
     placed.forEach(o => { for (const shift of [0, -Tw, Tw]) {   // a dot over the seam also appears on the other side
         const left = o.x - o.d / 2 + shift; if (left > Tw || left + o.d < 0) continue;
@@ -2039,8 +2047,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
           o.tc = o.col === 'gold' ? '#2c5494' : o.col === 'blue' && Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
         if (!o.gd) { o.gd = R(3, 8).toFixed(2); o.g0 = R(.96, .985).toFixed(3); o.g1 = R(1.01, 1.025).toFixed(3); }
-        o.ring = false;
-        const b = document.createElement('div'); b.className = 'rb' + (o.ring ? ' ring' : ''); b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s;--pd:${o.pd}s;--pdd:-${o.pdd}s;--gd:${o.gd}s;--g0:${o.g0};--g1:${o.g1};--rw:${Math.max(2, o.d * .15).toFixed(1)}px`;
+        if (o.idot && o.col !== 'blue' && o.col !== 'gold' && Math.random() < .5) o.col = 'gold';   // i-dots mostly in the logo's gold or blue
+        const b = document.createElement('div'); b.className = 'rb' + (o.ring ? ' ring' : '') + (o.idot ? ' idot' : '') + (o.logo ? ' logo' : ''); b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s;--pd:${o.pd}s;--pdd:-${o.pdd}s;--gd:${o.gd}s;--g0:${o.g0};--g1:${o.g1};--rw:${Math.max(2.5, o.d * .1).toFixed(1)}px;--lr:${o.lr || 0}deg`;
         if (o.w) { const t = document.createElement('span'); t.className = 'w'; t.style.setProperty('--fs', o.f.fs + 'px'); t.style.fontWeight = o.wt; t.style.fontStyle = o.it ? 'italic' : 'normal';
           o.f.lines.forEach(l => { const sp = document.createElement('span'); sp.textContent = l; t.append(sp); }); b.append(t); }
         sc.append(b); el.append(sc); tile.append(el); } });
