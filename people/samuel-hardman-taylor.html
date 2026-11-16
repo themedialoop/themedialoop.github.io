@@ -675,7 +675,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
      it always keeps clear of the photo, the name and the links */
   const side = document.querySelector('.side-net'), sideIn = document.querySelector('.side-in');
   { const topBar = document.getElementById('top'), aside = document.querySelector('.p-side');
-    const over = () => { if (!topBar || !aside) return; const b = aside.getBoundingClientRect(); topBar.classList.toggle('over-side', mobile() && b.bottom > 70); };
+    const over = () => { if (!topBar || !aside) return; const b = aside.getBoundingClientRect(); topBar.classList.toggle('over-side', b.bottom > 70); };
     addEventListener('scroll', over, { passive: true }); addEventListener('resize', over); over(); }
   const sse = v => { v = Math.min(1, Math.max(0, v)); return v * v * (3 - 2 * v); };
   const drawSide = time => {
@@ -767,10 +767,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
 
   /* the blue sidebar meets the cream page with a natural, slightly uneven brush-stroke edge (right side on wide screens, bottom on narrow ones) */
   { const aside = document.querySelector('.p-side');
-    const brush = () => { if (!aside) return; const n = 140, pts = [], m = mobile() || innerWidth <= 900;
-      const off = u => 6 + 3 * Math.sin(u * 3.3 + .9) + 2 * Math.sin(u * 8.1 + 2.2) + .8 * Math.sin(u * 19 + 1);
-      if (m) { pts.push('0 0', '100% 0'); for (let i = n; i >= 0; i--) pts.push(`${(i / n * 100).toFixed(2)}% calc(100% - ${off(i / n).toFixed(1)}px)`); }
-      else { pts.push('0 0'); for (let i = 0; i <= n; i++) pts.push(`calc(100% - ${off(i / n).toFixed(1)}px) ${(i / n * 100).toFixed(2)}%`); pts.push('0 100%'); }
+    const brush = () => { if (!aside) return; const n = 200, pts = ['0 0', '100% 0'], D = innerWidth < 760 ? 60 : 110;   // the bottom bows down in one gentle curve, a touch uneven like a hand-cut dot
+      for (let i = n; i >= 0; i--) { const u = i / n, arc = D * (1 - Math.pow(Math.sin(u * Math.PI), .6)) + 4 * Math.sin(u * 11 + 2) + 2 * Math.sin(u * 23);
+        pts.push(`${(u * 100).toFixed(2)}% calc(100% - ${Math.max(0, arc).toFixed(1)}px)`); }
       aside.style.clipPath = `polygon(${pts.join(',')})`; };
     brush(); addEventListener('resize', brush); }
 
@@ -1120,6 +1119,26 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .pubs a[href]:is(:hover,:focus-visible),.pubs a[href]:is(:hover,:focus-visible) *{color:#f2eedd !important}
 .pubs a[href]:is(:hover,:focus-visible) .ttl-main{background-size:0 0 !important}
 .pubs a.hl-gold[href]:is(:hover,:focus-visible),.pubs a.hl-gold[href]:is(:hover,:focus-visible) *{color:#2c5494 !important}
+
+/* ---------- the blue header across the top (replaces the tall side column on wide screens too) ----------
+   Photo beside the name on wide screens, stacked on phones; its bottom edge bows down in one gentle, slightly uneven curve. */
+.p-side{position:relative !important;width:auto !important;margin-left:calc(-1 * max(16px, env(safe-area-inset-left, 0px))) !important;margin-right:calc(-1 * max(16px, env(safe-area-inset-right, 0px))) !important}
+.side-in{height:auto !important}
+.person{margin-left:0 !important}
+.top.solid:not(.open){background:color-mix(in srgb, var(--cream) 86%, transparent) !important;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.menu-btn{color:var(--blue)}
+.top.over-side:not(.open){background:transparent !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+.top.over-side:not(.open) .menu-btn{color:var(--cream)}
+.top.over-side:not(.open) .mark{filter:brightness(0) invert(94%) sepia(9%) saturate(390%) hue-rotate(10deg)}
+.top .mark,.top{transition:background .35s, filter .35s}
+@media (min-width:901px){
+  .side-in{padding:clamp(110px,13vh,150px) clamp(48px,7vw,130px) clamp(110px,14vh,150px) !important}
+  .p-side .p-hero{flex-direction:row !important;align-items:center !important;gap:clamp(36px,4.5vw,80px) !important}
+  .p-side .p-photo-shadow{width:clamp(220px,19vw,300px) !important;flex:none}
+  .p-side .p-intro h1{font-size:clamp(56px,5.6vw,100px) !important;max-width:12ch}
+  .person{padding-inline:clamp(48px,7vw,130px) !important;padding-top:clamp(50px,7vh,90px) !important}
+}
+@media (max-width:900px){.side-in{padding-bottom:clamp(90px,22vw,130px) !important}}
 </style>
 <script>
 (() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6'];
