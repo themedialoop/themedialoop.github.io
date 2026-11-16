@@ -1907,7 +1907,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
   /* the Apply card: its colour and the UIC mark (its dots are set in the dots script at the end) */
   { const ap = document.querySelector('.apply'), cv = ap && ap.querySelector('canvas');
     // the Apply card's colour is picked at random from these (never sage or lavender: the cream UIC mark gets lost on them)
-    const AC = ['a-gold', 'a-blue', 'a-gold', 'a-blue', 'a-plum']   // pink and orange stay sprinkles, never a background under words
+    const AC = ['a-gold', 'a-blue']   // the Apply card is only ever gold or blue   // pink and orange stay sprinkles, never a background under words
     , ac = AC[Math.floor(Math.random() * AC.length)]; if (ap) ap.classList.add(ac);
     // the UIC mark sits on the same line as the "More information" button: centred on it vertically
     const apUic = ap && ap.querySelector('.ap-uic'), apGo = ap && ap.querySelector('.ap-go');
