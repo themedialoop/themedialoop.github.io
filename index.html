@@ -484,6 +484,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
    while you scroll back up, and come back only after you have scrolled above the section and down again.
    Their movement is their own: a quicker, gentle swell in place (about 5% every few seconds), livelier than the slow breathe of the other dots. */
 #resDots{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#resDots:not(.awake){display:none}   /* asleep (and costing nothing) whenever they aren't showing */
 #resDots i{position:absolute;width:var(--d);height:var(--d);transform:scale(0);transition:transform .2s cubic-bezier(.55,0,.9,.4) var(--out,0s)}
 #resDots.on i:not(.clip){transform:scale(1);transition:transform .55s cubic-bezier(.3,1.6,.5,1) var(--in,0s)}
 #resDots.on.sweep i:not(.clip){transform:scale(var(--k,1));transition:transform .12s linear}
@@ -1060,13 +1061,20 @@ button,input,select,textarea,optgroup{font-family:inherit}
      A second one belongs to the Contact section, on the left. Positions: x as a share of the window width,
      yp in page pixels, r as a share of the window's longer side. */
   const footEl = document.getElementById('contact');
+  // where things sit on the page, measured now and then rather than every frame: asking the browser for positions
+  // while the page animates forces it to redo its layout, which was most of the work each frame on a phone
+  const rectCache = new Map(); let rectGen = 0;
+  const rectOf = el => { let c = rectCache.get(el);
+    if (!c || c.g !== rectGen) { const r = el.getBoundingClientRect(); c = { g: rectGen, t: r.top + scrollY, l: r.left, w: r.width, h: r.height }; rectCache.set(el, c); }
+    const top = c.t - scrollY; return { top, bottom: top + c.h, left: c.l, right: c.l + c.w, width: c.w, height: c.h }; };
+  setInterval(() => rectGen++, 700); addEventListener('resize', () => rectGen++); addEventListener('load', () => rectGen++);
   const lerp1 = (a, b, t) => a + (b - a) * t;
   function target() {
     const ih = innerHeight, m = isMobile(), e = ease(Math.min(1, scrollY / (ih * .6)));
     const top = { which: 'top', x: lerp1(m ? .86 : .94, m ? .04 : .06, e), yp: lerp1(m ? .26 : .46, m ? .14 : .1, e) * ih, r: lerp1(m ? .34 : .33, m ? .26 : .24, e) };   // desktop: far enough right that the net stays off the opening paragraph
-    const f = footEl.getBoundingClientRect();
+    const f = rectOf(footEl);
     const ct = { which: 'contact', x: m ? .12 : .14, yp: f.top + scrollY + (m ? .02 : .06) * ih, r: m ? .36 : .33, sx: 1.4 };   // stretched wider, left to right   // back on the left, just above the contact heading
-    const mr = mqEl.getBoundingClientRect();
+    const mr = rectOf(mqEl);
     const mp = Math.max(0, Math.min(1, (ih - mr.top) / (ih + mr.height)));          // how far this space has travelled up the screen
     // between About and Publications: an organic round glow, like the one at Contact, sitting on the right and
     // growing slowly as you scroll past; cream fades behind the nearby text keep it readable
@@ -1090,9 +1098,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
   let lastY = scrollY, vel = 0, pulse = 0;
 
   // while the rabbit hole fills the screen the net is out of sight: it rests, so all the phone's effort goes into the bubbles
-  let netResting = false;
+  let netResting = false, netBlank = false;
+  addEventListener('resize', () => { netBlank = false; });   // a resized canvas is blank: paint it again
   function frame(t) {
-    { if (window.mlRabbitCovers && !intro.on) { if (!netResting) { netResting = true; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); } requestAnimationFrame(frame); return; }
+    { if (window.mlRabbitCovers && !intro.on) { if (!netResting) { netResting = true; netBlank = false; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); } requestAnimationFrame(frame); return; }
       netResting = false; }
     const tg0 = intro.on ? { ...intro, which: 'intro', yp: intro.y * innerHeight + scrollY } : target(), k = reduce || intro.on ? (intro.on ? .2 : 1) : .08;
     const wt = reduce ? 0 : t / 1000, tg = intro.on ? tg0 : { ...tg0,                 // the net never quite sits still
@@ -1107,9 +1116,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
     pulse = Math.min(1, pulse * .94 + Math.abs(dy) / innerHeight * 1.6);
     const time = reduce ? 0 : t / 1000;
 
-    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = CREAM; ctx.fillRect(0, 0, W, H);
     const R = cur.r * Math.max(W, H), cx = cur.x * W, cy = cur.y * H;
-    if (R > 24) {
+    const netOn = R > 24 && cy + R * 2.2 > 0 && cy - R * 2.2 < H && cx + R * 3 > 0 && cx - R * 3 < W;   // is any of the net on screen?
+    if (netOn || !netBlank) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = CREAM; ctx.fillRect(0, 0, W, H); }
+    netBlank = !netOn;                                                                // off screen: paint the plain cream once, then rest
+    if (netOn) {
       // the gradient, inside a soft organic glow
       const size = Math.ceil(R * 2.6), q = .5;             // the glow is soft, so half resolution is plenty
       const s2 = Math.ceil(size * q);
@@ -1137,7 +1148,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
         ectx.fillStyle = e; ectx.fillRect(0, 0, s2, s2);
       }
       if (F > .01) {                                          // between About and Publications: an irregular circle whose outline keeps
-        const mrr = mqEl.getBoundingClientRect(), flow = (innerHeight - mrr.top) / (innerHeight + mrr.height);   // changing as you scroll: bulges grow and shrink
+        const mrr = rectOf(mqEl), flow = (innerHeight - mrr.top) / (innerHeight + mrr.height);   // changing as you scroll: bulges grow and shrink
         const c0 = s2 / 2;
         { const e = ectx.createRadialGradient(c0, c0, 0, c0, c0, s2 * .3);        // the round body
           e.addColorStop(0, `rgba(0,0,0,${.55 * F})`); e.addColorStop(.62, `rgba(0,0,0,${.4 * F})`); e.addColorStop(.88, `rgba(0,0,0,${.09 * F})`); e.addColorStop(1, 'rgba(0,0,0,0)'); ectx.fillStyle = e; ectx.fillRect(0, 0, s2, s2); }
@@ -1200,20 +1211,20 @@ button,input,select,textarea,optgroup{font-family:inherit}
       const mk = document.getElementById('introMark') || heroMarkEl;
       clear(mk && mk.getBoundingClientRect(), .62, 1.05);
       if (cur.which === 'mid') {                                    // cream fades behind the text around the middle net
-        document.querySelectorAll('.about-grid > *, #publications .label, #publications .pubs li:nth-child(-n+2), #publications .more').forEach(el => clear(el.getBoundingClientRect(), .62, .9, .96, .9));
+        document.querySelectorAll('.about-grid > *, #publications .label, #publications .pubs li:nth-child(-n+2), #publications .more').forEach(el => clear(rectOf(el), .62, .9, .96, .9));
       }
-      const ct = contactEls.map(e => e.getBoundingClientRect());
+      const ct = contactEls.map(e => rectOf(e));
       if (ct.length) clear({ left: Math.min(...ct.map(r => r.left)), top: Math.min(...ct.map(r => r.top)), right: Math.max(...ct.map(r => r.right)), bottom: Math.max(...ct.map(r => r.bottom)),
         get width() { return this.right - this.left; }, get height() { return this.bottom - this.top; } }, .95, .95, 1, .97);   // the cream clearing behind the contact words, as before
     }
 
     // header, statement words, marquee
     top.classList.toggle('solid', scrollY > innerHeight * .55);
-    const sr = st ? st.getBoundingClientRect() : { top: 0, height: 1 };
+    const sr = st ? rectOf(st) : { top: 0, height: 1 };
     const sp = Math.min(1, Math.max(0, (innerHeight * .95 - sr.top) / (sr.height * .55 + innerHeight * .2)));
     words.forEach((el, i) => el.style.setProperty('--o', reduce ? 1 : Math.max(.28, Math.min(1, sp * words.length * 1.3 - i + 2))));
     {
-      const rr = mqEl.getBoundingClientRect();
+      const rr = rectOf(mqEl);
       rib.sy += (scrollY - rib.sy) * (reduce ? 1 : .12);
       // how far the band is through the screen: 0 as it enters at the bottom, 1 in the middle, 0 again as it leaves at the top
       const c = (rr.top + rr.height / 2) / innerHeight, vt = reduce ? 1 : ease(Math.max(0, Math.min(1, (.98 - c) / .3)));   // arrives as it comes up the screen, then stays
@@ -1885,7 +1896,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .marquee.hm-marq{height:auto !important;display:block;padding:clamp(80px,10vw,140px) 0;margin-inline:0;width:100vw;margin-left:calc(50% - 50vw);overflow-x:clip}
 .river{position:relative;height:clamp(420px,46vw,620px);overflow:hidden;width:112vw;margin-left:-6vw;rotate:-3.5deg}   /* four rows of the net */   /* tilted a little; wider than the screen so its ends never show */
 .river .track{position:absolute;left:0;top:0;height:100%;display:flex}
-.river .tile{position:relative;flex:none;height:100%}
+.river .tile{position:relative;flex:none;height:100%;content-visibility:auto}   /* stretches of river off to the side aren't drawn */
+.river:not(.run) .track{content-visibility:hidden}   /* and none of it while the river is off screen */
+.river .rd.sm,.river .rd.sm .rb::before{animation:none}   /* the small dots sit still: hundreds of little moving parts were the main cost on a phone */
+.river:not(.run) .rd,.river:not(.run) .rb::before{animation-play-state:paused}   /* and nothing moves while the river is off screen */
 .river .rd{position:absolute;animation:var(--mv,rvBob) var(--md,6s) ease-in-out var(--bp,0s) infinite alternate}   /* each bubble has its own little motion: a bob, a sway, a small loop, a rock or a squish */
 @keyframes rvSway{0%{translate:-2px 0}100%{translate:2px 0}}
 @keyframes rvLoop{0%{translate:0 -2px}25%{translate:2px 0}50%{translate:0 2px}75%{translate:-2px 0}100%{translate:0 -2px}}
@@ -2044,7 +2058,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
         if (!o.mv) { const m = ['rvBob', 'rvSway', 'rvLoop', 'rvDrift'][Math.floor(Math.random() * 4)]; o.mv = m; o.md = (m === 'rvLoop' ? R(8, 12) : R(5, 8)).toFixed(2); o.mp = R(0, 6).toFixed(2); }
         if (!o.hv) o.hv = ['rvHop', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 6)];
         if (o.pp === undefined) { o.pp = false; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
-        const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '');
+        const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '') + (o.small ? ' sm' : '');
         el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(2 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
         if (!o.col) { const t = Math.random(); o.col = o.small ? (t < .62 ? 'blue' : t < .86 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)]) : t < .68 ? 'blue' : t < .93 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)];
           o.tc = o.col === 'gold' ? '#2c5494' : o.col === 'blue' && Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
@@ -2076,7 +2090,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const sc = Math.min(1, Math.max(.4, innerWidth / 1280));   // on a phone the river keeps to a phone-sized pace
     boost = 0;   // no push from scrolling: a river that surges sideways while the page moves up made people queasy
     off += 16 * sc * dt; place(); requestAnimationFrame(loop); };
-  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on');
+  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on'); river.classList.toggle('run', v);
     if (v && !visible && !still) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '80px 0px' }).observe(river);
   addEventListener('resize', () => { if (Math.abs(river.clientWidth - builtW) > 40) build(); });
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(build);
@@ -2572,7 +2586,10 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   const sweep = () => {   // the wave line runs from the bottom of the screen to just above the top as the last card travels up
     const band = innerHeight * .3, L = innerHeight - qv * (innerHeight + band);
     dots.forEach(d => { const k = smooth(Math.min(1, Math.max(0, (L - d.y) / band))); if (Math.abs(k - (d.k ?? 1)) > .004) { d.k = k; d.el.style.setProperty('--k', k.toFixed(3)); } }); };
-  const finish = () => { on = false; armed = false; layer.classList.remove('on', 'sweep'); };
+  let sleepT = 0;
+  const wake = () => { clearTimeout(sleepT); if (!layer.classList.contains('awake')) { layer.classList.add('awake'); void layer.offsetWidth; } layer.classList.add('on'); };   // shown first, so the pop-in still plays
+  const rest = () => { clearTimeout(sleepT); sleepT = setTimeout(() => { if (!on) layer.classList.remove('awake'); }, 1200); };   // put away once they have shrunk out of sight
+  const finish = () => { on = false; armed = false; layer.classList.remove('on', 'sweep'); rest(); };
   const clip = () => {                         // keep the heading and intro clear: no dot above the intro's bottom edge
     const b = intro ? intro.getBoundingClientRect().bottom + 16 : -1e9;
     dots.forEach(d => { const c = d.y - d.r < b; if (c !== d.c) { d.c = c; d.el.classList.toggle('clip', c); } });
@@ -2581,8 +2598,8 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     // measured live, as the page above can change height while you scroll
     const st = stack.getBoundingClientRect().top, past = st <= innerHeight * .7, lastTop = st + tail;
     if (sec.getBoundingClientRect().top > innerHeight && !on) { armed = true; q = qv = 0; dots.forEach(d => { d.k = 1; d.el.style.removeProperty('--k'); }); }   // above the section: ready for the next way down
-    if (on && !past && q === 0) { on = false; layer.classList.remove('on'); }   // scrolled back up above the stack before the end
-    else if (!on && armed && down && past && lastTop > innerHeight) { clip(); on = true; layer.classList.add('on'); }
+    if (on && !past && q === 0) { on = false; layer.classList.remove('on'); rest(); }   // scrolled back up above the stack before the end
+    else if (!on && armed && down && past && lastTop > innerHeight) { clip(); on = true; wake(); }
     else if (!on && lastTop <= innerHeight) armed = false;   // never start once the last card is already coming up
     if (!on) return;
     clip();

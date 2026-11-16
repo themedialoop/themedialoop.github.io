@@ -734,7 +734,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .p-river{display:block;padding:clamp(30px,5vw,60px) 0;overflow-x:clip}
 .river{position:relative;height:clamp(400px,40vw,560px);overflow:hidden;width:112%;margin-left:-6%;rotate:-3.5deg}   /* four rows of the net */   /* tilted a little; wider than the screen so its ends never show */
 .river .track{position:absolute;left:0;top:0;height:100%;display:flex}
-.river .tile{position:relative;flex:none;height:100%}
+.river .tile{position:relative;flex:none;height:100%;content-visibility:auto}   /* stretches of river off to the side aren't drawn */
+.river:not(.run) .track{content-visibility:hidden}   /* and none of it while the river is off screen */
+.river .rd.sm,.river .rd.sm .rb::before{animation:none}   /* the small dots sit still: hundreds of little moving parts were the main cost on a phone */
+.river:not(.run) .rd,.river:not(.run) .rb::before{animation-play-state:paused}   /* and nothing moves while the river is off screen */
 .river .rd{position:absolute;animation:var(--mv,rvBob) var(--md,6s) ease-in-out var(--bp,0s) infinite alternate}   /* each bubble has its own little motion: a bob, a sway, a small loop, a rock or a squish */
 @keyframes rvSway{0%{translate:-2px 0}100%{translate:2px 0}}
 @keyframes rvLoop{0%{translate:0 -2px}25%{translate:2px 0}50%{translate:0 2px}75%{translate:-2px 0}100%{translate:0 -2px}}
@@ -857,7 +860,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
         if (!o.mv) { const m = ['rvBob', 'rvSway', 'rvLoop', 'rvDrift'][Math.floor(Math.random() * 4)]; o.mv = m; o.md = (m === 'rvLoop' ? R(8, 12) : R(5, 8)).toFixed(2); o.mp = R(0, 6).toFixed(2); }
         if (!o.hv) o.hv = ['rvHop', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 6)];
         if (o.pp === undefined) { o.pp = false; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
-        const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '');
+        const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '') + (o.small ? ' sm' : '');
         el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(2 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
         if (!o.col) { const t = Math.random(); o.col = o.small ? (t < .62 ? 'blue' : t < .86 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)]) : t < .68 ? 'blue' : t < .93 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)];
           o.tc = o.col === 'gold' ? '#2c5494' : o.col === 'blue' && Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
@@ -889,7 +892,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const sc = Math.min(1, Math.max(.4, innerWidth / 1280));   // on a phone the river keeps to a phone-sized pace
     boost = 0;   // no push from scrolling: a river that surges sideways while the page moves up made people queasy
     off += 16 * sc * dt; place(); requestAnimationFrame(loop); };
-  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on');
+  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on'); river.classList.toggle('run', v);
     if (v && !visible && !still) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '80px 0px' }).observe(river);
   addEventListener('resize', () => { if (Math.abs(river.clientWidth - builtW) > 40) build(); });
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(build);
