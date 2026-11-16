@@ -630,6 +630,13 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
 .river{overflow:visible !important}
 .marquee.hm-marq{overflow:visible !important;overflow-x:clip !important}
 </style>
+<style>
+/* the bar at the top: no hard bottom edge that slices the dots passing under it. A soft cream veil that fades away
+   downwards instead, so a dot sliding up simply melts into it */
+html body .top.solid:not(.open){background:linear-gradient(to bottom, var(--cream,#f2eedd) 0%, var(--cream,#f2eedd) 45%, color-mix(in srgb, var(--cream,#f2eedd) 70%, transparent) 70%, transparent 100%) !important;
+  backdrop-filter:none !important;-webkit-backdrop-filter:none !important;padding-bottom:34px !important}
+html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){background:transparent !important;padding-bottom:18px !important}
+</style>
 </head>
 <body>
 <canvas id="net" aria-hidden="true"></canvas>
