@@ -2984,7 +2984,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       if (lab) { const rg = document.createRange(); rg.selectNodeContents(lab); const ls = [...rg.getClientRects()].filter(b => b.width > 4);
         if (ls.length && ls[0].bottom > -80 && ls[0].top < H + 80) {
           const L0 = ls[0], hgt = L0.height, R1 = Math.min(30, hgt * .26), R2 = R1 * .42;
-          const x1 = Math.min(L0.right + hgt * .55 + R1, W - R1 - 14), y1 = L0.top + hgt * .42, x2 = Math.min(x1 + R1 * 1.9, W - R2 - 10), y2 = y1 + R1 * 1.5;
+          const ph2 = W < 760, x1 = W - Math.max(ph2 ? 48 : 70, W * (ph2 ? .13 : .13)), y1 = ph2 ? L0.top - hgt * .55 : L0.top + hgt * .4, x2 = Math.min(x1 + R1 * 1.6, W - R2 - 12), y2 = y1 + R1 * 1.9;   // floating on the far right of the screen, well clear of the words
           [[x1, y1, R1, '#2c5494', 0], [x2, y2, R2, '#e7aa4d', 2.1]].forEach(([x, y, rr, col, ph]) => {
             const sb = rr * (reduce ? 1 : .9 + .1 * Math.sin(t * 1.5 + ph)), px = x + (reduce ? 0 : 3 * Math.sin(t * .45 + ph)), py = y + (reduce ? 0 : 3 * Math.cos(t * .38 + ph));
             ctx.setTransform(sb * DPR, 0, 0, sb * DPR, px * DPR, py * DPR); ctx.rotate(ph + t * .1); ctx.fillStyle = col; ctx.fill(shapes[ph ? 3 : 5]); }); } } }
