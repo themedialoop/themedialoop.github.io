@@ -368,7 +368,7 @@ body{font-size:clamp(1.0625rem,1rem + .35vw,1.25rem)}
 </style>
 <style>
 /* "Sam's Buzzwords": big chunky type above the river, at the river's slant, its o a blue dot; no thin rules around this section */
-.bz-h{position:relative;z-index:2;margin:0 0 clamp(4px,1vw,14px);font-weight:900;font-size:clamp(38px,9.5vw,140px);line-height:.9;letter-spacing:-.055em;color:var(--blue,#2c5494);rotate:-3.5deg;transform-origin:0 100%;white-space:nowrap}
+.bz-h{position:relative;z-index:2;margin:0 0 clamp(4px,1vw,14px);font-weight:900;font-size:clamp(28px,8.6vw,126px);line-height:.9;letter-spacing:-.055em;color:var(--blue,#2c5494);rotate:-3.5deg;transform-origin:0 100%;white-space:nowrap}
 .bz-o{display:inline-block;width:.52em;height:.5em;margin:0 .03em 0 .02em;background:var(--blue,#2c5494);border-radius:52% 48% 55% 45%/46% 54% 47% 53%;vertical-align:baseline;animation:bzO 4.2s ease-in-out infinite alternate}
 .bz-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @keyframes bzO{from{transform:scale(.92)}to{transform:scale(1.06)}}
@@ -842,7 +842,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
   const RES = [...ul.querySelectorAll('strong')].map(s => s.textContent.trim()).filter(Boolean), FUN = [];
   { const h1 = document.querySelector('h1'), first = h1 ? h1.textContent.trim().split(' ')[0] : '', nm = first === 'Samuel' ? 'Sam' : first;   // "Sam's Buzzwords"
     const hh = document.createElement('h2'); hh.className = 'bz-h';
-    hh.innerHTML = `<span class="bz-sr">${nm}&rsquo;s Curiosities</span><span aria-hidden="true"><span class="bz-a">${nm}&rsquo;s</span> <span class="bz-b">Curiosities</span></span>`; ul.after(hh); }
+    hh.innerHTML = `<span class="bz-sr">${nm}&rsquo;s Favorite Things</span><span aria-hidden="true"><span class="bz-a">${nm}&rsquo;s</span> <span class="bz-b">Favorite Things</span></span>`; ul.after(hh); }
   const box = document.createElement('div'); box.className = 'p-river'; box.setAttribute('role', 'img'); box.setAttribute('aria-label', 'Research interests: ' + RES.join(', '));
   ul.parentNode.querySelector('.bz-h').after(box);
   const river = document.createElement('div'); river.className = 'river'; river.setAttribute('aria-hidden', 'true'); box.append(river);
