@@ -2110,7 +2110,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const el = p.el = document.createElement('div'); el.className = 'dot' + (kind === 'dust' ? ' dust' : '');
     el.style.width = el.style.height = B.toFixed(1) + 'px'; p.ts = B / d;   // text and shapes are laid out at full size too
     const sc = document.createElement('div'); sc.className = 'sc';
-    const col = pickCol(), wordy = kind === 'res' || kind === 'fun';
+    const blueing = Math.max(0, Math.min(1, (prog - .45) / .5)), col = Math.random() < blueing * blueing * (3 - 2 * blueing) * .95 ? 'blue' : pickCol(), wordy = kind === 'res' || kind === 'fun';   // the field turns blue as you near the end
     if (kind === 'shape') p.logo = true;   // shapes stay whole, like the word bubbles
     const blob = p.blob = document.createElement(wordy ? 'button' : 'div'); blob.className = 'blob';
     blob.style.cssText = `--c:${COL[col]};--tc:${textCol(col)};--br:${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()};--bd:-${R(0, 2.8).toFixed(2)}s`;
@@ -2173,7 +2173,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       ok = marks.every(m => { const w = m.ww * z; return Math.hypot(x - (W / 2 + m.wx * z), y - (H / 2 + m.wy * z)) > w0 / 2 + w / 2 + 12; }); }
     if (!ok) return false; const B = Math.max(W, H) * 1.6;
     const el = document.createElement('div'); el.className = 'fly'; el.setAttribute('aria-hidden', 'true');
-    el.style.width = B.toFixed(0) + 'px'; el.style.height = (B * 1185 / 4278).toFixed(0) + 'px'; el.style.background = MARK_COLS[Math.floor(Math.random() * MARK_COLS.length)];
+    el.style.width = B.toFixed(0) + 'px'; el.style.height = (B * 1185 / 4278).toFixed(0) + 'px'; el.style.background = Math.random() < Math.max(0, Math.min(1, (prog - .45) / .5)) ? '#2c5494' : MARK_COLS[Math.floor(Math.random() * MARK_COLS.length)];
     el.style.opacity = '0'; el.style.transition = 'opacity .5s';
     if (Math.random() < .5) { el.style.zIndex = '0'; band.prepend(el); } else band.append(el);   // some pass behind the dots, some in front
     requestAnimationFrame(() => { el.style.opacity = '1'; });
@@ -2204,7 +2204,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
   // at the bottom of the rabbit hole you fall through: the field rushes outward, one blue dot opens up from the middle
   // until it fills the screen, and you come out on the blue of the landing page as it opens again
   let warping = false;
-  const warp = () => { warping = true; band.classList.add('warp');
+  let lastHush = 0; const hush = e => { if (e.cancelable) e.preventDefault(); e.stopImmediatePropagation(); lastHush = performance.now(); };
+  const holdInput = on => ['wheel', 'touchstart', 'touchmove', 'keydown'].forEach(t => (on ? addEventListener : removeEventListener)(t, hush, { capture: true, passive: false }));
+  const warp = () => { warping = true; band.classList.add('warp'); holdInput(true);   // no scrolling until 0.4 s after the blue starts to lift
     const c = document.createElement('div'); c.className = 'cover'; const D = Math.hypot(W, H) * 1.35; c.style.width = c.style.height = D + 'px'; band.append(c);
     requestAnimationFrame(() => requestAnimationFrame(() => { c.style.transform = 'translate(-50%,-50%) scale(1)'; }));
     setTimeout(() => {   // the screen is all blue now: behind it, back to the top and the opener begins
@@ -2213,7 +2215,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo({ top: 0, behavior: 'instant' }); document.documentElement.style.scrollBehavior = '';
       const replayed = window.mlPlayOpener && window.mlPlayOpener();
       if (!replayed) { window.scrollTo({ top: 0, behavior: 'instant' }); }
-      setTimeout(() => { band.style.transition = 'opacity .9s cubic-bezier(.4,0,.2,1)'; band.style.opacity = '0';   // the blue melts away into the opener's blue net
+      setTimeout(() => { band.style.transition = 'opacity .9s cubic-bezier(.4,0,.2,1)'; band.style.opacity = '0'; const t0 = performance.now(); const release = () => { const now = performance.now(); if (now - t0 >= 400 && (now - lastHush > 250 || now - t0 > 1600)) holdInput(false); else setTimeout(release, 60); }; setTimeout(release, 400);   // at least 0.4 s, and until any coasting scroll has stopped   // the blue melts away into the opener's blue net
         setTimeout(() => { band.classList.remove('warp'); c.remove(); band.style.transition = ''; band.style.opacity = ''; warping = false; visible = false; nextMark = 0; build(); }, 950); }, 120);
     }, 1050); };
   const loop = now => { if (!visible && !warping) { last = 0; sv = vel = 0; window.mlRabbitCovers = false; return; }
