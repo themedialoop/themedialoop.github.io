@@ -802,13 +802,18 @@ button,input,select,textarea,optgroup{font-family:inherit}
     // an inverted infinity net: openings of about the same size, in staggered rows, with a narrow cream mesh between them.
     // Each research term takes an opening of its own; the rest of the openings are left plain.
     const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-    const ROWS = 4, m = 8 * k, d0 = (H - 2 * m) / (1 + (ROWS - 1) * .9526), s = d0 * 1.1, py = s * .866;
+    const ROWS = 4, m = 6 * k, d0 = (H - 2 * m) / (1 + (ROWS - 1) * .9526) * 1.02, s = d0 * 1.08, py = s * .866;
     const words = shuffle(RES.slice()).map(w => ({ w, fun: false })).concat(shuffle(FUN.slice()).map(w => ({ w, fun: true })));
     const cols = Math.max(Math.ceil(W * 1.2 / s), Math.ceil(words.length * 1.4 / ROWS)); Tw = cols * s;
     const hi = Math.round(Math.min(22, d0 * .17));
     const WTS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
     const placed = [];
-    for (let rr = 0; rr < ROWS; rr++) for (let c = 0; c < cols; c++) placed.push({ x: c * s + (rr % 2) * s / 2 + R(-.03, .03) * d0, y: m + d0 / 2 + rr * py + R(-.03, .03) * d0, d: d0 * R(.95, 1.03) });
+    for (let rr = 0; rr < ROWS; rr++) for (let c = 0; c < cols; c++) placed.push({ x: c * s + (rr % 2) * s / 2 + R(-.06, .06) * d0, y: m + d0 / 2 + rr * py + R(-.05, .05) * d0, d: d0 });
+    // like a hand-painted infinity net: the openings are jostled a little, and each one grows to fill its own space,
+    // so the cream lines between them stay thin and even while no two openings are quite alike
+    const gapN = d0 * .075, wrapD = (a, b) => { let dx = Math.abs(a.x - b.x); dx = Math.min(dx, Tw - dx); return Math.hypot(dx, a.y - b.y); };
+    placed.forEach(o => { let nd = 1e9; for (const q of placed) if (q !== o) { const dd = wrapD(o, q); if (dd < nd) nd = dd; }
+      const edge = Math.min(o.y - 2, H - 2 - o.y) * 2; o.d = Math.max(d0 * .8, Math.min(nd - gapN, edge, d0 * 1.2)); });
     const slots = shuffle(placed.slice());
     for (const wd of words) {   // each word: a weight and style of its own (thin only where the type is big enough to read)
       for (const o of slots) { if (o.w) continue;
@@ -822,10 +827,10 @@ button,input,select,textarea,optgroup{font-family:inherit}
         const left = o.x - o.d / 2 + shift; if (left > Tw || left + o.d < 0) continue;
         if (!o.mv) { const m = ['rvBob', 'rvSway', 'rvLoop', 'rvRock', 'rvSquish', 'rvDrift'][Math.floor(Math.random() * 6)]; o.mv = m; o.md = (m === 'rvLoop' ? R(4, 7) : R(2.2, 4.8)).toFixed(2); o.mp = R(0, 6).toFixed(2); }
         if (!o.hv) o.hv = ['rvHop', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 6)];
-        if (o.pp === undefined) { o.pp = !o.w && Math.random() < .12; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
+        if (o.pp === undefined) { o.pp = false; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
         const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '');
         el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(3 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
-        if (!o.col) { o.col = pickCol(); o.tc = textCol(o.col); o.br = `${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()}`; o.bd = R(0, 2.8).toFixed(2); }
+        if (!o.col) { o.col = 'blue'; o.tc = Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
         if (!o.gd) { o.gd = R(3, 8).toFixed(2); o.g0 = R(.95, .98).toFixed(3); o.g1 = R(1.02, 1.04).toFixed(3); }
         o.ring = false;
