@@ -1883,15 +1883,15 @@ button,input,select,textarea,optgroup{font-family:inherit}
    words (light italic). It drifts slowly on its own and speeds up while you scroll, like the pills it replaces. Every dot
    moves together, with a gentle bob shared by its neighbours, so they never touch. */
 .marquee.hm-marq{height:auto !important;display:block;padding:clamp(80px,10vw,140px) 0;margin-inline:0;width:100vw;margin-left:calc(50% - 50vw);overflow-x:clip}
-.river{position:relative;height:clamp(340px,38vw,520px);overflow:hidden;width:112vw;margin-left:-6vw;rotate:-3.5deg}   /* tilted a little; wider than the screen so its ends never show */
+.river{position:relative;height:clamp(420px,46vw,620px);overflow:hidden;width:112vw;margin-left:-6vw;rotate:-3.5deg}   /* four rows of the net */   /* tilted a little; wider than the screen so its ends never show */
 .river .track{position:absolute;left:0;top:0;height:100%;display:flex}
 .river .tile{position:relative;flex:none;height:100%}
 .river .rd{position:absolute;animation:var(--mv,rvBob) var(--md,6s) ease-in-out var(--bp,0s) infinite alternate}   /* each bubble has its own little motion: a bob, a sway, a small loop, a rock or a squish */
-@keyframes rvSway{0%{translate:-7px 0}100%{translate:7px 0}}
-@keyframes rvLoop{0%{translate:0 -7px}25%{translate:7px 0}50%{translate:0 7px}75%{translate:-7px 0}100%{translate:0 -7px}}
+@keyframes rvSway{0%{translate:-3px 0}100%{translate:3px 0}}
+@keyframes rvLoop{0%{translate:0 -3px}25%{translate:3px 0}50%{translate:0 3px}75%{translate:-3px 0}100%{translate:0 -3px}}
 @keyframes rvRock{0%{rotate:-10deg}100%{rotate:10deg}}
-@keyframes rvSquish{0%{scale:1.07 .93}100%{scale:.93 1.07}}
-@keyframes rvDrift{0%{translate:-6px 6px}100%{translate:6px -6px}}
+@keyframes rvSquish{0%{scale:1.03 .97}100%{scale:.97 1.03}}
+@keyframes rvDrift{0%{translate:-3px 3px}100%{translate:3px -3px}}
 .river .rs{width:100%;height:100%;transform:scale(0);transition:transform .7s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
 .river.on .rs{transform:scale(1)}
 .river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--c);color:var(--tc);border-radius:var(--br);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace */
@@ -1971,50 +1971,53 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const textCol = c => c === 'gold' ? '#2c5494' : c === 'blue' && Math.random() < .25 ? '#e7aa4d' : '#f2eedd';
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mctx = document.createElement('canvas').getContext('2d');
-  const fit = (word, d, fun, hi) => {
-    for (let fs = hi; fs >= 13; fs--) {
-      mctx.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif';
+  const fit = (word, d, wt, it, hi) => {   // the largest size at which the word fits its opening, in this weight and style of Inter
+    for (let fs = hi; fs >= 10; fs--) {
+      mctx.font = (it ? 'italic ' : '') + wt + ' ' + fs + 'px Inter, sans-serif';
       const maxw = d * .74, lines = []; let cur = '', ok = true;
-      for (const w of word.split(' ')) { const t = cur ? cur + ' ' + w : w;
+      for (const w of word.split(/ |(?<=-)/)) { const t = cur ? cur + (cur.endsWith('-') ? '' : ' ') + w : w;   // long words may break after a hyphen
         if (mctx.measureText(t).width <= maxw) cur = t; else { if (cur) lines.push(cur); cur = w; if (mctx.measureText(w).width > maxw) { ok = false; break; } } }
       if (!ok) continue; lines.push(cur);
-      if (lines.length <= 3 && lines.length * fs * 1.08 <= d * .62) return { fs, lines };
+      if (lines.length <= 4 && lines.length * fs * 1.08 <= d * .7) return { fs, lines };
     }
     return null;
   };
   let track = null, Tw = 0, off = 0, boost = 0, lastY = scrollY, last = 0, visible = false, builtW = 0;
   const build = () => {
     river.textContent = ''; const H = river.clientHeight, W = river.clientWidth; builtW = W; if (!H || !W) return;
-    const k = Math.min(1.25, Math.max(.7, H / 440)), AY = 7 * k, hi = Math.round(20 * k);
-    // every word gets a dot sized to fit it; a few small plain dots go in between
-    const items = [];
+    const k = Math.min(1.25, Math.max(.7, H / 440));
+    // an inverted infinity net: openings of about the same size, in staggered rows, with a narrow cream mesh between them.
+    // Each research term takes an opening of its own; the rest of the openings are left plain.
     const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-    shuffle(RES.slice()).forEach(w => { for (let d = 100 * k; d <= 170 * k; d += 8 * k) { const f = fit(w, d, false, hi); if (f) { items.push({ d, w, f, fun: false }); break; } } });
-    shuffle(FUN.slice()).forEach(w => { for (let d = 62 * k; d <= 120 * k; d += 6 * k) { const f = fit(w, d, true, hi); if (f) { items.push({ d, w, f, fun: true }); break; } } });
-    // plain dots: some small, plenty tiny, for sparkle between the words
-    const nPlain = Math.round(items.length * .45); for (let i = 0; i < nPlain; i++) items.push({ d: R(16, 36) * k });
-    for (let i = 0; i < Math.round(nPlain * 1.1); i++) items.push({ d: R(7, 15) * k });
-    const area = items.reduce((a, o) => a + o.d * o.d, 0);
-    Tw = Math.max(W * 1.2, area / (H * .62));
-    const placed = [], gap = (a, b) => Math.max(5, .06 * Math.max(a, b)) + 18 * k;   // room for each bubble's own little motion
-    const dist = (x1, y1, x2, y2) => { let dx = Math.abs(x1 - x2); dx = Math.min(dx, Tw - dx); return Math.hypot(dx, y1 - y2); };   // the tile wraps around
-    items.sort((a, b) => b.d - a.d);
-    for (const o of items) { for (let n = 0; n < 3000; n++) { const x = R(0, Tw), y = R(o.d / 2 + AY + 6, H - o.d / 2 - AY - 6);
-        if (placed.every(q => dist(x, y, q.x, q.y) >= o.d / 2 + q.d / 2 + gap(o.d, q.d))) { o.x = x; o.y = y; placed.push(o); break; } } }
+    const ROWS = 4, m = 8 * k, d0 = (H - 2 * m) / (1 + (ROWS - 1) * .9526), s = d0 * 1.1, py = s * .866;
+    const words = shuffle(RES.slice()).map(w => ({ w, fun: false })).concat(shuffle(FUN.slice()).map(w => ({ w, fun: true })));
+    const cols = Math.max(Math.ceil(W * 1.2 / s), Math.ceil(words.length * 1.4 / ROWS)); Tw = cols * s;
+    const hi = Math.round(Math.min(22, d0 * .17));
+    const WTS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+    const placed = [];
+    for (let rr = 0; rr < ROWS; rr++) for (let c = 0; c < cols; c++) placed.push({ x: c * s + (rr % 2) * s / 2 + R(-.03, .03) * d0, y: m + d0 / 2 + rr * py + R(-.03, .03) * d0, d: d0 * R(.95, 1.03) });
+    const slots = shuffle(placed.slice());
+    for (const wd of words) {   // each word: a weight and style of its own (thin only where the type is big enough to read)
+      for (const o of slots) { if (o.w) continue;
+        const it = wd.fun ? Math.random() < .75 : Math.random() < .25;
+        let wt = WTS[Math.floor(Math.random() * WTS.length)];
+        const f = fit(wd.w, o.d, wt, it, hi); if (!f) continue;
+        if (wt < 300 && f.fs < 18) { wt = 300 + 100 * Math.floor(Math.random() * 3); const f2 = fit(wd.w, o.d, wt, it, hi); if (!f2) continue; Object.assign(f, f2); }
+        o.w = wd.w; o.fun = wd.fun; o.f = f; o.wt = wt; o.it = it; break; } }
     const tile = document.createElement('div'); tile.className = 'tile'; tile.style.width = Tw + 'px';
     placed.forEach(o => { for (const shift of [0, -Tw, Tw]) {   // a dot over the seam also appears on the other side
         const left = o.x - o.d / 2 + shift; if (left > Tw || left + o.d < 0) continue;
         if (!o.mv) { const m = ['rvBob', 'rvSway', 'rvLoop', 'rvRock', 'rvSquish', 'rvDrift'][Math.floor(Math.random() * 6)]; o.mv = m; o.md = (m === 'rvLoop' ? R(4, 7) : R(2.2, 4.8)).toFixed(2); o.mp = R(0, 6).toFixed(2); }
         if (!o.hv) o.hv = ['rvHop', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 6)];
-        if (o.pp === undefined) { o.pp = !o.w && Math.random() < .3; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
+        if (o.pp === undefined) { o.pp = !o.w && Math.random() < .12; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
         const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '');
-        el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${AY.toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
+        el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(3 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
         if (!o.col) { o.col = pickCol(); o.tc = textCol(o.col); o.br = `${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()}`; o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
-        if (!o.gd) { o.gd = R(3, 8).toFixed(2); o.g0 = R(.9, .96).toFixed(3); o.g1 = R(1.04, 1.09).toFixed(3); }
-        if (o.ring === undefined) o.ring = !o.w && Math.random() < .3;
+        if (!o.gd) { o.gd = R(3, 8).toFixed(2); o.g0 = R(.95, .98).toFixed(3); o.g1 = R(1.02, 1.04).toFixed(3); }
+        o.ring = false;
         const b = document.createElement('div'); b.className = 'rb' + (o.ring ? ' ring' : ''); b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s;--pd:${o.pd}s;--pdd:-${o.pdd}s;--gd:${o.gd}s;--g0:${o.g0};--g1:${o.g1};--rw:${Math.max(2, o.d * .15).toFixed(1)}px`;
-        if (o.w) { const t = document.createElement('span'); t.className = 'w' + (o.fun ? ' fun' : ''); t.style.setProperty('--fs', o.f.fs + 'px');
+        if (o.w) { const t = document.createElement('span'); t.className = 'w'; t.style.setProperty('--fs', o.f.fs + 'px'); t.style.fontWeight = o.wt; t.style.fontStyle = o.it ? 'italic' : 'normal';
           o.f.lines.forEach(l => { const sp = document.createElement('span'); sp.textContent = l; t.append(sp); }); b.append(t); }
         sc.append(b); el.append(sc); tile.append(el); } });
     track = document.createElement('div'); track.className = 'track';
