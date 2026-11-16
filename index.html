@@ -625,6 +625,11 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
 @keyframes bzO{from{transform:scale(.92)}to{transform:scale(1.06)}}
 @media (prefers-reduced-motion:reduce){.bz-o{animation:none}}
 </style>
+<style>
+/* the river's dots may dance beyond its band without being sliced: only the sides are clipped (by the page edge) */
+.river{overflow:visible !important}
+.marquee.hm-marq{overflow:visible !important;overflow-x:clip !important}
+</style>
 </head>
 <body>
 <canvas id="net" aria-hidden="true"></canvas>
@@ -2015,7 +2020,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
 /* research interests: a simple river of dots drifting left to right, some carrying research terms (bold) or playful
    words (light italic). It drifts slowly on its own and speeds up while you scroll, like the pills it replaces. Every dot
    moves together, with a gentle bob shared by its neighbours, so they never touch. */
-.marquee.hm-marq{height:auto !important;display:block;padding:clamp(80px,10vw,140px) 0;margin-inline:0;width:100vw;margin-left:calc(50% - 50vw);overflow-x:clip}
+.marquee.hm-marq{height:auto !important;display:block;padding:clamp(80px,10vw,140px) 0;margin-inline:0;width:100vw;margin-left:calc(50% - 50vw);overflow:clip !important}   /* clip, not hidden: a hidden box would capture the river's scroll timeline */
 .river{position:relative;height:clamp(540px,64vw,900px);overflow:hidden;width:112vw;margin-left:-6vw;rotate:-3.5deg}   /* four rows of the net */   /* tilted a little; wider than the screen so its ends never show */
 .river .track{position:absolute;left:0;top:0;height:100%;display:flex}
 .river .tile{position:relative;flex:none;height:100%}   /* (not clipped: a dot over a tile's edge simply overhangs into the next one, whole) */
@@ -2030,14 +2035,20 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
 @keyframes rvDrift{0%{translate:-1.5px 1.5px}100%{translate:1.5px -1.5px}}
 .river .rs{width:100%;height:100%;transform:scale(0);transition:transform .7s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
 .river.on .rs{transform:none}
-.river.on.gone .rs{transform:scale(0);transition:transform .26s cubic-bezier(.45,-.9,.7,.5) var(--out,0s)}   /* a quick swell, then gone: pop */
-.river .track{transform-origin:50% 50%}
-.river.gone .rd,.river.gone .rb::before{animation-play-state:paused}   /* nothing else moves while they pop */
-@media (max-width:760px),(pointer:coarse){   /* phones: the big dots shrink away smoothly on their own layers; the tiny ones simply fade with them */
-  .river .rd:not(.sm) .rs{will-change:transform}
-  .river.on.gone .rs{transition:transform .34s cubic-bezier(.5,0,.75,0) var(--out,0s)}
-  .river.on.gone .rd.sm .rs{transition:transform .18s ease-in 0s}
+.river{view-timeline:--rv block}
+@supports (animation-timeline: view()){   /* as the river rises off the top, each dot sways, spins and heads off the screen; it runs backwards when you scroll back
+     up. The browser drives it straight from the scroll position, so it stays smooth even with hundreds of dots */
+  .river.on .rd.sm .rs{animation:rvFade linear both;animation-timeline:--rv;animation-range:exit 20% exit 70%}
+  @keyframes rvFade{to{scale:0}}
+  .river.on .rd:not(.sm) .rs{animation:rvDance linear both;animation-timeline:--rv;animation-range:exit 15% exit 80%}
+  @keyframes rvDance{0%{translate:0 0;rotate:0deg;scale:1}
+    35%{translate:calc(var(--dx) * .25 + var(--sw)) calc(var(--dy) * .25);rotate:calc(var(--sr) * .3)}
+    70%{translate:calc(var(--dx) * .65 - var(--sw)) calc(var(--dy) * .65);rotate:calc(var(--sr) * .7);scale:.85}
+    100%{translate:var(--dx) var(--dy);rotate:var(--sr);scale:0}}
 }
+@media (prefers-reduced-motion:reduce){.river.on .rs{animation:none}}
+.river .track{transform-origin:50% 50%}
+
 .river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;isolation:isolate;color:var(--tc);border-radius:var(--br)}
 .river .rb::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--c);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace: only its colour does, so the words are never scaled (scaled type turns grainy) */
 .river .rb.ring::before{background:transparent;box-shadow:inset 0 0 0 var(--rw,3px) var(--c)}   /* an open circle */
@@ -2166,7 +2177,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
         const c = { x, y }; let rr = Math.min(y - 3, H - 3 - y);
         for (const t of placed) rr = Math.min(rr, wrapD(c, t) - t.d / 2 - gapN * .55);
         const d = Math.min(2 * rr, d0 * .3); if (d >= d0 * .08) placed.push({ x, y, d, small: true }); })));
-      for (let n = 0; n < cols * ROWS * 60; n++) { const d = d0 * R(.07, .2), o = { x: R(0, Tw), y: R(d / 2 + 2, H - d / 2 - 2), d, small: true };   // tiny ones in any spare corner, mostly along the edges
+      for (let n = 0; n < cols * ROWS * 10; n++) { const d = d0 * R(.07, .2), o = { x: R(0, Tw), y: R(d / 2 + 2, H - d / 2 - 2), d, small: true };   // tiny ones in any spare corner, mostly along the edges
         if (placed.every(q => wrapD(o, q) >= d / 2 + q.d / 2 + gapN * .55)) placed.push(o); } }
     for (const wd of words) {   // each word: a weight and style of its own (thin only where the type is big enough to read)
       for (const o of slots) { if (o.w) continue;
@@ -2192,6 +2203,9 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
         if (!o.col) { const t = Math.random(); o.col = o.small ? (t < .62 ? 'blue' : t < .86 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)]) : t < .68 ? 'blue' : t < .93 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)];
           o.tc = o.col === 'gold' ? '#2c5494' : o.col === 'blue' && Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
+        if (o.ddx === undefined) { const vy = -H * R(.5, 1), vx = R(-1, 1) * H * .45, L = Math.hypot(vx, vy) || 1, far = H * R(.7, 1.3);   // always up and away: never down over the words below
+          o.ddx = (vx / L * far).toFixed(0); o.ddy = (vy / L * far).toFixed(0); o.dsr = R(-220, 220).toFixed(0); o.dsw = R(6, 16).toFixed(1); }
+        sc.style.cssText = `--dx:${o.ddx}px;--dy:${o.ddy}px;--sr:${o.dsr}deg;--sw:${o.dsw}px`;
         if (!o.gd) { o.gd = R(7, 12).toFixed(2); o.g0 = R(.96, .985).toFixed(3); o.g1 = R(1.01, 1.025).toFixed(3); }
         if (o.idot && o.col !== 'blue' && o.col !== 'gold' && Math.random() < .5) o.col = 'gold';   // i-dots mostly in the logo's gold or blue
         const b = document.createElement('div'); b.className = 'rb' + (o.ring ? ' ring' : '') + (o.idot ? ' idot' : '') + (o.logo ? ' logo' : ''); b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s;--pd:${o.pd}s;--pdd:-${o.pdd}s;--gd:${o.gd}s;--g0:${o.g0};--g1:${o.g1};--rw:${Math.max(2.5, o.d * .1).toFixed(1)}px;--lr:${o.lr || 0}deg`;
@@ -2219,7 +2233,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
     const dy = scrollY - lastY; lastY = scrollY;
     const sc = Math.min(1, Math.max(.4, innerWidth / 1280));   // on a phone the river keeps to a phone-sized pace
     boost = 0;   // no push from scrolling: a river that surges sideways while the page moves up made people queasy
-    { const rb = river.getBoundingClientRect(); river.classList.toggle('gone', rb.bottom < innerHeight * .41); }   // risen off the top: the dots pop away; back down: they pop in again
+    /* (the dots' dance off the screen is driven by the browser from the scroll position: see the river's styles) */
     if (!still) sy += (scrollY * .32 * sc - sy) * Math.min(1, dt * 7);   // eased, so it glides rather than jerks
     off += 16 * sc * dt; place(); requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on'); river.classList.toggle('run', v);
@@ -2794,18 +2808,21 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         if (Math.hypot(o.x - x, o.y - y) < (o.r + r) * 1.1 + 4 + 2 * AMP) { ok = false; break; }   // never touching, even at their fullest breath and furthest drift
       if (!ok) continue;
       const d = { x, y, r, s: shapes[n % 8], rot: R(0, 6.3), ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), sp: R(-.25, .25), z: Math.random(),
-        gB: Math.random() < .1, gC: Math.random() < .035, ring: !big && Math.random() < .06 };   // on the blue: cream with some gold; on the cream: blue with a few gold
+        gB: Math.random() < .17, gC: Math.random() < .17, few: Math.random() < .85, ring: !big && Math.random() < .06 };   // on the blue: cream with some gold; on the cream: blue with a few gold
       (grid.get(key(x, y)) || grid.set(key(x, y), []).get(key(x, y))).push(d); dots.push(d);
     }
   };
   const wob = (a, t) => 1 + .09 * Math.sin(3 * a + 1.3 + t * .2) + .06 * Math.sin(5 * a + .4 - t * .15) + .03 * Math.sin(8 * a + 2);
-  let gc = { x: 0, y: 0, rx: 1, ry: 1 };
+  let gc = { x: 0, y: 0, rx: 1, ry: 1 }, arcY = 0, arcOn = 1;
   const maskLanding = (x, y, t) => { const u = (x - gc.x) / gc.rx, v = (y - gc.y) / gc.ry, d = Math.hypot(u, v), a = Math.atan2(v, u); return ss(.8, 1.15, d / wob(a, t)); };
   const maskHome = (x, y, t) => { const u = x / W, v = y / H;   // along the top and down the right side, soft wavy inner edges
     const topD = (mob ? .2 : .19) * (1 + .22 * Math.sin(u * 7.3 + 1 + t * .18) + .12 * Math.sin(u * 15 + 2 - t * .12));
     const rgtD = (mob ? .2 : .25) * (1 + .2 * Math.sin(v * 6.1 + 2.4 - t * .16) + .1 * Math.sin(v * 13 + .5 + t * .1));
     const foot = 1 - ss(.62 + .08 * Math.sin(u * 5.3 + 1.7 + t * .12), .95, v);   // and the band down the right tapers away before the landing ends: no dot is ever cut off by its edge
-    return Math.max(1 - ss(topD * .55, topD, v), (1 - ss(rgtD * .55, rgtD, 1 - u)) * foot); };
+    // and a loose curve of dots sweeping under the logo and the words, rising on the right to meet the band there
+    const yc = arcY + H * .05 * Math.sin(u * 4.1 + t * .14) - (arcY - H * .45) * ss(.45, 1, u) * .9, band = H * (mob ? .065 : .085);
+    const arc = (1 - ss(band * .45, band, Math.abs(y - yc))) * ss(.02, .1, u);
+    return Math.max(1 - ss(topD * .55, topD, v), (1 - ss(rgtD * .55, rgtD, 1 - u)) * foot, arc * arcOn); };
 
   // ---- the opener's state: pv runs 0 (landing) to 1 (home page). It only moves forward, on its own, once started
   let pv = 1, going = false, on = false, idle = 0, lastT = 0, guard = 0, popped = true;
@@ -2855,6 +2872,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const lo = ss(.62, .96, pv); lede.style.opacity = lo; lede.style.transform = `translate(${gx}px,${(ty + fs * (5.1 - 3.3 * ss(.3, .7, pv)) + (1 - lo) * 22).toFixed(1)}px)`;
     const ink = mix('#f2eedd', '#2c5494', ce); pin.style.setProperty('--st-bg', mix('#2c5494', '#f2eedd', ce)); pin.style.setProperty('--st-ink', ink);
     const sr = stage.getBoundingClientRect(); root.classList.toggle('st-blue', ce < .5 && sr.bottom > 60); root.classList.toggle('st-on', on || sr.bottom > H * .45);
+    arcY = Math.min(H - H * (mob ? .07 : .09), ty + fs * (5.1 - 3.3 * ss(.3, .7, pv)) + ledeH + Math.min(56, H * .06));   // just under the description
     gc = { x: wx + ww / 2, y: wy + ww * asp * .62, rx: ww * (mob ? .6 : .66), ry: ww * asp * (mob ? 1.35 : 1.25) + fs };   // the clearing around the logo and tagline
     // the gold dot: a big sweeping gesture, out wide to the side, up over the page, then down onto the i, swelling mid-flight
     { const cw = 92, ch = 84, x0 = W / 2 - cw / 2, y0 = H - Math.max(28, 18) - ch, x1 = wx + ww * .47751, y1 = wy + ww * asp * .24869, w1 = ww * .03637, h1d = ww * asp * .11527;
@@ -2873,7 +2891,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     // the right), swaying from side to side and spinning as it goes; scroll back up and they dance home again
     const sq = on || reduce ? 0 : Math.min(1, Math.max(0, -sr.top / (H * 1.05))), sqe = sq * sq * (3 - 2 * sq), hx = wx + ww * .35, hy = wy + ww * asp;
     for (const d of dots) {
-      const k = ss(d.z * .45, d.z * .45 + .55, e), m = lerp(maskLanding(d.x, d.y, t), maskHome(d.x, d.y, t), k) * ss(d.z * .6, d.z * .6 + .4, born);   // each makes the trip at its own moment
+      arcOn = d.few ? 1 : 0; const k = ss(d.z * .45, d.z * .45 + .55, e), m = lerp(maskLanding(d.x, d.y, t), maskHome(d.x, d.y, t), k) * ss(d.z * .6, d.z * .6 + .4, born);   // each makes the trip at its own moment
       if (m < .02) continue;
       let px = d.x + AMP * Math.sin(t * d.fx + d.ph), py = d.y + AMP * Math.cos(t * d.fy + d.ph * 1.3), spin = 0;   // each wanders on its own small loop
       if (sqe > 0) { let vx = d.x - hx, vy = d.y - hy; const L = Math.hypot(vx, vy) || 1; vx /= L; vy /= L;
