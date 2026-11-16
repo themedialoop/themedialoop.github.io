@@ -1893,11 +1893,13 @@ button,input,select,textarea,optgroup{font-family:inherit}
 @keyframes rvSquish{0%{scale:1.03 .97}100%{scale:.97 1.03}}
 @keyframes rvDrift{0%{translate:-1.5px 1.5px}100%{translate:1.5px -1.5px}}
 .river .rs{width:100%;height:100%;transform:scale(0);transition:transform .7s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
-.river.on .rs{transform:scale(1)}
-.river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--c);color:var(--tc);border-radius:var(--br);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace */
-.river .rb.ring{background:transparent;box-shadow:inset 0 0 0 var(--rw,3px) var(--c)}   /* an open circle */
+.river.on .rs{transform:none}
+.river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;isolation:isolate;color:var(--tc);border-radius:var(--br)}
+.river .rb::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--c);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace: only its colour does, so the words are never scaled (scaled type turns grainy) */
+.river .rb.ring::before{background:transparent;box-shadow:inset 0 0 0 var(--rw,3px) var(--c)}   /* an open circle */
 .river .rb.idot{border-radius:0;-webkit-mask:url(assets/idot.svg) center/contain no-repeat;mask:url(assets/idot.svg) center/contain no-repeat}   /* the logo's own i-dot */
-.river .rb.logo{border-radius:0;background:url(assets/medialoop-wordmark.svg) center/contain no-repeat;rotate:var(--lr,0deg)}   /* the medialoop logo, on its own */
+.river .rb.logo{border-radius:0;background:url(assets/medialoop-wordmark.svg) center/contain no-repeat;rotate:var(--lr,0deg)}   /* (no colour behind it) */
+.river .rb.logo::before{display:none}   /* the medialoop logo, on its own */
 .river{cursor:grab;touch-action:pan-y}.river.drag{cursor:grabbing}
 @keyframes rvGrow{0%{transform:scale(var(--g0,.94))}100%{transform:scale(var(--g1,1.07))}}
 .river .rd.hv .rs{animation:var(--hv,rvHop) .9s cubic-bezier(.3,1.4,.5,1)}   /* touch or hover a bubble: each has its own reaction */
@@ -1907,14 +1909,14 @@ button,input,select,textarea,optgroup{font-family:inherit}
 @keyframes rvDip{0%{translate:0 0}30%{translate:0 4px;scale:1.03 .93}60%{translate:0 -2px;scale:.97 1.02}100%{translate:0 0;scale:1}}
 @keyframes rvTwirl{0%{rotate:0deg;scale:1}50%{rotate:-22deg;scale:1.03}75%{rotate:10deg}100%{rotate:0deg;scale:1}}
 @keyframes rvHop{0%{translate:0 0;rotate:0deg}25%{translate:0 -4px;rotate:-8deg}50%{translate:0 1px;rotate:6deg}70%{translate:0 -2px;rotate:-3deg}100%{translate:0 0;rotate:0deg}}
-.river .w{display:block;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
+.river .w{display:block;-webkit-font-smoothing:antialiased;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
 .river .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
 .river .w span{display:block}
 .river-words{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.river .rd.pp .rb{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,rvPop var(--pd,11s) ease-in-out var(--pdd,0s) infinite}   /* a few little dots pop out and back now and then */
+.river .rd.pp .rb::before{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,rvPop var(--pd,11s) ease-in-out var(--pdd,0s) infinite}   /* a few little dots pop out and back now and then */
 @keyframes rvPop{0%,80%{scale:1}85%,90%{scale:0}96%{scale:1.18}100%{scale:1}}
 @keyframes rvBob{0%{translate:0 var(--ay)}100%{translate:0 calc(var(--ay) * -1)}}   /* every motion stays well inside the cream line around each dot */
-@media (prefers-reduced-motion:reduce){.river .rd,.river .rb,.river .rd.pp .rb{animation:none}.river{rotate:-3.5deg}.river .rs{transition:none}}
+@media (prefers-reduced-motion:reduce){.river .rd,.river .rb::before,.river .rd.pp .rb::before{animation:none}.river{rotate:-3.5deg}.river .rs{transition:none}}
 /* the rabbit hole, at the very end of the page. It holds the screen for a long while as you scroll: the dots flow slowly
    outward from the middle, as if you are sinking into the field, new bubbles bloom in every gap that opens (some with
    research terms in bold, some with playful words in light italic), and fine dust thickens until it envelops you, then lets
