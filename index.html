@@ -2143,13 +2143,15 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const deep = Math.max(0, (prog - .78) / .2);   // the shapes only turn up near the very end
     if (shapes < Math.round(deep * Math.max(6, 10 * W * H / (1280 * 800)))) for (let n = 0; n < 60; n++) { const d = R(44, 104) * k, m = 10 * k, x = R(0, W), y = R(0, H);
       if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue; make(x, y, d, 'shape'); break; }
-    const words = parts.filter(p => !p.dead && p.word).length, want = Math.round(Math.min(30, Math.max(11, 18 * (W * H / (1280 * 800)) / (k * k))));
+    // the field starts empty and fills as you scroll in: over the first stretch of the trip, more and more dots and words arrive
+    const ramp = Math.max(0, Math.min(1, prog / .14)); if (ramp <= 0) return;
+    const words = parts.filter(p => !p.dead && p.word).length, want = Math.round(ramp * Math.min(30, Math.max(11, 18 * (W * H / (1280 * 800)) / (k * k))));
     for (let n = 0, made = 0; n < 160 && words + made < want && made < Math.ceil(2 * Math.sqrt(W * H / (1280 * 800))); n++) {
       const res = Math.random() < .72, d = (res ? R(96, 134) : R(62, 88)) * k, m = 18 * k, x = R(0, W), y = R(0, H);
       if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue;
       const p = make(x, y, d, res ? 'res' : 'fun'); if (!p.word) p.kind = 'plain'; else made++;
     }
-    const target = .58 + .2 * fill, wordsNow = parts.filter(p => !p.dead && p.word).length;   // dense from the start: no bare cream
+    const target = (.58 + .2 * fill) * ramp, wordsNow = parts.filter(p => !p.dead && p.word).length;   // dense from the start: no bare cream
     for (let n = 0; n < budget * 10 && budget > 0; n++) {
       if (coverage() > target) return;
       const short = wordsNow < want * .7;   // while words are short, only dust fills in, so word bubbles still find room
@@ -2196,7 +2198,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     k = Math.min(1.6, Math.max(.62, Math.sqrt(W * H / (1280 * 800))));   // dot sizes follow the screen, phone to wall display
     marks.forEach(m => m.el.remove()); marks = []; nextMark = 0;
     zl = progress() * 2.3; fill = still ? .6 : 0;
-    for (let i = 0; i < 30; i++) spawn(1); spawn(400); tick();
+    prog = progress(); for (let i = 0; i < 30; i++) spawn(1); spawn(400); tick();   // empty if you have not scrolled in yet
   };
   // at the bottom of the rabbit hole you fall through: the field rushes outward, one blue dot opens up from the middle
   // until it fills the screen, and you come out on the blue of the landing page as it opens again
