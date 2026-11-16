@@ -2996,7 +2996,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         if (g.kind === 'ct') { const u = d.x / W, vv = (d.y - g.r.top) / Math.max(1, g.r.bottom - g.r.top), ed = (mob ? .8 : Math.min(.8, Math.max(.5, ctEdge + .05))) + .025 * Math.sin(d.y * .012 + t * .15) + .65 * ss(.3, .75, vv);   // lower down it trickles off the right side: no band of dots running along underneath   // Contact: dots on the right side only,
           w *= ss(ed, ed + .08, u); }                                                                                      // with plenty of cream between them and the words
         if (g.kind === 'res' && g.r.resBot !== undefined && d.y > g.r.resBot - F) {   // ... past the cards it thins out and drifts over to the right, clear of the words
-          const f = Math.min(1, Math.max(0, (d.y - g.r.resBot + F) / Math.max(1, g.r.bottom - g.r.resBot + F))), u = d.x / W, edge = (mob ? .3 : .1) + ((mob ? .5 : Math.min(.8, Math.max(.5, ctEdge + .05))) - (mob ? .3 : .1)) * f + .04 * Math.sin(d.y * .01 + t * .2);   // drifts right until it lines up with Contact's field
+          const f = Math.min(1, Math.max(0, (d.y - g.r.resBot + F) / Math.max(1, g.r.bottom - g.r.resBot + F))), u = d.x / W, edge = (mob ? .04 : .1) + ((mob ? .72 : Math.min(.8, Math.max(.5, ctEdge + .05))) - (mob ? .04 : .1)) * f + .04 * Math.sin(d.y * .01 + t * .2);   // drifts right until it lines up with Contact's field
           w *= ss(edge, edge + .1, u); }
         if (w > m) { m = w; reg = g; }
       }
