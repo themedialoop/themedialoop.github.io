@@ -598,6 +598,16 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
 .ev > .ev-dot::before{width:62%;height:62%;right:0;bottom:0;border-width:clamp(7px,.7vw,10px);border-radius:52% 48% 55% 45%/46% 54% 47% 53%}
 .ev > .ev-dot::after{width:30%;height:30%;left:8%;top:12%;border-width:clamp(5px,.5vw,7px);border-radius:47% 53% 45% 55%/55% 46% 54% 45%}
 .ev:nth-child(2) > .ev-dot{animation-delay:-3s}.ev:nth-child(3) > .ev-dot{animation-delay:-5s}.ev:nth-child(4) > .ev-dot{animation-delay:-1.5s}
+/* each card's trio is arranged a little differently */
+.ev:nth-child(2) > .ev-dot{background:radial-gradient(circle at 80% 14%, var(--ring,#f2eedd) 0 6%, transparent 6.5%)}
+.ev:nth-child(2) > .ev-dot::before{width:48%;height:48%;right:auto;left:4%;bottom:6%;border-radius:47% 53% 45% 55%/55% 46% 54% 45%}
+.ev:nth-child(2) > .ev-dot::after{width:40%;height:40%;left:auto;right:4%;top:auto;bottom:30%;border-radius:52% 48% 55% 45%/46% 54% 47% 53%}
+.ev:nth-child(3) > .ev-dot{background:radial-gradient(circle at 63% 66%, var(--ring,#f2eedd) 0 9%, transparent 9.5%)}
+.ev:nth-child(3) > .ev-dot::before{width:70%;height:70%;right:0;bottom:0}
+.ev:nth-child(3) > .ev-dot::after{width:20%;height:20%;left:4%;top:4%}
+.ev:nth-child(4) > .ev-dot{background:radial-gradient(circle at 12% 30%, var(--ring,#f2eedd) 0 5%, transparent 5.5%)}
+.ev:nth-child(4) > .ev-dot::before{width:34%;height:34%;right:44%;bottom:2%;border-radius:55% 45% 50% 50%/48% 56% 44% 52%}
+.ev:nth-child(4) > .ev-dot::after{width:46%;height:46%;left:auto;right:0;top:18%}
 .ev > :not(.ev-dot):not(.ev-cv):not(.kdots){position:relative;z-index:1}
 @keyframes edBreathe{from{transform:scale(1)}to{transform:scale(1.04)}}
 @media (max-width:560px){.ev > .ev-dot{width:84px;height:84px;top:12px;right:12px;bottom:auto}}
@@ -2188,8 +2198,8 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
     const hop = e => { const d = e.target.closest && e.target.closest('.rd'); if (!d || d.classList.contains('hv') || still) return; d.classList.add('hv'); setTimeout(() => d.classList.remove('hv'), 950); };
     track.addEventListener('pointerover', hop); track.addEventListener('pointerdown', hop);
   };
-  let sq = 0, sqv = 0;
-  const place = () => { if (track) track.style.transform = `translateX(${((off % Tw) - Tw).toFixed(1)}px)`; };
+  let sy = 0;   // the river also follows your scroll a little: scroll down and it slides along, scroll up and it slides back
+  const place = () => { if (track) track.style.transform = `translateX(${(((off + sy) % Tw + Tw) % Tw - Tw).toFixed(1)}px)`; };
   let dragX = null, fling = 0, lastMove = 0, moveV = 0;
   river.addEventListener('pointerdown', e => { if (e.button > 0) return; dragX = e.clientX; fling = 0; moveV = 0; lastMove = performance.now(); river.classList.add('drag'); try { river.setPointerCapture(e.pointerId); } catch (_) {} });
   river.addEventListener('pointermove', e => { if (dragX == null) return; const dx = e.clientX - dragX, now = performance.now(); dragX = e.clientX;
@@ -2204,6 +2214,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
     const sc = Math.min(1, Math.max(.4, innerWidth / 1280));   // on a phone the river keeps to a phone-sized pace
     boost = 0;   // no push from scrolling: a river that surges sideways while the page moves up made people queasy
     { const rb = river.getBoundingClientRect(); river.classList.toggle('gone', rb.bottom < innerHeight * .38); }   // risen off the top: the dots pop away; back down: they pop in again
+    if (!still) sy += (scrollY * .32 * sc - sy) * Math.min(1, dt * 7);   // eased, so it glides rather than jerks
     off += 16 * sc * dt; place(); requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on'); river.classList.toggle('run', v);
     if (v && !visible && !still) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '80px 0px' }).observe(river);

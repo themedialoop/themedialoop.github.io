@@ -895,8 +895,8 @@ body{font-size:clamp(1.0625rem,1rem + .35vw,1.25rem)}
     const hop = e => { const d = e.target.closest && e.target.closest('.rd'); if (!d || d.classList.contains('hv') || still) return; d.classList.add('hv'); setTimeout(() => d.classList.remove('hv'), 950); };
     track.addEventListener('pointerover', hop); track.addEventListener('pointerdown', hop);
   };
-  let sq = 0, sqv = 0;
-  const place = () => { if (track) track.style.transform = `translateX(${((off % Tw) - Tw).toFixed(1)}px)`; };
+  let sy = 0;   // the river also follows your scroll a little: scroll down and it slides along, scroll up and it slides back
+  const place = () => { if (track) track.style.transform = `translateX(${(((off + sy) % Tw + Tw) % Tw - Tw).toFixed(1)}px)`; };
   let dragX = null, fling = 0, lastMove = 0, moveV = 0;
   river.addEventListener('pointerdown', e => { if (e.button > 0) return; dragX = e.clientX; fling = 0; moveV = 0; lastMove = performance.now(); river.classList.add('drag'); try { river.setPointerCapture(e.pointerId); } catch (_) {} });
   river.addEventListener('pointermove', e => { if (dragX == null) return; const dx = e.clientX - dragX, now = performance.now(); dragX = e.clientX;
@@ -911,6 +911,7 @@ body{font-size:clamp(1.0625rem,1rem + .35vw,1.25rem)}
     const sc = Math.min(1, Math.max(.4, innerWidth / 1280));   // on a phone the river keeps to a phone-sized pace
     boost = 0;   // no push from scrolling: a river that surges sideways while the page moves up made people queasy
     { const rb = river.getBoundingClientRect(); river.classList.toggle('gone', rb.bottom < innerHeight * .38); }   // risen off the top: the dots pop away; back down: they pop in again
+    if (!still) sy += (scrollY * .32 * sc - sy) * Math.min(1, dt * 7);   // eased, so it glides rather than jerks
     off += 16 * sc * dt; place(); requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on'); river.classList.toggle('run', v);
     if (v && !visible && !still) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '80px 0px' }).observe(river);
