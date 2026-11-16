@@ -781,9 +781,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
   ul.after(box);
   const river = document.createElement('div'); river.className = 'river'; river.setAttribute('aria-hidden', 'true'); box.append(river);
   // edge to edge: the river reaches past the page's side padding to both edges of the content area (from the blue side panel to the window's edge)
-  const bleed = () => { const pr = box.closest('.person') || document.body; box.style.marginLeft = box.style.marginRight = '0px';
-    const p = pr.getBoundingClientRect(), b = box.getBoundingClientRect(), right = document.documentElement.clientWidth, sp = document.querySelector('.p-side'), sr = sp && getComputedStyle(sp).display !== 'none' ? sp.getBoundingClientRect() : null, left = sr && sr.right < right * .7 && sr.right > 0 ? sr.right - 2 : 0;   // tucked right up to the side panel on wide screens (a hair under it), the window's edge on phones
-    box.style.marginLeft = (left - b.left) + 'px'; box.style.marginRight = (b.right - right) + 'px'; };
+  // edge to edge: the page column is centred, so reaching out by half the difference to the window's width touches both edges
+  // (done in CSS rather than measured, as a measurement taken mid-entrance, while the section is still scaled, came out short)
+  const bleed = () => { box.style.marginLeft = box.style.marginRight = 'calc(50% - 50vw)'; };
   bleed(); addEventListener('resize', bleed);
   const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', purple: '#9b6aa6' };
   const MIX = [['blue', .46], ['gold', .4], ['orange', .04], ['pink', .04], ['teal', .03], ['purple', .03]];   // mostly blue and gold, a few sprinkles
