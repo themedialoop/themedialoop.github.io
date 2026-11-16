@@ -905,9 +905,9 @@ body{font-size:clamp(1.0625rem,1rem + .35vw,1.25rem)}
 .river{view-timeline:--rv block}
 @supports (animation-timeline: view()){   /* as the river rises off the top, each dot sways, spins and heads off the screen; it runs backwards when you scroll back
      up. The browser drives it straight from the scroll position, so it stays smooth even with hundreds of dots */
-  .river.on .rd.sm .rs{animation:rvFade linear both;animation-timeline:--rv;animation-range:exit 20% exit 70%}
+  .river.on .rd.sm .rs{animation:rvFade linear both;animation-timeline:--rv;animation-range:exit 40% exit 85%}
   @keyframes rvFade{to{scale:0}}
-  .river.on .rd:not(.sm) .rs{animation:rvDance linear both;animation-timeline:--rv;animation-range:exit 15% exit 80%}
+  .river.on .rd:not(.sm) .rs{animation:rvDance linear both;animation-timeline:--rv;animation-range:exit 40% exit 95%}
   @keyframes rvDance{0%{translate:0 0;rotate:0deg;scale:1}
     35%{translate:calc(var(--dx) * .25 + var(--sw)) calc(var(--dy) * .25);rotate:calc(var(--sr) * .3)}
     70%{translate:calc(var(--dx) * .65 - var(--sw)) calc(var(--dy) * .65);rotate:calc(var(--sr) * .7);scale:.85}
