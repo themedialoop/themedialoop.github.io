@@ -2067,7 +2067,16 @@ button,input,select,textarea,optgroup{font-family:inherit}
       o.d = Math.max(d0 * .4, d); });
     placed.forEach(o => { let room = 1e9; for (const q of placed) if (q !== o) room = Math.min(room, wrapD(o, q) - q.d / 2 - gapN);   // then grow into any slack
       o.d = Math.max(o.d, Math.min(o.t * 1.1, 2 * room, Math.min(o.y - 2, H - 2 - o.y) * 2)); });
-    const slots = shuffle(placed.slice());
+    // the medialoop logo, once or twice: it is wide, so it takes a long clearing of its own (the openings it would cover
+    // are taken out) instead of being squeezed into one round opening where the dots crowd its ends
+    const AR = 1185 / 4278, logos = [], nLogo = Tw > 2200 ? 2 : 1;
+    const inRect = (o, q, g) => { let dx = Math.abs(o.x - q.x); dx = Math.min(dx, Tw - dx);
+      return Math.hypot(Math.max(0, dx - o.lw / 2), Math.max(0, Math.abs(o.y - q.y) - o.lh / 2)) < q.d / 2 + g; };
+    for (const o of shuffle(placed.filter(o => o.y > H * .3 && o.y < H * .7))) {
+      if (logos.length >= nLogo) break; if (logos.some(q => wrapD(o, q) < Tw / 3)) continue;
+      o.lw = Math.min(d0 * 2.4, W * .62); o.lh = o.lw * AR * 1.2; o.logo = true; o.lr = R(-2, 3).toFixed(1); logos.push(o);
+      for (let i = placed.length - 1; i >= 0; i--) if (placed[i] !== o && inRect(o, placed[i], gapN * 1.4)) placed.splice(i, 1); }
+    const slots = shuffle(placed.filter(o => !o.logo));
     { // little dots in every nook of the net, where three openings meet, and more wherever else there is room
       const big = placed.slice(), near = big.map(o => big.filter(q => q !== o && wrapD(o, q) < s * 1.35)), seen = new Set();
       big.forEach((o, i) => near[i].forEach(q => near[i].forEach(p => { if (p === q || wrapD(p, q) > s * 1.35) return;
@@ -2079,7 +2088,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
         for (const t of placed) rr = Math.min(rr, wrapD(c, t) - t.d / 2 - gapN * .55);
         const d = Math.min(2 * rr, d0 * .3); if (d >= d0 * .08) placed.push({ x, y, d, small: true }); })));
       for (let n = 0; n < cols * ROWS * 60; n++) { const d = d0 * R(.07, .2), o = { x: R(0, Tw), y: R(d / 2 + 2, H - d / 2 - 2), d, small: true };   // tiny ones in any spare corner, mostly along the edges
-        if (placed.every(q => wrapD(o, q) >= d / 2 + q.d / 2 + gapN * .55)) placed.push(o); } }
+        if (placed.every(q => wrapD(o, q) >= d / 2 + q.d / 2 + gapN * .55)) placed.push(o); }
+      for (const L of logos) for (let i = placed.length - 1; i >= 0; i--) if (placed[i].small && inRect(L, placed[i], gapN * 1.2)) placed.splice(i, 1); }
     for (const wd of words) {   // each word: a weight and style of its own (thin only where the type is big enough to read)
       for (const o of slots) { if (o.w) continue;
         const it = wd.fun ? Math.random() < .75 : Math.random() < .25;
@@ -2088,9 +2098,6 @@ button,input,select,textarea,optgroup{font-family:inherit}
         if (wt < 300 && f.fs < 18) { wt = 300 + 100 * Math.floor(Math.random() * 3); const f2 = fit(wd.w, o.d, wt, it, hi); if (!f2) continue; Object.assign(f, f2); }
         o.w = wd.w; o.fun = wd.fun; o.f = f; o.wt = wt; o.it = it; break; } }
     { // the empty openings: once or twice the medialoop logo itself, and among the rest some open circles and some i-dots
-      const nLogo = Tw > 2200 ? 2 : 1, logos = [];
-      for (const o of placed.filter(o => !o.small && !o.w).sort((a, b) => b.d - a.d)) {
-        if (logos.length >= nLogo) break; if (logos.some(q => wrapD(o, q) < Tw / 3)) continue; o.logo = true; o.lr = R(-4, 10).toFixed(1); logos.push(o); }
       placed.forEach(o => { if (o.w || o.logo) return; const t = Math.random();
         if (o.small && t < .16) o.ring = true; else if (o.small && t < .175) o.idot = true; }); }   // open circles and i-dots: only small and tiny ones, and only a few i-dots   // (i-dots only on the smaller ones: a big one leaves a gap in the net)
     const tile = document.createElement('div'); tile.className = 'tile'; tile.style.width = Tw + 'px';
@@ -2100,7 +2107,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
         if (!o.hv) o.hv = ['rvHop', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 6)];
         if (o.pp === undefined) { o.pp = false; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
         const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '') + (o.small ? ' sm' : '');
-        el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(2 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
+        const ew = o.logo ? o.lw : o.d, eh = o.logo ? o.lh : o.d;
+        el.style.cssText = `left:${(o.x - ew / 2 + shift).toFixed(1)}px;top:${(o.y - eh / 2).toFixed(1)}px;width:${ew.toFixed(1)}px;height:${eh.toFixed(1)}px;--ay:${(2 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
         if (!o.col) { const t = Math.random(); o.col = o.small ? (t < .62 ? 'blue' : t < .86 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)]) : t < .68 ? 'blue' : t < .93 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)];
           o.tc = o.col === 'gold' ? '#2c5494' : o.col === 'blue' && Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
