@@ -2844,7 +2844,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const big = mob ? W * .88 : Math.min(W * .64, 880), ww = big, fs = mob ? 14 : Math.min(21, Math.max(15, big * .023));
     const below = fs * 6 + ledeH, wx = gx, wy = Math.max(H * .2, H * (mob ? .86 : .88) - below - big * asp);
     h1.style.setProperty('--st-w', big + 'px'); h1.style.transform = `translate(${wx.toFixed(1)}px,${wy.toFixed(1)}px)`;
-    tag.style.fontSize = fs.toFixed(2) + 'px'; const ty = wy + ww * asp * .86; tag.style.transform = `translate(${wx.toFixed(1)}px,${ty.toFixed(1)}px)`;   // tucked up close under the logo
+    tag.style.fontSize = fs.toFixed(2) + 'px'; tag.style.filter = `opacity(${(1 - ss(.3, .6, pv)).toFixed(3)})`; tag.style.visibility = pv >= .6 ? 'hidden' : '';   // the tagline belongs to the landing only: it fades away as the home page arrives const ty = wy + ww * asp * .86; tag.style.transform = `translate(${wx.toFixed(1)}px,${ty.toFixed(1)}px)`;   // tucked up close under the logo
     const lo = ss(.62, .96, pv); lede.style.opacity = lo; lede.style.transform = `translate(${gx}px,${(ty + fs * 5.1 + (1 - lo) * 22).toFixed(1)}px)`;
     const ink = mix('#f2eedd', '#2c5494', ce); pin.style.setProperty('--st-bg', mix('#2c5494', '#f2eedd', ce)); pin.style.setProperty('--st-ink', ink);
     const sr = stage.getBoundingClientRect(); root.classList.toggle('st-blue', ce < .5 && sr.bottom > 60); root.classList.toggle('st-on', on || sr.bottom > H * .45);
@@ -2861,7 +2861,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     // the dots
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height);
     const pad = Math.min(W, H) * .045, pr = pin.getBoundingClientRect(), born = reduce || !on && pv >= 1 && now - t0 > 1500 ? 1 : (now - t0) / 1500,
-      boxes = [h1.getBoundingClientRect(), tag.getBoundingClientRect(), lo > .01 ? lede.getBoundingClientRect() : null, menu ? menu.getBoundingClientRect() : null].filter(Boolean);
+      boxes = [h1.getBoundingClientRect(), pv < .6 ? tag.getBoundingClientRect() : null, lo > .01 ? lede.getBoundingClientRect() : null, menu ? menu.getBoundingClientRect() : null].filter(Boolean);
     for (const d of dots) {
       const k = ss(d.z * .45, d.z * .45 + .55, e), m = lerp(maskLanding(d.x, d.y, t), maskHome(d.x, d.y, t), k) * ss(d.z * .6, d.z * .6 + .4, born);   // each makes the trip at its own moment
       if (m < .02) continue;
