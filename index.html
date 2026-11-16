@@ -591,13 +591,15 @@ html.st-on .top:not(.open) .mark{opacity:0 !important;pointer-events:none}
 html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
 .top .menu-btn{transition:color .3s}
 @media (prefers-reduced-motion:reduce){.st-h1,.st-tag,.st-cue{animation:none}.st-cue-dot,.st-cue-up{animation:none}}
-.ev > .ev-dot{position:absolute;right:calc(var(--ed) * -.2);bottom:calc(var(--ed) * -.24);--ed:clamp(150px,15vw,220px);width:var(--ed);height:var(--ed);z-index:0;pointer-events:none;
-  background:var(--ed-c,#e7aa4d);border-radius:52% 48% 55% 45%/46% 54% 47% 53%;animation:edBreathe 8s ease-in-out infinite alternate;transition:background-color .35s}
-.ev:nth-child(2) > .ev-dot,.ev:nth-child(3) > .ev-dot{--ed-c:#f2eedd;border-radius:47% 53% 45% 55%/55% 46% 54% 45%;animation-delay:-3s}
-.ev:nth-child(4) > .ev-dot{border-radius:55% 45% 50% 50%/48% 56% 44% 52%;animation-delay:-5s}
+.ev > .ev-dot{position:absolute;right:clamp(14px,1.6vw,24px);bottom:clamp(14px,1.6vw,24px);width:clamp(150px,15vw,210px);height:clamp(150px,15vw,210px);z-index:0;pointer-events:none;
+  background:radial-gradient(circle at 18% 78%, #f2eedd 0 7%, transparent 7.5%);animation:edBreathe 8s ease-in-out infinite alternate}   /* two open cream rings and a small dot, inside the card */
+.ev > .ev-dot::before,.ev > .ev-dot::after{content:"";position:absolute;box-sizing:border-box;border:solid #f2eedd}
+.ev > .ev-dot::before{width:62%;height:62%;right:0;bottom:0;border-width:clamp(7px,.7vw,10px);border-radius:52% 48% 55% 45%/46% 54% 47% 53%}
+.ev > .ev-dot::after{width:30%;height:30%;left:8%;top:12%;border-width:clamp(5px,.5vw,7px);border-radius:47% 53% 45% 55%/55% 46% 54% 45%}
+.ev:nth-child(2) > .ev-dot{animation-delay:-3s}.ev:nth-child(3) > .ev-dot{animation-delay:-5s}.ev:nth-child(4) > .ev-dot{animation-delay:-1.5s}
 .ev > :not(.ev-dot):not(.ev-cv):not(.kdots){position:relative;z-index:1}
-@keyframes edBreathe{from{transform:scale(1) rotate(0deg)}to{transform:scale(1.05) rotate(5deg)}}
-@media (max-width:560px){.ev > .ev-dot{--ed:120px;bottom:auto;top:calc(var(--ed) * -.3);right:calc(var(--ed) * -.28)}}
+@keyframes edBreathe{from{transform:scale(1)}to{transform:scale(1.04)}}
+@media (max-width:560px){.ev > .ev-dot{width:84px;height:84px;top:12px;right:12px;bottom:auto}}
 @media (prefers-reduced-motion:reduce){.ev > .ev-dot{animation:none}}
 </style>
 </head>
@@ -2887,7 +2889,10 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     }
   };
   // what each section keeps clear of
-  const clearOf = { res: el => [...el.querySelectorAll('.label, .res-intro, .res')].map(e => Object.assign(e, { _wide: !e.classList.contains('res') })), ct: el => [...el.querySelectorAll('.label, .contact, .mail, .apply')] };
+  const clearOf = { res: el => [...el.querySelectorAll('.label, .res-intro, .res')].map(e => Object.assign(e, { _wide: !e.classList.contains('res') })), ct: el => { const g = [...el.querySelectorAll('.label, .contact, .mail-row')].map(e => e.getBoundingClientRect()).filter(b => b.width);   // one clearing around them all
+      const u = g.length ? { getBoundingClientRect: () => { const bs = [...el.querySelectorAll('.label, .contact, .mail-row')].map(e => e.getBoundingClientRect()).filter(b => b.width);
+        return { left: Math.min(...bs.map(b => b.left)), right: Math.max(...bs.map(b => b.right)), top: Math.min(...bs.map(b => b.top)), bottom: Math.max(...bs.map(b => b.bottom)), width: 1 }; }, _wide: false } : null;
+      return [u, ...el.querySelectorAll('.apply')].filter(Boolean); } };
   let active = 0, raf = 0, blank = true;
   const frame = now => { raf = 0; if (!active) { if (!blank) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); blank = true; } return; }
     const t = reduce ? 0 : now / 1000, F = Math.min(240, H * .28), pad = Math.min(W, H) * .03;
