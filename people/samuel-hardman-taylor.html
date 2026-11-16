@@ -964,7 +964,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
   const RES = [...ul.querySelectorAll('strong')].map(s => s.textContent.trim()).filter(Boolean), FUN = [];
   { const h1 = document.querySelector('h1'), first = h1 ? h1.textContent.trim().split(' ')[0] : '', nm = first === 'Samuel' ? 'Sam' : first;   // "Sam's Buzzwords"
     const hh = document.createElement('h2'); hh.className = 'bz-h';
-    hh.innerHTML = `<span class="bz-sr">${nm}&rsquo;s Buzzwords</span><span aria-hidden="true"><span class="bz-a">${nm}&rsquo;s</span> <span class="bz-b">Buzzwords</span></span>`; ul.after(hh); }
+    hh.innerHTML = `<span class="bz-sr">${nm}&rsquo;s Curiosities</span><span aria-hidden="true"><span class="bz-a">${nm}&rsquo;s</span> <span class="bz-b">Curiosities</span></span>`; ul.after(hh); }
   const box = document.createElement('div'); box.className = 'p-river'; box.setAttribute('role', 'img'); box.setAttribute('aria-label', 'Research interests: ' + RES.join(', '));
   ul.parentNode.querySelector('.bz-h').after(box);
   const river = document.createElement('div'); river.className = 'river'; river.setAttribute('aria-hidden', 'true'); box.append(river);
