@@ -650,6 +650,11 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 @keyframes flyIn{0%{opacity:0;translate:0 70px;rotate:var(--ft,-3deg);scale:.94}55%{opacity:1}100%{opacity:1;translate:0 0;rotate:0deg;scale:1}}
 @media (prefers-reduced-motion:reduce){.fw{opacity:1}.fly{animation:none}}
 </style>
+<style>
+/* the resource cards' call to action ends in the same hand-drawn arrow as the rest of the site */
+.res .r-go .r-arrow.arr{width:.85em;height:.85em;vertical-align:-.04em;transition:transform .35s}
+.res:hover .r-go .r-arrow.arr,.res:focus-visible .r-go .r-arrow.arr{transform:translate(3px,-3px)}
+</style>
 </head>
 <body>
 <canvas id="net" aria-hidden="true"></canvas>
@@ -2718,7 +2723,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
 (() => {
   document.querySelectorAll('.res-stack .res').forEach((el, i) => {
     el.classList.add('bd' + (i % 6 + 1));
-    const go = el.querySelector('.r-go'); if (go && !go.querySelector('.r-arrow')) { go.innerHTML = `<span class="r-label">${go.innerHTML}<span class="r-arrow" aria-hidden="true">&nbsp;→</span></span>`; }
+    const go = el.querySelector('.r-go'); if (go && !go.querySelector('.r-arrow')) { go.innerHTML = `<span class="r-label">${go.innerHTML}&nbsp;<span class="r-arrow arr" aria-hidden="true"></span></span>`; }
   });
 })();
 /* orange polka dots behind the resource cards (styles above). Built to fill the screen, packed close but never touching. */
