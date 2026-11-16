@@ -2842,10 +2842,10 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const e = ss(0, 1, pv), ce = ss(.38, .58, pv), asp = 1185 / 4278, gx = colX;
     // the logo stays where it has always been: on the page's left edge, low on the screen, the words beneath it
     const big = mob ? W * .88 : Math.min(W * .64, 880), ww = big, fs = mob ? 14 : Math.min(21, Math.max(15, big * .023));
-    const below = fs * 3.3 + ledeH, wx = gx, wy = Math.max(H * .2, H * (mob ? .86 : .88) - below - big * asp);
+    const below = fs * 4.6 + ledeH, wx = gx, wy = Math.max(H * .2, H * (mob ? .86 : .88) - below - big * asp);
     h1.style.setProperty('--st-w', big + 'px'); h1.style.transform = `translate(${wx.toFixed(1)}px,${wy.toFixed(1)}px)`;
     tag.style.fontSize = fs.toFixed(2) + 'px'; const ty = wy + ww * asp * .86; tag.style.transform = `translate(${wx.toFixed(1)}px,${ty.toFixed(1)}px)`;   // tucked up close under the logo
-    const lo = ss(.62, .96, pv); lede.style.opacity = lo; lede.style.transform = `translate(${gx}px,${(ty + fs * 2.4 + (1 - lo) * 22).toFixed(1)}px)`;
+    const lo = ss(.62, .96, pv); lede.style.opacity = lo; lede.style.transform = `translate(${gx}px,${(ty + fs * 3.7 + (1 - lo) * 22).toFixed(1)}px)`;
     const ink = mix('#f2eedd', '#2c5494', ce); pin.style.setProperty('--st-bg', mix('#2c5494', '#f2eedd', ce)); pin.style.setProperty('--st-ink', ink);
     const sr = stage.getBoundingClientRect(); root.classList.toggle('st-blue', ce < .5 && sr.bottom > 60); root.classList.toggle('st-on', on || sr.bottom > H * .45);
     gc = { x: wx + ww / 2, y: wy + ww * asp * .62, rx: ww * (mob ? .6 : .66), ry: ww * asp * (mob ? 1.35 : 1.25) + fs };   // the clearing around the logo and tagline
