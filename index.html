@@ -2039,7 +2039,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const tile = document.createElement('div'); tile.className = 'tile'; tile.style.width = Tw + 'px';
     placed.forEach(o => { for (const shift of [0, -Tw, Tw]) {   // a dot over the seam also appears on the other side
         const left = o.x - o.d / 2 + shift; if (left > Tw || left + o.d < 0) continue;
-        if (!o.mv) { const m = ['rvBob', 'rvSway', 'rvLoop', 'rvRock', 'rvSquish', 'rvDrift'][Math.floor(Math.random() * 6)]; o.mv = m; o.md = (m === 'rvLoop' ? R(4, 7) : R(2.2, 4.8)).toFixed(2); o.mp = R(0, 6).toFixed(2); }
+        if (!o.mv) { const m = ['rvBob', 'rvSway', 'rvLoop', 'rvDrift'][Math.floor(Math.random() * 4)]; o.mv = m; o.md = (m === 'rvLoop' ? R(8, 12) : R(5, 8)).toFixed(2);   // slow, small, no rocking or squishing o.mp = R(0, 6).toFixed(2); }
         if (!o.hv) o.hv = ['rvHop', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 6)];
         if (o.pp === undefined) { o.pp = false; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
         const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '');
@@ -2047,7 +2047,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
         if (!o.col) { const t = Math.random(); o.col = o.small ? (t < .62 ? 'blue' : t < .86 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)]) : t < .68 ? 'blue' : t < .93 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)];
           o.tc = o.col === 'gold' ? '#2c5494' : o.col === 'blue' && Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
-        if (!o.gd) { o.gd = R(3, 8).toFixed(2); o.g0 = R(.96, .985).toFixed(3); o.g1 = R(1.01, 1.025).toFixed(3); }
+        if (!o.gd) { o.gd = R(7, 12).toFixed(2); o.g0 = R(.96, .985).toFixed(3); o.g1 = R(1.01, 1.025).toFixed(3); }
         if (o.idot && o.col !== 'blue' && o.col !== 'gold' && Math.random() < .5) o.col = 'gold';   // i-dots mostly in the logo's gold or blue
         const b = document.createElement('div'); b.className = 'rb' + (o.ring ? ' ring' : '') + (o.idot ? ' idot' : '') + (o.logo ? ' logo' : ''); b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s;--pd:${o.pd}s;--pdd:-${o.pdd}s;--gd:${o.gd}s;--g0:${o.g0};--g1:${o.g1};--rw:${Math.max(2.5, o.d * .1).toFixed(1)}px;--lr:${o.lr || 0}deg`;
         if (o.w) { const t = document.createElement('span'); t.className = 'w'; t.style.setProperty('--fs', o.f.fs + 'px'); t.style.fontWeight = o.wt; t.style.fontStyle = o.it ? 'italic' : 'normal';
@@ -2072,8 +2072,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
     off += fling * dt; fling *= Math.pow(.05, dt); if (Math.abs(fling) < 2) fling = 0;
     const dy = scrollY - lastY; lastY = scrollY;
     const sc = Math.min(1, Math.max(.4, innerWidth / 1280));   // on a phone the river keeps to a phone-sized pace
-    boost = Math.min(260 * sc, boost * Math.pow(.04, dt) + Math.abs(dy) * 1.5 * sc);   // scrolling pushes the river along, then it eases back to its slow drift
-    off += (22 * sc + boost) * dt; place(); requestAnimationFrame(loop); };
+    boost = 0;   // no push from scrolling: a river that surges sideways while the page moves up made people queasy
+    off += 16 * sc * dt;   // just one slow, steady drift place(); requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on');
     if (v && !visible && !still) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '80px 0px' }).observe(river);
   addEventListener('resize', () => { if (Math.abs(river.clientWidth - builtW) > 40) build(); });
