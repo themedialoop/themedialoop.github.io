@@ -1887,11 +1887,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .river .track{position:absolute;left:0;top:0;height:100%;display:flex}
 .river .tile{position:relative;flex:none;height:100%}
 .river .rd{position:absolute;animation:var(--mv,rvBob) var(--md,6s) ease-in-out var(--bp,0s) infinite alternate}   /* each bubble has its own little motion: a bob, a sway, a small loop, a rock or a squish */
-@keyframes rvSway{0%{translate:-3px 0}100%{translate:3px 0}}
-@keyframes rvLoop{0%{translate:0 -3px}25%{translate:3px 0}50%{translate:0 3px}75%{translate:-3px 0}100%{translate:0 -3px}}
+@keyframes rvSway{0%{translate:-2px 0}100%{translate:2px 0}}
+@keyframes rvLoop{0%{translate:0 -2px}25%{translate:2px 0}50%{translate:0 2px}75%{translate:-2px 0}100%{translate:0 -2px}}
 @keyframes rvRock{0%{rotate:-10deg}100%{rotate:10deg}}
 @keyframes rvSquish{0%{scale:1.03 .97}100%{scale:.97 1.03}}
-@keyframes rvDrift{0%{translate:-3px 3px}100%{translate:3px -3px}}
+@keyframes rvDrift{0%{translate:-1.5px 1.5px}100%{translate:1.5px -1.5px}}
 .river .rs{width:100%;height:100%;transform:scale(0);transition:transform .7s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
 .river.on .rs{transform:scale(1)}
 .river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--c);color:var(--tc);border-radius:var(--br);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace */
@@ -1899,19 +1899,19 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .river{cursor:grab;touch-action:pan-y}.river.drag{cursor:grabbing}
 @keyframes rvGrow{0%{transform:scale(var(--g0,.94))}100%{transform:scale(var(--g1,1.07))}}
 .river .rd.hv .rs{animation:var(--hv,rvHop) .9s cubic-bezier(.3,1.4,.5,1)}   /* touch or hover a bubble: each has its own reaction */
-@keyframes rvJelly{0%{scale:1 1}20%{scale:1.22 .8}40%{scale:.86 1.16}60%{scale:1.08 .94}80%{scale:.97 1.03}100%{scale:1 1}}
-@keyframes rvPulse{0%{scale:1}35%{scale:1.28}65%{scale:.94}100%{scale:1}}
-@keyframes rvShake{0%,100%{translate:0 0}15%{translate:-8px 0}30%{translate:7px 0}45%{translate:-5px 0}60%{translate:4px 0}75%{translate:-2px 0}}
-@keyframes rvDip{0%{translate:0 0}30%{translate:0 12px;scale:1.08 .9}60%{translate:0 -6px;scale:.96 1.04}100%{translate:0 0;scale:1}}
-@keyframes rvTwirl{0%{rotate:0deg;scale:1}50%{rotate:-25deg;scale:1.15}75%{rotate:12deg}100%{rotate:0deg;scale:1}}
-@keyframes rvHop{0%{translate:0 0;rotate:0deg}25%{translate:0 -16px;rotate:-8deg}50%{translate:0 2px;rotate:6deg}70%{translate:0 -5px;rotate:-3deg}100%{translate:0 0;rotate:0deg}}
+@keyframes rvJelly{0%{scale:1 1}20%{scale:1.05 .9}40%{scale:.92 1.05}60%{scale:1.03 .96}80%{scale:.99 1.01}100%{scale:1 1}}
+@keyframes rvPulse{0%{scale:1}35%{scale:1.05}65%{scale:.94}100%{scale:1}}
+@keyframes rvShake{0%,100%{translate:0 0}15%{translate:-4px 0}30%{translate:3.5px 0}45%{translate:-2.5px 0}60%{translate:2px 0}75%{translate:-1px 0}}
+@keyframes rvDip{0%{translate:0 0}30%{translate:0 4px;scale:1.03 .93}60%{translate:0 -2px;scale:.97 1.02}100%{translate:0 0;scale:1}}
+@keyframes rvTwirl{0%{rotate:0deg;scale:1}50%{rotate:-22deg;scale:1.03}75%{rotate:10deg}100%{rotate:0deg;scale:1}}
+@keyframes rvHop{0%{translate:0 0;rotate:0deg}25%{translate:0 -4px;rotate:-8deg}50%{translate:0 1px;rotate:6deg}70%{translate:0 -2px;rotate:-3deg}100%{translate:0 0;rotate:0deg}}
 .river .w{display:block;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
 .river .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
 .river .w span{display:block}
 .river-words{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .river .rd.pp .rb{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,rvPop var(--pd,11s) ease-in-out var(--pdd,0s) infinite}   /* a few little dots pop out and back now and then */
 @keyframes rvPop{0%,80%{scale:1}85%,90%{scale:0}96%{scale:1.18}100%{scale:1}}
-@keyframes rvBob{0%{translate:0 var(--ay)}100%{translate:0 calc(var(--ay) * -1)}}
+@keyframes rvBob{0%{translate:0 var(--ay)}100%{translate:0 calc(var(--ay) * -1)}}   /* every motion stays well inside the cream line around each dot */
 @media (prefers-reduced-motion:reduce){.river .rd,.river .rb,.river .rd.pp .rb{animation:none}.river{rotate:-3.5deg}.river .rs{transition:none}}
 /* the rabbit hole, at the very end of the page. It holds the screen for a long while as you scroll: the dots flow slowly
    outward from the middle, as if you are sinking into the field, new bubbles bloom in every gap that opens (some with
@@ -1998,10 +1998,21 @@ button,input,select,textarea,optgroup{font-family:inherit}
     for (let rr = 0; rr < ROWS; rr++) for (let c = 0; c < cols; c++) placed.push({ x: c * s + (rr % 2) * s / 2 + R(-.06, .06) * d0, y: m + d0 / 2 + rr * py + R(-.05, .05) * d0, d: d0 });
     // like a hand-painted infinity net: the openings are jostled a little, and each one grows to fill its own space,
     // so the cream lines between them stay thin and even while no two openings are quite alike
-    const gapN = d0 * .075, wrapD = (a, b) => { let dx = Math.abs(a.x - b.x); dx = Math.min(dx, Tw - dx); return Math.hypot(dx, a.y - b.y); };
+    const gapN = d0 * .11, wrapD = (a, b) => { let dx = Math.abs(a.x - b.x); dx = Math.min(dx, Tw - dx); return Math.hypot(dx, a.y - b.y); };
     placed.forEach(o => { let nd = 1e9; for (const q of placed) if (q !== o) { const dd = wrapD(o, q); if (dd < nd) nd = dd; }
       const edge = Math.min(o.y - 2, H - 2 - o.y) * 2; o.d = Math.max(d0 * .8, Math.min(nd - gapN, edge, d0 * 1.2)); });
     const slots = shuffle(placed.slice());
+    { // little dots in the nooks of the net, where three openings meet; about half the nooks get one
+      const big = placed.slice(), near = big.map(o => big.filter(q => q !== o && wrapD(o, q) < s * 1.35)), seen = new Set();
+      big.forEach((o, i) => near[i].forEach(q => near[i].forEach(p => { if (p === q || wrapD(p, q) > s * 1.35) return;
+        const key = [o, q, p].map(t => big.indexOf(t)).sort((a, b) => a - b).join(); if (seen.has(key)) return; seen.add(key);
+        if (Math.random() > .5) return;
+        // the nook's centre (allowing for the wrap at the tile's ends)
+        const ux = v => { let dx = v.x - o.x; if (dx > Tw / 2) dx -= Tw; if (dx < -Tw / 2) dx += Tw; return o.x + dx; };
+        let x = (o.x + ux(q) + ux(p)) / 3; const y = (o.y + q.y + p.y) / 3; x = (x + Tw) % Tw;
+        const c = { x, y }; let rr = Math.min(y - 3, H - 3 - y);
+        for (const t of placed) rr = Math.min(rr, wrapD(c, t) - t.d / 2 - gapN * .55);
+        const d = Math.min(2 * rr, d0 * .3); if (d >= d0 * .1) placed.push({ x, y, d, small: true }); }))); }
     for (const wd of words) {   // each word: a weight and style of its own (thin only where the type is big enough to read)
       for (const o of slots) { if (o.w) continue;
         const it = wd.fun ? Math.random() < .75 : Math.random() < .25;
@@ -2016,10 +2027,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
         if (!o.hv) o.hv = ['rvHop', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 6)];
         if (o.pp === undefined) { o.pp = false; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
         const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '');
-        el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(3 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
-        if (!o.col) { o.col = 'blue'; o.tc = Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
+        el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(2 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
+        if (!o.col) { const t = Math.random(); o.col = o.small ? (t < .62 ? 'blue' : t < .86 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)]) : t < .68 ? 'blue' : t < .93 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)];
+          o.tc = o.col === 'gold' ? '#2c5494' : o.col === 'blue' && Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
-        if (!o.gd) { o.gd = R(3, 8).toFixed(2); o.g0 = R(.95, .98).toFixed(3); o.g1 = R(1.02, 1.04).toFixed(3); }
+        if (!o.gd) { o.gd = R(3, 8).toFixed(2); o.g0 = R(.96, .985).toFixed(3); o.g1 = R(1.01, 1.025).toFixed(3); }
         o.ring = false;
         const b = document.createElement('div'); b.className = 'rb' + (o.ring ? ' ring' : ''); b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s;--pd:${o.pd}s;--pdd:-${o.pdd}s;--gd:${o.gd}s;--g0:${o.g0};--g1:${o.g1};--rw:${Math.max(2, o.d * .15).toFixed(1)}px`;
         if (o.w) { const t = document.createElement('span'); t.className = 'w'; t.style.setProperty('--fs', o.f.fs + 'px'); t.style.fontWeight = o.wt; t.style.fontStyle = o.it ? 'italic' : 'normal';
