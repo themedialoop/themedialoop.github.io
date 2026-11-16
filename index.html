@@ -2869,13 +2869,19 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height);
     const pad = Math.min(W, H) * .045, pr = pin.getBoundingClientRect(), born = reduce || !on && pv >= 1 && now - t0 > 1500 ? 1 : (now - t0) / 1500,
       boxes = [h1.getBoundingClientRect(), pv < .6 ? tag.getBoundingClientRect() : null, lo > .01 ? lede.getBoundingClientRect() : null, menu ? menu.getBoundingClientRect() : null].filter(Boolean);
+    // as you scroll down from the home page, the dots dance off the screen: each heads away from the words (up and out to
+    // the right), swaying from side to side and spinning as it goes; scroll back up and they dance home again
+    const sq = on || reduce ? 0 : Math.min(1, Math.max(0, -sr.top / (H * 1.05))), sqe = sq * sq * (3 - 2 * sq), hx = wx + ww * .35, hy = wy + ww * asp;
     for (const d of dots) {
       const k = ss(d.z * .45, d.z * .45 + .55, e), m = lerp(maskLanding(d.x, d.y, t), maskHome(d.x, d.y, t), k) * ss(d.z * .6, d.z * .6 + .4, born);   // each makes the trip at its own moment
       if (m < .02) continue;
-      let c = 1; for (const b of boxes) { const g = Math.max(b.left - pr.left - d.x, d.x - (b.right - pr.left), b.top - pr.top - d.y, d.y - (b.bottom - pr.top), 0); if (g < pad + d.r) c *= ss(0, pad + d.r, g); }
+      let px = d.x + AMP * Math.sin(t * d.fx + d.ph), py = d.y + AMP * Math.cos(t * d.fy + d.ph * 1.3), spin = 0;   // each wanders on its own small loop
+      if (sqe > 0) { let vx = d.x - hx, vy = d.y - hy; const L = Math.hypot(vx, vy) || 1; vx /= L; vy /= L;
+        const far = sqe * (H * .35 + d.z * H * .5), sway = Math.sin(t * 4 + d.ph * 3) * Math.min(1, sq * 3) * (8 + d.r * .4);
+        px += vx * far - vy * sway; py += vy * far + vx * sway; spin = sqe * (d.sp > 0 ? 1 : -1) * (2 + d.z * 3); }
+      let c = 1; for (const b of boxes) { const g = Math.max(b.left - pr.left - px, px - (b.right - pr.left), b.top - pr.top - py, py - (b.bottom - pr.top), 0); if (g < pad + d.r) c *= ss(0, pad + d.r, g); }   // never over the words, wherever it dances
       const s = d.r * m * c * (reduce ? .97 : .84 + .16 * Math.sin(t * 1.5 + d.ph * .6 - (d.x + d.y) * .004)); if (s < .4) continue;   // a ripple of breath across the field
-      const px = d.x + AMP * Math.sin(t * d.fx + d.ph), py = d.y + AMP * Math.cos(t * d.fy + d.ph * 1.3);   // and each wanders on its own small loop
-      ctx.setTransform(s * DPR, 0, 0, s * DPR, px * DPR, py * DPR); ctx.rotate(d.rot + t * d.sp);
+      ctx.setTransform(s * DPR, 0, 0, s * DPR, px * DPR, py * DPR); ctx.rotate(d.rot + t * d.sp + spin);
       const col = mix(d.gB ? '#e7aa4d' : '#f2eedd', d.gC ? '#e7aa4d' : '#2c5494', ce);
       if (d.ring) { ctx.lineWidth = .28; ctx.strokeStyle = col; ctx.stroke(d.s); } else { ctx.fillStyle = col; ctx.fill(d.s); }
     }
