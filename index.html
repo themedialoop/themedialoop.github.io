@@ -1518,8 +1518,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
             let px = bx + h.cx * k, py = by + h.cy * k;
             if (px < -40 || py < -40 || px > W + 40 || py > H + 40) continue;
             const jit = 1 + .05 * Math.sin(h.ph * 3.1);               // an organic, uneven front
-            const w = .5 + .5 * Math.sin(time * .9 - Math.hypot(px - W / 2, py - H / 2) / diag * 14 + h.ph * .35);
-            let base = .62 + .3 * w, rim;
+            // every dot breathes in and out on its own beat (a clear swell, never big enough to touch a neighbour)
+            const w = reduce ? .6 : .5 + .5 * Math.sin(time * 1.5 + h.ph * 2.1 + (px + py) * .0035);
+            let base = .56 + .38 * w, rim;
             if (e <= 0) {
               let d = 1e9;
               seeds.forEach(([x, y], i) => { d = Math.min(d, Math.hypot(px - x, py - y) / wob(Math.atan2(py - y, px - x), i)); });
