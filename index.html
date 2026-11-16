@@ -2896,7 +2896,9 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   let active = 0, raf = 0, blank = true;
   const frame = now => { raf = 0; if (!active) { if (!blank) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); blank = true; } return; }
     const t = reduce ? 0 : now / 1000, F = Math.min(240, H * .28), pad = Math.min(W, H) * .03;
-    const regs = secs.map(q => { const r = q.el.getBoundingClientRect(); return r.bottom < -F || r.top > H + F ? null : { r, kind: q.kind, boxes: clearOf[q.kind](q.el).map(e => { const b = e.getBoundingClientRect(); return { left: b.left, right: b.right, top: b.top, bottom: b.bottom, width: b.width, wide: !!e._wide }; }).filter(b => b.width && b.bottom > -40 && b.top < H + 40) }; }).filter(Boolean);
+    const regs = secs.map(q => { let r = q.el.getBoundingClientRect();
+      if (q.kind === 'ct') { const ap = q.el.querySelector('.apply'); if (ap) { const a = ap.getBoundingClientRect(); r = { top: r.top, bottom: a.top + Math.min(90, a.height * .25), height: a.top - r.top }; } }   // at Contact the dots end by the top of the Apply card
+      return r.bottom < -F || r.top > H + F ? null : { r, kind: q.kind, boxes: clearOf[q.kind](q.el).map(e => { const b = e.getBoundingClientRect(); return { left: b.left, right: b.right, top: b.top, bottom: b.bottom, width: b.width, wide: !!e._wide }; }).filter(b => b.width && b.bottom > -40 && b.top < H + 40) }; }).filter(Boolean);
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); blank = false;
     for (const d of dots) {
       let m = 0, reg = null;
