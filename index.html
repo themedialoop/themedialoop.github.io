@@ -2443,7 +2443,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
       setTimeout(() => { band.style.transition = 'opacity .9s cubic-bezier(.4,0,.2,1)'; band.style.opacity = '0'; const t0 = performance.now(); const release = () => { const now = performance.now(); if (now - t0 >= 400 && (now - lastHush > 250 || now - t0 > 1600)) holdInput(false); else setTimeout(release, 60); }; setTimeout(release, 400);   // at least 0.4 s, and until any coasting scroll has stopped   // the blue melts away into the opener's blue net
         setTimeout(() => { band.classList.remove('warp'); c.remove(); band.style.transition = ''; band.style.opacity = ''; warping = false; visible = false; nextMark = 0; build(); }, 950); }, 120);
     }, 1050); };
-  // once you are in, the rabbit hole takes over: after about three scrolls or two seconds it carries you down on its own,
+  // once you are in, the rabbit hole takes over: after about four scrolls or two seconds it carries you down on its own,
   // gathering speed, to the fall at the bottom. Scrolling back up hands control back to you.
   let inAt = 0, gestures = 0, lastGest = 0, auto = false, av = 0, aA = 0, autoOff = 0;
   const gesture = () => { const n = performance.now(); if (n - lastGest > 280) gestures++; lastGest = n; };
@@ -2453,7 +2453,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
   const drive = (p, dt, now) => {
     if (still || warping) return;
     if (p > .004 && p < .985) { if (!inAt) { inAt = now; gestures = 0; } } else if (p <= .004) { inAt = 0; auto = false; av = 0; return; }
-    if (!auto && inAt && now - autoOff > 1500 && (gestures >= 3 || now - inAt > 2000)) { auto = true; av = .15; aA = 2 * Math.max(1, holdTop + holdSpan - scrollY) / (3600 * 3600); }   // about 3.5 seconds to the bottom, speeding up all the way
+    if (!auto && inAt && now - autoOff > 1500 && (gestures >= 4 || now - inAt > 2000)) { auto = true; av = .15; aA = 2 * Math.max(1, holdTop + holdSpan - scrollY) / (3600 * 3600); }   // about 3.5 seconds to the bottom, speeding up all the way
     if (!auto) return;
     av = Math.min(av + aA * dt, 7); document.documentElement.style.scrollBehavior = 'auto'; scrollBy(0, av * dt); };
   const loop = now => { if (!visible && !warping) { last = 0; sv = vel = 0; window.mlRabbitCovers = false; return; }
