@@ -1930,7 +1930,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
   }
 
   /* event cards: each gets its own hover colour, never two the same: purple likeliest, then teal, with orange, pink and cream mixed in at random */
-  { const evs = [...document.querySelectorAll('.ev-cards .ev')], bag = [['h-purple', 4], ['h-teal', 3], ['h-orange', 2], ['h-pink', 2], ['h-cream', 2]];
+  { const evs = [...document.querySelectorAll('.ev-cards .ev')], bag = [['h-cream', 1], ['h-cream', 1], ['h-cream', 1], ['h-cream', 1], ['h-cream', 1], ['h-cream', 1]];   // every event card highlights cream with blue words
     evs.forEach(el => { if (!bag.length) return; let r = Math.random() * bag.reduce((a, b) => a + b[1], 0), k = 0;
       for (; k < bag.length - 1; k++) { r -= bag[k][1]; if (r <= 0) break; } el.classList.add(bag.splice(k, 1)[0][0]); }); }
   /* each visit, roughly one card in four quietly swaps its hover colour for lavender mist or dusky plum */
@@ -2401,8 +2401,10 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
       if (w < 3 || x - w / 2 > W + 40 || x + w / 2 < -40 || y - h / 2 > H + 40 || y + h / 2 < -40) { m.el.remove(); return false; }
       m.el.style.transform = `translate(${(x - m.B / 2).toFixed(1)}px,${(y - m.B * 1185 / 4278 / 2).toFixed(1)}px) scale(${(w / m.B).toFixed(4)}) rotate(${(m.tilt + m.spin * clock * .1).toFixed(2)}deg)`; return true; }); };
   const tick = () => { moveMarks();
-    for (const p of parts) { if (p.dead) continue; const o = screen(p);
-      p.el.style.transform = `translate(${(o.x - p.B / 2).toFixed(1)}px,${(o.y - p.B / 2).toFixed(1)}px) scale(${(o.d / p.B).toFixed(4)})`;
+    const bTop = band.getBoundingClientRect().top;   // while the field is still sliding up into view, its top edge is on screen:
+    for (const p of parts) { if (p.dead) continue; const o = screen(p);   // dots near that edge shrink away rather than being cut by it
+      const cut = bTop > 1 ? Math.max(0, Math.min(1, (o.y - o.d * .55) / (o.d * .8 + 40))) : 1, sc = cut * cut * (3 - 2 * cut);
+      p.el.style.transform = `translate(${(o.x - p.B / 2).toFixed(1)}px,${(o.y - p.B / 2).toFixed(1)}px) scale(${(o.d * sc / p.B).toFixed(4)})`;
       if (p.logo && prog < .74) { pop(p); continue; }   // scrolling back up, the shapes go
       const wordy = !!p.word || !!p.logo, edge = wordy ? 14 * k : -o.d * .3;
       if (o.d < 2.5 || (wordy && (o.x - o.d / 2 < edge || o.x + o.d / 2 > W - edge || o.y - o.d / 2 < edge || o.y + o.d / 2 > H - edge)) || o.d > (wordy ? Math.min(W, H) * .42 : 120 * k) || o.x + o.d / 2 < 0 || o.x - o.d / 2 > W || o.y + o.d / 2 < 0 || o.y - o.d / 2 > H) pop(p);
