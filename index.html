@@ -2882,7 +2882,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       for (let i = -1; i <= 1 && ok; i++) for (let j = -1; j <= 1 && ok; j++) for (const o of grid.get((cx + i) + ',' + (cy + j)) || [])
         if (Math.hypot(o.x - x, o.y - y) < (o.r + r) * 1.1 + 4 + 2 * AMP) { ok = false; break; }
       if (!ok) continue;
-      const d = { x, y, r, s: shapes[n % 8], rot: R(0, 6.3), ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), sp: R(-.25, .25), col: Math.random() < .035 ? '#e7aa4d' : '#2c5494', ring: !big && Math.random() < .06 };
+      const d = { x, y, r, s: shapes[n % 8], rot: R(0, 6.3), ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), sp: R(-.25, .25), col: Math.random() < .035 ? '#e7aa4d' : '#2c5494', ring: !big && Math.random() < .06, thin: Math.random() < .45 };
       (grid.get(key(x, y)) || grid.set(key(x, y), []).get(key(x, y))).push(d); dots.push(d);
     }
   };
@@ -2898,8 +2898,8 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       for (const g of regs) {   // inside this section, with a soft, wavy margin at its top and bottom
         const wv = F * .35 * Math.sin(d.x * .006 + t * .1 + (g.kind === 'ct' ? 2 : 0));
         let w = ss(g.r.top - F * .1 + wv, g.r.top + F + wv, d.y) * (1 - ss(g.r.bottom - F + wv, g.r.bottom + F * .1 + wv, d.y));
-        if (g.kind === 'ct') { const u = d.x / W, v = (d.y - g.r.top) / Math.max(1, g.r.height);   // at Contact, like the home page: thickest along the top and down the right
-          w *= Math.max(1 - ss(.16, .34, v + .05 * Math.sin(u * 7 + t * .15)), 1 - ss(mob ? .2 : .26, mob ? .34 : .44, 1 - u + .04 * Math.sin(v * 9 - t * .12))); }
+        if (g.kind === 'ct') { const u = d.x / W, v = (d.y - g.r.top) / Math.max(1, g.r.height);   // at Contact: a lighter scatter, down the left side only
+          w *= (1 - ss(mob ? .1 : .14, mob ? .22 : .3, u + .04 * Math.sin(v * 9 - t * .12))) * (d.thin ? 0 : 1); }
         if (w > m) { m = w; reg = g; }
       }
       if (m < .02) continue;
