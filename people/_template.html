@@ -624,10 +624,10 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
         (grid.get(kk(x, y)) || grid.set(kk(x, y), []).get(kk(x, y))).push(d); dts.push(d); }
       side._dots = dts; side._dkey = key; side._amp = AMP; }
     const pad = 16 * dpr, soft = 40 * dpr, AMP = side._amp, D = (innerWidth < 760 ? 60 : 110) * dpr;
-    const edgeY = x => { const u = Math.min(1, Math.max(0, x / w)); return h - (D * (1 - Math.pow(Math.sin(u * Math.PI), .6)) + (4 * Math.sin(u * 11 + 2) + 2 * Math.sin(u * 23)) * dpr); };   // the curve at the header's bottom
+    const edgeY = x => { const u = Math.min(1, Math.max(0, x / w)); return h - (window.mlHem ? window.mlHem(u, D / dpr) * dpr : 0); };   // the curve at the header's bottom
     for (const d of side._dots) {
       let f = 1; for (const [x0, y0, x1, y1] of boxes) { const dx = Math.max(0, x0 - d.x, d.x - x1), dy = Math.max(0, y0 - d.y, d.y - y1); f *= sse((Math.hypot(dx, dy) - pad - d.r) / soft); if (f < .02) break; }
-      f *= sse((edgeY(d.x) - d.y - d.r * 1.2) / (d.r * 1.5 + 24 * dpr));   // shrink away before the curved edge
+      f *= sse((edgeY(d.x) - d.y - d.r * 1.1) / (d.r * .9 + 12 * dpr));   // dots run right down to the hem, shrinking just before it   // shrink away before the curved edge
       if (f < .05) continue;
       const s = d.r * f * (.84 + .16 * Math.sin(time * 1.5 + d.ph * .6 - (d.x + d.y) / dpr * .004)), px = d.x + AMP * Math.sin(time * d.fx + d.ph), py = d.y + AMP * Math.cos(time * d.fy + d.ph * 1.3);
       if (s < .5) continue;
@@ -692,8 +692,12 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 
   /* the blue sidebar meets the cream page with a natural, slightly uneven brush-stroke edge (right side on wide screens, bottom on narrow ones) */
   { const aside = document.querySelector('.p-side');
+    // the header's bottom edge: a soft, hand-drawn hem - two gentle swells, like the edge of a cut-paper shape,
+    // rising only a little at the sides (no pinched corners)
+    const HEM = (u, D) => Math.max(0, D * (.22 + .2 * Math.cos(u * Math.PI * 2 * 1.15 + .5) + .1 * Math.cos(u * Math.PI * 5 + 1.3) + .3 * Math.pow(Math.abs(u - .5) * 2, 3)));
+    window.mlHem = HEM;
     const brush = () => { if (!aside) return; const n = 200, pts = ['0 0', '100% 0'], D = innerWidth < 760 ? 60 : 110;   // the bottom bows down in one gentle curve, a touch uneven like a hand-cut dot
-      for (let i = n; i >= 0; i--) { const u = i / n, arc = D * (1 - Math.pow(Math.sin(u * Math.PI), .6)) + 4 * Math.sin(u * 11 + 2) + 2 * Math.sin(u * 23);
+      for (let i = n; i >= 0; i--) { const u = i / n, arc = HEM(u, D);
         pts.push(`${(u * 100).toFixed(2)}% calc(100% - ${Math.max(0, arc).toFixed(1)}px)`); }
       aside.style.clipPath = `polygon(${pts.join(',')})`; };
     brush(); addEventListener('resize', brush); }
