@@ -774,7 +774,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const river = document.createElement('div'); river.className = 'river'; river.setAttribute('aria-hidden', 'true'); box.append(river);
   // edge to edge: the river reaches past the page's side padding to both edges of the content area (from the blue side panel to the window's edge)
   const bleed = () => { const pr = box.closest('.person') || document.body; box.style.marginLeft = box.style.marginRight = '0px';
-    const p = pr.getBoundingClientRect(), b = box.getBoundingClientRect(), right = document.documentElement.clientWidth, left = p.left > 120 ? p.left : 0;   // beside the side panel on wide screens, the window's edge on phones
+    const p = pr.getBoundingClientRect(), b = box.getBoundingClientRect(), right = document.documentElement.clientWidth, sp = document.querySelector('.p-side'), sr = sp && getComputedStyle(sp).display !== 'none' ? sp.getBoundingClientRect() : null, left = sr && sr.right < right * .7 && sr.right > 0 ? sr.right - 2 : 0;   // tucked right up to the side panel on wide screens (a hair under it), the window's edge on phones
     box.style.marginLeft = (left - b.left) + 'px'; box.style.marginRight = (b.right - right) + 'px'; };
   bleed(); addEventListener('resize', bleed);
   const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', purple: '#9b6aa6' };
