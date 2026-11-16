@@ -2032,6 +2032,12 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
 .river.on .rs{transform:none}
 .river.on.gone .rs{transform:scale(0);transition:transform .26s cubic-bezier(.45,-.9,.7,.5) var(--out,0s)}   /* a quick swell, then gone: pop */
 .river .track{transform-origin:50% 50%}
+.river.gone .rd,.river.gone .rb::before{animation-play-state:paused}   /* nothing else moves while they pop */
+@media (max-width:760px),(pointer:coarse){   /* phones: the big dots shrink away smoothly on their own layers; the tiny ones simply fade with them */
+  .river .rd:not(.sm) .rs{will-change:transform}
+  .river.on.gone .rs{transition:transform .34s cubic-bezier(.5,0,.75,0) var(--out,0s)}
+  .river.on.gone .rd.sm .rs{transition:transform .18s ease-in 0s}
+}
 .river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;isolation:isolate;color:var(--tc);border-radius:var(--br)}
 .river .rb::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:var(--c);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace: only its colour does, so the words are never scaled (scaled type turns grainy) */
 .river .rb.ring::before{background:transparent;box-shadow:inset 0 0 0 var(--rw,3px) var(--c)}   /* an open circle */
