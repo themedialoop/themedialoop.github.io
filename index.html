@@ -1499,12 +1499,12 @@ button,input,select,textarea,optgroup{font-family:inherit}
       // rhythm. Nothing slides, so no dot can ever run into another. A swipe sends a gentle swell through them.
       const k = (isMobile() ? 980 : 1500) * DPR / TILE; l.fillStyle = `rgb(${CREAM_RGB})`; const m = Math.min(W, H);
       for (const d of blotInst) {
-        let sc = d.sc * (reduce ? 1 : 1 + .05 * Math.sin(time * .5 + d.h.ph * 1.7 + d.px * .002));
+        let sc = d.sc * (reduce ? 1 : 1 + .11 * Math.sin(time * 1.15 + d.h.ph * 1.7 + d.px * .002));   // a clear, unhurried breath: each dot swells and shrinks on its own beat
         for (const p of fx.pulses) { const age = (now - p.t) / 1000, R = age * m * 1.1, band = m * .11, dd = Math.hypot(d.px - p.x, d.py - p.y);
           const gg = Math.exp(-(((dd - R) / band) ** 2)) * Math.max(0, 1 - age / 1.5); sc *= 1 + .1 * gg; }
         sc = Math.min(sc, .95); if (sc < .08) continue;                           // never big enough to touch a neighbour
         if (d.u) { drawUIC(l, d.px, d.py, d.h.rad * k * .95 * sc / d.sc, d.h); continue; }
-        const ang = reduce ? 0 : .22 * Math.sin(time * .23 + d.h.ph * 2.3), c = Math.cos(ang) * k * sc, sn = Math.sin(ang) * k * sc;
+        const ang = reduce ? 0 : .32 * Math.sin(time * .55 + d.h.ph * 2.3), c = Math.cos(ang) * k * sc, sn = Math.sin(ang) * k * sc;
         l.setTransform(c, sn, -sn, c, d.px, d.py); l.fill(d.h.p); }
       l.setTransform(1, 0, 0, 1, 0, 0);
     }
