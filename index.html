@@ -3016,7 +3016,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
 /* the fly-in: people, event, resource, About and Apply cards, and the publication list */
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
-  const groups = ['.people > .card', '.ev-cards > .ev', '.res-stack > .res', '.about-grid > *', '.apply', '.pubs li'];
+  const groups = ['.people > .card', '.ev-cards > .ev', '.about-grid > *', '.apply', '.pubs li'];   // (the resource cards keep their own stacking)
   const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const el = e.target; io.unobserve(el);
     el.classList.remove('fw'); el.classList.add('fly'); el.addEventListener('animationend', () => el.classList.remove('fly'), { once: true }); }), { threshold: .12, rootMargin: '0px 0px -5% 0px' });
   groups.forEach(sel => document.querySelectorAll(sel).forEach((el, i) => {
