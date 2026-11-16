@@ -1159,6 +1159,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
     top.r = 0;   // the landing now has dots of its own: no net at the top of the page
     const f = rectOf(footEl);
     const ct = { which: 'contact', x: m ? .12 : .14, yp: f.top + scrollY + (m ? .02 : .06) * ih, r: m ? .36 : .33, sx: 1.4 };   // stretched wider, left to right   // back on the left, just above the contact heading
+    ct.r = 0;    // Contact now sits on the page dot field: the net rests
     const mr = rectOf(mqEl);
     const mp = Math.max(0, Math.min(1, (ih - mr.top) / (ih + mr.height)));          // how far this space has travelled up the screen
     // between About and Publications: an organic round glow, like the one at Contact, sitting on the right and
@@ -2510,7 +2511,7 @@ html.st-blue .top:not(.open) .menu-btn{color:var(--cream)}
 <script>
 (() => {
   const res = [...document.querySelectorAll('.res-stack .res')], evs = [...document.querySelectorAll('.ev-cards .ev')], ap = document.querySelector('.apply'), pills = [...document.querySelectorAll('.ab-pill')];
-  const cards = [...evs.map(el => ({ el, kind: 'ev' })), ...(ap ? [{ el: ap, kind: 'ap' }] : []), ...pills.map(el => ({ el, kind: 'pill' }))]; if (!cards.length) return;
+  const cards = [...(ap ? [{ el: ap, kind: 'ap' }] : []), ...pills.map(el => ({ el, kind: 'pill' }))]; if (!cards.length) return;
   const BLUE = '#2c5494', GOLD = '#e7aa4d', CREAM = '#f2eedd';
   // one dot colour per card: gold on blue cards, blue on gold, pink and orange cards, cream on teal and purple ones
   const dotColour = el => { const c = el.classList, h = k => c.contains(k);
@@ -2637,6 +2638,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
 })();
 /* orange polka dots behind the resource cards (styles above). Built to fill the screen, packed close but never touching. */
 (() => {
+  return;   // retired: the resources now sit on the same blue dot field as the home page (see the page dots script)
   const sec = document.getElementById('resources'), stack = sec && sec.querySelector('.res-stack'), intro = sec && sec.querySelector('.res-intro');
   const cards = stack ? [...stack.querySelectorAll('.res')] : []; if (!cards.length) return;
   const layer = document.createElement('div'); layer.id = 'resDots'; layer.setAttribute('aria-hidden', 'true');
@@ -2793,7 +2795,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   let visible = true, raf = 0;
   const frame = now => { raf = 0; if (!visible && !on) return;
     const t = reduce ? 0 : now / 1000, dt = lastT ? Math.min(64, now - lastT) : 16; lastT = now;
-    if (on) { if (going) pv = Math.min(1, pv + dt / 1700); else { idle += dt; if (idle > 5000) going = true; }   // a steady pace; after 5 quiet seconds it carries on
+    if (on) { if (going) pv = Math.min(1, pv + dt / 1050); else { idle += dt; if (idle > 5000) going = true; }   // a steady pace; after 5 quiet seconds it carries on
       if (pv >= 1) finish(); }
     const e = ss(0, 1, pv), ce = ss(.38, .58, pv), asp = 1185 / 4278, gx = colX;
     // the logo stays where it has always been: on the page's left edge, low on the screen, the words beneath it
@@ -2837,6 +2839,70 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   let seen = false; try { seen = !!sessionStorage.getItem('ml-opener-seen'); sessionStorage.setItem('ml-opener-seen', '1'); } catch (_) {}
   if (!reduce && !seen && !(location.hash && location.hash.length > 1) && scrollY < 20) open(); else { pv = 1; t0 = performance.now() - 2000; }
   go(); addEventListener('load', measure); document.fonts && document.fonts.ready.then(measure);
+})();
+</script>
+<script>
+/* the page dot field: the same blue dots on cream as the home page (a few gold, a few open circles, breathing and wandering),
+   behind the resource cards and around Contact. Pinned to the window like the net was; each section's dots grow in as it
+   arrives and shrink away as it leaves, over a soft, wavy margin, so no dot is ever cut off by an edge. Dots also shrink
+   away before they reach a card, a heading, a line of text or a button. */
+(() => {
+  const secs = [{ el: document.getElementById('resources'), kind: 'res' }, { el: document.getElementById('contact'), kind: 'ct' }].filter(q => q.el);
+  if (!secs.length) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const C = document.createElement('canvas'); C.id = 'pageDots'; C.setAttribute('aria-hidden', 'true');
+  C.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block';
+  const net = document.getElementById('net'); (net ? net.after(C) : document.body.prepend(C));
+  const ctx = C.getContext('2d');
+  const R = (a, b) => a + Math.random() * (b - a), ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const shapes = [...Array(8)].map(() => { const p = new Path2D(), ph = [R(0, 6.3), R(0, 6.3), R(0, 6.3)], n = 40;
+    for (let i = 0; i <= n; i++) { const a = i / n * Math.PI * 2, k = 1 + .045 * Math.sin(2 * a + ph[0]) + .03 * Math.sin(3 * a + ph[1]) + .015 * Math.sin(5 * a + ph[2]);
+      i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); } p.closePath(); return p; });
+  let W = 0, H = 0, DPR = 1, dots = [], mob = false, AMP = 3, builtW = 0;
+  const build = () => {
+    DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; mob = W < 760; AMP = reduce ? 0 : mob ? 2.6 : 3.4; builtW = W;
+    C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); dots = [];
+    const m = Math.min(W, H), lo = m * (mob ? .012 : .008), hi = m * (mob ? .075 : .06), cell = hi * 2.4, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
+    for (let n = 0, tries = Math.round(W * H / (lo * lo) * 3); n < tries; n++) {
+      const big = Math.random() < .16, r = big ? R(hi * .45, hi) : R(lo, hi * .35), x = R(-r, W + r), y = R(-r, H + r);
+      const cx = Math.floor(x / cell), cy = Math.floor(y / cell); let ok = true;
+      for (let i = -1; i <= 1 && ok; i++) for (let j = -1; j <= 1 && ok; j++) for (const o of grid.get((cx + i) + ',' + (cy + j)) || [])
+        if (Math.hypot(o.x - x, o.y - y) < (o.r + r) * 1.1 + 4 + 2 * AMP) { ok = false; break; }
+      if (!ok) continue;
+      const d = { x, y, r, s: shapes[n % 8], rot: R(0, 6.3), ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), sp: R(-.25, .25), col: Math.random() < .035 ? '#e7aa4d' : '#2c5494', ring: !big && Math.random() < .06 };
+      (grid.get(key(x, y)) || grid.set(key(x, y), []).get(key(x, y))).push(d); dots.push(d);
+    }
+  };
+  // what each section keeps clear of
+  const clearOf = { res: el => [...el.querySelectorAll('.label, .res-intro, .res')], ct: el => [...el.querySelectorAll('.label, .contact, .mail, .apply')] };
+  let active = 0, raf = 0, blank = true;
+  const frame = now => { raf = 0; if (!active) { if (!blank) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); blank = true; } return; }
+    const t = reduce ? 0 : now / 1000, F = Math.min(240, H * .28), pad = Math.min(W, H) * .03;
+    const regs = secs.map(q => { const r = q.el.getBoundingClientRect(); return r.bottom < -F || r.top > H + F ? null : { r, kind: q.kind, boxes: clearOf[q.kind](q.el).map(e => e.getBoundingClientRect()).filter(b => b.width && b.bottom > -40 && b.top < H + 40) }; }).filter(Boolean);
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); blank = false;
+    for (const d of dots) {
+      let m = 0, reg = null;
+      for (const g of regs) {   // inside this section, with a soft, wavy margin at its top and bottom
+        const wv = F * .35 * Math.sin(d.x * .006 + t * .1 + (g.kind === 'ct' ? 2 : 0));
+        let w = ss(g.r.top - F * .1 + wv, g.r.top + F + wv, d.y) * (1 - ss(g.r.bottom - F + wv, g.r.bottom + F * .1 + wv, d.y));
+        if (g.kind === 'ct') { const u = d.x / W, v = (d.y - g.r.top) / Math.max(1, g.r.height);   // at Contact, like the home page: thickest along the top and down the right
+          w *= Math.max(1 - ss(.16, .34, v + .05 * Math.sin(u * 7 + t * .15)), 1 - ss(mob ? .2 : .26, mob ? .34 : .44, 1 - u + .04 * Math.sin(v * 9 - t * .12))); }
+        if (w > m) { m = w; reg = g; }
+      }
+      if (m < .02) continue;
+      let c = 1; for (const b of reg.boxes) { const g = Math.max(b.left - d.x, d.x - b.right, b.top - d.y, d.y - b.bottom, 0); if (g < pad + d.r) { c *= ss(0, pad + d.r, g); if (c < .02) break; } }
+      const s = d.r * m * c * (reduce ? .97 : .84 + .16 * Math.sin(t * 1.5 + d.ph * .6 - (d.x + d.y) * .004)); if (s < .4) continue;
+      const px = d.x + AMP * Math.sin(t * d.fx + d.ph), py = d.y + AMP * Math.cos(t * d.fy + d.ph * 1.3);
+      ctx.setTransform(s * DPR, 0, 0, s * DPR, px * DPR, py * DPR); ctx.rotate(d.rot + t * d.sp);
+      if (d.ring) { ctx.lineWidth = .28; ctx.strokeStyle = d.col; ctx.stroke(d.s); } else { ctx.fillStyle = d.col; ctx.fill(d.s); }
+    }
+    raf = requestAnimationFrame(frame); };
+  const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
+  const seen = new Set();
+  const io = new IntersectionObserver(es => { es.forEach(e => e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)); active = seen.size; go(); }, { rootMargin: '30% 0px' });
+  secs.forEach(q => io.observe(q.el));
+  addEventListener('resize', () => { if (Math.abs(innerWidth - builtW) > 30 || Math.abs(innerHeight - H) > 160) build(); else { H = innerHeight; C.height = Math.round(H * DPR); } go(); });
+  build();
 })();
 </script>
 </body>
