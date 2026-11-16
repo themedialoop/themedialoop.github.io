@@ -2644,7 +2644,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
       // the gold open/close button is one of the dots: the others pack round it at the usual spacing
       const b = cd.el.querySelector('.pm').getBoundingClientRect(); dots.push({ x: b.left - cr.left + b.width / 2, y: b.top - cr.top + b.height / 2, r: 0, R: Math.max(b.width, b.height) / 2, fixed: true });
     }
-    const rM = phone ? Math.min(24, rmax) : rmax, gp = side ? Math.max(8, rmax * .26) : phone ? 5 : Math.max(4, rmax * .09);   // side fields are airier   // the corner is packed full: dots sit close, never touching
+    const big2 = cd.kind === 'pill' || cd.kind === 'ap' ? 1.45 : 1.25, rM = (phone ? Math.min(24, rmax) : rmax) * big2, gp = side ? Math.max(8, rmax * .26) : phone ? 5 : Math.max(4, rmax * .09);   // side fields are airier   // the corner is packed full: dots sit close, never touching
     const NT = phone ? 14000 : 16000;
     for (let i = 0; i < NT; i++) {
       const x = rnd() * (w + 60) - 30, y = rnd() * (h + 60) - 30, f = field(x, y); if (f <= .05) continue;
@@ -2653,7 +2653,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
       const late = i > NT * .45, r = (rmin + (rM - rmin) * f * (.55 + .45 * rnd())) * (late ? .22 + .4 * rnd() : 1), R = r * 1.1 * BREATH; if (r < rmin) continue;
       if (distTo(x, y, rects) < R + pad) continue;
       if (dots.some(p => Math.hypot(p.x - x, p.y - y) < p.R + R + gp)) continue;
-      dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283 }); }
+      dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283, ring: r > 4 && rnd() < .18 }); }   // about one in six is an open circle
     const dpr = Math.min(2, devicePixelRatio || 1);
     cd.w = w; cd.h = h; cd.dpr = dpr; cd.dots = dots; cd.col = cd.kind === 'ev' ? EV_DOT : dotColour(cd.el);
     cd.cv.width = Math.round(w * dpr); cd.cv.height = Math.round(h * dpr); cd.box.classList.add('on');
@@ -2665,7 +2665,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.classList.contains('h-cream') && cd.el.matches(':hover') ? GOLD : cd.col;   // cream dots turn gold on the cream hover, so they still show   // the card turns cream on hover; its dots turn gold
     for (const d of cd.dots) { if (d.fixed) continue; const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .3 - Math.hypot(d.x - ox, d.y - oy) / Rn * 5 + d.ph * .35);   // a slow breath, about every 20 s
       const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
-      g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); g.fill(d.p); }
+      g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); if (d.ring) { g.strokeStyle = g.fillStyle; g.lineWidth = .26; g.stroke(d.p); } else g.fill(d.p); }
     g.setTransform(1, 0, 0, 1, 0, 0); };
   if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => es.forEach(e => { const cd = cards.find(c => c.el === e.target); if (cd) e.isIntersecting ? seen.add(cd) : seen.delete(cd); }), { rootMargin: '120px' }); cards.forEach(cd => io.observe(cd.el)); } else cards.forEach(cd => seen.add(cd));
   const loop = t => { seen.forEach(cd => paint(cd, t / 1000)); requestAnimationFrame(loop); };
