@@ -1974,12 +1974,13 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const mctx = document.createElement('canvas').getContext('2d');
   const fit = (word, d, wt, it, hi) => {   // the largest size at which the word fits its opening, in this weight and style of Inter
-    for (let fs = hi; fs >= 10; fs--) {
+    for (let fs = Math.max(hi, Math.round(d * .34)); fs >= 10; fs--) {   // a short word grows to fill its opening; longer ones keep to the usual size
       mctx.font = (it ? 'italic ' : '') + wt + ' ' + fs + 'px Inter, sans-serif';
-      const maxw = d * .74, lines = []; let cur = '', ok = true;
+      const maxw = d * .76, lines = []; let cur = '', ok = true;
       for (const w of word.split(/ |(?<=-)/)) { const t = cur ? cur + (cur.endsWith('-') ? '' : ' ') + w : w;   // long words may break after a hyphen
         if (mctx.measureText(t).width <= maxw) cur = t; else { if (cur) lines.push(cur); cur = w; if (mctx.measureText(w).width > maxw) { ok = false; break; } } }
       if (!ok) continue; lines.push(cur);
+      if (lines.length > 1 && fs > hi) continue;
       if (lines.length <= 4 && lines.length * fs * 1.08 <= d * .7) return { fs, lines };
     }
     return null;
@@ -2034,7 +2035,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       for (const o of placed.filter(o => !o.small && !o.w).sort((a, b) => b.d - a.d)) {
         if (logos.length >= nLogo) break; if (logos.some(q => wrapD(o, q) < Tw / 3)) continue; o.logo = true; o.lr = R(-4, 10).toFixed(1); logos.push(o); }
       placed.forEach(o => { if (o.w || o.logo) return; const t = Math.random();
-        if (t < (o.small ? .16 : .32)) o.ring = true; else if (t < (o.small ? .3 : .5) && o.d < d0 * .85) o.idot = true; }); }   // (i-dots only on the smaller ones: a big one leaves a gap in the net)
+        if (o.small && t < .16) o.ring = true; else if (o.small && t < .175) o.idot = true; }); }   // open circles and i-dots: only small and tiny ones, and only a few i-dots   // (i-dots only on the smaller ones: a big one leaves a gap in the net)
     const tile = document.createElement('div'); tile.className = 'tile'; tile.style.width = Tw + 'px';
     placed.forEach(o => { for (const shift of [0, -Tw, Tw]) {   // a dot over the seam also appears on the other side
         const left = o.x - o.d / 2 + shift; if (left > Tw || left + o.d < 0) continue;
