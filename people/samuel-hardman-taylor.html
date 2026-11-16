@@ -850,71 +850,129 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .p-marq .pill.f-crete{font-style:normal}
 .p-marq .pill.f-crete-it{font-style:italic}
 </style>
+<style>
+/* research interests: a simple river of dots drifting left to right, some carrying research terms (bold) or playful
+   words (light italic). It drifts slowly on its own and speeds up while you scroll, like the pills it replaces. Every dot
+   moves together, with a gentle bob shared by its neighbours, so they never touch. */
+.p-river{display:block;padding:clamp(30px,5vw,60px) 0;margin-inline:calc(-1 * clamp(16px,3vw,40px));overflow-x:clip}
+.river{position:relative;height:clamp(300px,30vw,420px);overflow:hidden;width:112%;margin-left:-6%;rotate:-3.5deg}   /* tilted a little; wider than the screen so its ends never show */
+.river .track{position:absolute;left:0;top:0;height:100%;display:flex}
+.river .tile{position:relative;flex:none;height:100%}
+.river .rd{position:absolute;animation:var(--mv,rvBob) var(--md,6s) ease-in-out var(--bp,0s) infinite alternate}   /* each bubble has its own little motion: a bob, a sway, a small loop, a rock or a squish */
+@keyframes rvSway{0%{translate:-7px 0}100%{translate:7px 0}}
+@keyframes rvLoop{0%{translate:0 -7px}25%{translate:7px 0}50%{translate:0 7px}75%{translate:-7px 0}100%{translate:0 -7px}}
+@keyframes rvRock{0%{rotate:-10deg}100%{rotate:10deg}}
+@keyframes rvSquish{0%{scale:1.07 .93}100%{scale:.93 1.07}}
+@keyframes rvDrift{0%{translate:-6px 6px}100%{translate:6px -6px}}
+.river .rs{width:100%;height:100%;transform:scale(0);transition:transform .7s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
+.river.on .rs{transform:scale(1)}
+.river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--c);color:var(--tc);border-radius:var(--br);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace */
+.river .rb.ring{background:transparent;box-shadow:inset 0 0 0 var(--rw,3px) var(--c)}   /* an open circle */
+.river{cursor:grab;touch-action:pan-y}.river.drag{cursor:grabbing}
+@keyframes rvGrow{0%{transform:scale(var(--g0,.94))}100%{transform:scale(var(--g1,1.07))}}
+.river .rd.hv .rs{animation:var(--hv,rvHop) .9s cubic-bezier(.3,1.4,.5,1)}   /* touch or hover a bubble: each has its own reaction */
+@keyframes rvJelly{0%{scale:1 1}20%{scale:1.22 .8}40%{scale:.86 1.16}60%{scale:1.08 .94}80%{scale:.97 1.03}100%{scale:1 1}}
+@keyframes rvPulse{0%{scale:1}35%{scale:1.28}65%{scale:.94}100%{scale:1}}
+@keyframes rvShake{0%,100%{translate:0 0}15%{translate:-8px 0}30%{translate:7px 0}45%{translate:-5px 0}60%{translate:4px 0}75%{translate:-2px 0}}
+@keyframes rvDip{0%{translate:0 0}30%{translate:0 12px;scale:1.08 .9}60%{translate:0 -6px;scale:.96 1.04}100%{translate:0 0;scale:1}}
+@keyframes rvTwirl{0%{rotate:0deg;scale:1}50%{rotate:-25deg;scale:1.15}75%{rotate:12deg}100%{rotate:0deg;scale:1}}
+@keyframes rvHop{0%{translate:0 0;rotate:0deg}25%{translate:0 -16px;rotate:-8deg}50%{translate:0 2px;rotate:6deg}70%{translate:0 -5px;rotate:-3deg}100%{translate:0 0;rotate:0deg}}
+.river .w{display:block;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
+.river .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
+.river .w span{display:block}
+.river-words{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.river .rd.pp .rb{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,rvPop var(--pd,11s) ease-in-out var(--pdd,0s) infinite}   /* a few little dots pop out and back now and then */
+@keyframes rvPop{0%,80%{scale:1}85%,90%{scale:0}96%{scale:1.18}100%{scale:1}}
+@keyframes rvBob{0%{translate:0 var(--ay)}100%{translate:0 calc(var(--ay) * -1)}}
+@media (prefers-reduced-motion:reduce){.river .rd,.river .rb,.river .rd.pp .rb{animation:none}.river{rotate:-3.5deg}.river .rs{transition:none}}
+@keyframes bubSwell{0%{transform:scale(1)}100%{transform:scale(1.05)}}
+</style>
 <script>
+/* this person's research interests as a river of dots, like the home page's (styles above) */
 (() => {
   const ul = document.querySelector('.p-topics'); if (!ul) return;
-  const names = [...ul.querySelectorAll('strong')].map(s => s.textContent.trim());
-  const PAL = ['c-blue', 'c-gold', 'c-blue', 'c-cream', 'c-gold', 'c-deep'];
-  // one word in each row in Cormorant Garamond and one in Figtree (about 5% each), different words each visit
-  const fw = (lo, hi) => ' f-w' + (lo + 100 * Math.floor(Math.random() * ((hi - lo) / 100 + 1)));   // a random weight the face actually has
-  const faces = n => { const a = Math.floor(Math.random() * n); let b = Math.floor(Math.random() * (n - 1)); if (b >= a) b++; return i => { if (i === a) return ' f-corm' + fw(300, 700); if (i === b) return ' f-fig' + fw(300, 900); const r = Math.random(); return r < .03 ? ' f-crete' : r < .05 ? ' f-crete-it' : ''; }; };   // plus about 3% Crete Round and 2% Crete Round italic, at random
-  // gold and deep blue pills a little less often: about a third of them hand their turn to one of the other colours
-  const lessGD = c => /gold|deep/.test(c) && Math.random() < .35 ? ['c-blue', 'c-cream', 'c-blue', 'c-lav', 'c-blue'][Math.floor(Math.random() * 5)] : c;
-  // green and plum never meet: no plum words on green, no green words on plum, and never a green pill right next to a plum one
-  const unGP = row => { const ps = [...row.querySelectorAll('.pill')]; for (let i = 1; i < ps.length; i++) { const a = ps[i - 1].classList, b = ps[i].classList; if ((a.contains('c-sage') && b.contains('c-plum')) || (a.contains('c-plum') && b.contains('c-sage'))) b.replace(b.contains('c-plum') ? 'c-plum' : 'c-sage', 'c-blue'); } };   // also where a row repeats
-  let lastCol = '';
-  const noGP = c => { if ((c === 'c-sage' && lastCol === 'c-plum') || (c === 'c-plum' && lastCol === 'c-sage')) c = 'c-blue'; lastCol = c; return c; };
-  const tcol = c => { const r = Math.random();   // blue pills: gold words, sometimes mist blue (and mauve on the deep blue); gold: plum only rarely; green: never plum; plum: always cream
-    if (c === 'c-deep') return r < .25 ? ' t-gold' : r < .33 ? ' t-mist' : r < .42 ? ' t-mauve' : '';
-    if (c === 'c-blue') return r < .27 ? ' t-gold' : '';
-    if (c === 'c-gold') return r < .02 ? ' t-plum' : '';
-    return ''; };
-  for (let i = PAL.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [PAL[i], PAL[j]] = [PAL[j], PAL[i]]; }
-  // every colour of the palette turns up in the pills: blue and gold most, then orange, pink, teal, purple and cream;
-  // teal and purple are never side by side
-  const SEQ = ['c-blue', 'c-gold', 'c-mist', 'c-blue', 'c-lav', 'c-gold', 'c-sage', 'c-blue', 'c-gold', 'c-mauve', 'c-cream'], seqOff = Math.floor(Math.random() * 11);
-  // two rows on wider screens, three on phones; rebuilt if the screen crosses that width
-  const wrap = document.createElement('div'); wrap.className = 'p-marq'; wrap.setAttribute('aria-label', 'Research interests: ' + names.join(', '));
-  ul.after(wrap);
-  let rows = [], nRows = 0;
-  // let people drag or swipe a row left and right (and use a trackpad's sideways scroll); vertical page scrolling still works
-  const grab = o => { const el = o.row; o.m = o.m || 0; let sx = 0, sm = 0, id = null;
-    el.addEventListener('pointerdown', e => { id = e.pointerId; sx = e.clientX; sm = o.m; o.drag = true; el.setPointerCapture(id); el.classList.add('grabbing'); });
-    el.addEventListener('pointermove', e => { if (e.pointerId === id) o.m = sm + (e.clientX - sx); });
-    const end = e => { if (e.pointerId !== id) return; id = null; o.drag = false; el.classList.remove('grabbing'); };
-    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
-    el.addEventListener('wheel', e => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) { o.m -= e.deltaX; e.preventDefault(); } }, { passive: false }); };
-
-  const build = () => {
-    const want = 3; if (want === nRows) return; nRows = want; wrap.innerHTML = '';
-    const per = Math.ceil(names.length / want);
-    const fr = [Math.floor(Math.random() * want), Math.floor(Math.random() * want)];
-    rows = Array.from({ length: want }, (_, r) => names.slice(r * per, (r + 1) * per)).filter(s => s.length).map((set, r) => {
-      const row = document.createElement('div'); row.className = 'row'; row.setAttribute('aria-hidden', 'true');
-      // all Inter: each pill its own weight (thin only on darker colours), some italic, and a gold dot after a few
-      const face = faces(set.length), fc = face, keep = [r === fr[0] && ' f-corm', r === fr[1] && ' f-fig'];
-      const faceR = i => { const v = fc(i); return v && (v.startsWith(' f-crete') || keep.includes(v.split(' f-w')[0])) ? v : ''; };   // fewer words here, so each face turns up in just one row
-      const one = set.map((n, i) => { const cr = Math.random(), col = SEQ[(i + r * 4 + seqOff) % SEQ.length], light = /cream|lav|gold|mist/.test(col);
-        let wt = [200, 300, 400, 500, 600, 700, 800, 900][Math.floor(Math.random() * 8)]; if (light && wt < 300) wt = 300;
-        return '<span class="pill ' + col + tcol(col) + (Math.random() < .35 ? ' it' : '') + '" style="font-weight:' + wt + ';--a:' + (2 + Math.random() * 5).toFixed(1) + ';--wd:' + (.4 + Math.random() * .5).toFixed(2) + 's;--wn:' + ['wgTilt', 'wgHop', 'wgJelly'][Math.floor(Math.random() * 3)] + '">' + n + '</span>' + (Math.random() < .3 ? '<span class="gdot"></span>' + (Math.random() < .45 ? '<img class="gmark" src="../assets/medialoop-wordmark.svg" alt="" aria-hidden="true">' : '') : ''); }).join('');
-      row.innerHTML = one.repeat(6); unGP(row); wrap.appendChild(row); const o = { row, dir: r % 2 ? 1 : -1, w: 0, m: 0 }; grab(o); return o;
-    });
-    measure();
-  };
-  const measure = () => rows.forEach(o => { o.w = o.row.scrollWidth / 6; });
-  build(); addEventListener('resize', () => { build(); measure(); }); document.fonts && document.fonts.ready.then(measure);
+  const RES = [...ul.querySelectorAll('strong')].map(s => s.textContent.trim()).filter(Boolean), FUN = [];
+  const box = document.createElement('div'); box.className = 'p-river'; box.setAttribute('role', 'img'); box.setAttribute('aria-label', 'Research interests: ' + RES.join(', '));
+  ul.after(box);
+  const river = document.createElement('div'); river.className = 'river'; river.setAttribute('aria-hidden', 'true'); box.append(river);
+  const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', purple: '#9b6aa6' };
+  const MIX = [['blue', .46], ['gold', .4], ['orange', .04], ['pink', .04], ['teal', .03], ['purple', .03]];   // mostly blue and gold, a few sprinkles
+  const R = (a, b) => a + Math.random() * (b - a), pc = () => Math.round(R(42, 58)) + '%';
+  const pickCol = () => { let t = Math.random(); for (const [c, w] of MIX) { t -= w; if (t <= 0) return c; } return 'blue'; };
+  const textCol = c => c === 'gold' ? '#2c5494' : c === 'blue' && Math.random() < .25 ? '#e7aa4d' : '#f2eedd';
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let sy = scrollY, t0 = performance.now();
-  // very slow drift (6px a second) plus a gentle share of the page scroll, so the rows move with you as you scroll
-  let auto = 0, lastT = t0;
-  (function tick(now) {
-    const dtp = Math.min(.05, (now - lastT) / 1000); lastT = now;
-    sy += (scrollY - sy) * .08;
-    if (!rows.some(o => o.drag)) auto += still ? 0 : dtp * 6; 
-    rows.forEach((o, i) => { if (!o.w) return; const d = auto + sy * .35 + i * o.w * .4 + (o.dir < 0 ? -o.m : o.m);
-      const x = ((d % o.w) + o.w) % o.w; o.row.style.transform = 'translateX(' + (o.dir < 0 ? -x - o.w : x - 2 * o.w) + 'px)'; });
-    requestAnimationFrame(tick);
-  })(t0);
+  const mctx = document.createElement('canvas').getContext('2d');
+  const fit = (word, d, fun, hi) => {
+    for (let fs = hi; fs >= 13; fs--) {
+      mctx.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif';
+      const maxw = d * .74, lines = []; let cur = '', ok = true;
+      for (const w of word.split(' ')) { const t = cur ? cur + ' ' + w : w;
+        if (mctx.measureText(t).width <= maxw) cur = t; else { if (cur) lines.push(cur); cur = w; if (mctx.measureText(w).width > maxw) { ok = false; break; } } }
+      if (!ok) continue; lines.push(cur);
+      if (lines.length <= 3 && lines.length * fs * 1.08 <= d * .62) return { fs, lines };
+    }
+    return null;
+  };
+  let track = null, Tw = 0, off = 0, boost = 0, lastY = scrollY, last = 0, visible = false, builtW = 0;
+  const build = () => {
+    river.textContent = ''; const H = river.clientHeight, W = river.clientWidth; builtW = W; if (!H || !W) return;
+    const k = Math.min(1.25, Math.max(.7, H / 440)), AY = 7 * k, hi = Math.round(20 * k);
+    // every word gets a dot sized to fit it; a few small plain dots go in between
+    const items = [];
+    const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    shuffle(RES.slice()).forEach(w => { for (let d = 96 * k; d <= 230 * k; d += 8 * k) { const f = fit(w, d, false, hi); if (f) { items.push({ d, w, f, fun: false }); break; } } });
+    shuffle(FUN.slice()).forEach(w => { for (let d = 62 * k; d <= 120 * k; d += 6 * k) { const f = fit(w, d, true, hi); if (f) { items.push({ d, w, f, fun: true }); break; } } });
+    // plain dots: some small, plenty tiny, for sparkle between the words
+    const nPlain = Math.round(items.length * .45); for (let i = 0; i < nPlain; i++) items.push({ d: R(16, 36) * k });
+    for (let i = 0; i < Math.round(nPlain * 1.1); i++) items.push({ d: R(7, 15) * k });
+    const area = items.reduce((a, o) => a + o.d * o.d, 0);
+    Tw = Math.max(W * 1.2, area / (H * .4));   // room for every topic
+    const placed = [], gap = (a, b) => Math.max(5, .06 * Math.max(a, b)) + 18 * k;   // room for each bubble's own little motion
+    const dist = (x1, y1, x2, y2) => { let dx = Math.abs(x1 - x2); dx = Math.min(dx, Tw - dx); return Math.hypot(dx, y1 - y2); };   // the tile wraps around
+    items.sort((a, b) => b.d - a.d);
+    for (const o of items) { for (let n = 0; n < 6000; n++) { const x = R(0, Tw), y = R(o.d / 2 + AY + 6, H - o.d / 2 - AY - 6);
+        if (placed.every(q => dist(x, y, q.x, q.y) >= o.d / 2 + q.d / 2 + gap(o.d, q.d))) { o.x = x; o.y = y; placed.push(o); break; } } }
+    const tile = document.createElement('div'); tile.className = 'tile'; tile.style.width = Tw + 'px';
+    placed.forEach(o => { for (const shift of [0, -Tw, Tw]) {   // a dot over the seam also appears on the other side
+        const left = o.x - o.d / 2 + shift; if (left > Tw || left + o.d < 0) continue;
+        if (!o.mv) { const m = ['rvBob', 'rvSway', 'rvLoop', 'rvRock', 'rvSquish', 'rvDrift'][Math.floor(Math.random() * 6)]; o.mv = m; o.md = (m === 'rvLoop' ? R(4, 7) : R(2.2, 4.8)).toFixed(2); o.mp = R(0, 6).toFixed(2); }
+        if (!o.hv) o.hv = ['rvHop', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 6)];
+        if (o.pp === undefined) { o.pp = !o.w && Math.random() < .3; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
+        const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '');
+        el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${AY.toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
+        if (!o.col) { o.col = pickCol(); o.tc = textCol(o.col); o.br = `${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()}`; o.bd = R(0, 2.8).toFixed(2); }
+        const sc = document.createElement('div'); sc.className = 'rs';
+        if (!o.gd) { o.gd = R(3, 8).toFixed(2); o.g0 = R(.9, .96).toFixed(3); o.g1 = R(1.04, 1.09).toFixed(3); }
+        if (o.ring === undefined) o.ring = !o.w && Math.random() < .3;
+        const b = document.createElement('div'); b.className = 'rb' + (o.ring ? ' ring' : ''); b.style.cssText = `--c:${COL[o.col]};--tc:${o.tc};--br:${o.br};--bd:-${o.bd}s;--pd:${o.pd}s;--pdd:-${o.pdd}s;--gd:${o.gd}s;--g0:${o.g0};--g1:${o.g1};--rw:${Math.max(2, o.d * .15).toFixed(1)}px`;
+        if (o.w) { const t = document.createElement('span'); t.className = 'w' + (o.fun ? ' fun' : ''); t.style.setProperty('--fs', o.f.fs + 'px');
+          o.f.lines.forEach(l => { const sp = document.createElement('span'); sp.textContent = l; t.append(sp); }); b.append(t); }
+        sc.append(b); el.append(sc); tile.append(el); } });
+    track = document.createElement('div'); track.className = 'track';
+    const copies = Math.ceil(W / Tw) + 1; track.append(tile); for (let i = 0; i < copies; i++) track.append(tile.cloneNode(true));
+    river.append(track); off = R(0, Tw); place();
+    const hop = e => { const d = e.target.closest && e.target.closest('.rd'); if (!d || d.classList.contains('hv') || still) return; d.classList.add('hv'); setTimeout(() => d.classList.remove('hv'), 950); };
+    track.addEventListener('pointerover', hop); track.addEventListener('pointerdown', hop);
+  };
+  const place = () => { if (track) track.style.transform = `translateX(${((off % Tw) - Tw).toFixed(1)}px)`; };
+  let dragX = null, fling = 0, lastMove = 0, moveV = 0;
+  river.addEventListener('pointerdown', e => { if (e.button > 0) return; dragX = e.clientX; fling = 0; moveV = 0; lastMove = performance.now(); river.classList.add('drag'); try { river.setPointerCapture(e.pointerId); } catch (_) {} });
+  river.addEventListener('pointermove', e => { if (dragX == null) return; const dx = e.clientX - dragX, now = performance.now(); dragX = e.clientX;
+    off += dx; moveV = dx / Math.max(8, now - lastMove) * 1000; lastMove = now; place(); });
+  const endDrag = () => { if (dragX == null) return; dragX = null; river.classList.remove('drag'); fling = Math.max(-2500, Math.min(2500, moveV)); };
+  river.addEventListener('pointerup', endDrag); river.addEventListener('pointercancel', endDrag); river.addEventListener('lostpointercapture', endDrag);
+  const loop = now => { if (!visible) { last = 0; return; }
+    const dt = last ? Math.min(100, now - last) / 1000 : 0; last = now;
+    if (dragX != null) { requestAnimationFrame(loop); return; }   // while you hold it, the river is yours
+    off += fling * dt; fling *= Math.pow(.05, dt); if (Math.abs(fling) < 2) fling = 0;
+    const dy = scrollY - lastY; lastY = scrollY;
+    const sc = Math.min(1, Math.max(.4, innerWidth / 1280));   // on a phone the river keeps to a phone-sized pace
+    boost = Math.min(260 * sc, boost * Math.pow(.04, dt) + Math.abs(dy) * 1.5 * sc);   // scrolling pushes the river along, then it eases back to its slow drift
+    off += (22 * sc + boost) * dt; place(); requestAnimationFrame(loop); };
+  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v) river.classList.add('on');
+    if (v && !visible && !still) { visible = true; lastY = scrollY; requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '80px 0px' }).observe(river);
+  addEventListener('resize', () => { if (Math.abs(river.clientWidth - builtW) > 40) build(); });
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(build);
 })();
 </script>
 <style>
