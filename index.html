@@ -2643,14 +2643,15 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
       const b = cd.el.querySelector('.pm').getBoundingClientRect(); dots.push({ x: b.left - cr.left + b.width / 2, y: b.top - cr.top + b.height / 2, r: 0, R: Math.max(b.width, b.height) / 2, fixed: true });
     }
     const rM = phone ? Math.min(24, rmax) : rmax, gp = side ? Math.max(8, rmax * .26) : phone ? 5 : Math.max(4, rmax * .09);   // side fields are airier   // the corner is packed full: dots sit close, never touching
-    const NT = phone ? 14000 : 16000;
+    const NT = phone ? 14000 : 16000, CAP = cd.kind === 'pill' ? (phone ? 7 : 12) : cd.kind === 'ap' ? (phone ? 14 : 26) : 1e9;   // the info pills and Apply: just a light scatter
     for (let i = 0; i < NT; i++) {
       const x = rnd() * (w + 60) - 30, y = rnd() * (h + 60) - 30, f = field(x, y); if (f <= .05) continue;
       // first pass places the big dots; the second half of the tries places smaller ones in the gaps between them, so the
       // cluster reads as packed rather than as big dots with holes
       const late = i > NT * .45, r = (rmin + (rM - rmin) * f * (.55 + .45 * rnd())) * (late ? .22 + .4 * rnd() : 1), R = r * 1.1 * BREATH; if (r < rmin) continue;
       if (distTo(x, y, rects) < R + pad) continue;
-      if (dots.some(p => Math.hypot(p.x - x, p.y - y) < p.R + R + gp)) continue;
+      if (dots.some(p => Math.hypot(p.x - x, p.y - y) < p.R + R + gp * (side ? 2.4 : 1))) continue;   // side fields: far more space between dots
+      if (dots.length >= CAP + (cd.kind === 'pill' ? 1 : 0)) break;
       dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283 }); }
     const dpr = Math.min(2, devicePixelRatio || 1);
     cd.w = w; cd.h = h; cd.dpr = dpr; cd.dots = dots; cd.col = cd.kind === 'ev' ? EV_DOT : dotColour(cd.el);
