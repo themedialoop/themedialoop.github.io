@@ -2,7 +2,6 @@
 <html lang="en" class="intro" data-opener="eye">
 <head>
 <meta charset="utf-8">
-<style>@view-transition{navigation:auto}</style>
 <script>addEventListener("pagereveal",function(e){var v=e.viewTransition;if(v){v.ready.catch(function(){});v.finished.catch(function(){});v.updateCallbackDone&&v.updateCallbackDone.catch(function(){})}});addEventListener("pageswap",function(e){var v=e.viewTransition;if(v){v.ready.catch(function(){});v.finished.catch(function(){})}})</script>
 <script>try{if(sessionStorage.getItem("ml-replay")){try{history.scrollRestoration="manual"}catch(e){}scrollTo(0,0);addEventListener("pageshow",function(){scrollTo(0,0)});sessionStorage.removeItem("ml-replay");sessionStorage.removeItem("ml-opener-seen");window.mlReplay=true;try{if(location.search)history.replaceState(null,"",location.pathname+location.hash)}catch(e){}}}catch(e){}</script>
 <script>try{if(window.mlReplay)throw 0;var r=document.referrer,same=false;try{same=!!r&&new URL(r).origin===location.origin}catch(e){}if(same||(location.hash&&location.hash.length>1))sessionStorage.setItem("ml-opener-seen","1");if(sessionStorage.getItem("ml-opener-seen"))document.documentElement.classList.remove("intro")}catch(e){}</script>
@@ -1619,15 +1618,19 @@ button,input,select,textarea,optgroup{font-family:inherit}
     ov && ov.remove(); laceC.remove(); writeMark && writeMark.remove(); heroMark.style.opacity = ''; heroMark.style.transition = '';
   }
   let seen = false; try { seen = !!sessionStorage.getItem('ml-opener-seen'); sessionStorage.setItem('ml-opener-seen', '1'); } catch (e) {}   // the opener plays once per visit
-  if (reduce || !ov || mode !== 'eye' || seen) { ov && ov.remove(); root.classList.remove('intro'); }
-  else {
+  const canOpen = !reduce && mode === 'eye';
+  // the opener can play again later in the same visit, in place (the rabbit hole at the end of the page brings you back to it)
+  window.mlPlayOpener = () => { if (!canOpen || root.classList.contains('intro')) return false; root.classList.add('intro'); lace.open = 0; lace.retreat = 0; playOpener(); return true; };
+  if (!canOpen || !ov || seen) { ov && ov.remove(); root.classList.remove('intro'); }
+  else playOpener();
+  function playOpener() {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     scrollTo(0, 0); document.body.appendChild(laceC);
     lace.on = true; lace.mode = mode;
     heroMark.style.transition = 'none'; heroMark.style.opacity = '0';
 
     if (mode === 'eye') {
-      ov.remove();                                           // no big wordmark: the net is the opener
+      ov && ov.remove();                                           // no big wordmark: the net is the opener
       intro.on = true; intro.r = 0; cur.r = 0; lace.p = .5;      // the net already fills the screen
       const fadeEls = [...document.querySelectorAll('.top, .hero .lede')];
       fadeEls.forEach(el => { el.style.transition = 'none'; });
@@ -2201,9 +2204,15 @@ button,input,select,textarea,optgroup{font-family:inherit}
   const warp = () => { warping = true; band.classList.add('warp');
     const c = document.createElement('div'); c.className = 'cover'; const D = Math.hypot(W, H) * 1.35; c.style.width = c.style.height = D + 'px'; band.append(c);
     requestAnimationFrame(() => requestAnimationFrame(() => { c.style.transform = 'translate(-50%,-50%) scale(1)'; }));
-    setTimeout(() => { document.documentElement.style.background = '#2c5494'; try { sessionStorage.setItem('ml-replay', '1'); history.scrollRestoration = 'manual'; } catch (e) {}
-      window.scrollTo({ top: 0, behavior: 'instant' });   // under the blue, so a phone can never restore the old place at the bottom
-      location.replace(location.pathname + '?from=loop'); }, 1050); };
+    setTimeout(() => {   // the screen is all blue now: behind it, back to the top and the opener begins
+      parts.forEach(q => q.el.remove()); parts = []; marks.forEach(m => m.el.remove()); marks = []; shown = new Set();
+      window.mlRabbitCovers = false;
+      document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo({ top: 0, behavior: 'instant' }); document.documentElement.style.scrollBehavior = '';
+      const replayed = window.mlPlayOpener && window.mlPlayOpener();
+      if (!replayed) { window.scrollTo({ top: 0, behavior: 'instant' }); }
+      setTimeout(() => { band.style.transition = 'opacity .9s cubic-bezier(.4,0,.2,1)'; band.style.opacity = '0';   // the blue melts away into the opener's blue net
+        setTimeout(() => { band.classList.remove('warp'); c.remove(); band.style.transition = ''; band.style.opacity = ''; warping = false; visible = false; nextMark = 0; build(); }, 950); }, 120);
+    }, 1050); };
   const loop = now => { if (!visible && !warping) { last = 0; sv = vel = 0; window.mlRabbitCovers = false; return; }
     if (!warping && (++frameN % 90 === 0)) measureHold();   // now and then, in case the page above changed height
     window.mlRabbitCovers = scrollY >= holdTop && scrollY <= holdTop + holdSpan;   // the field fills the screen: the net behind can rest
