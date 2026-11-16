@@ -2977,7 +2977,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   const frame = now => { raf = 0; if (!active) { if (!blank) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); blank = true; } return; }
     const t = reduce ? 0 : now / 1000, F = Math.min(240, H * .28), pad = Math.min(W, H) * .03;
     const regs = secs.map(q => { let r = q.el.getBoundingClientRect();
-      if (q.kind === 'res') { const cl = document.querySelector('#contact .label'); if (cl) { const c = cl.getBoundingClientRect(); const cb = c.top - Math.min(60, H * .07); r = { top: r.top, bottom: cb, height: cb - r.top, resBot: r.bottom }; } }   // the field carries on down to Contact ...
+      if (q.kind === 'res') { const cl = document.querySelector('#contact .label'); if (cl) { const c = cl.getBoundingClientRect(); const cb = c.top + Math.min(160, H * .18); r = { top: r.top, bottom: cb, height: cb - r.top, resBot: r.bottom }; } }   // the field carries on down to Contact ...
       if (q.kind === 'ct') { const ap = q.el.querySelector('.apply'); if (ap) { const a = ap.getBoundingClientRect(); r = { top: r.top, bottom: a.top + Math.min(90, a.height * .25), height: a.top - r.top }; } }   // at Contact the dots end by the top of the Apply card
       return r.bottom < -F || r.top > H + F ? null : { r, kind: q.kind, boxes: clearOf[q.kind](q.el).map(e => { const b = e.getBoundingClientRect(); return { left: b.left, right: b.right, top: b.top, bottom: b.bottom, width: b.width, wide: !!e._wide || !!(e.closest && e.closest('#contact')) }; }).filter(b => b.width && b.bottom > -40 && b.top < H + 40) }; }).filter(Boolean);
     { const cs = [...document.querySelectorAll('#contact .label .lt, #contact .contact, #contact .mail')].map(e => { const rg = document.createRange(); rg.selectNodeContents(e); return Math.max(0, ...[...rg.getClientRects()].map(b => b.right)); });
@@ -2991,7 +2991,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         if (g.kind === 'ct') { const u = d.x / W, vv = (d.y - g.r.top) / Math.max(1, g.r.bottom - g.r.top), ed = (mob ? .8 : Math.min(.8, Math.max(.5, ctEdge + .05))) + .025 * Math.sin(d.y * .012 + t * .15) + .65 * ss(.3, .75, vv);   // lower down it trickles off the right side: no band of dots running along underneath   // Contact: dots on the right side only,
           w *= ss(ed, ed + .08, u); }                                                                                      // with plenty of cream between them and the words
         if (g.kind === 'res' && g.r.resBot !== undefined && d.y > g.r.resBot - F) {   // ... past the cards it thins out and drifts over to the right, clear of the words
-          const f = Math.min(1, Math.max(0, (d.y - g.r.resBot + F) / Math.max(1, g.r.bottom - g.r.resBot + F))), u = d.x / W, edge = (mob ? .3 : .1) + .4 * f + .04 * Math.sin(d.y * .01 + t * .2);
+          const f = Math.min(1, Math.max(0, (d.y - g.r.resBot + F) / Math.max(1, g.r.bottom - g.r.resBot + F))), u = d.x / W, edge = (mob ? .3 : .1) + ((mob ? .5 : Math.min(.8, Math.max(.5, ctEdge + .05))) - (mob ? .3 : .1)) * f + .04 * Math.sin(d.y * .01 + t * .2);   // drifts right until it lines up with Contact's field
           w *= ss(edge, edge + .1, u); }
         if (w > m) { m = w; reg = g; }
       }
