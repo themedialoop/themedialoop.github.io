@@ -566,11 +566,9 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .st-wm{position:absolute;inset:0;background:var(--st-ink,#f2eedd);-webkit-mask:url(assets/medialoop-wordmark-nodot.svg) center/contain no-repeat;mask:url(assets/medialoop-wordmark-nodot.svg) center/contain no-repeat}
 .st-idot{position:absolute;left:47.751%;top:24.869%;width:3.637%;height:11.527%;overflow:visible;opacity:var(--st-dot,0)}
 .st-idot path,.st-cue-dot path{fill:#e7aa4d}
-.st-idot{transform-origin:50% 60%}
-.st-idot.pop{animation:stPop .55s cubic-bezier(.3,1.8,.5,1)}
-@keyframes stPop{0%{transform:scale(1.7,1.35)}45%{transform:scale(.82,1.15)}100%{transform:scale(1)}}
-.st-spark{position:absolute;z-index:3;border-radius:46% 54% 52% 48%/55% 45% 55% 45%;background:#e7aa4d;pointer-events:none;animation:stSpark .75s cubic-bezier(.2,.7,.3,1) both}
-@keyframes stSpark{0%{transform:translate(0,0) scale(.4);opacity:1}70%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
+.st-idot{transform-origin:50% 50%;animation:stIdot 4.2s ease-in-out infinite alternate}   /* once it has landed, the i-dot breathes slowly in and out like the dots around it */
+@keyframes stIdot{from{transform:scale(.9)}to{transform:scale(1.08)}}
+@media (prefers-reduced-motion:reduce){.st-idot{animation:none}}
 .st-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .st-tag{position:absolute;left:0;top:0;margin:0;font-weight:300;letter-spacing:-.015em;line-height:1.1;white-space:nowrap;will-change:transform;animation:stIn 1.2s .35s cubic-bezier(.2,.8,.2,1) both}
 .st-tag em{font-style:italic;font-weight:300}
@@ -2775,13 +2773,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
 
   // ---- the opener's state: pv runs 0 (landing) to 1 (home page). It only moves forward, on its own, once started
   let pv = 1, going = false, on = false, idle = 0, lastT = 0, guard = 0, popped = true;
-  // the landing: the i-dot lands with a springy pop and a little burst of gold dots
-  const idotEl = stage.querySelector('.st-idot');
-  const pop = () => { if (reduce) return; idotEl.classList.remove('pop'); void idotEl.offsetWidth; idotEl.classList.add('pop');
-    const b = idotEl.getBoundingClientRect(), pr = pin.getBoundingClientRect(), cx = b.left + b.width / 2 - pr.left, cy = b.top + b.height / 2 - pr.top;
-    for (let i = 0; i < 9; i++) { const sp = document.createElement('i'); sp.className = 'st-spark'; const a = i / 9 * Math.PI * 2 + Math.random() * .5, d = b.width * (1.6 + Math.random() * 1.4), z = b.width * (.18 + Math.random() * .22);
-      sp.style.cssText = `left:${cx - z / 2}px;top:${cy - z / 2}px;width:${z}px;height:${z}px;--dx:${(Math.cos(a) * d).toFixed(1)}px;--dy:${(Math.sin(a) * d).toFixed(1)}px;animation-delay:${(Math.random() * .06).toFixed(2)}s`;
-      pin.append(sp); setTimeout(() => sp.remove(), 900); } };
+
   const start = () => { if (!on || going) return; going = true; };
   const stop = e => { if (e.cancelable) e.preventDefault(); };
   const onWheel = e => { stop(e); if (Math.abs(e.deltaY) >= 1) start(); };
@@ -2835,7 +2827,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       cue.style.transform = `translate(${(bx - (w - lerp(cw, w1, k)) / 2).toFixed(1)}px,${(by - (h - lerp(ch, h1d, k)) / 2).toFixed(1)}px) rotate(${(ss(0, 1, k) * 360 + Math.sin(k * Math.PI) * 30).toFixed(1)}deg) scale(${(w / cw).toFixed(4)},${(h / ch).toFixed(4)})`;
       cueP.setAttribute('d', morph(ss(.25, .9, k))); cueUp.style.opacity = (1 - Math.min(1, k * 4)).toFixed(3);
       const arrived = pv >= .78 ? 1 : 0; cue.style.visibility = arrived ? 'hidden' : ''; h1.style.setProperty('--st-dot', arrived);
-      if (arrived && on && !popped) { popped = true; pop(); } if (!arrived) popped = false; cue.tabIndex = on && !going ? 0 : -1; }
+ cue.tabIndex = on && !going ? 0 : -1; }
     // the dots
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height);
     const pad = Math.min(W, H) * .045, pr = pin.getBoundingClientRect(), born = reduce || !on && pv >= 1 && now - t0 > 1500 ? 1 : (now - t0) / 1500,
