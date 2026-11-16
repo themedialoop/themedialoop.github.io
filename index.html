@@ -1883,18 +1883,24 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .river .track{position:absolute;left:0;top:0;height:100%;display:flex}
 .river .tile{position:relative;flex:none;height:100%}
 .river .rd{position:absolute;animation:var(--mv,rvBob) var(--md,6s) ease-in-out var(--bp,0s) infinite alternate}   /* each bubble has its own little motion: a bob, a sway, a small loop, a rock or a squish */
-@keyframes rvSway{0%{translate:-5px 0}100%{translate:5px 0}}
-@keyframes rvLoop{0%{translate:0 -5px}25%{translate:5px 0}50%{translate:0 5px}75%{translate:-5px 0}100%{translate:0 -5px}}
-@keyframes rvRock{0%{rotate:-7deg}100%{rotate:7deg}}
-@keyframes rvSquish{0%{scale:1.05 .95}100%{scale:.95 1.05}}
-@keyframes rvDrift{0%{translate:-4px 4px}100%{translate:4px -4px}}
+@keyframes rvSway{0%{translate:-7px 0}100%{translate:7px 0}}
+@keyframes rvLoop{0%{translate:0 -7px}25%{translate:7px 0}50%{translate:0 7px}75%{translate:-7px 0}100%{translate:0 -7px}}
+@keyframes rvRock{0%{rotate:-10deg}100%{rotate:10deg}}
+@keyframes rvSquish{0%{scale:1.07 .93}100%{scale:.93 1.07}}
+@keyframes rvDrift{0%{translate:-6px 6px}100%{translate:6px -6px}}
 .river .rs{width:100%;height:100%;transform:scale(0);transition:transform .7s cubic-bezier(.3,1.5,.5,1) var(--in,0s)}
 .river.on .rs{transform:scale(1)}
 .river .rb{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--c);color:var(--tc);border-radius:var(--br);animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate}   /* each bubble grows and shrinks at its own pace */
 .river .rb.ring{background:transparent;box-shadow:inset 0 0 0 var(--rw,3px) var(--c)}   /* an open circle */
 .river{cursor:grab;touch-action:pan-y}.river.drag{cursor:grabbing}
 @keyframes rvGrow{0%{transform:scale(var(--g0,.94))}100%{transform:scale(var(--g1,1.07))}}
-.river .rd.hv .rs{animation:rvHop .9s cubic-bezier(.3,1.4,.5,1)}   /* touch or hover a bubble and it hops and jiggles */
+.river .rd.hv .rs{animation:var(--hv,rvHop) .9s cubic-bezier(.3,1.4,.5,1)}   /* touch or hover a bubble: each has its own reaction */
+@keyframes rvSpin{0%{rotate:0deg}100%{rotate:360deg}}
+@keyframes rvJelly{0%{scale:1 1}20%{scale:1.22 .8}40%{scale:.86 1.16}60%{scale:1.08 .94}80%{scale:.97 1.03}100%{scale:1 1}}
+@keyframes rvPulse{0%{scale:1}35%{scale:1.28}65%{scale:.94}100%{scale:1}}
+@keyframes rvShake{0%,100%{translate:0 0}15%{translate:-8px 0}30%{translate:7px 0}45%{translate:-5px 0}60%{translate:4px 0}75%{translate:-2px 0}}
+@keyframes rvDip{0%{translate:0 0}30%{translate:0 12px;scale:1.08 .9}60%{translate:0 -6px;scale:.96 1.04}100%{translate:0 0;scale:1}}
+@keyframes rvTwirl{0%{rotate:0deg;scale:1}50%{rotate:-25deg;scale:1.15}75%{rotate:12deg}100%{rotate:0deg;scale:1}}
 @keyframes rvHop{0%{translate:0 0;rotate:0deg}25%{translate:0 -16px;rotate:-8deg}50%{translate:0 2px;rotate:6deg}70%{translate:0 -5px;rotate:-3deg}100%{translate:0 0;rotate:0deg}}
 .river .w{display:block;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
 .river .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
@@ -1956,7 +1962,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
   RES.forEach(w => { const li = document.createElement('li'); li.textContent = w; list.append(li); }); box.append(list);
   const river = document.createElement('div'); river.className = 'river'; river.setAttribute('aria-hidden', 'true'); box.append(river);
   const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', purple: '#9b6aa6' };
-  const MIX = [['blue', .34], ['gold', .3], ['orange', .1], ['pink', .1], ['teal', .08], ['purple', .08]];
+  const MIX = [['blue', .46], ['gold', .4], ['orange', .04], ['pink', .04], ['teal', .03], ['purple', .03]];   // mostly blue and gold, a few sprinkles
   const R = (a, b) => a + Math.random() * (b - a), pc = () => Math.round(R(42, 58)) + '%';
   const pickCol = () => { let t = Math.random(); for (const [c, w] of MIX) { t -= w; if (t <= 0) return c; } return 'blue'; };
   const textCol = c => c === 'gold' ? '#2c5494' : c === 'blue' && Math.random() < .25 ? '#e7aa4d' : '#f2eedd';
@@ -1987,7 +1993,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
     for (let i = 0; i < Math.round(nPlain * 1.1); i++) items.push({ d: R(7, 15) * k });
     const area = items.reduce((a, o) => a + o.d * o.d, 0);
     Tw = Math.max(W * 1.2, area / (H * .62));
-    const placed = [], gap = (a, b) => Math.max(5, .06 * Math.max(a, b)) + 14 * k;
+    const placed = [], gap = (a, b) => Math.max(5, .06 * Math.max(a, b)) + 18 * k;   // room for each bubble's own little motion
     const dist = (x1, y1, x2, y2) => { let dx = Math.abs(x1 - x2); dx = Math.min(dx, Tw - dx); return Math.hypot(dx, y1 - y2); };   // the tile wraps around
     items.sort((a, b) => b.d - a.d);
     for (const o of items) { for (let n = 0; n < 3000; n++) { const x = R(0, Tw), y = R(o.d / 2 + AY + 6, H - o.d / 2 - AY - 6);
@@ -1995,10 +2001,11 @@ button,input,select,textarea,optgroup{font-family:inherit}
     const tile = document.createElement('div'); tile.className = 'tile'; tile.style.width = Tw + 'px';
     placed.forEach(o => { for (const shift of [0, -Tw, Tw]) {   // a dot over the seam also appears on the other side
         const left = o.x - o.d / 2 + shift; if (left > Tw || left + o.d < 0) continue;
-        if (!o.mv) { const m = ['rvBob', 'rvSway', 'rvLoop', 'rvRock', 'rvSquish', 'rvDrift'][Math.floor(Math.random() * 6)]; o.mv = m; o.md = (m === 'rvLoop' ? R(5, 9) : R(2.6, 6)).toFixed(2); o.mp = R(0, 6).toFixed(2); }
+        if (!o.mv) { const m = ['rvBob', 'rvSway', 'rvLoop', 'rvRock', 'rvSquish', 'rvDrift'][Math.floor(Math.random() * 6)]; o.mv = m; o.md = (m === 'rvLoop' ? R(4, 7) : R(2.2, 4.8)).toFixed(2); o.mp = R(0, 6).toFixed(2); }
+        if (!o.hv) o.hv = ['rvHop', 'rvSpin', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 7)];
         if (o.pp === undefined) { o.pp = !o.w && Math.random() < .3; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
         const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '');
-        el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(AY * .7).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--in:${R(0, .9).toFixed(2)}s`;
+        el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${AY.toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s`;
         if (!o.col) { o.col = pickCol(); o.tc = textCol(o.col); o.br = `${pc()} ${pc()} ${pc()} ${pc()} / ${pc()} ${pc()} ${pc()} ${pc()}`; o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
         if (!o.gd) { o.gd = R(3, 8).toFixed(2); o.g0 = R(.9, .96).toFixed(3); o.g1 = R(1.04, 1.09).toFixed(3); }
