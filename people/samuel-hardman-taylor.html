@@ -856,7 +856,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .p-river{display:block;padding:clamp(30px,5vw,60px) 0;overflow-x:clip}
 .river{position:relative;height:clamp(400px,40vw,560px);overflow:hidden;width:112%;margin-left:-6%;rotate:-3.5deg}   /* four rows of the net */   /* tilted a little; wider than the screen so its ends never show */
 .river .track{position:absolute;left:0;top:0;height:100%;display:flex}
-.river .tile{position:relative;flex:none;height:100%;content-visibility:auto}   /* stretches of river off to the side aren't drawn */
+.river .tile{position:relative;flex:none;height:100%}   /* (not clipped: a dot over a tile's edge simply overhangs into the next one, whole) */
 .river:not(.run) .track{content-visibility:hidden}   /* and none of it while the river is off screen */
 .river .rd.sm,.river .rd.sm .rb::before{animation:none}   /* the small dots sit still: hundreds of little moving parts were the main cost on a phone */
 .river:not(.run) .rd,.river:not(.run) .rb::before{animation-play-state:paused}   /* and nothing moves while the river is off screen */
@@ -977,7 +977,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
       placed.forEach(o => { if (o.w || o.logo) return; const t = Math.random();
         if (o.small && t < .16) o.ring = true; else if (o.small && t < .175) o.idot = true; }); }   // open circles and i-dots: only small and tiny ones, and only a few i-dots   // (i-dots only on the smaller ones: a big one leaves a gap in the net)
     const tile = document.createElement('div'); tile.className = 'tile'; tile.style.width = Tw + 'px';
-    placed.forEach(o => { for (const shift of [0, -Tw, Tw]) {   // a dot over the seam also appears on the other side
+    placed.forEach(o => { for (const shift of [0]) {   // each dot once per tile: one over the seam overhangs into the next tile, whole, rather than being cut in two
         const left = o.x - o.d / 2 + shift; if (left > Tw || left + o.d < 0) continue;
         if (!o.mv) { const m = ['rvBob', 'rvSway', 'rvLoop', 'rvDrift'][Math.floor(Math.random() * 4)]; o.mv = m; o.md = (m === 'rvLoop' ? R(8, 12) : R(5, 8)).toFixed(2); o.mp = R(0, 6).toFixed(2); }
         if (!o.hv) o.hv = ['rvHop', 'rvJelly', 'rvPulse', 'rvShake', 'rvDip', 'rvTwirl'][Math.floor(Math.random() * 6)];
