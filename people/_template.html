@@ -418,7 +418,14 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
    lines never touch */
 .bz-h.sec-h{rotate:none !important;line-height:1.02 !important}
 .bz-h{line-height:1.02 !important}
-@media (max-width:600px){.bz-h{line-height:1.02 !important}}
+@media (max-width:600px){.bz-h{line-height:1.02 !important;text-wrap:balance}}
+</style>
+<style>
+/* (balanced, so no lonely word on a line of its own) */
+/* the big titles stack into rows on desktop too, a word or two per line, like on phones */
+@media (min-width:601px){
+  .bz-h,.bz-h.sec-h{white-space:normal !important;max-width:6.2em !important;text-wrap:balance}
+}
 </style>
 </head>
 <body>

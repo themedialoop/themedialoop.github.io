@@ -682,9 +682,17 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
    lines never touch */
 .bz-h.sec-h{rotate:none !important;line-height:1.02 !important}
 .bz-h{line-height:1.02 !important}
-@media (max-width:600px){.bz-h{line-height:1.02 !important}}
+@media (max-width:600px){.bz-h{line-height:1.02 !important;text-wrap:balance}}
 </style>
 <style>.bz-h .bz-c{color:#d8708e}</style>
+<style>
+/* (balanced, so no lonely word on a line of its own) */
+/* the big titles stack into rows on desktop too, a word or two per line, like on phones */
+@media (min-width:601px){
+  .bz-h,.bz-h.sec-h{white-space:normal !important;max-width:6.2em !important;text-wrap:balance}
+  #resources .bz-h.sec-h{max-width:4.2em !important}
+}
+</style>
 </head>
 <body>
 <canvas id="net" aria-hidden="true"></canvas>
@@ -786,7 +794,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 </div>
 
 <footer class="wrap" id="contact" data-net="0.14 0.42 0.33" data-net-m="0.12 0.4 0.36">
-  <h2 class="bz-h sec-h ct-h"><span class="bz-a">Email</span> <span class="bz-b">Us, Maybe?</span></h2>
+  <h2 class="bz-h sec-h ct-h"><span class="bz-a">Email Us</span> <span class="bz-b">Maybe?</span></h2>
   <p class="contact">There is something rather magical about finding another person who thinks like you. <span class="t4">Please take a moment to connect.</span></p>
   <div class="mail-row">
   <a class="mail" href="mailto:samuelht@uic.edu"><span class="glink">You can find our email here.</span></a>
