@@ -693,6 +693,12 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   #resources .bz-h.sec-h{max-width:4.2em !important}
 }
 </style>
+<style>
+/* the big titles break where their colours change: the first row gold, the rows after it orange (Publications pink),
+   on every screen size */
+.bz-h .bz-a,.bz-h .bz-b,.bz-h .bz-c{display:block}
+.bz-h,.bz-h.sec-h,#resources .bz-h.sec-h{white-space:nowrap !important;max-width:none !important;text-wrap:nowrap}
+</style>
 </head>
 <body>
 <canvas id="net" aria-hidden="true"></canvas>
@@ -727,7 +733,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   </section>
 
   <section id="about" data-net="-0.03 0.0 0.17" data-net-m="-0.1 0.17 0.18" data-net-at="0 0.35">
-    <h2 class="bz-h sec-h"><span class="bz-a">Get</span> <span class="bz-b">to Know Us</span></h2>
+    <h2 class="bz-h sec-h"><span class="bz-a">Get to</span> <span class="bz-b">Know Us</span></h2>
     <p class="statement ab-lead" id="statement">Our goal, quite unapologetically, is to create fresh scientific insights about communication technologies by bringing warmth, rigor, and playfulness to our research projects. In our philosophy, whimsy and creativity sit happily alongside statistics and meticulous measurement. We have a fondness for the artisanal qualities of doing scientific research and think they ought to be celebrated, with much jubilation.<br>Good research deserves a bit of pizzazz, and we&rsquo;re happy to supply it.</p>
     <div class="about-grid ab-pills">
       <details class="ab-pill ab-b2"><canvas aria-hidden="true"></canvas><summary><h3>Our interests</h3><span class="pm" aria-hidden="true"></span></summary><p>There is a nearly endless source of inspiration from the mysteries of communication, technology, and human behavior. Media and communication technologies shape how we think, feel, and connect, and our behaviors shape them back. We care deeply about both directions of this social process. Our research interests draw our imaginations towards friendships, families and the small, everyday rituals through which connection and identity take form. Oftentimes, our answers look like a Jackson Pollock painting, rather than a tidy APA-formatted list of takeaways, and honestly, we prefer it that way. The dazzling chaos of human communication and technology keeps us interested and inspired.</p></details>
@@ -737,11 +743,11 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   </section>
 </main>
 
-<div class="marquee hm-marq" id="marquee" data-band="none"><canvas id="ribbonC" hidden></canvas><h2 class="bz-h"><span class="st-sr">Our Favorite Things: research interests</span><span aria-hidden="true"><span class="bz-a">Our</span> <span class="bz-b">Favorite Things</span></span></h2><ul class="river-words"><li>Algorithms</li><li>Perceived algorithm responsiveness</li><li>Social connectedness</li><li>Loneliness</li><li>Close relationships</li><li>AI-mediated communication</li><li>Self-disclosure</li><li>Privacy</li><li>Deception</li><li>Trust in technology</li><li>Mental health disclosure</li><li>Interpersonal communication</li><li>Social media</li><li>Subjective well-being</li><li>Imagined audience</li><li>Affordances</li><li>Media multiplexity</li><li>Algorithm awareness</li><li>Intimacy</li><li>Human-machine communication</li><li>Human-AI relationships</li><li>Misinformation</li><li>Digital literacy</li><li>Online safety</li><li>Folk theories of algorithms</li><li>Social cognition</li><li>Cyberbullying</li><li>Bystander intervention</li><li>Open science</li><li>Mobile phones</li><li>Experience sampling</li><li>Longitudinal methods</li><li>Adolescents and young adults</li><li>LGBTQ+ youth</li><li>Identity</li><li>Social comparison</li><li>Media psychology</li><li>Social media cognition</li><li>Mobile phone habits</li><li>Prosocial behavior</li><li>Family communication</li><li>Language and technology</li><li>Social media sensitivity</li><li>Older adults and technology</li><li>Computational social science</li></ul></div>
+<div class="marquee hm-marq" id="marquee" data-band="none"><canvas id="ribbonC" hidden></canvas><h2 class="bz-h"><span class="st-sr">Our Favorite Things: research interests</span><span aria-hidden="true"><span class="bz-a">Our</span> <span class="bz-b">Favorite<br>Things</span></span></h2><ul class="river-words"><li>Algorithms</li><li>Perceived algorithm responsiveness</li><li>Social connectedness</li><li>Loneliness</li><li>Close relationships</li><li>AI-mediated communication</li><li>Self-disclosure</li><li>Privacy</li><li>Deception</li><li>Trust in technology</li><li>Mental health disclosure</li><li>Interpersonal communication</li><li>Social media</li><li>Subjective well-being</li><li>Imagined audience</li><li>Affordances</li><li>Media multiplexity</li><li>Algorithm awareness</li><li>Intimacy</li><li>Human-machine communication</li><li>Human-AI relationships</li><li>Misinformation</li><li>Digital literacy</li><li>Online safety</li><li>Folk theories of algorithms</li><li>Social cognition</li><li>Cyberbullying</li><li>Bystander intervention</li><li>Open science</li><li>Mobile phones</li><li>Experience sampling</li><li>Longitudinal methods</li><li>Adolescents and young adults</li><li>LGBTQ+ youth</li><li>Identity</li><li>Social comparison</li><li>Media psychology</li><li>Social media cognition</li><li>Mobile phone habits</li><li>Prosocial behavior</li><li>Family communication</li><li>Language and technology</li><li>Social media sensitivity</li><li>Older adults and technology</li><li>Computational social science</li></ul></div>
 
 <div class="wrap">
   <section id="people" data-net="-0.03 0.0 0.17" data-net-m="-0.1 0.17 0.18" data-net-at="1 0.7">
-    <h2 class="bz-h sec-h"><span class="bz-a">The</span> <span class="bz-b">Company We Keep</span></h2>
+    <h2 class="bz-h sec-h"><span class="bz-a">The</span> <span class="bz-b">Company<br>We Keep</span></h2>
     <div class="people">
       <a class="card" href="people/samuel-hardman-taylor.html"><div class="photo"><img src="assets/people/samuel-hardman-taylor.jpg" alt="Samuel Hardman Taylor" width="824" height="824" loading="lazy"></div><h3>Samuel Hardman Taylor</h3></a>
       <article class="card"><div class="photo"><img src="https://y-anthonychen.github.io/assets/images/headshot.jpg" alt="Y. Anthony Chen" loading="lazy"></div><h3>Y.&nbsp;Anthony Chen</h3></article>
@@ -780,7 +786,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   </section>
 
   <section id="resources" aria-labelledby="res-h">
-    <h2 class="bz-h sec-h" id="res-h"><span class="bz-a">Let</span> <span class="bz-b">Us Help</span></h2>
+    <h2 class="bz-h sec-h" id="res-h"><span class="bz-a">Let Us</span> <span class="bz-b">Help</span></h2>
     <p class="res-intro">Here you will find tools created by members of the Medialoop Collective. They are free to use. If you have questions about how to use them, <a href="#contact">email us</a>.</p>
     <div class="res-stack">
       <a class="res r-blue" href="https://docs.google.com/document/d/11GHs-22nEN9UNJ3MVLq-V8ZS8MVtG2FGaQ7hOCoL7hk/edit?usp=sharing" target="_blank" rel="noopener" style="--i:0"><canvas aria-hidden="true"></canvas><span class="r-top"><span class="r-kind">Scale</span><span class="r-mini" aria-hidden="true">Survey Measures</span><span class="r-n">01 / 06</span></span><span class="r-name">Survey Measures</span><span class="r-desc">Our primary survey measure is the Perceived Algorithm Responsiveness and Insensitivity Scale. This 15-item scale measures two variables: perceived algorithm responsiveness (PAR) and perceived algorithm insensitivity (PAI). It is validated for Facebook, Twitter, TikTok and Instagram; more information is in our Social Media + Society publication.</span><span class="r-go">Get the scale</span></a>
