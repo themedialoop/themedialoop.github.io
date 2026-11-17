@@ -699,6 +699,9 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 .bz-h .bz-a,.bz-h .bz-b,.bz-h .bz-c{display:block}
 .bz-h,.bz-h.sec-h,#resources .bz-h.sec-h{white-space:nowrap !important;max-width:none !important;text-wrap:nowrap}
 </style>
+<style>/* the big titles fly in row by row: up from below, without the tilt the cards have */
+.bz-h .fly{animation-name:flyInRow}
+@keyframes flyInRow{0%{opacity:0;translate:0 60px}55%{opacity:1}100%{opacity:1;translate:0 0}}</style>
 </head>
 <body>
 <canvas id="net" aria-hidden="true"></canvas>
@@ -3089,14 +3092,14 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
 /* the fly-in: people, event, resource, About and Apply cards, and the publication list */
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
-  const groups = ['.people > .card', '.ev-cards > .ev', '.about-grid > *', '.apply', '.pubs li'];   // (the resource cards keep their own stacking)
+  const groups = ['.bz-h .bz-a', '.bz-h .bz-b', '.bz-h .bz-c', '.people > .card', '.ev-cards > .ev', '.about-grid > *', '.apply', '.pubs li'];   // (the resource cards keep their own stacking)
   const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const el = e.target; io.unobserve(el);
     el.classList.remove('fw'); el.classList.add('fly'); el.addEventListener('animationend', () => el.classList.remove('fly'), { once: true }); }), { threshold: .12, rootMargin: '0px 0px -5% 0px' });
   groups.forEach(sel => document.querySelectorAll(sel).forEach((el, i) => {
     if (el.getBoundingClientRect().top < innerHeight * .9) return;   // already on screen when the page opens: leave it be
     el.classList.remove('rv', 'in');
     const k = [...el.parentNode.children].indexOf(el);
-    el.style.setProperty('--fd', (Math.min(k, 5) * .08).toFixed(2) + 's'); el.style.setProperty('--ft', (k % 2 ? 3 : -3) + 'deg');
+    el.style.setProperty('--fd', (Math.min(k, 5) * (el.closest('.bz-h') ? .12 : .08)).toFixed(2) + 's'); el.style.setProperty('--ft', (k % 2 ? 3 : -3) + 'deg');
     el.classList.add('fw'); io.observe(el); }));
 })();
 </script>

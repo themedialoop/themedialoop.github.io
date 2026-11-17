@@ -872,7 +872,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   /* entrances: a gentle, staggered fade-and-rise as things come into view */
   (() => {
     if (reduce || !('IntersectionObserver' in window)) return;
-    const groups = ['.back', '.p-photo-shadow', '.p-intro h1', '.p-role', '.p-links li', '.label', '.sec-h', '.p-bio p', '.p-topics li', '.pubs li', '.p-foot > *'];
+    const groups = ['.back', '.p-photo-shadow', '.p-intro h1', '.p-role', '.p-links li', '.label', '.bz-h .bz-a', '.bz-h .bz-b', '.p-bio p', '.p-topics li', '.pubs li', '.p-foot > *'];
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15, rootMargin: '0px 0px -6% 0px' });
     groups.forEach(sel => document.querySelectorAll(sel).forEach((el, i, all) => {
       const sib = [...el.parentNode.children].filter(c => all.length && [...all].includes(c)), k = Math.max(0, sib.indexOf(el));
