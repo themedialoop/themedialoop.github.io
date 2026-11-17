@@ -303,7 +303,7 @@ a.card{text-decoration:none}
 .ev:nth-child(1){--hr:-2deg}.ev:nth-child(2){--hr:1.5deg}.ev:nth-child(3){--hr:-1deg}.ev:nth-child(4){--hr:2deg}
 .ev:hover{transform:translateY(-8px) rotate(var(--hr));background:var(--cream);color:var(--blue)}
 .ev.h-purple:hover{background:#9b6aa6;color:var(--cream)}
-.ev.h-teal:hover{background:#2a8c8c;color:var(--cream)}
+.ev.h-teal:hover{background:#9b6aa6;color:var(--cream)}
 .ev.h-orange:hover{background:#e0773a;color:var(--cream)}
 .ev.h-pink:hover{background:#d8708e;color:var(--cream)}
 .ev.h-cream:hover{background:var(--cream);color:var(--blue)}
@@ -408,7 +408,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) clamp(8
 .r-blue2{background:#2c5494;color:var(--cream)}
 .r-egg{background:#9b6aa6;color:var(--cream)}   /* mauve */
 .r-lav{background:#d8708e;color:#2c5494}   /* rose */
-.r-sage{background:#2a8c8c;color:var(--cream)}   /* lagoon teal */
+.r-sage{background:#9b6aa6;color:var(--cream)}
 .r-sage .r-kind::before{background:var(--gold)}
 .r-orange{background:#e0773a;color:#2c5494}   /* orange, a sprinkle */
 .r-orange .r-kind::before{background:var(--blue)}
@@ -477,7 +477,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) clamp(8
 .apply.a-blue:hover .ap-go,.apply.a-deep:hover .ap-go,.apply.a-plum:hover .ap-go{background:var(--gold);color:var(--ink);filter:brightness(.92)}
 .apply.a-lav{background:#d8708e;color:#2c5494}
 .apply.a-lav .ap-t{color:#2c5494}
-.apply.a-sage{background:#2a8c8c}
+.apply.a-sage{background:#9b6aa6}
 @media (prefers-reduced-motion:reduce){.apply,.ap-go{transition:none}}
 
 /* section headings: a small kicker with a gold dot above a big, bold, tight heading that ends in a gold full stop
@@ -495,7 +495,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) clamp(8
 
 /* a small surprise: on each visit a few cards light up in lavender or plum instead of their usual hover colour */
 .people .card.s-lav:hover,.ev.s-lav:hover{background-color:#d8708e;background-image:none;color:#2c5494}
-.people .card.s-chart:hover,.ev.s-chart:hover{background-color:#2a8c8c;background-image:none;color:var(--cream)}
+.people .card.s-chart:hover,.ev.s-chart:hover{background-color:#d8708e;background-image:none;color:var(--cream)}
 .people .card.s-plum:hover,.ev.s-plum:hover{background-color:#9b6aa6;background-image:none;color:var(--cream)}
 .pubs a:not([href]){cursor:default}
 /* every piece of text on the site is Inter */
@@ -553,7 +553,7 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .res.bd2{background:#9b6aa6;color:#f2eedd;--net:#ac84b1}.res.bd2 .r-kind::before{background:#d8708e}.res.bd2 .r-go{--gd-bg:#e7aa4d;color:#2c5494}
 .res.bd3{background:#2c5494;color:#f2eedd;--net:#46689d}.res.bd3 .r-kind::before{background:#e7aa4d}.res.bd3 .r-go{--gd-bg:#e7aa4d;color:#2c5494}
 .res.bd4{background:#d8708e;color:#f2eedd;--net:#df8aa2}.res.bd4 .r-kind::before{background:#2c5494}.res.bd4 .r-go{--gd-bg:#2c5494;color:#f2eedd}
-.res.bd5{background:#2a8c8c;color:#f2eedd;--net:#4a9c99}.res.bd5 .r-kind::before{background:#e7aa4d}.res.bd5 .r-go{--gd-bg:#e7aa4d;color:#2c5494}
+.res.bd5{background:#e0773a;color:#f2eedd;--net:#e58d57}.res.bd5 .r-kind::before{background:#2c5494}.res.bd5 .r-go{--gd-bg:#2c5494;color:#f2eedd}
 .res.bd6{background:#e7aa4d;color:#2c5494;--net:#e49746}.res.bd6 .r-kind::before{background:#2c5494}.res.bd6 .r-go{--gd-bg:#2c5494;color:#f2eedd}
 </style>
 <style>
@@ -669,10 +669,10 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 </style>
 <style>
 /* menu: each tab lights up in the next brand colour, in the same order as the publication list (blue, gold, orange, pink,
-   teal, purple), and its little dot changes in the same instant: no transitions on either */
-.top nav a:nth-child(6n+1){--nh:#2c5494;--nt:#f2eedd}.top nav a:nth-child(6n+2){--nh:#e7aa4d;--nt:#2c5494}
-.top nav a:nth-child(6n+3){--nh:#e0773a;--nt:#f2eedd}.top nav a:nth-child(6n+4){--nh:#d8708e;--nt:#f2eedd}
-.top nav a:nth-child(6n+5){--nh:#2a8c8c;--nt:#f2eedd}.top nav a:nth-child(6n+6){--nh:#9b6aa6;--nt:#f2eedd}
+   purple), and its little dot changes in the same instant: no transitions on either */
+.top nav a:nth-child(5n+1){--nh:#2c5494;--nt:#f2eedd}.top nav a:nth-child(5n+2){--nh:#e7aa4d;--nt:#2c5494}
+.top nav a:nth-child(5n+3){--nh:#e0773a;--nt:#f2eedd}.top nav a:nth-child(5n+4){--nh:#d8708e;--nt:#f2eedd}
+.top nav a:nth-child(5n+5){--nh:#9b6aa6;--nt:#f2eedd}
 .top nav a,.top nav a::before{transition:opacity .4s,transform .5s cubic-bezier(.2,.7,.2,1),background-color 0s,color 0s !important}
 html body .top nav a:is(:hover,:focus-visible,.tapped){background:var(--nh) !important;color:var(--nt) !important}
 html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--nt) !important;transform:none !important}
@@ -1991,7 +1991,7 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
     if (apUic) { apUic.complete ? placeUic() : apUic.addEventListener('load', placeUic); addEventListener('resize', placeUic); document.fonts && document.fonts.ready.then(placeUic); }
   }
 
-  /* event cards: each gets its own hover colour, never two the same: purple likeliest, then teal, with orange, pink and cream mixed in at random */
+  /* event cards: each gets its own hover colour, never two the same: purple likeliest, with orange, pink and cream mixed in at random */
   { const evs = [...document.querySelectorAll('.ev-cards .ev')], bag = [['h-cream', 1], ['h-cream', 1], ['h-cream', 1], ['h-cream', 1], ['h-cream', 1], ['h-cream', 1]];   // every event card highlights cream with blue words
     evs.forEach(el => { if (!bag.length) return; let r = Math.random() * bag.reduce((a, b) => a + b[1], 0), k = 0;
       for (; k < bag.length - 1; k++) { r -= bag[k][1]; if (r <= 0) break; } el.classList.add(bag.splice(k, 1)[0][0]); }); }
@@ -2210,8 +2210,8 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
   // for screen readers: the research interests as a plain list; the river itself is decoration
   // (the research interests are also written into the page as a plain list, for screen readers and search engines)
   const river = document.createElement('div'); river.className = 'river'; river.setAttribute('aria-hidden', 'true'); box.append(river);
-  const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', purple: '#9b6aa6' };
-  const MIX = [['blue', .46], ['gold', .4], ['orange', .04], ['pink', .04], ['teal', .03], ['purple', .03]];   // mostly blue and gold, a few sprinkles
+  const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', purple: '#9b6aa6' };
+  const MIX = [['blue', .46], ['gold', .4], ['orange', .05], ['pink', .045], ['purple', .045]];   // mostly blue and gold, a few sprinkles
   const R = (a, b) => a + Math.random() * (b - a), pc = () => Math.round(R(42, 58)) + '%';
   const pickCol = () => { let t = Math.random(); for (const [c, w] of MIX) { t -= w; if (t <= 0) return c; } return 'blue'; };
   const textCol = c => c === 'gold' ? '#2c5494' : c === 'blue' && Math.random() < .25 ? '#e7aa4d' : '#f2eedd';
@@ -2292,7 +2292,7 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
         if (o.pp === undefined) { o.pp = false; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
         const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '') + (o.small ? ' sm' : '');
         el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(2 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s;--out:${R(0, .28).toFixed(2)}s`;
-        if (!o.col) { const t = Math.random(); o.col = o.small ? (t < .62 ? 'blue' : t < .86 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)]) : t < .68 ? 'blue' : t < .93 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)];
+        if (!o.col) { const t = Math.random(); o.col = o.small ? (t < .62 ? 'blue' : t < .86 ? 'gold' : ['orange', 'pink', 'purple'][Math.floor(Math.random() * 3)]) : t < .68 ? 'blue' : t < .93 ? 'gold' : ['orange', 'pink', 'purple'][Math.floor(Math.random() * 3)];
           o.tc = o.col === 'gold' ? '#2c5494' : o.col === 'blue' && Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
         if (o.ddx === undefined) { const vy = -H * R(.5, 1), vx = R(-1, 1) * H * .45, L = Math.hypot(vx, vy) || 1, far = H * R(.7, 1.3);   // always up and away: never down over the words below
@@ -2349,8 +2349,8 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
     ['Internet addiction', 'Marriage', 'Friends', 'Family', 'Social network', 'Strong ties', 'Weak ties', 'Parenting', 'Love', 'Relations', 'Responsiveness', 'Emotion regulation', 'Self-esteem', 'Body image', 'Community', 'Self-presentation', 'Impression management', 'Hyperpersonal', 'Online community', 'Survey design', 'Person-specific analysis', '*cookies', '*party', '*chocolate chip cookies', '*YouTube', '*Spicy', '*groovy', '*lowkey', '*periodt', '*brain rot', '*yap', '*slay', '*Beyoncé', '*Gaga', '*Bad Bunny', '*GOAT', '*beige flags', '*bae', '*bèbè', '*Moira Rose', '*Liz Lemon', '*Chicken Tenders', '*Peanut M&Ms', '*30 Rock', '*EXTRA', '*Ghosted', '*Gucci', '*IYKYK', '*Salty', '*Situationship', '*TBH', '*snatched', '*understood the assignment', '*Amsterdam', '*Chicago', '*Chai', '*self-obliteration', '*The Blue Line', '*The Red Line', '*The L', '*World\'s Columbian Exposition', '*The Loop', '*Logan Square', '*Wicker Park', '*Wrigleyville', '*Bridgeport', '*River North', '*Ravenswood', '*Lake Michigan', '*Maxwell Street Polish', '*Lake Shore Drive', '*Second City', '*Daniel Burnham', '*Marshall Field', '*Harold Washington', '*Ida B. Wells']
   ];
   const ALL = ROWS.flat(), RES = ALL.filter(w => w[0] !== '*'), FUN = ALL.filter(w => w[0] === '*').map(w => w.slice(1));
-  const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', purple: '#9b6aa6' };
-  const MIX = [['blue', .34], ['gold', .3], ['orange', .1], ['pink', .1], ['teal', .08], ['purple', .08]];
+  const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', purple: '#9b6aa6' };
+  const MIX = [['blue', .34], ['gold', .3], ['orange', .13], ['pink', .11], ['purple', .12]];
   const R = (a, b) => a + Math.random() * (b - a), pc = () => Math.round(R(42, 58)) + '%';
   const pickCol = () => { let t = Math.random(); for (const [c, w] of MIX) { t -= w; if (t <= 0) return c; } return 'blue'; };
   const textCol = c => c === 'gold' ? '#2c5494' : c === 'blue' && Math.random() < .25 ? '#e7aa4d' : '#f2eedd';
@@ -2474,7 +2474,7 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
   // the medialoop logo lives in the field too: it appears small near the middle at a dozen points on the way down,
   // then grows and sails off the screen as you sink, like everything else
   const MARK_AT = [...Array(12)].map((_, i) => .03 + i * .08);
-  const MARK_COLS = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6'];
+  const MARK_COLS = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6'];
   // logos never overlap one another: each takes a spot whose circle is clear of the others, and since the whole field grows
   // evenly from the middle, two logos that start apart stay apart (their slow turn stays inside their own circle)
   const addMark = () => { const z = Z(), w0 = R(.07, .14) * Math.min(W, 900); let x, y, ok = false;
@@ -2700,7 +2700,7 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
   const res = [...document.querySelectorAll('.res-stack .res')], evs = [...document.querySelectorAll('.ev-cards .ev')], ap = document.querySelector('.apply'), pills = [...document.querySelectorAll('.ab-pill')];
   const cards = [...(ap ? [{ el: ap, kind: 'ap' }] : []), ...pills.map(el => ({ el, kind: 'pill' }))]; if (!cards.length) return;
   const BLUE = '#2c5494', GOLD = '#e7aa4d', CREAM = '#f2eedd';
-  // one dot colour per card: gold on blue cards, blue on gold, pink and orange cards, cream on teal and purple ones
+  // one dot colour per card: gold on blue cards, blue on gold, pink and orange cards, cream on purple ones
   const dotColour = el => { const c = el.classList, h = k => c.contains(k);
     if (h('r-gold') || h('a-gold') || h('r-lav') || h('a-lav') || h('r-orange') || (c.contains('apply') && !h('a-blue') && !h('a-deep') && !h('a-plum') && !h('a-sage'))) return BLUE;
     if (h('r-sage') || h('a-sage') || h('r-egg') || h('a-plum')) return CREAM;
@@ -2800,14 +2800,14 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
 </script>
 <style>
 /* publication and resource lists: on hover each row lights up in the next brand colour, in order down the page:
-   blue, gold, orange, pink, teal, purple, then round again. Words turn cream on every colour except gold, where they stay blue. */
+   blue, gold, orange, pink, purple, then round again. Words turn cream on every colour except gold, where they stay blue. */
 .pubs a[style*="--hl"]::before,.r-list a[style*="--hl"]::before{background:var(--hl) !important}
 .pubs a.hl-gold:is(:hover,:focus-visible),.pubs a.hl-gold:is(:hover,:focus-visible) *,
 .r-list a.hl-gold:is(:hover,:focus-visible),.r-list a.hl-gold:is(:hover,:focus-visible) *{color:#2c5494 !important}
 .r-list a.hl-gold:is(:hover,:focus-visible) .r-type::before{background:#2c5494 !important}
 </style>
 <script>
-(() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6'];
+(() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6'];
   [...document.querySelectorAll('.pubs li > a[href], .r-list li > a[href]')].forEach((a, i) => { const c = P[i % P.length];
     a.style.setProperty('--hl', c); if (c === '#e7aa4d') a.classList.add('hl-gold'); }); })();
 </script>

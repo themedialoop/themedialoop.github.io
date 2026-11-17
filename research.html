@@ -1336,10 +1336,10 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 </style>
 <style>
 /* menu: each tab lights up in the next brand colour, in the same order as the publication list (blue, gold, orange, pink,
-   teal, purple), and its little dot changes in the same instant: no transitions on either */
-.top nav a:nth-child(6n+1){--nh:#2c5494;--nt:#f2eedd}.top nav a:nth-child(6n+2){--nh:#e7aa4d;--nt:#2c5494}
-.top nav a:nth-child(6n+3){--nh:#e0773a;--nt:#f2eedd}.top nav a:nth-child(6n+4){--nh:#d8708e;--nt:#f2eedd}
-.top nav a:nth-child(6n+5){--nh:#2a8c8c;--nt:#f2eedd}.top nav a:nth-child(6n+6){--nh:#9b6aa6;--nt:#f2eedd}
+   purple), and its little dot changes in the same instant: no transitions on either */
+.top nav a:nth-child(5n+1){--nh:#2c5494;--nt:#f2eedd}.top nav a:nth-child(5n+2){--nh:#e7aa4d;--nt:#2c5494}
+.top nav a:nth-child(5n+3){--nh:#e0773a;--nt:#f2eedd}.top nav a:nth-child(5n+4){--nh:#d8708e;--nt:#f2eedd}
+.top nav a:nth-child(5n+5){--nh:#9b6aa6;--nt:#f2eedd}
 .top nav a,.top nav a::before{transition:opacity .4s,transform .5s cubic-bezier(.2,.7,.2,1),background-color 0s,color 0s !important}
 html body .top nav a:is(:hover,:focus-visible,.tapped){background:var(--nh) !important;color:var(--nt) !important}
 html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--nt) !important;transform:none !important}
@@ -1759,14 +1759,14 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 </style>
 <style>
 /* publication and resource lists: on hover each row lights up in the next brand colour, in order down the page:
-   blue, gold, orange, pink, teal, purple, then round again. Words turn cream on every colour except gold, where they stay blue. */
+   blue, gold, orange, pink, purple, then round again. Words turn cream on every colour except gold, where they stay blue. */
 .pubs a[style*="--hl"]::before,.r-list a[style*="--hl"]::before{background:var(--hl) !important}
 .pubs a.hl-gold:is(:hover,:focus-visible),.pubs a.hl-gold:is(:hover,:focus-visible) *,
 .r-list a.hl-gold:is(:hover,:focus-visible),.r-list a.hl-gold:is(:hover,:focus-visible) *{color:#2c5494 !important}
 .r-list a.hl-gold:is(:hover,:focus-visible) .r-type::before{background:#2c5494 !important}
 </style>
 <script>
-(() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6'];
+(() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6'];
   [...document.querySelectorAll('.pubs li > a[href], .r-list li > a[href]')].forEach((a, i) => { const c = P[i % P.length];
     a.style.setProperty('--hl', c); if (c === '#e7aa4d') a.classList.add('hl-gold'); }); })();
 </script>

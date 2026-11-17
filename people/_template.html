@@ -400,10 +400,10 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 </style>
 <style>
 /* menu: each tab lights up in the next brand colour, in the same order as the publication list (blue, gold, orange, pink,
-   teal, purple), and its little dot changes in the same instant: no transitions on either */
-.top nav a:nth-child(6n+1){--nh:#2c5494;--nt:#f2eedd}.top nav a:nth-child(6n+2){--nh:#e7aa4d;--nt:#2c5494}
-.top nav a:nth-child(6n+3){--nh:#e0773a;--nt:#f2eedd}.top nav a:nth-child(6n+4){--nh:#d8708e;--nt:#f2eedd}
-.top nav a:nth-child(6n+5){--nh:#2a8c8c;--nt:#f2eedd}.top nav a:nth-child(6n+6){--nh:#9b6aa6;--nt:#f2eedd}
+   purple), and its little dot changes in the same instant: no transitions on either */
+.top nav a:nth-child(5n+1){--nh:#2c5494;--nt:#f2eedd}.top nav a:nth-child(5n+2){--nh:#e7aa4d;--nt:#2c5494}
+.top nav a:nth-child(5n+3){--nh:#e0773a;--nt:#f2eedd}.top nav a:nth-child(5n+4){--nh:#d8708e;--nt:#f2eedd}
+.top nav a:nth-child(5n+5){--nh:#9b6aa6;--nt:#f2eedd}
 .top nav a,.top nav a::before{transition:opacity .4s,transform .5s cubic-bezier(.2,.7,.2,1),background-color 0s,color 0s !important}
 html body .top nav a:is(:hover,:focus-visible,.tapped){background:var(--nh) !important;color:var(--nt) !important}
 html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--nt) !important;transform:none !important}
@@ -807,7 +807,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 .p-marq .c-deep{background:#2c5494;color:var(--cream)}
 .p-marq .c-cream{background:#e9e2c9;color:var(--blue)}   /* the pill cream: a shade off the page cream, so the pill still shows */
 .p-marq .c-lav{background:#d8708e;color:var(--cream)}
-.p-marq .c-sage{background:#2a8c8c;color:var(--cream)}
+.p-marq .c-sage{background:#9b6aa6;color:var(--cream)}
 .p-marq .c-plum{background:#9b6aa6;color:var(--cream)}
 .p-marq .pill.t-gold{color:var(--gold)}
 .p-marq .pill.t-plum{color:var(--blue)}
@@ -900,8 +900,8 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
   // (done in CSS rather than measured, as a measurement taken mid-entrance, while the section is still scaled, came out short)
   const bleed = () => { box.style.marginLeft = box.style.marginRight = 'calc(50% - 50vw)'; };
   bleed(); addEventListener('resize', bleed);
-  const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', teal: '#2a8c8c', purple: '#9b6aa6' };
-  const MIX = [['blue', .46], ['gold', .4], ['orange', .04], ['pink', .04], ['teal', .03], ['purple', .03]];   // mostly blue and gold, a few sprinkles
+  const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', purple: '#9b6aa6' };
+  const MIX = [['blue', .46], ['gold', .4], ['orange', .05], ['pink', .045], ['purple', .045]];   // mostly blue and gold, a few sprinkles
   const R = (a, b) => a + Math.random() * (b - a), pc = () => Math.round(R(42, 58)) + '%';
   const pickCol = () => { let t = Math.random(); for (const [c, w] of MIX) { t -= w; if (t <= 0) return c; } return 'blue'; };
   const textCol = c => c === 'gold' ? '#2c5494' : c === 'blue' && Math.random() < .25 ? '#e7aa4d' : '#f2eedd';
@@ -982,7 +982,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
         if (o.pp === undefined) { o.pp = false; o.pd = R(8, 15).toFixed(1); o.pdd = R(0, 15).toFixed(1); }
         const el = document.createElement('div'); el.className = 'rd' + (o.pp ? ' pp' : '') + (o.small ? ' sm' : '');
         el.style.cssText = `left:${left.toFixed(1)}px;top:${(o.y - o.d / 2).toFixed(1)}px;width:${o.d.toFixed(1)}px;height:${o.d.toFixed(1)}px;--ay:${(2 * k).toFixed(1)}px;--bp:-${o.mp}s;--mv:${o.mv};--md:${o.md}s;--hv:${o.hv};--in:${R(0, .9).toFixed(2)}s;--out:${R(0, .28).toFixed(2)}s`;
-        if (!o.col) { const t = Math.random(); o.col = o.small ? (t < .62 ? 'blue' : t < .86 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)]) : t < .68 ? 'blue' : t < .93 ? 'gold' : ['orange', 'pink', 'teal', 'purple'][Math.floor(Math.random() * 4)];
+        if (!o.col) { const t = Math.random(); o.col = o.small ? (t < .62 ? 'blue' : t < .86 ? 'gold' : ['orange', 'pink', 'purple'][Math.floor(Math.random() * 3)]) : t < .68 ? 'blue' : t < .93 ? 'gold' : ['orange', 'pink', 'purple'][Math.floor(Math.random() * 3)];
           o.tc = o.col === 'gold' ? '#2c5494' : o.col === 'blue' && Math.random() < .22 ? '#e7aa4d' : '#f2eedd'; { const q = () => Math.round(R(46, 54)) + '%'; o.br = `${q()} ${q()} ${q()} ${q()} / ${q()} ${q()} ${q()} ${q()}`; } o.bd = R(0, 2.8).toFixed(2); }
         const sc = document.createElement('div'); sc.className = 'rs';
         if (o.ddx === undefined) { const vy = -H * R(.5, 1), vx = R(-1, 1) * H * .45, L = Math.hypot(vx, vy) || 1, far = H * R(.7, 1.3);   // always up and away: never down over the words below
@@ -1110,7 +1110,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 </style>
 <style>
 /* publications: on hover each row lights up in the next brand colour, in order down the page:
-   blue, gold, orange, pink, teal, purple, then round again. Words turn cream on every colour except gold, where they stay blue. */
+   blue, gold, orange, pink, purple, then round again. Words turn cream on every colour except gold, where they stay blue. */
 .pubs a[style*="--hl"]::before{background:var(--hl) !important}
 .pubs a[href]:is(:hover,:focus-visible)::before{opacity:1}
 .pubs a[href]:is(:hover,:focus-visible),.pubs a[href]:is(:hover,:focus-visible) *{color:#f2eedd !important}
@@ -1139,7 +1139,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 @media (max-width:900px){.side-in{padding-bottom:clamp(90px,22vw,130px) !important}}
 </style>
 <script>
-(() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#2a8c8c', '#9b6aa6'];
+(() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6'];
   [...document.querySelectorAll('.pubs li > a[href]')].forEach((a, i) => { const c = P[i % P.length];
     a.style.setProperty('--hl', c); if (c === '#e7aa4d') a.classList.add('hl-gold'); }); })();
 </script>
