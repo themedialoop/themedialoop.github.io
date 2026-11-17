@@ -657,7 +657,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 </style>
 <style>
 /* phones: the Favorite Things title stacks onto two or three lines so it can be big next to the river's dots */
-@media (max-width:600px){.bz-h{white-space:normal !important;font-size:17vw !important;line-height:.86 !important;max-width:94vw}}
+@media (max-width:600px){.bz-h{white-space:normal !important;font-size:16vw !important;line-height:.86 !important;max-width:94vw}}
 </style>
 <style>
 /* section titles in the same style as Our Favorite Things: heaviest Inter, first word gold, the rest orange, at the river's slant */
@@ -665,7 +665,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 #publications .bz-h.sec-h{max-width:min(100%,13ch)}
 .more-h{position:relative;z-index:1;padding-block:clamp(30px,6vh,70px) clamp(40px,8vh,90px)}
 .more-h .bz-h.sec-h{margin:0}
-@media (max-width:600px){.bz-h.sec-h{font-size:15vw !important;max-width:none}}
+@media (max-width:600px){.bz-h.sec-h{font-size:14vw !important;max-width:none}}
 </style>
 <style>
 /* menu: each tab lights up in the next brand colour, in the same order as the publication list (blue, gold, orange, pink,
@@ -702,6 +702,10 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 <style>/* the big titles fly in row by row: up from below, without the tilt the cards have */
 .bz-h .fly{animation-name:flyInRow}
 @keyframes flyInRow{0%{opacity:0;translate:0 60px}55%{opacity:1}100%{opacity:1;translate:0 0}}</style>
+<style>
+/* the heavy titles: a touch more room between letters, so neighbours never touch */
+html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
+</style>
 </head>
 <body>
 <canvas id="net" aria-hidden="true"></canvas>
