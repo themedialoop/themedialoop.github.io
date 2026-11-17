@@ -706,6 +706,9 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 /* the heavy titles: a touch more room between letters, so neighbours never touch */
 html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 </style>
+<style>/* the title before the rabbit hole keeps a slight tilt */
+html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
+@media (max-width:600px){html body .bz-h.tilt-h{font-size:11vw !important}}   /* (its rows are longer: smaller on phones so each stays on one line) */</style>
 </head>
 <body>
 <canvas id="net" aria-hidden="true"></canvas>
@@ -807,7 +810,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 </div>
 
 <footer class="wrap" id="contact" data-net="0.14 0.42 0.33" data-net-m="0.12 0.4 0.36">
-  <h2 class="bz-h sec-h ct-h"><span class="bz-a">Email Us</span> <span class="bz-b">Maybe?</span></h2>
+  <h2 class="bz-h sec-h ct-h"><span class="bz-a">Step Into</span> <span class="bz-b">Our Orbit</span></h2>
   <p class="contact">There is something rather magical about finding another person who thinks like you. <span class="t4">Please take a moment to connect.</span></p>
   <div class="mail-row">
   <a class="mail" href="mailto:samuelht@uic.edu"><span class="glink">You can find our email here.</span></a>
@@ -822,7 +825,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
   </a>
 </footer>
 
-<div class="wrap more-h"><h2 class="bz-h sec-h"><span class="bz-a">There&rsquo;s</span> <span class="bz-b">Always More</span></h2></div>
+<div class="wrap more-h"><h2 class="bz-h sec-h tilt-h"><span class="bz-a">Keep Scrolling</span> <span class="bz-b">Get a Little Lost?</span></h2></div>
 
 <div class="rabbit" id="rabbit"></div>
 
