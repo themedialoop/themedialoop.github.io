@@ -659,6 +659,14 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 /* phones: the Favorite Things title stacks onto two or three lines so it can be big next to the river's dots */
 @media (max-width:600px){.bz-h{white-space:normal !important;font-size:17vw !important;line-height:.86 !important;max-width:94vw}}
 </style>
+<style>
+/* section titles in the same style as Our Favorite Things: heaviest Inter, first word gold, the rest orange, at the river's slant */
+.bz-h.sec-h{padding-left:0;margin:0 0 clamp(26px,4vw,52px);white-space:normal;max-width:min(100%,22ch);font-size:clamp(46px,8.4vw,128px);line-height:.92}
+#publications .bz-h.sec-h{max-width:min(100%,13ch)}
+.more-h{position:relative;z-index:1;padding-block:clamp(30px,6vh,70px) clamp(40px,8vh,90px)}
+.more-h .bz-h.sec-h{margin:0}
+@media (max-width:600px){.bz-h.sec-h{font-size:15vw !important;max-width:none}}
+</style>
 </head>
 <body>
 <canvas id="net" aria-hidden="true"></canvas>
@@ -707,7 +715,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 
 <div class="wrap">
   <section id="people" data-net="-0.03 0.0 0.17" data-net-m="-0.1 0.17 0.18" data-net-at="1 0.7">
-    <p class="label" data-kicker="People">The Company We Keep</p>
+    <h2 class="bz-h sec-h"><span class="bz-a">The</span> <span class="bz-b">Company We Keep</span></h2>
     <div class="people">
       <a class="card" href="people/samuel-hardman-taylor.html"><div class="photo"><img src="assets/people/samuel-hardman-taylor.jpg" alt="Samuel Hardman Taylor" width="824" height="824" loading="lazy"></div><h3>Samuel Hardman Taylor</h3></a>
       <article class="card"><div class="photo"><img src="https://y-anthonychen.github.io/assets/images/headshot.jpg" alt="Y. Anthony Chen" loading="lazy"></div><h3>Y.&nbsp;Anthony Chen</h3></article>
@@ -730,7 +738,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
   </section>
 
   <section id="publications">
-    <p class="label" data-kicker="Publications">Research questions we&rsquo;ve investigated</p>
+    <h2 class="bz-h sec-h"><span class="bz-a">Projects,</span> <span class="bz-b">Papers, &amp; Publications</span></h2>
     <p class="res-intro">Here are some of our newest papers to spark your interest. The full list is under the Research page below.</p>
     <ul class="pubs">
       <li><a href="https://journals.sagepub.com/doi/10.1177/00936502261494874" target="_blank" rel="noopener"><span class="yr">2026</span><span class="ttl"><span class="ttl-main">Testing hypotheses from the social approval theory of online hate: An analysis of 110 million posts from Parler</span><span class="meta">Markowitz, D. M., &amp; Taylor, S. H. · Communication Research</span></span></a></li>
@@ -746,7 +754,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
   </section>
 
   <section id="resources" aria-labelledby="res-h">
-    <p class="label" id="res-h" data-kicker="Resources">Freebies to help you</p>
+    <h2 class="bz-h sec-h" id="res-h"><span class="bz-a">Let</span> <span class="bz-b">Us Help</span></h2>
     <p class="res-intro">Here you will find tools created by members of the Medialoop Collective. They are free to use. If you have questions about how to use them, <a href="#contact">email us</a>.</p>
     <div class="res-stack">
       <a class="res r-blue" href="https://docs.google.com/document/d/11GHs-22nEN9UNJ3MVLq-V8ZS8MVtG2FGaQ7hOCoL7hk/edit?usp=sharing" target="_blank" rel="noopener" style="--i:0"><canvas aria-hidden="true"></canvas><span class="r-top"><span class="r-kind">Scale</span><span class="r-mini" aria-hidden="true">Survey Measures</span><span class="r-n">01 / 06</span></span><span class="r-name">Survey Measures</span><span class="r-desc">Our primary survey measure is the Perceived Algorithm Responsiveness and Insensitivity Scale. This 15-item scale measures two variables: perceived algorithm responsiveness (PAR) and perceived algorithm insensitivity (PAI). It is validated for Facebook, Twitter, TikTok and Instagram; more information is in our Social Media + Society publication.</span><span class="r-go">Get the scale</span></a>
@@ -774,6 +782,8 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
     <span class="ap-go">More information</span>
   </a>
 </footer>
+
+<div class="wrap more-h"><h2 class="bz-h sec-h"><span class="bz-a">There&rsquo;s</span> <span class="bz-b">Always More</span></h2></div>
 
 <div class="rabbit" id="rabbit"></div>
 
@@ -1367,7 +1377,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
       const mk = document.getElementById('introMark') || heroMarkEl;
       clear(mk && mk.getBoundingClientRect(), .62, 1.05);
       if (cur.which === 'mid') {                                    // cream fades behind the text around the middle net
-        document.querySelectorAll('.about-grid > *, #publications .label, #publications .pubs li:nth-child(-n+2), #publications .more').forEach(el => clear(rectOf(el), .62, .9, .96, .9));
+        document.querySelectorAll('.about-grid > *, #publications .sec-h, #publications .pubs li:nth-child(-n+2), #publications .more').forEach(el => clear(rectOf(el), .62, .9, .96, .9));
       }
       const ct = contactEls.map(e => rectOf(e));
       if (ct.length) clear({ left: Math.min(...ct.map(r => r.left)), top: Math.min(...ct.map(r => r.top)), right: Math.max(...ct.map(r => r.right)), bottom: Math.max(...ct.map(r => r.bottom)),
@@ -2998,7 +3008,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     }
   };
   // what each section keeps clear of
-  const clearOf = { res: el => [...el.querySelectorAll('.label, .res-intro, .res'), ...document.querySelectorAll('#contact .label .lt')].map(e => Object.assign(e, { _wide: !e.classList.contains('res') })), ct: el => { const g = [...el.querySelectorAll('.label, .contact, .mail-row')].map(e => e.getBoundingClientRect()).filter(b => b.width);   // one clearing around them all
+  const clearOf = { res: el => [...el.querySelectorAll('.sec-h, .label, .res-intro, .res'), ...document.querySelectorAll('#contact .label .lt')].map(e => Object.assign(e, { _wide: !e.classList.contains('res') })), ct: el => { const g = [...el.querySelectorAll('.label, .contact, .mail-row')].map(e => e.getBoundingClientRect()).filter(b => b.width);   // one clearing around them all
       const u = g.length ? { getBoundingClientRect: () => { const bs = [...el.querySelectorAll('.label .lt, .label .kick, .contact, .mail')].flatMap(e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects()]; }).concat([...el.querySelectorAll('.mail')].map(e => e.getBoundingClientRect())).filter(b => b.width);   // the words themselves, not their full-width boxes
         return { left: Math.min(...bs.map(b => b.left)), right: Math.max(...bs.map(b => b.right)), top: Math.min(...bs.map(b => b.top)), bottom: Math.max(...bs.map(b => b.bottom)), width: 1 }; }, _wide: false } : null;
       return [u, ...el.querySelectorAll('.apply')].filter(Boolean); } };
@@ -3026,7 +3036,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       }
       if (m < .02) continue;
       let c = 1; for (const b of reg.boxes) { const g = Math.max(b.left - d.x, d.x - b.right, b.top - d.y, d.y - b.bottom, 0), pp = b.wide ? pad * 3.5 : pad; if (g < pp + d.r) { c *= ss(0, pp + d.r, g); if (c < .02) break; } }   // headings and text get a wide berth
-      if (reg.kind === 'res') { const lb = document.querySelector('#resources .res-stack .res') || document.querySelector('#resources .label'); if (lb) { const q = lb.getBoundingClientRect(); m *= ss(q.top - 10, q.top + 70, d.y); if (m < .02) continue; } }   // no dots above or beside the heading or its description: the field starts at the first card
+      if (reg.kind === 'res') { const lb = document.querySelector('#resources .res-stack .res') || document.querySelector('#resources .sec-h'); if (lb) { const q = lb.getBoundingClientRect(); m *= ss(q.top - 10, q.top + 70, d.y); if (m < .02) continue; } }   // no dots above or beside the heading or its description: the field starts at the first card
       if (reg.kind === 'res' && d.thin) { const st = reg.boxes.find(b => !b.wide); if (!st || d.y < st.top) continue; }   // and the space around them is lighter
       const s = d.r * m * c * (reduce ? .97 : .84 + .16 * Math.sin(t * 1.5 + d.ph * .6 - (d.x + d.y) * .004)); if (s < .4) continue;
       const px = d.x + AMP * Math.sin(t * d.fx + d.ph), py = d.y + AMP * Math.cos(t * d.fy + d.ph * 1.3);
