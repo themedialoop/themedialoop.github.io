@@ -2181,6 +2181,11 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
 .bub .blob.shape{background:none;animation:none}
 .bub .blob.shape svg{width:100%;height:100%;overflow:visible;rotate:var(--r0);animation:shSpin var(--sp,20s) linear infinite}   /* swirls, squiggles, stars and petals that turn slowly */
 @keyframes shSpin{to{rotate:calc(var(--r0) + 360deg)}}
+.bub .blob.sp-grin{background:none;animation:none}.bub .blob.sp-grin svg{width:100%;height:100%;overflow:visible}
+.bub .blob.sp-grin .body{animation:chFade 3.4s ease-in-out infinite alternate}   /* the cat fades away and back; the grin stays */
+@keyframes chFade{0%,20%{opacity:1}100%{opacity:.12}}
+.bub .blob.sp-rabbit{background:#fffdf7;box-shadow:inset 0 0 0 2.5px #2c5494;color:#2c5494}
+@media (prefers-reduced-motion:reduce){.bub .blob.sp-grin .body{animation:none}}
 @keyframes bubSwell{0%{transform:scale(1)}100%{transform:scale(1.05)}}
 @media (prefers-reduced-motion:reduce){.bub .blob.shape svg{animation:none}.bub-hold{height:auto}.bub{position:relative;height:clamp(440px,60vh,660px)}.bub .blob{animation:none}.bub .sc,.bub .dot.on .sc{transition:none}}
 /* the events title: cream letters on a deep-blue highlighter band, one band per line, tilted a touch, so it stands out on the gold */
@@ -2429,6 +2434,19 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
     const deep = Math.max(0, (prog - .78) / .2);   // the shapes only turn up near the very end
     if (shapes < Math.round(deep * Math.max(6, 10 * W * H / (1280 * 800)))) for (let n = 0; n < 60; n++) { const d = R(44, 104) * k, m = 10 * k, x = R(0, W), y = R(0, H);
       if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue; make(x, y, d, 'shape'); break; }
+    /* near the end of the trip only: a Cheshire Cat's grin on a fading purple dot, and a white dot that says white rabbit */
+    if (prog > .8 && prog < .97) for (const id of ['grin', 'rabbit']) { if (parts.some(p => !p.dead && p.sp === id)) continue;
+      for (let n = 0; n < 80; n++) { const d = R(112, 140) * k, m = 24 * k, x = R(W * .15, W * .85), y = R(H * .15, H * .85);
+        if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue;
+        const p = make(x, y, d, 'shape'); p.sp = id; const b = p.blob; b.classList.remove('shape'); b.classList.add('sp-' + id);
+        if (id === 'grin') b.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><path class="body" d="' + smooth(jit(ring(9, () => R(44, 48)), 1.2)) + '" fill="#9b6aa6"/>'
+          + '<path d="M16 46 Q50 60 84 44 Q80 76 50 80 Q22 77 16 46Z" fill="#f2eedd" stroke="#2c5494" stroke-width="3" stroke-linejoin="round"/>'
+          + '<path d="M16 46 Q50 66 84 44" fill="none" stroke="#2c5494" stroke-width="2"/>'
+          + [28, 39, 50, 61, 72].map(t => `<path d="M${t} ${(55 + 4 * Math.sin(t / 100 * Math.PI)).toFixed(1)} L${t} ${(73 - 9 * Math.pow((t - 50) / 34, 2)).toFixed(1)}" stroke="#2c5494" stroke-width="1.6" stroke-linecap="round"/>`).join('')
+          + '<path d="M12 44 Q14 40 18 41 M88 42 Q86 38 82 39" fill="none" stroke="#2c5494" stroke-width="2.4" stroke-linecap="round"/></svg>';
+        else { b.innerHTML = ''; const w = document.createElement('span'); w.className = 'w fun'; w.style.setProperty('--fs', Math.round(19 * Math.max(1, k)) + 'px');
+          ['white', 'rabbit'].forEach(l => { const sp = document.createElement('span'); sp.textContent = l; w.append(sp); }); b.append(w); b.removeAttribute('aria-hidden'); b.setAttribute('aria-label', 'white rabbit'); }
+        break; } }
     // the field starts empty and fills as you scroll in: over the first stretch of the trip, more and more dots and words arrive
     const ramp = Math.max(.2, Math.min(1, prog / .14));   // never empty: a few dots and words already float there as you arrive, to draw you in
     const words = parts.filter(p => !p.dead && p.word).length, want = Math.round(ramp * Math.min(30, Math.max(11, 18 * (W * H / (1280 * 800)) / (k * k))));
