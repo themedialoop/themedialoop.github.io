@@ -677,6 +677,13 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 html body .top nav a:is(:hover,:focus-visible,.tapped){background:var(--nh) !important;color:var(--nt) !important}
 html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--nt) !important;transform:none !important}
 </style>
+<style>
+/* big section titles: upright (only Favorite Things keeps the river's slant), with enough line height that stacked
+   lines never touch */
+.bz-h.sec-h{rotate:none !important;line-height:1.02 !important}
+.bz-h{line-height:1.02 !important}
+@media (max-width:600px){.bz-h{line-height:1.02 !important}}
+</style>
 </head>
 <body>
 <canvas id="net" aria-hidden="true"></canvas>
@@ -711,7 +718,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   </section>
 
   <section id="about" data-net="-0.03 0.0 0.17" data-net-m="-0.1 0.17 0.18" data-net-at="0 0.35">
-    <p class="label" data-kicker="About us">Get to Know Us</p>
+    <h2 class="bz-h sec-h"><span class="bz-a">Get</span> <span class="bz-b">to Know Us</span></h2>
     <p class="statement ab-lead" id="statement">Our goal, quite unapologetically, is to create fresh scientific insights about communication technologies by bringing warmth, rigor, and playfulness to our research projects. In our philosophy, whimsy and creativity sit happily alongside statistics and meticulous measurement. We have a fondness for the artisanal qualities of doing scientific research and think they ought to be celebrated, with much jubilation.<br>Good research deserves a bit of pizzazz, and we&rsquo;re happy to supply it.</p>
     <div class="about-grid ab-pills">
       <details class="ab-pill ab-b2"><canvas aria-hidden="true"></canvas><summary><h3>Our interests</h3><span class="pm" aria-hidden="true"></span></summary><p>There is a nearly endless source of inspiration from the mysteries of communication, technology, and human behavior. Media and communication technologies shape how we think, feel, and connect, and our behaviors shape them back. We care deeply about both directions of this social process. Our research interests draw our imaginations towards friendships, families and the small, everyday rituals through which connection and identity take form. Oftentimes, our answers look like a Jackson Pollock painting, rather than a tidy APA-formatted list of takeaways, and honestly, we prefer it that way. The dazzling chaos of human communication and technology keeps us interested and inspired.</p></details>
@@ -778,7 +785,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 </div>
 
 <footer class="wrap" id="contact" data-net="0.14 0.42 0.33" data-net-m="0.12 0.4 0.36">
-  <p class="label" data-kicker="Contact">Email Us, Maybe?</p>
+  <h2 class="bz-h sec-h ct-h"><span class="bz-a">Email</span> <span class="bz-b">Us, Maybe?</span></h2>
   <p class="contact">There is something rather magical about finding another person who thinks like you. <span class="t4">Please take a moment to connect.</span></p>
   <div class="mail-row">
   <a class="mail" href="mailto:samuelht@uic.edu"><span class="glink">You can find our email here.</span></a>
@@ -1219,7 +1226,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   }).catch(() => {});
 
   const mqEl = document.getElementById('marquee');
-  const contactEls = [...document.querySelectorAll('#contact .label, #contact .contact, #contact .mail')];
+  const contactEls = [...document.querySelectorAll('#contact .ct-h, #contact .contact, #contact .mail')];
   const isMobile = () => innerWidth < 760;
   const secs = [...document.querySelectorAll('[data-net]')];
   const way = () => secs.map(el => {
@@ -2866,7 +2873,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     for (let i = 0; i <= n; i++) { const a = i / n * Math.PI * 2, k = 1 + .045 * Math.sin(2 * a + ph[0]) + .03 * Math.sin(3 * a + ph[1]) + .015 * Math.sin(5 * a + ph[2]);
       i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); } p.closePath(); return p; });
   let W = 0, H = 0, DPR = 1, dots = [], mob = false, AMP = 3, builtW = 0, t0 = performance.now(), colX = 24, ledeH = 150;
-  const measure = () => { const a = document.querySelector('#about .label'); if (a) colX = a.getBoundingClientRect().left; ledeH = lede.offsetHeight; };
+  const measure = () => { const a = document.querySelector('#about .sec-h, #about .label'); if (a) colX = a.getBoundingClientRect().left; ledeH = lede.offsetHeight; };
   const build = () => {
     DPR = Math.min(2, devicePixelRatio || 1); W = pin.clientWidth; H = pin.clientHeight; mob = W < 760; AMP = reduce ? 0 : mob ? 2.6 : 3.4; builtW = W;
     C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); dots = [];
@@ -3018,18 +3025,18 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     }
   };
   // what each section keeps clear of
-  const clearOf = { res: el => [...el.querySelectorAll('.sec-h, .label, .res-intro, .res'), ...document.querySelectorAll('#contact .label .lt')].map(e => Object.assign(e, { _wide: !e.classList.contains('res') })), ct: el => { const g = [...el.querySelectorAll('.label, .contact, .mail-row')].map(e => e.getBoundingClientRect()).filter(b => b.width);   // one clearing around them all
-      const u = g.length ? { getBoundingClientRect: () => { const bs = [...el.querySelectorAll('.label .lt, .label .kick, .contact, .mail')].flatMap(e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects()]; }).concat([...el.querySelectorAll('.mail')].map(e => e.getBoundingClientRect())).filter(b => b.width);   // the words themselves, not their full-width boxes
+  const clearOf = { res: el => [...el.querySelectorAll('.sec-h, .label, .res-intro, .res'), ...document.querySelectorAll('#contact .ct-h')].map(e => Object.assign(e, { _wide: !e.classList.contains('res') })), ct: el => { const g = [...el.querySelectorAll('.label, .contact, .mail-row')].map(e => e.getBoundingClientRect()).filter(b => b.width);   // one clearing around them all
+      const u = g.length ? { getBoundingClientRect: () => { const bs = [...el.querySelectorAll('.ct-h, .contact, .mail')].flatMap(e => { const rg = document.createRange(); rg.selectNodeContents(e); return [...rg.getClientRects()]; }).concat([...el.querySelectorAll('.mail')].map(e => e.getBoundingClientRect())).filter(b => b.width);   // the words themselves, not their full-width boxes
         return { left: Math.min(...bs.map(b => b.left)), right: Math.max(...bs.map(b => b.right)), top: Math.min(...bs.map(b => b.top)), bottom: Math.max(...bs.map(b => b.bottom)), width: 1 }; }, _wide: false } : null;
       return [u, ...el.querySelectorAll('.apply')].filter(Boolean); } };
   let active = 0, raf = 0, blank = true, ctEdge = .5;
   const frame = now => { raf = 0; if (!active) { if (!blank) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); blank = true; } return; }
     const t = reduce ? 0 : now / 1000, F = Math.min(240, H * .28), pad = Math.min(W, H) * .03;
     const regs = secs.map(q => { let r = q.el.getBoundingClientRect();
-      if (q.kind === 'res') { const cl = document.querySelector('#contact .label'); if (cl) { const c = cl.getBoundingClientRect(); const cb = c.top + Math.min(160, H * .18); r = { top: r.top, bottom: cb, height: cb - r.top, resBot: r.bottom }; } }   // the field carries on down to Contact ...
+      if (q.kind === 'res') { const cl = document.querySelector('#contact .ct-h'); if (cl) { const c = cl.getBoundingClientRect(); const cb = c.top + Math.min(160, H * .18); r = { top: r.top, bottom: cb, height: cb - r.top, resBot: r.bottom }; } }   // the field carries on down to Contact ...
       if (q.kind === 'ct') { const ap = q.el.querySelector('.apply'); if (ap) { const a = ap.getBoundingClientRect(); r = { top: r.top, bottom: a.top + Math.min(90, a.height * .25), height: a.top - r.top }; } }   // at Contact the dots end by the top of the Apply card
       return r.bottom < -F || r.top > H + F ? null : { r, kind: q.kind, boxes: clearOf[q.kind](q.el).map(e => { const b = e.getBoundingClientRect(); return { left: b.left, right: b.right, top: b.top, bottom: b.bottom, width: b.width, wide: !!e._wide || !!(e.closest && e.closest('#contact')) }; }).filter(b => b.width && b.bottom > -40 && b.top < H + 40) }; }).filter(Boolean);
-    { const cs = [...document.querySelectorAll('#contact .label .lt, #contact .contact, #contact .mail')].map(e => { const rg = document.createRange(); rg.selectNodeContents(e); return Math.max(0, ...[...rg.getClientRects()].map(b => b.right)); });
+    { const cs = [...document.querySelectorAll('#contact .ct-h, #contact .contact, #contact .mail')].map(e => { const rg = document.createRange(); rg.selectNodeContents(e); return Math.max(0, ...[...rg.getClientRects()].map(b => b.right)); });
       ctEdge = cs.length ? Math.max(...cs) / W : .5; }   // where the words at Contact end, on the right
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height); blank = false;
     for (const d of dots) {
