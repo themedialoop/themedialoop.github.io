@@ -807,7 +807,33 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     }
     g.setTransform(1, 0, 0, 1, 0, 0);
   };
-  const cardLoop = t => { const tt = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : t / 1000; drawCards(tt); drawSide(tt); requestAnimationFrame(cardLoop); };
+  /* a few dots spill out past the header's curved hem onto the cream, thinning out as they fall */
+  const spill = document.createElement('canvas'); spill.className = 'side-spill'; spill.setAttribute('aria-hidden', 'true');
+  spill.style.cssText = 'position:absolute;left:0;pointer-events:none;z-index:1'; document.body.append(spill);
+  const drawSpill = time => {
+    const aside = document.querySelector('.p-side'); if (!aside) return;
+    const ar = aside.getBoundingClientRect(), mob = innerWidth < 760, D = mob ? 60 : 110, depth = mob ? 60 : 90;   /* just a little spill */
+    const top = ar.bottom + scrollY - D, cssH = D + depth;
+    if (ar.bottom + depth < 0 || ar.bottom - D > innerHeight) return;
+    const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(ar.width * dpr), h = Math.round(cssH * dpr), key = w + 'x' + h;
+    if (spill._key !== key) { spill.width = w; spill.height = h; spill.style.width = ar.width + 'px'; spill.style.height = cssH + 'px'; spill.style.left = (ar.left + scrollX) + 'px';
+      const R = (a, b) => a + Math.random() * (b - a), hem = x => (D - window.mlHem(Math.min(1, Math.max(0, x / ar.width)), D)) * dpr, dts = [];
+      const n = Math.round(ar.width / (mob ? 42 : 52)), hd = document.querySelector('main .bz-h, .p-bio, main h2'), stop = hd ? (hd.getBoundingClientRect().top - ar.bottom - 28) : depth;
+      for (let t = 0; t < n * 40 && dts.length < n; t++) { const x = R(12, ar.width - 12) * dpr, f = Math.pow(Math.random(), 1.8), rr = R(mob ? 3.2 : 3.6, mob ? 7.5 : 10) * (1 - .45 * f) * dpr,
+          y = hem(x / dpr) + rr + (8 + f * (depth - 26)) * dpr;   // most stay close under the hem, a few fall further
+        if (y + rr > h - 4 * dpr || y + rr > (D + stop) * dpr || x - rr < 6 * dpr || x + rr > w - 6 * dpr) continue;
+        if (dts.some(o => Math.hypot(o.x - x, o.y - y) < o.r + rr + 7 * dpr)) continue;
+        const q = [R(0, 6.3), R(0, 6.3), R(0, 6.3)], p = new Path2D();
+        for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, kq = 1 + .045 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * kq, Math.sin(a) * kq) : p.moveTo(kq, 0); }
+        p.closePath(); dts.push({ x, y, r: rr, p, ph: R(0, 6.3), gold: Math.random() < .17, ring: rr > 5 * dpr && Math.random() < .12, rot: R(0, 6.3) }); }
+      spill._dots = dts; spill._key = key; }
+    spill.style.top = top + 'px';
+    const g = spill.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
+    for (const d of spill._dots) { const s = d.r * (.86 + .14 * Math.sin(time * 1.5 + d.ph)), py = d.y + 1.5 * dpr * Math.sin(time * .5 + d.ph);
+      g.setTransform(s, 0, 0, s, d.x, py); g.rotate(d.rot);
+      const c = d.gold ? '#e7aa4d' : '#2c5494'; if (d.ring) { g.lineWidth = .3; g.strokeStyle = c; g.stroke(d.p); } else { g.fillStyle = c; g.fill(d.p); } }
+    g.setTransform(1, 0, 0, 1, 0, 0); };
+  const cardLoop = t => { const tt = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : t / 1000; drawCards(tt); drawSide(tt); drawSpill(tt); requestAnimationFrame(cardLoop); };
   requestAnimationFrame(cardLoop);
   let W = 0, H = 0, DPR = 1;
   const resize = () => { DPR = Math.min(devicePixelRatio || 1, 2); W = C.width = Math.round(innerWidth * DPR); H = C.height = Math.round(innerHeight * DPR); };
