@@ -1117,7 +1117,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     river.addEventListener('pointerdown', () => cur.classList.add('down')); addEventListener('pointerup', () => cur.classList.remove('down'));
     addEventListener('scroll', () => { if (!river.matches(':hover')) cur.classList.remove('on'); }, { passive: true }); }
   river.addEventListener('pointerup', letGo); river.addEventListener('pointercancel', letGo); river.addEventListener('lostpointercapture', letGo);
-  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; requestAnimationFrame(frame); } else if (!v) visible = false; }, { rootMargin: '120px 0px' }).observe(river);
+  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; if (W && cv.width < 2) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); } requestAnimationFrame(frame); } else if (!v) { visible = false; cv.width = cv.height = 1; } }, { rootMargin: '120px 0px' }).observe(river);   /* the river's canvas is freed while it's off screen */
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { build(); if (visible) requestAnimationFrame(frame); });
 })();
 </script>
