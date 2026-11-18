@@ -2453,7 +2453,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue; make(x, y, d, 'shape'); break; }
     /* near the end of the trip only: a Cheshire Cat's grin on a fading purple dot, and a white dot that says white rabbit */
     if (prog < .76) spSeen.clear();   /* scrolling back up re-arms them */
-    if (prog > .8 && prog < .97) for (const id of ['grin']) { if (spSeen.has(id)) continue;   /* each appears once per trip: one smile, one rabbit */
+    if (prog > .8 && prog < .97) for (const id of []) { if (spSeen.has(id)) continue;   /* each appears once per trip: one smile, one rabbit */
       for (let n = 0; n < 80; n++) { const d = R(112, 140) * k, m = 24 * k, x = R(W * .15, W * .85), y = R(H * .15, H * .85);
         if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue;
         const p = make(x, y, d, 'shape'); p.sp = id; spSeen.add(id); const b = p.blob; b.classList.remove('shape'); b.classList.add('sp-' + id);
