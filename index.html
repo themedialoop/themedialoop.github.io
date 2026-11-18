@@ -2162,7 +2162,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 .river .w{display:block;-webkit-font-smoothing:antialiased;padding:0 4%;font-size:var(--fs);font-weight:700;line-height:1.08;letter-spacing:-.02em}
 .river .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
 .river .w span{display:block}
-.river.lf{cursor:default}.river.lf canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.river.lf{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;height:clamp(360px,40vw,580px) !important}.river.lf.drag{cursor:grabbing}.river.lf canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .river-words{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .river .rd.pp .rb::before{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,rvPop var(--pd,11s) ease-in-out var(--pdd,0s) infinite}   /* a few little dots pop out and back now and then */
 @keyframes rvPop{0%,80%{scale:1}85%,90%{scale:0}96%{scale:1.18}100%{scale:1}}
@@ -2241,17 +2241,18 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   let W = 0, H = 0, dpr = 1, S = 50, L = 0, sc = 1, dots = [], words = [], wq = 0, visible = false, last = 0, clock = 0, sy = 0, rmax = 20, rmin = 3, built = 0;
   let ri = 0, fi = 0; const nextWord = () => { const fun = wq++ % 3 === 2; return fun ? { w: FUN[fi++ % FUN.length], fun } : { w: RES[ri++ % RES.length], fun }; };
   // a word's lines and the opening that holds them: one to three balanced lines, the opening just big enough
-  const dress = (slot, cap) => { const { w, fun } = nextWord(); let fs = Math.round((fun ? 21 : 19) * sc), best;
-    for (; fs >= 12; fs--) { mc.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif'; const parts = w.split(' '); best = { ls: [w], r: 0 };
+  const dress = (slot, cap) => { let w, fun, fs, best; for (let tries = 0; tries < 6; tries++) { ({ w, fun } = nextWord()); fs = Math.round((fun ? 18 : 16) * sc);
+    for (; fs >= 11; fs--) { mc.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif'; const parts = w.split(' '); best = { ls: [w], r: 0 };
       for (let n = 1; n <= Math.min(3, parts.length); n++) { const per = Math.ceil(parts.length / n), ls = []; for (let i = 0; i < parts.length; i += per) ls.push(parts.slice(i, i + per).join(' '));
         const tw = Math.max(...ls.map(l => mc.measureText(l).width)), th = ls.length * fs * 1.08, r = Math.hypot(tw / 2, th / 2) + fs * .6; if (!best.r || r < best.r * .92) best = { ls, r }; }
       if (best.r <= cap) break; }   // a long phrase steps its type down rather than outgrowing its row
-    slot.w = w; slot.fun = fun; slot.fs = fs; slot.ls = best.ls; slot.R = Math.min(cap, Math.max(S * .95, best.r));
+    if (best.r <= cap) break; }   // and one that still won't fit waits for a roomier river
+    slot.w = w; slot.fun = fun; slot.fs = fs; slot.ls = best.ls; slot.R = Math.min(cap, Math.max(S * .72, best.r));
     slot.k = fun ? (Math.random() < .6 ? 'gold' : 'blue') : (Math.random() < .8 ? 'blue' : 'gold'); slot.tc = slot.k === 'gold' ? COL.blue : Math.random() < .25 ? COL.gold : COL.cream;
     slot.p = SH[Math.floor(Math.random() * SH.length)]; slot.y = Math.min(H - slot.R - 14, Math.max(slot.R + 14, slot.y0)); };
 
   const fillRows = upTo => { for (let k = 0; k < nRows; k++) while (rowEnd[k] < upTo) { const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3) };
-      dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.3, S * 2.8); words.push(slot); } };
+      dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.8, S * 3.6); words.push(slot); } };
   const build = () => {
     W = river.offsetWidth; H = river.offsetHeight; if (!W || !H) return; built = W; dpr = Math.min(2, devicePixelRatio || 1);
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
@@ -2260,15 +2261,15 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     L = Math.ceil(Math.max(W * 2.6, 1800) / S) * S;   // the river's length before it repeats
     // words ride in rows; each row adds its next word just past its last, so the river never runs out of them
     words = []; wq = 0; ri = Math.floor(Math.random() * RES.length); fi = Math.floor(Math.random() * FUN.length);
-    nRows = Math.max(2, Math.round(H / (innerWidth < 700 ? 175 : 215))); rowH = H / nRows; rowEnd = [...Array(nRows)].map((_, k) => -W * .1 + k * rowH * .55);
+    nRows = Math.max(2, Math.round(H / (innerWidth < 700 ? 125 : 150))); rowH = H / nRows; rowEnd = [...Array(nRows)].map((_, k) => -W * .1 + k * rowH * .55);
     fillRows(W * 1.3);
     // the field: a lattice turned 45°, its sizes rising and falling along the diagonals
     dots = [];
     for (let i = 0; i < L / S; i++) for (let j = 0; j <= H / S * 2; j++) { const x = i * S + (j % 2 ? S / 2 : 0), y = j * S / 2 + S * .25; if (y > H - 4) continue;
       if (Math.random() < .12) continue;   // a few spots left empty
       const wave = .5 + .5 * Math.sin((i + j / 2) * .9) * Math.sin((i - j / 2) * .55), big = Math.random() < .08;
-      dots.push({ hx: Math.max(0, Math.min(L - .01, x + R(-2, 2))), hy: y + R(-2, 2), r0: big ? rmax * R(.85, 1) : (rmin + wave * (rmax * .78 - rmin)) * R(.85, 1.08),
-        k: pickCol(), p: SH[Math.floor(Math.random() * SH.length)], ph: R(0, 6.3), fx: R(.3, .9), fy: R(.3, .9), wa: R(2.5, innerWidth < 700 ? 5.5 : 7.5), ring: Math.random() < .06, ox: 0, oy: 0, pop: 0, hit: -9, k0: null, st: Math.random() }); }
+      dots.push({ hx: Math.max(0, Math.min(L - .01, x + R(-.2, .2) * S)), hy: y + R(-.18, .18) * S, r0: big ? rmax * R(.85, 1) : (rmin + wave * (rmax * .78 - rmin)) * R(.85, 1.08),
+        k: pickCol(), p: SH[Math.floor(Math.random() * SH.length)], ph: R(0, 6.3), fx: R(.3, .9), fy: R(.3, .9), wa: R(4, innerWidth < 700 ? 9 : 12), wb: R(0, 1) < .3 ? R(6, 14) : 0, fz: R(.15, .35), ring: Math.random() < .06, ox: 0, oy: 0, pop: 0, hit: -9, k0: null, st: Math.random() }); }
     dots.sort((a, b) => a.hx - b.hx);
   };
 
@@ -2280,23 +2281,28 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (!visible) { last = 0; return; } requestAnimationFrame(frame);
     if (Math.abs(river.offsetWidth - built) > 2) build(); if (!W) return;
     const dt = last ? Math.min(.05, (now - last) / 1000) : .016; last = now; if (!still) clock += dt;
-    sy += (scrollY * .32 - sy) * Math.min(1, dt * 7);   // the slide follows the scroll, eased so it glides
-    const shift = still ? 0 : ((clock * 14 + sy) % L + L) % L;
+    sy += (scrollY * .5 - sy) * Math.min(1, dt * 7);   // the slide follows the scroll, eased so it glides
+    const rc = river.getBoundingClientRect(), par = Math.max(-1, Math.min(1, (rc.top + rc.height / 2 - innerHeight / 2) / innerHeight)) * (innerWidth < 700 ? 10 : 18);
+    const vy = scrollY - (frame.ly ?? scrollY); frame.ly = scrollY; frame.kv = ((frame.kv || 0) + (-vy * .9 - (frame.kk || 0)) * .12) * .8; frame.kk = (frame.kk || 0) + frame.kv; const kick = still ? 0 : Math.max(-18, Math.min(18, frame.kk));   // a springy kick from the scroll's speed
+    if (!held) { drag += dv; dv *= Math.pow(.92, dt * 60); }   // a flick keeps gliding, then eases off
+    const shift = ((((still ? 0 : clock * 14 + sy) - drag) % L) + L) % L;
     // leaving at the top of the screen, the dots dance off: the small ones shrink away first, then the rest, then the words
     const rr = river.getBoundingClientRect(), ex = Math.max(0, Math.min(1, -rr.top / Math.max(1, rr.height)));   // 0 while the river is on screen, 1 once it has gone off the top
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     const wrap = x => { x = ((x - shift) % L + L) % L; return x > W + 80 ? x - L : x; };
     // words: a slot that has slipped off the left takes the next word before it comes round again
-    const travel = still ? 0 : clock * 14 + sy, ws = [];
-    fillRows(travel + W * 1.3); words = words.filter(s => s.x - travel > -s.R - 80);
-    for (const s of words) { const x = s.x - travel; if (x > W + s.R + 40) continue;
+    const travel = (still ? 0 : clock * 14 + sy) - drag, ws = [];
+    fillRows(travel + W * 1.3); words = words.filter(s => s.x - travel > -W * 2.5);   // keep the ones just behind, in case the river is pulled back
+    for (const s of words) { const x = s.x - travel; if (x > W + s.R + 40 || x < -s.R - 40) continue;
       ws.push({ s, x, y: s.y, R: s.R * (.975 + .025 * Math.sin(clock * 1.1 + s.ph)) }); }
     // dots: wander, keep clear of the words with a gentle swell around each, then settle any that bump
     const vis = [];
     for (const d of inView(shift - 40, shift + W + 40)) { const x0 = wrap(d.hx); if (x0 < -40 || x0 > W + 40) continue;
-      if (d.k0 && clock - d.hit > 6) { d.k = d.k0; d.k0 = null; d.pop = .6; }   // a bumped dot settles back to its own colour
+      if (d.k0 && clock - d.hit > 4) { d.k = d.k0; d.k0 = null; d.pop = .6; }   // a bumped dot settles back to its own colour
       d.ox *= .985; d.oy *= .985; d.pop *= .9;
-      const bx = x0 + (still ? 0 : d.wa * Math.sin(clock * d.fx + d.ph)) + d.ox, by = d.hy + (still ? 0 : d.wa * Math.cos(clock * d.fy + d.ph * 1.3)) + d.oy;
+      const lp = still ? 0 : d.wb * Math.sin(clock * d.fz + d.ph * 2);   // a few dots also roam in slow loops
+      const bx = x0 + (still ? 0 : d.wa * Math.sin(clock * d.fx + d.ph) + lp * Math.cos(clock * d.fz)) + d.ox,
+        by = d.hy + (still ? 0 : d.wa * Math.cos(clock * d.fy + d.ph * 1.3) + lp * Math.sin(clock * d.fz * 1.3)) + d.oy + (still ? 0 : par * (d.r0 / rmax - .5) * 2 + kick * (.4 + .6 * d.st));   // parallax with the scroll: bigger dots ride a little ahead, smaller ones lag
       let r = d.r0, room = 1e9, halo = 0;
       for (const w of ws) { const gap = Math.hypot(bx - w.x, by - w.y) - w.R; room = Math.min(room, gap - 7); halo = Math.max(halo, 1 - ss(0, S * 2.2, gap)); }
       r = Math.max(r, rmax * .8 * halo);   // near a word the dots stay generous and taper away
@@ -2332,6 +2338,13 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         const lh = s.fs * 1.08; s.ls.forEach((ln, j) => g.fillText(ln, 0, (j - (s.ls.length - 1) / 2) * lh)); }
       g.restore(); }
   };
+  // grab the river and pull it side to side (mouse on desktop, a sideways swipe on touch); let go and it glides on, then settles back to its own drift
+  let drag = 0, dv = 0, held = null;
+  river.addEventListener('pointerdown', e => { if (e.button) return; held = { x: e.clientX, t: performance.now(), id: e.pointerId }; dv = 0; river.classList.add('drag'); river.setPointerCapture(e.pointerId); });
+  river.addEventListener('pointermove', e => { if (!held || e.pointerId !== held.id) return; const now = performance.now(), dx = e.clientX - held.x;
+    drag += dx; dv = dx / Math.max(8, now - held.t) * 16; held.x = e.clientX; held.t = now; });
+  const letGo = e => { if (!held || (e && e.pointerId !== held.id)) return; held = null; river.classList.remove('drag'); };
+  river.addEventListener('pointerup', letGo); river.addEventListener('pointercancel', letGo); river.addEventListener('lostpointercapture', letGo);
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; requestAnimationFrame(frame); } else if (!v) visible = false; }, { rootMargin: '120px 0px' }).observe(river);
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { build(); if (visible) requestAnimationFrame(frame); });
 })();
@@ -2989,11 +3002,9 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     DPR = Math.min(2, devicePixelRatio || 1); W = pin.clientWidth; H = pin.clientHeight; mob = W < 760; AMP = reduce ? 0 : mob ? 2.6 : 3.4; builtW = W;
     C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); dots = [];
     const m = Math.min(W, H), lo = m * (mob ? .012 : .008), hi = m * (mob ? .075 : .06), cell = hi * 2.4, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
-    const S = hi * 1.3, cand = [];   /* Netsch's Field Theory: the dots sit on a hidden grid of squares turned 45°, each nudged a little off its spot */
-      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) { const wave = .5 + .5 * Math.sin((i + j / 2) * .9) * Math.sin((i - j / 2) * .55), big = Math.random() < .16;
-        cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.17, .17) * S, y: j * S / 2 + R(-.17, .17) * S, r: big ? R(hi * .45, hi) : lo + wave * (hi * .35 - lo) * R(.8, 1.1), big }); }
-      cand.sort((a, b) => b.r - a.r);   // the big ones claim their spots first
-      for (let j = 0; j <= H / S * 2; j++) for (let i = 0; i <= W / S; i++) cand.push({ x: i * S + (j % 2 ? 0 : S / 2) + R(-.12, .12) * S, y: j * S / 2 + R(-.12, .12) * S, r: R(lo, hi * .2), big: false });   // small dots in the middle of each square
+    const S = hi * 3.2, cand = [];   /* Netsch's Field Theory: the big dots sit on a hidden grid of squares turned 45°; the small ones scatter around them as before */
+      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) if (Math.random() < .3) cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.1, .1) * S, y: j * S / 2 + R(-.1, .1) * S, r: R(hi * .45, hi * .85), big: true });
+      for (let n = 0, tries = Math.round(W * H / (lo * lo) * 3); n < tries; n++) { const r = R(lo, hi * .35); cand.push({ x: R(-r, W + r), y: R(-r, H + r), r, big: false }); }
     for (let n = 0; n < cand.length; n++) {
       const { x, y, r, big } = cand[n]; if (x < -r || x > W + r || y < -r || y > H + r) continue;
       const cx = Math.floor(x / cell), cy = Math.floor(y / cell); let ok = true;
@@ -3131,11 +3142,9 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; mob = W < 760; AMP = reduce ? 0 : mob ? 2.6 : 3.4; builtW = W;
     C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); dots = [];
     const m = Math.min(W, H), lo = m * (mob ? .012 : .008), hi = m * (mob ? .075 : .06), cell = hi * 2.4, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
-    const S = hi * 1.3, cand = [];   /* Netsch's Field Theory: the dots sit on a hidden grid of squares turned 45°, each nudged a little off its spot */
-      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) { const wave = .5 + .5 * Math.sin((i + j / 2) * .9) * Math.sin((i - j / 2) * .55), big = Math.random() < .16;
-        cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.17, .17) * S, y: j * S / 2 + R(-.17, .17) * S, r: big ? R(hi * .45, hi) : lo + wave * (hi * .35 - lo) * R(.8, 1.1), big }); }
-      cand.sort((a, b) => b.r - a.r);   // the big ones claim their spots first
-      for (let j = 0; j <= H / S * 2; j++) for (let i = 0; i <= W / S; i++) cand.push({ x: i * S + (j % 2 ? 0 : S / 2) + R(-.12, .12) * S, y: j * S / 2 + R(-.12, .12) * S, r: R(lo, hi * .2), big: false });   // small dots in the middle of each square
+    const S = hi * 3.2, cand = [];   /* Netsch's Field Theory: the big dots sit on a hidden grid of squares turned 45°; the small ones scatter around them as before */
+      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) if (Math.random() < .3) cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.1, .1) * S, y: j * S / 2 + R(-.1, .1) * S, r: R(hi * .45, hi * .85), big: true });
+      for (let n = 0, tries = Math.round(W * H / (lo * lo) * 3); n < tries; n++) { const r = R(lo, hi * .35); cand.push({ x: R(-r, W + r), y: R(-r, H + r), r, big: false }); }
     for (let n = 0; n < cand.length; n++) {
       const { x, y, r, big } = cand[n]; if (x < -r || x > W + r || y < -r || y > H + r) continue;
       const cx = Math.floor(x / cell), cy = Math.floor(y / cell); let ok = true;
