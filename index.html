@@ -2911,6 +2911,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
      page is simply there. The rabbit hole at the end of the page plays it again in place. */
 (() => {
   const stage = document.querySelector('.stage'); if (!stage) return;
+  let tagK = 0;
   const pin = stage.querySelector('.st-pin'), C = stage.querySelector('.st-dots'), ctx = C.getContext('2d'), h1 = stage.querySelector('.st-h1'),
     tag = stage.querySelector('.st-tag'), lede = stage.querySelector('.st-lede'), cue = stage.querySelector('.st-cue'), cueP = cue.querySelector('.st-cue-dot path'),
     cueUp = cue.querySelector('.st-cue-up'), dotP = stage.querySelector('.st-idot path'), root = document.documentElement, menu = document.querySelector('.menu-btn');
@@ -2994,7 +2995,8 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const big = mob ? W * .88 : Math.min(W * .64, 880), ww = big, fs = mob ? 14 : Math.min(21, Math.max(15, big * .023));
     const below = fs * 6 + ledeH, wx = gx, wy = Math.max(H * .2, H * (mob ? .86 : .88) - below - big * asp);
     h1.style.setProperty('--st-w', big + 'px'); h1.style.transform = `translate(${wx.toFixed(1)}px,${wy.toFixed(1)}px)`;
-    tag.style.fontSize = fs.toFixed(2) + 'px'; tag.style.filter = `opacity(${(1 - ss(.3, .6, pv)).toFixed(3)})`; tag.style.visibility = pv >= .6 ? 'hidden' : '';   /* the tagline belongs to the landing only: it fades away as the home page arrives */
+    if (!tagK) { tag.style.fontSize = '100px'; tagK = tag.getBoundingClientRect().width / 100 || 0; }   /* tagline width per px of type, measured once */
+    tag.style.fontSize = (tagK ? big * .455 / tagK : fs).toFixed(2) + 'px';   /* the tagline spans the logo from the m to the end of the d */ tag.style.filter = `opacity(${(1 - ss(.3, .6, pv)).toFixed(3)})`; tag.style.visibility = pv >= .6 ? 'hidden' : '';   /* the tagline belongs to the landing only: it fades away as the home page arrives */
     const ty = wy + ww * asp * .86; tag.style.transform = `translate(${wx.toFixed(1)}px,${ty.toFixed(1)}px)`;   // tucked up close under the logo
     const lo = ss(.62, .96, pv); lede.style.opacity = lo; lede.style.transform = `translate(${gx}px,${(ty + fs * (5.1 - 3.3 * ss(.3, .7, pv)) + (1 - lo) * 22).toFixed(1)}px)`;
     const ink = mix('#f2eedd', '#2c5494', ce); pin.style.setProperty('--st-bg', mix('#2c5494', '#f2eedd', ce)); pin.style.setProperty('--st-ink', ink);
