@@ -3055,7 +3055,8 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); dots = [];
     const m = Math.min(W, H), lo = m * (mob ? .012 : .008), hi = m * (mob ? .075 : .06), cell = hi * 2.4, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
     const S = hi * 3.2, cand = [];   /* Netsch's Field Theory: the big dots sit on a hidden grid of squares turned 45°; the small ones scatter around them as before */
-      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) if (Math.random() < .3) cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.1, .1) * S, y: j * S / 2 + R(-.1, .1) * S, r: R(hi * .45, hi * .85), big: true });
+      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) if (Math.random() < .45) cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.05, .05) * S, y: j * S / 2 + R(-.05, .05) * S, r: R(hi * .45, hi * .85), big: true });
+      for (let j = -1; j <= H / S * 4 + 1; j++) for (let i = -1; i <= W / S * 2 + 1; i++) if (Math.random() < .3) cand.push({ x: (i + (j % 2 ? .5 : 0)) * S / 2 + R(-.04, .04) * S, y: j * S / 4 + R(-.04, .04) * S, r: R(hi * .18, hi * .3), big: false });   /* a finer turned grid for the middling dots, so the diagonals read */
       for (let n = 0, tries = Math.round(W * H / (lo * lo) * 3); n < tries; n++) { const r = R(lo, hi * .35); cand.push({ x: R(-r, W + r), y: R(-r, H + r), r, big: false }); }
     for (let n = 0; n < cand.length; n++) {
       const { x, y, r, big } = cand[n]; if (x < -r || x > W + r || y < -r || y > H + r) continue;
@@ -3195,7 +3196,8 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); dots = [];
     const m = Math.min(W, H), lo = m * (mob ? .012 : .008), hi = m * (mob ? .075 : .06), cell = hi * 2.4, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
     const S = hi * 3.2, cand = [];   /* Netsch's Field Theory: the big dots sit on a hidden grid of squares turned 45°; the small ones scatter around them as before */
-      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) if (Math.random() < .3) cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.1, .1) * S, y: j * S / 2 + R(-.1, .1) * S, r: R(hi * .45, hi * .85), big: true });
+      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) if (Math.random() < .45) cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.05, .05) * S, y: j * S / 2 + R(-.05, .05) * S, r: R(hi * .45, hi * .85), big: true });
+      for (let j = -1; j <= H / S * 4 + 1; j++) for (let i = -1; i <= W / S * 2 + 1; i++) if (Math.random() < .3) cand.push({ x: (i + (j % 2 ? .5 : 0)) * S / 2 + R(-.04, .04) * S, y: j * S / 4 + R(-.04, .04) * S, r: R(hi * .18, hi * .3), big: false });   /* a finer turned grid for the middling dots, so the diagonals read */
       for (let n = 0, tries = Math.round(W * H / (lo * lo) * 3); n < tries; n++) { const r = R(lo, hi * .35); cand.push({ x: R(-r, W + r), y: R(-r, H + r), r, big: false }); }
     for (let n = 0; n < cand.length; n++) {
       const { x, y, r, big } = cand[n]; if (x < -r || x > W + r || y < -r || y > H + r) continue;
