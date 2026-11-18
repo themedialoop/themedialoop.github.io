@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="en" data-opener="landing">
 <head>
+<script>window.mlRipple = window.mlRipple || ((x, y, t) => { const S = 54, u1 = Math.sin((x + y) / S * .42 - t * 1.5), u2 = Math.sin((x - y) / S * .36 + t * 1.05), v = Math.max(-1, Math.min(1, (u1 + u2) * .62 / .55)); return .5 + .5 * v * (1.5 - .5 * v * v); });   /* one ripple for every dot field: two slow waves crossing along the 45° diagonals */
+</script>
 <meta charset="utf-8">
 <script>addEventListener("pagereveal",function(e){var v=e.viewTransition;if(v){v.ready.catch(function(){});v.finished.catch(function(){});v.updateCallbackDone&&v.updateCallbackDone.catch(function(){})}});addEventListener("pageswap",function(e){var v=e.viewTransition;if(v){v.ready.catch(function(){});v.finished.catch(function(){})}})</script>
 <script>try{if(sessionStorage.getItem("ml-replay")){try{history.scrollRestoration="manual"}catch(e){}scrollTo(0,0);addEventListener("pageshow",function(){scrollTo(0,0)});sessionStorage.removeItem("ml-replay");sessionStorage.removeItem("ml-opener-seen");window.mlReplay=true;try{if(location.search)history.replaceState(null,"",location.pathname+location.hash)}catch(e){}}}catch(e){}</script>
@@ -2316,7 +2318,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     fillRows(travel + W * 1.3); words = words.filter(s => s.x - travel > -W * 2.5);   // keep the ones just behind, in case the river is pulled back
     for (const s of words) { const x = s.x - travel; if (x > W + s.R + 40 || x < -s.R - 40) continue;
       const gi = (((s.x % L) + L) % L) / S, gj = 2 * s.y / S, v1 = Math.sin((gi + gj / 2) * .42 - clock * 1.5 - sy * .008), v2 = Math.sin((gi - gj / 2) * .36 + clock * 1.05);
-      let RR = s.R * (still ? 1 : .86 + .2 * ss(-.55, .55, (v1 + v2) * .62));   // the word bubbles ride the same ripple, more gently: the text scales with them for (const a of AR) RR = Math.min(RR, Math.max(0, Math.hypot(x - a.x, s.y - a.y) - a.R - 10));   // a word passing an arrow shrinks round it
+      let RR = s.R * (still ? 1 : .94 + .06 * ss(-.55, .55, (v1 + v2) * .62));   // the word bubbles ride the same ripple, more gently: the text scales with them for (const a of AR) RR = Math.min(RR, Math.max(0, Math.hypot(x - a.x, s.y - a.y) - a.R - 10));   // a word passing an arrow shrinks round it
       ws.push({ s, x, y: s.y, R: RR }); }
     // dots: wander, keep clear of the words with a gentle swell around each, then settle any that bump
     const vis = [];
@@ -2327,7 +2329,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       const bx = x0 + (still ? 0 : d.wa * Math.sin(clock * d.fx + d.ph) + lp * Math.cos(clock * d.fz)) + d.ox,
         by = d.hy + (still ? 0 : d.wa * Math.cos(clock * d.fy + d.ph * 1.3) + lp * Math.sin(clock * d.fz * 1.3)) + d.oy + (still ? 0 : par * (d.r0 / rmax - .5) * 2 + kick * (.4 + .6 * d.st));   // parallax with the scroll: bigger dots ride a little ahead, smaller ones lag
       const u1 = Math.sin((d.gi + d.gj / 2) * .42 - clock * 1.5 - sy * .008), u2 = Math.sin((d.gi - d.gj / 2) * .36 + clock * 1.05);
-      let r = (still ? d.r0 : Math.max(d.r0 * .12, rmax * (.12 + .95 * ss(-.55, .55, (u1 + u2) * .62)) * (.75 + .25 * d.r0 / rmax))), room = 1e9, halo = 0;   // strong crossing waves along the 45° rows: the grid swells and sinks
+      let r = (still ? d.r0 : Math.max(d.r0 * .12, rmax * (.6 + .4 * ss(-.55, .55, (u1 + u2) * .62)) * (.75 + .25 * d.r0 / rmax))), room = 1e9, halo = 0;   // strong crossing waves along the 45° rows: the grid swells and sinks
       for (const w of ws) { const gap = Math.hypot(bx - w.x, by - w.y) - w.R; room = Math.min(room, gap - 7); halo = Math.max(halo, 1 - ss(0, S * 2.2, gap)); }
       for (const a of AR) room = Math.min(room, Math.hypot(bx - a.x, by - a.y) - a.R - 6);
       r = Math.max(r, rmax * .8 * halo);   // near a word the dots stay generous and taper away
@@ -2353,11 +2355,12 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     const clear = (x, y, r) => { const gx = Math.floor(x / cell), gy = Math.floor(y / cell); for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (const o of drawn.get(K(gx + a, gy + b)) || []) r = Math.min(r, Math.hypot(o[0] - x, o[1] - y) - o[2] - 4); return r; };
     for (const w of ws) { if (w.R < 2) continue; const k = K(Math.floor(w.x / cell), Math.floor(w.y / cell)); (drawn.get(k) || drawn.set(k, []).get(k)).push([w.x, w.y, w.R]); }
     vis.sort((a, b) => b.r - a.r);
-    for (const v of vis) { let r = Math.min(v.r, v.y - 3, H - 3 - v.y); for (const w of ws) r = Math.min(r, Math.hypot(w.x - v.x, w.y - v.y) - w.R - 5); for (const a of AR) r = Math.min(r, Math.hypot(a.x - v.x, a.y - v.y) - a.R - 6); if (r < .8) continue;
+    for (const v of vis) { let r = Math.min(v.r, v.y - 3, H - 3 - v.y); for (const w of ws) r = Math.min(r, Math.hypot(w.x - v.x, w.y - v.y) - w.R - 5); for (const a of AR) r = Math.min(r, Math.hypot(a.x - v.x, a.y - v.y) - a.R - 6); r = clear(v.x, v.y, r); if (r < .8) continue;
       g.save(); g.translate(v.x, v.y); g.scale(r, r); g.rotate(v.d.ph + (v.rot || 0));
       if (v.d.sq) { g.restore(); g.save(); g.translate(v.x, v.y); g.scale(r, r); const st = sy / 260 + v.d.ph, f = st - Math.floor(st), e = f < .75 ? 0 : (f - .75) / .25; g.rotate((Math.floor(st) + e * e * (3 - 2 * e)) * Math.PI / 4);
         g.lineWidth = .16; g.strokeStyle = COL[v.d.k]; g.stroke(v.d.sq); }
       else if (v.d.ring && r > 6) { g.lineWidth = .22; g.strokeStyle = COL[v.d.k]; g.stroke(v.d.p); } else { g.fillStyle = COL[v.d.k]; g.fill(v.d.p); } g.restore();
+      { const k = K(Math.floor(v.x / cell), Math.floor(v.y / cell)); (drawn.get(k) || drawn.set(k, []).get(k)).push([v.x, v.y, r]); }
     }
     for (const w of ws) { if (w.R < 4) continue; const s = w.s, f = w.R / s.R;
       g.save(); g.translate(w.x, w.y); g.rotate(w.rot || 0); g.save(); g.scale(w.R, w.R); g.rotate(s.ph); g.fillStyle = COL[s.k]; g.fill(s.p); g.restore();
@@ -3145,7 +3148,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         const far = sqe * (H * .35 + d.z * H * .5), sway = Math.sin(t * 4 + d.ph * 3) * Math.min(1, sq * 3) * (8 + d.r * .4);
         px += vx * far - vy * sway; py += vy * far + vx * sway; spin = sqe * (d.sp > 0 ? 1 : -1) * (2 + d.z * 3); }
       let c = 1; for (const b of boxes) { const g = Math.max(b.left - pr.left - px, px - (b.right - pr.left), b.top - pr.top - py, py - (b.bottom - pr.top), 0); if (g < pad + d.r) c *= ss(0, pad + d.r, g); }   // never over the words, wherever it dances
-      const s = d.r * m * c * (reduce ? .97 : .84 + .16 * Math.sin(t * 1.5 + d.ph * .6 - (d.x + d.y) * .004)); if (s < .4) continue;   // a ripple of breath across the field
+      const s = d.r * m * c * (reduce ? .97 : .82 + .18 * mlRipple(d.x, d.y, t)); if (s < .4) continue;   // a ripple of breath across the field
       ctx.setTransform(s * DPR, 0, 0, s * DPR, px * DPR, py * DPR); ctx.rotate(d.rot + t * d.sp + spin);
       const col = mix(d.gB ? '#e7aa4d' : '#f2eedd', d.gC ? '#e7aa4d' : '#2c5494', ce);
       if (d.ring) { ctx.lineWidth = .28; ctx.strokeStyle = col; ctx.stroke(d.s); } else { ctx.fillStyle = col; ctx.fill(d.s); }
@@ -3230,7 +3233,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       let c = 1; for (const b of reg.boxes) { const g = Math.max(b.left - d.x, d.x - b.right, b.top - d.y, d.y - b.bottom, 0), pp = b.wide ? pad * 3.5 : pad; if (g < pp + d.r) { c *= ss(0, pp + d.r, g); if (c < .02) break; } }   // headings and text get a wide berth
       if (reg.kind === 'res') { const lb = document.querySelector('#resources .res-stack .res') || document.querySelector('#resources .sec-h'); if (lb) { const q = lb.getBoundingClientRect(); m *= ss(q.top - 10, q.top + 70, d.y); if (m < .02) continue; } }   // no dots above or beside the heading or its description: the field starts at the first card
       if (reg.kind === 'res' && d.thin) { const st = reg.boxes.find(b => !b.wide); if (!st || d.y < st.top) continue; }   // and the space around them is lighter
-      let s = d.r * m * c * (reduce ? .97 : .84 + .16 * Math.sin(t * 1.5 + d.ph * .6 - (d.x + d.y) * .004));
+      let s = d.r * m * c * (reduce ? .97 : .82 + .18 * mlRipple(d.x, d.y, t));
       let px = d.x + AMP * Math.sin(t * d.fx + d.ph), py = d.y + AMP * Math.cos(t * d.fy + d.ph * 1.3), spin = 0;
       if (ex > 0) { const k = Math.max(0, Math.min(1, ex * 1.35 - d.st * .35));   // the dance: each dot sways one way, then the other, spins, and sails off the side
         if (d.r < Math.min(W, H) * .02) s *= 1 - k;   // the small ones simply shrink away
