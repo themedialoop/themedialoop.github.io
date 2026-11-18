@@ -2169,9 +2169,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 .rv-cur.on{opacity:1;scale:1}.rv-cur.down{scale:.82}
 .rv-cur i{width:24px;height:24px;background:#e7aa4d;-webkit-mask:url(assets/arrow-back.svg?v=3) center/contain no-repeat;mask:url(assets/arrow-back.svg?v=3) center/contain no-repeat}
 .rv-cur i + i{-webkit-mask-image:url(assets/arrow.svg?v=3);mask-image:url(assets/arrow.svg?v=3);rotate:45deg}
-.rv-nav{position:absolute;z-index:3;left:0;right:0;display:flex;opacity:0;transition:opacity .2s;align-items:center;justify-content:space-between;padding:0 clamp(10px,2vw,28px);pointer-events:none;translate:0 -50%}
-.rv-nav .rv-b{pointer-events:none;box-shadow:0 0 0 6px #f2eedd}
-.rv-nav:focus-within{opacity:1}.rv-nav:focus-within .rv-b{pointer-events:auto}   /* shown only to keyboard users */
+.rv-nav{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,3vw,40px);margin-top:clamp(12px,2vw,24px);rotate:-3.5deg}
 @media (min-width:900px){.rv-b{width:60px;height:60px}.rv-b i{width:26px;height:26px}}   /* a cream halo keeps the dots clear of the river behind */
 .rv-b{width:48px;height:48px;border:0;padding:0;cursor:pointer;background:#e7aa4d;border-radius:52% 46% 50% 48% / 47% 52% 46% 53%;display:grid;place-items:center;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
 .rv-r{border-radius:47% 53% 46% 52% / 52% 46% 54% 48%}
@@ -2364,8 +2362,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   // a quiet hint under the river: two gold dots with arrows to nudge it either way, and a word that says you can drag it
   const nav = document.createElement('div'); nav.className = 'rv-nav';
   nav.innerHTML = '<button type="button" class="rv-b rv-l" aria-label="Move the river left"><i></i></button><button type="button" class="rv-b rv-r" aria-label="Move the river right"><i></i></button>';
-  river.after(nav); if (getComputedStyle(box).position === 'static') box.style.position = 'relative';
-  const placeNav = () => { nav.style.top = (river.offsetTop + river.offsetHeight / 2) + 'px'; }; placeNav(); addEventListener('resize', placeNav); (document.fonts ? document.fonts.ready : Promise.resolve()).then(placeNav); setTimeout(placeNav, 1500);
+  river.after(nav);
   nav.querySelector('.rv-l').addEventListener('click', () => { dv = 30 * Math.max(1, sc); });
   nav.querySelector('.rv-r').addEventListener('click', () => { dv = -30 * Math.max(1, sc); });
   // on desktop the cursor becomes a gold dot with arrows both ways, so it's clear the river can be pulled
