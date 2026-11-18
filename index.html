@@ -2459,7 +2459,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     }
     return null;
   };
-  const spSeen = new Set(); let marks = [], nextMark = 0, prog = 0, W = 0, H = 0, k = 1, parts = [], shown = new Set(), zl = 0, clock = 0, fill = 0, sv = 0, vel = 0, lastY = scrollY, last = 0, visible = false;
+  const spSeen = new Set(); let marks = [], nextMark = 0, prog = 0, W = 0, H = 0, k = 1, parts = [], shown = new Set(), zl = 0, zv = 0, clock = 0, fill = 0, sv = 0, vel = 0, lastY = scrollY, last = 0, visible = false;
   const Z = () => Math.exp(zl);
   // each dot lives in "world" space around the centre; the screen is that world, magnified by the zoom
   const screen = p => { const z = Z(), A = 7 * k, t = clock;
@@ -2672,12 +2672,12 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (!warping && (++frameN % 90 === 0)) measureHold();   // now and then, in case the page above changed height
     window.mlRabbitCovers = scrollY >= holdTop && scrollY <= holdTop + holdSpan;   // the field fills the screen: the net behind can rest
     const first = !last, dt = first ? 16 : Math.min(100, now - last); last = now;
-    if (warping) { clock += dt / 1000; zl += dt / 1000 * 2.2; tick(); drawTun(); requestAnimationFrame(loop); return; }   // falling: the field rushes outward
+    if (warping) { clock += dt / 1000; zv += (2.2 - zv) * Math.min(1, dt / 1000 * 2.5); zl += dt / 1000 * zv; tick(); drawTun(); requestAnimationFrame(loop); return; }   // falling: carries on at the speed you arrived with, easing into the rush   // falling: the field rushes outward
     const p = progress(); prog = p; drive(p, dt, now); const x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
     if (!still && p >= .985) { warp(); requestAnimationFrame(loop); return; }
     while (nextMark < MARK_AT.length && p >= MARK_AT[nextMark]) { if (p - MARK_AT[nextMark] < .04 && !addMark()) break; nextMark++; }   // no room yet: try again next frame
     while (nextMark > 0 && p < MARK_AT[nextMark - 1] - .02) nextMark--;   // scrolling back up re-arms them
-    if (!still) { clock += dt / 1000; zl = p * 5.6 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
+    if (!still) { clock += dt / 1000; const z0 = zl; zl = p * 5.6 + clock * .02; if (dt > 0) zv += (Math.max(0, (zl - z0) / (dt / 1000)) - zv) * .25;   // the zoom follows your scroll, and keeps sinking slowly on its own (its speed is remembered for the fall)
       const dy = first ? 0 : scrollY - lastY; lastY = scrollY;
       const target = coarse ? 0 : Math.max(-26, Math.min(26, -dy * 1.6)); vel = (vel + (target - sv) * .2) * .68; sv += vel; }
     tick(); drawTun(); spawn(still ? 0 : Math.ceil(7 * W * H / (1280 * 800)));   // bigger screens fill faster
