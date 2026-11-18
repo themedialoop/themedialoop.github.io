@@ -2164,7 +2164,6 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 .river .w span{display:block}
 .river.lf{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;height:clamp(360px,40vw,580px) !important}
 @media (max-width:700px){.river.lf{height:540px !important}}   /* phones keep the taller band */.river.lf.drag{cursor:grabbing}
-@media (hover:hover) and (pointer:fine){.river.lf,.river.lf.drag{cursor:none}}
 .rv-cur{position:fixed;left:0;top:0;z-index:60;width:76px;height:76px;margin:-38px 0 0 -38px;pointer-events:none;display:flex;align-items:center;justify-content:center;gap:6px;
   background:#2c5494;box-shadow:0 0 0 4px #f2eedd;border-radius:52% 46% 50% 48% / 47% 52% 46% 53%;opacity:0;scale:.4;transition:opacity .2s,scale .35s cubic-bezier(.3,1.6,.5,1)}
 .rv-cur.on{opacity:1;scale:1}.rv-cur.down{scale:.82}
@@ -2370,7 +2369,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   nav.querySelector('.rv-l').addEventListener('click', () => { dv = 30 * Math.max(1, sc); });
   nav.querySelector('.rv-r').addEventListener('click', () => { dv = -30 * Math.max(1, sc); });
   // on desktop the cursor becomes a gold dot with arrows both ways, so it's clear the river can be pulled
-  if (matchMedia('(hover: hover) and (pointer: fine)').matches) { const cur = document.createElement('div'); cur.className = 'rv-cur'; cur.setAttribute('aria-hidden', 'true'); cur.innerHTML = '<i></i><i></i>'; document.body.append(cur);
+  if (false && matchMedia('(hover: hover) and (pointer: fine)').matches) { const cur = document.createElement('div'); cur.className = 'rv-cur'; cur.setAttribute('aria-hidden', 'true'); cur.innerHTML = '<i></i><i></i>'; document.body.append(cur);
     const at = e => { cur.style.transform = `translate(${e.clientX}px,${e.clientY}px)`; };
     river.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { at(e); cur.classList.add('on'); } });
     river.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') at(e); });
