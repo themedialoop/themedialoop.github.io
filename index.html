@@ -2284,7 +2284,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     // words ride in rows; each row adds its next word just past its last, so the river never runs out of them
     words = []; wq = 0; rn = 0; fn = 0; ri = Math.floor(Math.random() * RES.length); fi = Math.floor(Math.random() * FUN.length);
     nRows = Math.max(2, Math.round(H / (innerWidth < 700 ? 175 : 150))); rowH = H / nRows; rowEnd = [...Array(nRows)].map((_, k) => k * rowH * .55);
-    while (rn < RES.length || fn < FUN.length) { const k = rowEnd.indexOf(Math.min(...rowEnd)); const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3),
+    while (rn < RES.length || fn < FUN.length || Math.min(...rowEnd) < W * 2) {   /* every word at least once, and enough of them to fill a couple of screens */ const k = rowEnd.indexOf(Math.min(...rowEnd)); const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3),
         per: R(30, 55), pp: R(0, 6.3) };   // each word now and then sinks back into a plain dot, then swells into a word again
       dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.8, S * 3.6); words.push(slot); }
     L = Math.max(L, Math.ceil((Math.max(...rowEnd) + S) / S) * S);   // the loop is long enough to hold every word once
