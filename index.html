@@ -2164,7 +2164,9 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 .river .w span{display:block}
 .river.lf{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;height:clamp(360px,40vw,580px) !important}
 @media (max-width:700px){.river.lf{height:540px !important}}   /* phones keep the taller band */.river.lf.drag{cursor:grabbing}
-.rv-nav{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:14px;margin:clamp(14px,2vw,26px) auto 0;rotate:-3.5deg}
+.rv-nav{position:absolute;z-index:3;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(10px,2vw,28px);pointer-events:none;translate:0 -50%}
+.rv-nav .rv-b{pointer-events:auto;box-shadow:0 0 0 6px #f2eedd}
+@media (min-width:900px){.rv-b{width:60px;height:60px}.rv-b i{width:26px;height:26px}}   /* a cream halo keeps the dots clear of the river behind */
 .rv-b{width:48px;height:48px;border:0;padding:0;cursor:pointer;background:#e7aa4d;border-radius:52% 46% 50% 48% / 47% 52% 46% 53%;display:grid;place-items:center;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
 .rv-r{border-radius:47% 53% 46% 52% / 52% 46% 54% 48%}
 .rv-b i{width:22px;height:22px;background:#2c5494;-webkit-mask:url(assets/arrow-back.svg?v=3) center/contain no-repeat;mask:url(assets/arrow-back.svg?v=3) center/contain no-repeat}
@@ -2355,8 +2357,9 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   const letGo = e => { if (!held || (e && e.pointerId !== held.id)) return; held = null; river.classList.remove('drag'); };
   // a quiet hint under the river: two gold dots with arrows to nudge it either way, and a word that says you can drag it
   const nav = document.createElement('div'); nav.className = 'rv-nav';
-  nav.innerHTML = '<button type="button" class="rv-b rv-l" aria-label="Move the river left"><i></i></button><span class="rv-t">drag to explore</span><button type="button" class="rv-b rv-r" aria-label="Move the river right"><i></i></button>';
-  river.after(nav);
+  nav.innerHTML = '<button type="button" class="rv-b rv-l" aria-label="Move the river left"><i></i></button><button type="button" class="rv-b rv-r" aria-label="Move the river right"><i></i></button>';
+  river.after(nav); if (getComputedStyle(box).position === 'static') box.style.position = 'relative';
+  const placeNav = () => { nav.style.top = (river.offsetTop + river.offsetHeight / 2) + 'px'; }; placeNav(); addEventListener('resize', placeNav); (document.fonts ? document.fonts.ready : Promise.resolve()).then(placeNav); setTimeout(placeNav, 1500);
   nav.querySelector('.rv-l').addEventListener('click', () => { dv = 30 * Math.max(1, sc); });
   nav.querySelector('.rv-r').addEventListener('click', () => { dv = -30 * Math.max(1, sc); });
   river.addEventListener('pointerup', letGo); river.addEventListener('pointercancel', letGo); river.addEventListener('lostpointercapture', letGo);
