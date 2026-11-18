@@ -2322,7 +2322,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       const gi = (((s.x % L) + L) % L) / S, gj = 2 * s.y / S, v1 = Math.sin((gi + gj / 2) * .42 - clock * 1.5 - sy * .008), v2 = Math.sin((gi - gj / 2) * .36 + clock * 1.05);
       let RR = s.R * (still ? 1 : .94 + .06 * ss(-.55, .55, (v1 + v2) * .62));   /* the word bubbles ride the same ripple, more gently: the text scales with them */ const pv = Math.sin(clock * 6.283 / s.per + s.pp), pres = still ? 1 : 1 - ss(.5, .85, pv); if (pres < 1) RR = RR * pres + Math.min(RR, rmax * .9) * (1 - pres);   /* sinking into a plain dot, or swelling back into a word */
       let wy = s.y;   // a word passing an arrow glides over or under it, keeping its size
-      for (const a of AR) { const need = a.R + RR + 12, dx = Math.abs(x - a.x); if (dx < need * 1.6) { const lift = need * Math.cos(Math.min(1, dx / (need * 1.6)) * Math.PI / 2), up = s.y < a.y ? -1 : 1, yy = a.y + up * lift;   /* a gentle arc over or under, no jump */
+      for (const a of AR) { const need = a.R + RR + 12, dx = Math.abs(x - a.x); if (dx < need * 2.6) { const lift = need * (.5 + .5 * Math.cos(Math.min(1, dx / (need * 2.6)) * Math.PI)), up = s.y < a.y ? -1 : 1, yy = a.y + up * lift;   /* a gentle arc over or under, no jump */
         if (up < 0 ? wy > yy : wy < yy) wy = yy; } }
       if (wy - RR < 4 || wy + RR > H - 4) { const room = Math.min(wy - 4, H - 4 - wy); RR = Math.max(0, Math.min(RR, room)); }   // squeezed at the band's edge, it shrinks a little instead
       ws.push({ s, x, y: wy, R: RR, lifted: wy !== s.y }); }
@@ -2337,8 +2337,8 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         by = d.hy + (still ? 0 : d.wa * Math.cos(clock * d.fy + d.ph * 1.3) + lp * Math.sin(clock * d.fz * 1.3)) + d.oy + (still ? 0 : par * (d.r0 / rmax - .5) * 2 + kick * (.4 + .6 * d.st));   // parallax with the scroll: bigger dots ride a little ahead, smaller ones lag
       const u1 = Math.sin((d.gi + d.gj / 2) * .42 - clock * 1.5 - sy * .008), u2 = Math.sin((d.gi - d.gj / 2) * .36 + clock * 1.05);
       let r = (still ? d.r0 : Math.min(rmax, d.r0 * (.62 + .5 * ss(-.55, .55, (u1 + u2) * .62)))), room = 1e9, halo = 0;   // strong crossing waves along the 45° rows: the grid swells and sinks
-      for (const a of AR) { const dx = bx - a.x, dy = by - a.y, dd = Math.hypot(dx, dy) || .01, c = a.R + 6 + r, Z = Math.max(S * 1.6, c * 1.3) + c;
-        if (dd < Z) { const nd = dd + c * Math.pow(1 - dd / Z, 2); bx = a.x + dx / dd * nd; by = a.y + dy / dd * nd; } }   /* near an arrow the dots ease aside along a smooth curve, like water round a stone */
+      for (const a of AR) { const dx = bx - a.x, dy = by - a.y, dd = Math.hypot(dx, dy) || .01, c = a.R + 6 + r, Z = Math.max(S * 3.2, c * 2.6) + c;
+        if (dd < Z) { const q = 1 - dd / Z, nd = dd + c * q * q * (3 - 2 * q) * .9; bx = a.x + dx / dd * nd; by = a.y + dy / dd * nd; r *= 1 - .3 * q * q; } }   /* a wide, soft parting: dots drift aside slowly and shrink a little rather than dart */   /* near an arrow the dots ease aside along a smooth curve, like water round a stone */
       for (const w of ws) { const gap = Math.hypot(bx - w.x, by - w.y) - w.R; room = Math.min(room, gap - 7); halo = Math.max(halo, 1 - ss(0, S * 2.2, gap)); }
       for (const a of AR) room = Math.min(room, Math.hypot(bx - a.x, by - a.y) - a.R - 6);
       r = Math.max(r, rmax * .8 * halo);   // near a word the dots stay generous and taper away
