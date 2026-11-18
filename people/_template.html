@@ -456,11 +456,11 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 .rv-nav{position:absolute;z-index:6;left:0;right:0;top:50%;translate:0 -50%;display:flex;align-items:center;justify-content:space-between;padding:0 calc(6vw + clamp(12px,2.4vw,36px));pointer-events:none}
 .rv-nav .rv-b{pointer-events:auto}
    /* a cream halo keeps the dots clear of the river behind */
-.rv-b{width:52px;height:52px;border:0;padding:0;cursor:pointer;background:#f2eedd;box-shadow:inset 0 0 0 3px #2c5494;transition:transform .35s cubic-bezier(.3,1.6,.5,1),background-color .25s;border-radius:52% 46% 50% 48% / 47% 52% 46% 53%;display:grid;place-items:center;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.rv-b{width:52px;height:52px;border:0;padding:0;cursor:pointer;background:#f2eedd;box-shadow:inset 0 0 0 5px #2c5494;transition:transform .35s cubic-bezier(.3,1.6,.5,1),background-color .25s;border-radius:52% 46% 50% 48% / 47% 52% 46% 53%;display:grid;place-items:center;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
 .rv-r{border-radius:47% 53% 46% 52% / 52% 46% 54% 48%}
-.rv-b i{width:22px;height:22px;background:#2c5494;-webkit-mask:url(../assets/arrow-back.svg?v=3) center/contain no-repeat;mask:url(../assets/arrow-back.svg?v=3) center/contain no-repeat}
-.rv-r i{-webkit-mask-image:url(../assets/arrow.svg?v=3);mask-image:url(../assets/arrow.svg?v=3);rotate:45deg}
-@media (min-width:900px){.rv-b{width:64px;height:64px}.rv-b i{width:26px;height:26px}}
+.rv-b i{width:28px;height:28px;background:#2c5494;-webkit-mask:url(../assets/arrow-bold-l.svg) center/contain no-repeat;mask:url(../assets/arrow-bold-l.svg) center/contain no-repeat}
+.rv-r i{-webkit-mask-image:url(../assets/arrow-bold-r.svg);mask-image:url(../assets/arrow-bold-r.svg)}
+@media (min-width:900px){.rv-b{width:66px;height:66px}.rv-b i{width:32px;height:32px}}
 .rv-b:hover,.rv-b:focus-visible{transform:scale(1.16) rotate(-6deg);background:#2c5494}.rv-b:hover i,.rv-b:focus-visible i{background:#f2eedd}.rv-b i{transition:background-color .25s}.rv-b:active{transform:scale(.94)}
 .rv-t{font-weight:300;font-style:italic;font-size:15px;color:#2c5494;letter-spacing:.01em}
 @media (prefers-reduced-motion:reduce){.rv-b{transition:none}}.river.lf canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
