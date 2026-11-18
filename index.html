@@ -2181,6 +2181,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 .rabbit{margin-inline:0;width:100vw;margin-left:calc(50% - 50vw)}   /* full bleed on every screen */
 .bub{position:sticky;top:0;width:100%;height:100vh;height:100lvh;overflow:hidden}   /* the large viewport: it reaches under a phone's toolbars, so the field always meets the bottom of the screen */
 .bub .dot{position:absolute;left:0;top:0;transform-origin:50% 50%}
+.bub canvas.tun{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 .bub .sc{width:100%;height:100%;transform:scale(0);transition:transform .38s cubic-bezier(.5,0,.9,.5)}
 .bub .dot.on .sc{transform:scale(1);transition:transform .45s cubic-bezier(.3,1.5,.5,1)}
 .bub .blob{box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;border:none;padding:0;margin:0;font:inherit;background:var(--c);border-radius:var(--br);transition:scale .3s cubic-bezier(.3,1.6,.5,1)}   /* no per-dot animation: the field's own motion is enough, and it keeps phones smooth */
@@ -2354,6 +2355,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Things we love');
   const hold = document.createElement('div'); hold.className = 'bub-hold';
   const band = document.createElement('div'); band.className = 'bub'; hold.append(band); box.append(hold);
+  const tcv = document.createElement('canvas'); tcv.className = 'tun'; tcv.setAttribute('aria-hidden', 'true'); band.append(tcv); const tg = tcv.getContext('2d');
   const ROWS = [
     ['Algorithms', 'Perceived algorithm responsiveness', 'Social connectedness', 'Loneliness', 'Close relationships', 'AI-mediated communication', 'Self-disclosure', '*moxie', '*epiphany', '*sparkle', '*tinkering', '*merriment', '*Ferris Wheel'],
     ['Interpersonal communication', 'Social media', 'Subjective well-being', 'Imagined audience', 'Affordances', 'Media multiplexity', 'Algorithm awareness', 'Intimacy', 'Human-machine communication', 'Human-AI relationships', '*snap', '*zesty', '*boldness', '*thrill', '*eagerness', '*cool', '*frisky'],
@@ -2446,7 +2448,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   const spawn = budget => {   // words come first: keep plenty of them up, then fill what is left with plain dots, then dust
     const shapes = parts.filter(p => !p.dead && p.logo).length;   // a sprinkle of fun shapes and swirls among the dots
     const deep = Math.max(0, (prog - .78) / .2);   // the shapes only turn up near the very end
-    if (shapes < Math.round(deep * Math.max(6, 10 * W * H / (1280 * 800)))) for (let n = 0; n < 60; n++) { const d = R(44, 104) * k, m = 10 * k, x = R(0, W), y = R(0, H);
+    if (false && shapes < Math.round(deep * Math.max(6, 10 * W * H / (1280 * 800)))) for (let n = 0; n < 60; n++) { const d = R(44, 104) * k, m = 10 * k, x = R(0, W), y = R(0, H);
       if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue; make(x, y, d, 'shape'); break; }
     /* near the end of the trip only: a Cheshire Cat's grin on a fading purple dot, and a white dot that says white rabbit */
     if (prog < .76) spSeen.clear();   /* scrolling back up re-arms them */
@@ -2466,6 +2468,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         else { b.innerHTML = ''; const w = document.createElement('span'); w.className = 'w fun'; w.style.setProperty('--fs', Math.round(19 * Math.max(1, k)) + 'px');
           ['white', 'rabbit'].forEach(l => { const sp = document.createElement('span'); sp.textContent = l; w.append(sp); }); b.append(w); b.removeAttribute('aria-hidden'); b.setAttribute('aria-label', 'white rabbit'); }
         break; } }
+    return;   /* the field itself is now the crossing octagon tunnels, drawn on the canvas */
     // the field starts empty and fills as you scroll in: over the first stretch of the trip, more and more dots and words arrive
     const ramp = Math.max(.2, Math.min(1, prog / .14));   // never empty: a few dots and words already float there as you arrive, to draw you in
     const words = parts.filter(p => !p.dead && p.word).length, want = Math.round(ramp * Math.min(30, Math.max(11, 18 * (W * H / (1280 * 800)) / (k * k))));
@@ -2514,6 +2517,58 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       if (o.d < 2.5 || (wordy && (o.x - o.d / 2 < edge || o.x + o.d / 2 > W - edge || o.y - o.d / 2 < edge || o.y + o.d / 2 > H - edge)) || o.d > (wordy ? Math.min(W, H) * .42 : 120 * k) || o.x + o.d / 2 < 0 || o.x - o.d / 2 > W || o.y + o.d / 2 < 0 || o.y - o.d / 2 > H) pop(p);
       else if (p.word) p.blob.tabIndex = p.on ? 0 : -1; }
   };
+
+  /* crossing octagon tunnels, after Walter Netsch's Field Theory: three tunnels of octagon rings, each with its own centre,
+     speed and spin, falling toward you as you scroll; their rings weave through each other, and no two dots ever touch
+     (a dot that would bump a neighbour shrinks instead). Toward the end the dots turn blue, ready for the fall into the landing page. */
+  const DSH = [...Array(10)].map(() => { const q = [R(0, 6.3), R(0, 6.3), R(0, 6.3)], p = new Path2D();   // the landing page's organic dot
+    for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2, kq = 1 + .045 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * kq, Math.sin(a) * kq) : p.moveTo(Math.cos(a) * kq, Math.sin(a) * kq); }
+    p.closePath(); return p; });
+  const TMIX = [['blue', .7], ['gold', .2], ['orange', .035], ['pink', .035], ['purple', .03]];   // blue and gold lead; the rest are sprinkles
+  const tPick = () => { let t = Math.random(); for (const [c, w] of TMIX) { t -= w; if (t <= 0) return c; } return 'blue'; };
+  let wi = 0; const nextWord = () => { const fun = wi % 3 === 2, list = fun ? FUN : RES, w = list[Math.floor(wi / (fun ? 3 : 1.5)) % list.length]; wi++; return { w, fun }; };
+  const TUN = [[.3, .3, 1, 1], [.72, .48, .82, -1], [.44, .76, 1.14, 1]].map(([x, y, sp, dir]) => ({ x, y, sp, dir, ph: R(0, 6.3),
+    layers: [...Array(12)].map((_, L) => ({ off: L / 12 + R(-.015, .015), rot: R(0, Math.PI / 4), spin: R(-.3, .3),
+      dots: [...Array(24)].map(() => ({ gone: Math.random() < .12, jr: R(-.07, .07), ja: R(-.06, .06), ph: R(0, 6.3), k: tPick(), p: DSH[Math.floor(Math.random() * DSH.length)], sz: R(.6, 1.35),
+        ring: Math.random() < .08, bl: Math.random(), rp: Math.random(), word: Math.random() < .07 ? nextWord() : null })) })) }));
+  const fitT = (w, fun, r) => {   // the word wraps into the dot in one or two lines, as large as fits; too small and the dot stays plain
+    const parts2 = w.split(' '); let best = null;
+    for (let fs = Math.min(22 * Math.max(1, k), r * .42); fs >= 12; fs -= 1) { mctx.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif';
+      const tries = [[w]]; if (parts2.length > 1) { const h = Math.ceil(parts2.length / 2); tries.push([parts2.slice(0, h).join(' '), parts2.slice(h).join(' ')]); }
+      for (const ls of tries) { const tw = Math.max(...ls.map(l => mctx.measureText(l).width)), th = ls.length * fs * 1.08; if (Math.hypot(tw / 2, th / 2) <= r * .86) { best = { fs, ls }; break; } }
+      if (best) return best; }
+    return null; };
+  let TQ = [];
+  const drawTun = () => {
+    const dpr = Math.min(2, devicePixelRatio || 1); if (tcv.width !== Math.round(W * dpr) || tcv.height !== Math.round(H * dpr)) { tcv.width = Math.round(W * dpr); tcv.height = Math.round(H * dpr); }
+    tg.setTransform(dpr, 0, 0, dpr, 0, 0); tg.clearRect(0, 0, W, H); if (!W || !H) return;
+    const max = Math.hypot(W, H) * .42, ramp = Math.max(.35, Math.min(1, prog / .14));   // a few dots already there as you arrive; the rest arrive as you go in
+    const bt = Math.max(0, Math.min(1, (prog - .45) / .5)), blue = bt * bt * (3 - 2 * bt) * .95;   // the field turns blue as you near the bottom
+    TUN.forEach((tn, T) => { const z = (zl * .3 + clock * .03) * tn.sp + T * .33;
+      const cx = tn.x * W + W * .06 * Math.sin(clock * .23 + tn.ph), cy = tn.y * H + H * .05 * Math.cos(clock * .19 + tn.ph);   // each tunnel's centre drifts a little
+      for (const l of tn.layers) { const d = (l.off + z) % 1, sc = Math.pow(d, 2.2) * max, fade = Math.min(1, d * 6, (1 - d) * 10); if (sc < 6) continue;
+        const n = l.dots.length, rot = l.rot + tn.dir * (clock * l.spin * .6 + z * .8);
+        for (const dt of l.dots) { if (dt.gone || dt.rp > ramp) continue; const i = l.dots.indexOf(dt), a = i / n * Math.PI * 2 + dt.ja * .6, seg = Math.PI / 4, kk = Math.cos(seg / 2) / Math.cos(((a % seg) + seg) % seg - seg / 2);
+          const rr = sc * kk * (1 + dt.jr * .6 + .02 * Math.sin(clock * 1.3 + dt.ph)), aa = a + rot, x = cx + Math.cos(aa) * rr, y = cy + Math.sin(aa) * rr;
+          if (x < -40 || x > W + 40 || y < -40 || y > H + 40) continue;
+          const room = Math.min(Math.PI * sc / n * .72, 2.2 * sc / (12 * Math.max(d, .05)) * .36) * .8, size = Math.min(room, sc * .042 * dt.sz) * fade * (dt.word ? 1.5 : 1);
+          if (size >= .7) TQ.push([dt, x, y, size, aa, dt.bl < blue ? 'blue' : dt.k]); } } });
+    // obstacles: the grin and the white rabbit, so the field makes room around them
+    const obs = parts.filter(p => !p.dead).map(p => { const o = screen(p); return [o.x, o.y, o.d / 2]; });
+    TQ.sort((a, b) => b[3] - a[3]); const cell = 60, grid = new Map(), key = (a, b) => a + ',' + b;
+    for (const o of obs) { const kq = key(Math.floor(o[0] / cell), Math.floor(o[1] / cell)); (grid.get(kq) || grid.set(kq, []).get(kq)).push(o); }
+    const big = obs.filter(o => o[2] > cell);
+    for (const q of TQ) { let [dt, x, y, rr, rot, col] = q; rr = Math.min(rr, x - 4, W - 4 - x, y - 4, H - 4 - y);   // never cut by the screen's edge
+      for (const o of big) rr = Math.min(rr, Math.hypot(o[0] - x, o[1] - y) - o[2] - 8);
+      const gx = Math.floor(x / cell), gy = Math.floor(y / cell);
+      for (let a = -2; a <= 2; a++) for (let b = -2; b <= 2; b++) for (const o of grid.get(key(gx + a, gy + b)) || []) rr = Math.min(rr, Math.hypot(o[0] - x, o[1] - y) - o[2] - (4 + .12 * Math.min(rr, o[2])));
+      if (rr < .8) continue;
+      tg.save(); tg.translate(x, y); tg.scale(rr, rr); tg.rotate(rot);
+      if (dt.ring && rr > 6 && !dt.word) { tg.lineWidth = .22; tg.strokeStyle = COL[col]; tg.stroke(dt.p); } else { tg.fillStyle = COL[col]; tg.fill(dt.p); } tg.restore();
+      if (dt.word && rr > 30 * k) { const f = fitT(dt.word.w, dt.word.fun, rr); if (f) { tg.save(); tg.translate(x, y); tg.fillStyle = col === 'gold' ? '#2c5494' : '#f2eedd'; tg.textAlign = 'center'; tg.textBaseline = 'middle';
+        tg.font = (dt.word.fun ? 'italic 300 ' : '700 ') + f.fs + 'px Inter, sans-serif'; const lh = f.fs * 1.08; f.ls.forEach((ln, j) => tg.fillText(ln, 0, (j - (f.ls.length - 1) / 2) * lh)); tg.restore(); } }
+      const kq = key(gx, gy); (grid.get(kq) || grid.set(kq, []).get(kq)).push([x, y, rr]); }
+    TQ = []; };
   let holdTop = 0, holdSpan = 1, frameN = 0;
   const measureHold = () => { const r = hold.getBoundingClientRect(); holdTop = r.top + scrollY; holdSpan = Math.max(1, r.height - innerHeight); };
   const progress = () => Math.max(0, Math.min(1, (scrollY - holdTop) / holdSpan));
@@ -2523,7 +2578,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     k = Math.min(1.6, Math.max(.62, Math.sqrt(W * H / (1280 * 800))));   // dot sizes follow the screen, phone to wall display
     marks.forEach(m => m.el.remove()); marks = []; nextMark = 0;
     zl = progress() * 2.3; fill = still ? .6 : 0;
-    prog = progress(); for (let i = 0; i < 30; i++) spawn(1); spawn(400); tick();   // empty if you have not scrolled in yet
+    prog = progress(); for (let i = 0; i < 30; i++) spawn(1); spawn(400); tick(); drawTun();   // empty if you have not scrolled in yet
   };
   // at the bottom of the rabbit hole you fall through: the field rushes outward, one blue dot opens up from the middle
   // until it fills the screen, and you come out on the blue of the landing page as it opens again
@@ -2559,7 +2614,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (!warping && (++frameN % 90 === 0)) measureHold();   // now and then, in case the page above changed height
     window.mlRabbitCovers = scrollY >= holdTop && scrollY <= holdTop + holdSpan;   // the field fills the screen: the net behind can rest
     const first = !last, dt = first ? 16 : Math.min(100, now - last); last = now;
-    if (warping) { clock += dt / 1000; zl += dt / 1000 * 2.2; tick(); requestAnimationFrame(loop); return; }   // falling: the field rushes outward
+    if (warping) { clock += dt / 1000; zl += dt / 1000 * 2.2; tick(); drawTun(); requestAnimationFrame(loop); return; }   // falling: the field rushes outward
     const p = progress(); prog = p; drive(p, dt, now); const x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
     if (!still && p >= .985) { warp(); requestAnimationFrame(loop); return; }
     while (nextMark < MARK_AT.length && p >= MARK_AT[nextMark]) { if (p - MARK_AT[nextMark] < .04 && !addMark()) break; nextMark++; }   // no room yet: try again next frame
@@ -2567,7 +2622,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (!still) { clock += dt / 1000; zl = p * 5.6 + clock * .02;   // the zoom follows your scroll, and keeps sinking slowly on its own
       const dy = first ? 0 : scrollY - lastY; lastY = scrollY;
       const target = coarse ? 0 : Math.max(-26, Math.min(26, -dy * 1.6)); vel = (vel + (target - sv) * .2) * .68; sv += vel; }
-    tick(); spawn(still ? 0 : Math.ceil(7 * W * H / (1280 * 800)));   // bigger screens fill faster
+    tick(); drawTun(); spawn(still ? 0 : Math.ceil(7 * W * H / (1280 * 800)));   // bigger screens fill faster
     requestAnimationFrame(loop); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; lastY = scrollY; measureHold(); requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '100px 0px' }).observe(band);
   // follow the band's real size, however the browser changes it (phone toolbars sliding in and out do not always fire a resize)
