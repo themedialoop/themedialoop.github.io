@@ -728,7 +728,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     if (spill._key !== key) { spill.width = w; spill.height = h; spill.style.width = ar.width + 'px'; spill.style.height = cssH + 'px'; spill.style.left = (ar.left + scrollX) + 'px';
       const R = (a, b) => a + Math.random() * (b - a), hem = x => (D - window.mlHem(Math.min(1, Math.max(0, x / ar.width)), D)) * dpr, dts = [];
       const n = Math.round(ar.width / (mob ? 9 : 11)), hd = document.querySelector('main .bz-h, .p-bio, main h2'), stop = hd ? (hd.getBoundingClientRect().top - ar.bottom - (mob ? 70 : 110)) : depth;   /* a band of clear cream before the heading */
-      for (let t = 0; t < n * 40 && dts.length < n; t++) { const x = R(12, ar.width - 12) * dpr, f = Math.pow(Math.random(), 1.8), rr = R(mob ? 3.2 : 3.6, mob ? 7.5 : 10) * (1 - .45 * f) * dpr,
+      for (let t = 0; t < n * 40 && dts.length < n; t++) { const x = R(12, ar.width - 12) * dpr, f = Math.pow(Math.random(), 1.8), rr = (Math.random() < .16 ? R(mob ? 12 : 15, mob ? 20 : 26) : R(mob ? 3.2 : 3.6, mob ? 9 : 12)) * (1 - .4 * f) * dpr   /* mostly small, with some big ones like the header's */,
           y = hem(x / dpr) + rr + (8 + f * (depth - 26)) * dpr;   // most stay close under the hem, a few fall further
         if (y + rr > h - 4 * dpr || y + rr > (D + stop) * dpr || x - rr < 6 * dpr || x + rr > w - 6 * dpr) continue;
         if (dts.some(o => Math.hypot(o.x - x, o.y - y) < o.r + rr + 7 * dpr)) continue;
