@@ -2425,11 +2425,11 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   const spawn = budget => {   // words come first: keep plenty of them up, then fill what is left with plain dots, then dust
     const shapes = parts.filter(p => !p.dead && p.logo).length;   // a sprinkle of fun shapes and swirls among the dots
     const deep = Math.max(0, (prog - .78) / .2);   // the shapes only turn up near the very end
-    if (false && shapes < Math.round(deep * Math.max(6, 10 * W * H / (1280 * 800)))) for (let n = 0; n < 60; n++) { const d = R(44, 104) * k, m = 10 * k, x = R(0, W), y = R(0, H);
+    if (shapes < Math.round(deep * Math.max(6, 10 * W * H / (1280 * 800)))) for (let n = 0; n < 60; n++) { const d = R(44, 104) * k, m = 10 * k, x = R(0, W), y = R(0, H);
       if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue; make(x, y, d, 'shape'); break; }
     /* near the end of the trip only: a Cheshire Cat's grin on a fading purple dot, and a white dot that says white rabbit */
     if (prog < .76) spSeen.clear();   /* scrolling back up re-arms them */
-    if (prog > .8 && prog < .97) for (const id of ['grin', 'rabbit']) { if (spSeen.has(id)) continue;   /* each appears once per trip: one smile, one rabbit */
+    if (prog > .8 && prog < .97) for (const id of ['grin']) { if (spSeen.has(id)) continue;   /* each appears once per trip: one smile, one rabbit */
       for (let n = 0; n < 80; n++) { const d = R(112, 140) * k, m = 24 * k, x = R(W * .15, W * .85), y = R(H * .15, H * .85);
         if (x - d / 2 < m || x + d / 2 > W - m || y - d / 2 < m || y + d / 2 > H - m || !free(x, y, d)) continue;
         const p = make(x, y, d, 'shape'); p.sp = id; spSeen.add(id); const b = p.blob; b.classList.remove('shape'); b.classList.add('sp-' + id);
@@ -2976,8 +2976,13 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     DPR = Math.min(2, devicePixelRatio || 1); W = pin.clientWidth; H = pin.clientHeight; mob = W < 760; AMP = reduce ? 0 : mob ? 2.6 : 3.4; builtW = W;
     C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); dots = [];
     const m = Math.min(W, H), lo = m * (mob ? .012 : .008), hi = m * (mob ? .075 : .06), cell = hi * 2.4, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
-    for (let n = 0, tries = Math.round(W * H / (lo * lo) * 3); n < tries; n++) {
-      const big = Math.random() < .16, r = big ? R(hi * .45, hi) : R(lo, hi * .35), x = R(-r, W + r), y = R(-r, H + r);
+    const S = hi * 1.3, cand = [];   /* Netsch's Field Theory: the dots sit on a hidden grid of squares turned 45°, each nudged a little off its spot */
+      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) { const wave = .5 + .5 * Math.sin((i + j / 2) * .9) * Math.sin((i - j / 2) * .55), big = Math.random() < .16;
+        cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.17, .17) * S, y: j * S / 2 + R(-.17, .17) * S, r: big ? R(hi * .45, hi) : lo + wave * (hi * .35 - lo) * R(.8, 1.1), big }); }
+      cand.sort((a, b) => b.r - a.r);   // the big ones claim their spots first
+      for (let j = 0; j <= H / S * 2; j++) for (let i = 0; i <= W / S; i++) cand.push({ x: i * S + (j % 2 ? 0 : S / 2) + R(-.12, .12) * S, y: j * S / 2 + R(-.12, .12) * S, r: R(lo, hi * .2), big: false });   // small dots in the middle of each square
+    for (let n = 0; n < cand.length; n++) {
+      const { x, y, r, big } = cand[n]; if (x < -r || x > W + r || y < -r || y > H + r) continue;
       const cx = Math.floor(x / cell), cy = Math.floor(y / cell); let ok = true;
       for (let i = -1; i <= 1 && ok; i++) for (let j = -1; j <= 1 && ok; j++) for (const o of grid.get((cx + i) + ',' + (cy + j)) || [])
         if (Math.hypot(o.x - x, o.y - y) < (o.r + r) * 1.1 + 4 + 2 * AMP) { ok = false; break; }   // never touching, even at their fullest breath and furthest drift
@@ -3113,8 +3118,13 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; mob = W < 760; AMP = reduce ? 0 : mob ? 2.6 : 3.4; builtW = W;
     C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); dots = [];
     const m = Math.min(W, H), lo = m * (mob ? .012 : .008), hi = m * (mob ? .075 : .06), cell = hi * 2.4, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
-    for (let n = 0, tries = Math.round(W * H / (lo * lo) * 3); n < tries; n++) {
-      const big = Math.random() < .16, r = big ? R(hi * .45, hi) : R(lo, hi * .35), x = R(-r, W + r), y = R(-r, H + r);
+    const S = hi * 1.3, cand = [];   /* Netsch's Field Theory: the dots sit on a hidden grid of squares turned 45°, each nudged a little off its spot */
+      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) { const wave = .5 + .5 * Math.sin((i + j / 2) * .9) * Math.sin((i - j / 2) * .55), big = Math.random() < .16;
+        cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.17, .17) * S, y: j * S / 2 + R(-.17, .17) * S, r: big ? R(hi * .45, hi) : lo + wave * (hi * .35 - lo) * R(.8, 1.1), big }); }
+      cand.sort((a, b) => b.r - a.r);   // the big ones claim their spots first
+      for (let j = 0; j <= H / S * 2; j++) for (let i = 0; i <= W / S; i++) cand.push({ x: i * S + (j % 2 ? 0 : S / 2) + R(-.12, .12) * S, y: j * S / 2 + R(-.12, .12) * S, r: R(lo, hi * .2), big: false });   // small dots in the middle of each square
+    for (let n = 0; n < cand.length; n++) {
+      const { x, y, r, big } = cand[n]; if (x < -r || x > W + r || y < -r || y > H + r) continue;
       const cx = Math.floor(x / cell), cy = Math.floor(y / cell); let ok = true;
       for (let i = -1; i <= 1 && ok; i++) for (let j = -1; j <= 1 && ok; j++) for (const o of grid.get((cx + i) + ',' + (cy + j)) || [])
         if (Math.hypot(o.x - x, o.y - y) < (o.r + r) * 1.1 + 4 + 2 * AMP) { ok = false; break; }
