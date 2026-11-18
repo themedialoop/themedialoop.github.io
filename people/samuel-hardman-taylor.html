@@ -860,9 +860,12 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
       spill._dots = dts; spill._key = key; }
     spill.style.top = top + 'px';
     const g = spill.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
-    const exs = Math.max(0, Math.min(1, (innerHeight * .3 - ar.bottom) / (innerHeight * .45)));   /* they stay while you scroll down to them, then shrink away as they rise past the top third */
-    for (const d of spill._dots) { const ks = Math.max(0, Math.min(1, exs * 1.4 - (d.ph / 6.3) * .4)), s = d.r * (.82 + .18 * mlRipple(d.x / dpr, d.y / dpr, time)) * (1 - ks), py = d.y + 1.5 * dpr * Math.sin(time * .5 + d.ph) - ks * 40 * dpr; if (s < .4) continue;
-      g.setTransform(s, 0, 0, s, d.x, py); g.rotate(d.rot);
+    const exs = Math.max(0, Math.min(1, (innerHeight * .45 - ar.bottom) / (innerHeight * .45)));   /* they stay while you scroll down to them, then shrink away as they rise past the top third */
+    for (const d of spill._dots) { const ks = Math.max(0, Math.min(1, exs * 1.4 - (d.ph / 6.3) * .4)), e2 = ks * ks * (3 - 2 * ks), sway = ks < .35 ? ks / .35 : ks < .7 ? 1 - 2 * (ks - .35) / .35 : -1 + (ks - .7) / .3;
+      if (d.fx === undefined) { d.fx = (d.x < w / 2 ? -1 : 1) * (.4 + Math.random() * .45) * w; d.fy = -(.1 + Math.random() * .25) * h; d.sw = (Math.random() * 80 - 40) * dpr; d.sr = Math.random() * 6 - 3; }
+      const small = d.r < 6 * dpr, s = d.r * (.82 + .18 * mlRipple(d.x / dpr, d.y / dpr, time)) * (small ? 1 - ks : ks < .7 ? 1 - .15 * ks / .7 : .85 * (1 - (ks - .7) / .3));   // the cream's dots fly away like the header's
+      const px = d.x + (small ? 0 : d.fx * e2 + d.sw * sway), py = d.y + 1.5 * dpr * Math.sin(time * .5 + d.ph) + (small ? -ks * 30 * dpr : d.fy * e2); if (s < .4) continue;
+      g.setTransform(s, 0, 0, s, px, py); g.rotate(d.rot + (small ? 0 : d.sr * ks));
       const c = d.gold ? '#e7aa4d' : '#2c5494'; if (d.ring) { g.lineWidth = .3; g.strokeStyle = c; g.stroke(d.p); } else { g.fillStyle = c; g.fill(d.p); } }
     g.setTransform(1, 0, 0, 1, 0, 0); };
   const cardLoop = t => { const tt = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : t / 1000; drawCards(tt); drawSide(tt); drawSpill(tt); requestAnimationFrame(cardLoop); };
