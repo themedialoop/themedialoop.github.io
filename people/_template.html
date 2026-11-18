@@ -718,15 +718,15 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
   };
   /* a few dots spill out past the header's curved hem onto the cream, thinning out as they fall */
   const spill = document.createElement('canvas'); spill.className = 'side-spill'; spill.setAttribute('aria-hidden', 'true');
-  spill.style.cssText = 'position:absolute;left:0;pointer-events:none;z-index:1'; document.body.append(spill);
+  spill.style.cssText = 'position:absolute;left:0;pointer-events:none;z-index:40'; document.body.append(spill);
   const drawSpill = time => {
     const aside = document.querySelector('.p-side'); if (!aside) return;
     const ar = aside.getBoundingClientRect(), mob = innerWidth < 760, D = mob ? 60 : 110, depth = mob ? 260 : 360;   /* a fuller spill, a few rows deep, stopping short of the first heading */
-    const top = ar.bottom + scrollY - D, cssH = D + depth;
+    const U = mob ? 260 : 340, top = ar.bottom + scrollY - D - U, cssH = D + depth + U;   /* the canvas reaches up into the header, so the dots can fly into it */
     if (ar.bottom + depth < 0 || ar.bottom - D > innerHeight) return;
     const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(ar.width * dpr), h = Math.round(cssH * dpr), key = w + 'x' + h;
     if (spill._key !== key) { spill.width = w; spill.height = h; spill.style.width = ar.width + 'px'; spill.style.height = cssH + 'px'; spill.style.left = (ar.left + scrollX) + 'px';
-      const R = (a, b) => a + Math.random() * (b - a), hem = x => (D - window.mlHem(Math.min(1, Math.max(0, x / ar.width)), D)) * dpr, dts = [];
+      const R = (a, b) => a + Math.random() * (b - a), hem = x => (D - window.mlHem(Math.min(1, Math.max(0, x / ar.width)), D)) * dpr, dts = []; spill._hem = hem;
       const n = Math.round(ar.width / (mob ? 9 : 11)), hd = document.querySelector('main .bz-h, .p-bio, main h2'), stop = hd ? (hd.getBoundingClientRect().top - ar.bottom - (mob ? 70 : 110)) : depth;   /* a band of clear cream before the heading */
       for (let t = 0; t < n * 40 && dts.length < n; t++) { const x = R(12, ar.width - 12) * dpr, f = Math.pow(Math.random(), 1.8), rr = R(mob ? 3.2 : 3.6, mob ? 7.5 : 10) * (1 - .45 * f) * dpr,
           y = hem(x / dpr) + rr + (8 + f * (depth - 26)) * dpr;   // most stay close under the hem, a few fall further
@@ -739,12 +739,13 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     spill.style.top = top + 'px';
     const g = spill.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
     const exs = Math.max(0, Math.min(1, (innerHeight * .45 - ar.bottom) / (innerHeight * .45)));   /* they stay while you scroll down to them, then shrink away as they rise past the top third */
-    for (const d of spill._dots) { const ks = Math.max(0, Math.min(1, exs * 1.4 - (d.ph / 6.3) * .4)), e2 = ks * ks * (3 - 2 * ks), sway = ks < .35 ? ks / .35 : ks < .7 ? 1 - 2 * (ks - .35) / .35 : -1 + (ks - .7) / .3;
-      if (d.fx === undefined) { d.fx = (d.x < w / 2 ? -1 : 1) * (.4 + Math.random() * .45) * w; d.fy = -(.1 + Math.random() * .25) * h; d.sw = (Math.random() * 80 - 40) * dpr; d.sr = Math.random() * 6 - 3; }
-      const small = d.r < 6 * dpr, s = d.r * (.82 + .18 * mlRipple(d.x / dpr, d.y / dpr, time)) * (small ? 1 - ks : ks < .7 ? 1 - .15 * ks / .7 : .85 * (1 - (ks - .7) / .3));   // the cream's dots fly away like the header's
-      const px = d.x + (small ? 0 : d.fx * e2 + d.sw * sway), py = d.y + 1.5 * dpr * Math.sin(time * .5 + d.ph) + (small ? -ks * 30 * dpr : d.fy * e2); if (s < .4) continue;
-      g.setTransform(s, 0, 0, s, px, py); g.rotate(d.rot + (small ? 0 : d.sr * ks));
-      const c = d.gold ? '#e7aa4d' : '#2c5494'; if (d.ring) { g.lineWidth = .3; g.strokeStyle = c; g.stroke(d.p); } else { g.fillStyle = c; g.fill(d.p); } }
+    for (const d of spill._dots) { const ks = Math.max(0, Math.min(1, exs * 1.4 - (d.ph / 6.3) * .4)), e2 = ks * ks * (3 - 2 * ks), sway = Math.sin(ks * Math.PI * 2);
+      if (d.fx === undefined) { d.fx = (Math.random() * 2 - 1) * .12 * w; d.fy = -(U * (.55 + Math.random() * .4) + (d.y / dpr - D)) * dpr; d.sw = (Math.random() * 50 - 25) * dpr; d.sr = Math.random() * 6 - 3; }
+      const px = d.x + d.fx * e2 + d.sw * sway * (1 - ks), py = U * dpr + d.y + 1.5 * dpr * Math.sin(time * .5 + d.ph) + d.fy * e2;   // they rise and fly up into the header
+      const s = d.r * (.82 + .18 * mlRipple(d.x / dpr, d.y / dpr, time)) * (ks < .8 ? 1 : 1 - (ks - .8) / .2); if (s < .4) continue;
+      const inside = py < spill._hem(px / dpr) + U * dpr;   // over the blue, a blue dot turns cream
+      g.setTransform(s, 0, 0, s, px, py); g.rotate(d.rot + d.sr * ks);
+      const c = d.gold ? '#e7aa4d' : inside ? '#f2eedd' : '#2c5494'; if (d.ring) { g.lineWidth = .3; g.strokeStyle = c; g.stroke(d.p); } else { g.fillStyle = c; g.fill(d.p); } }
     g.setTransform(1, 0, 0, 1, 0, 0); };
   const cardLoop = t => { const tt = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : t / 1000; drawCards(tt); drawSide(tt); drawSpill(tt); requestAnimationFrame(cardLoop); };
   requestAnimationFrame(cardLoop);
@@ -1051,7 +1052,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
       const bx = x0 + (still ? 0 : d.wa * Math.sin(clock * d.fx + d.ph) + lp * Math.cos(clock * d.fz)) + d.ox,
         by = d.hy + (still ? 0 : d.wa * Math.cos(clock * d.fy + d.ph * 1.3) + lp * Math.sin(clock * d.fz * 1.3)) + d.oy + (still ? 0 : par * (d.r0 / rmax - .5) * 2 + kick * (.4 + .6 * d.st));   // parallax with the scroll: bigger dots ride a little ahead, smaller ones lag
       const u1 = Math.sin((d.gi + d.gj / 2) * .42 - clock * 1.5 - sy * .008), u2 = Math.sin((d.gi - d.gj / 2) * .36 + clock * 1.05);
-      let r = (still ? d.r0 : Math.max(d.r0 * .12, rmax * (.6 + .4 * ss(-.55, .55, (u1 + u2) * .62)) * (.75 + .25 * d.r0 / rmax))), room = 1e9, halo = 0;   // strong crossing waves along the 45° rows: the grid swells and sinks
+      let r = (still ? d.r0 : Math.min(rmax, d.r0 * (.62 + .5 * ss(-.55, .55, (u1 + u2) * .62)))), room = 1e9, halo = 0;   // strong crossing waves along the 45° rows: the grid swells and sinks
       for (const w of ws) { const gap = Math.hypot(bx - w.x, by - w.y) - w.R; room = Math.min(room, gap - 7); halo = Math.max(halo, 1 - ss(0, S * 2.2, gap)); }
       for (const a of AR) room = Math.min(room, Math.hypot(bx - a.x, by - a.y) - a.R - 6);
       r = Math.max(r, rmax * .8 * halo);   // near a word the dots stay generous and taper away

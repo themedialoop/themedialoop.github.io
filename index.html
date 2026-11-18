@@ -2336,7 +2336,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       const bx = x0 + (still ? 0 : d.wa * Math.sin(clock * d.fx + d.ph) + lp * Math.cos(clock * d.fz)) + d.ox,
         by = d.hy + (still ? 0 : d.wa * Math.cos(clock * d.fy + d.ph * 1.3) + lp * Math.sin(clock * d.fz * 1.3)) + d.oy + (still ? 0 : par * (d.r0 / rmax - .5) * 2 + kick * (.4 + .6 * d.st));   // parallax with the scroll: bigger dots ride a little ahead, smaller ones lag
       const u1 = Math.sin((d.gi + d.gj / 2) * .42 - clock * 1.5 - sy * .008), u2 = Math.sin((d.gi - d.gj / 2) * .36 + clock * 1.05);
-      let r = (still ? d.r0 : Math.max(d.r0 * .12, rmax * (.6 + .4 * ss(-.55, .55, (u1 + u2) * .62)) * (.75 + .25 * d.r0 / rmax))), room = 1e9, halo = 0;   // strong crossing waves along the 45° rows: the grid swells and sinks
+      let r = (still ? d.r0 : Math.min(rmax, d.r0 * (.62 + .5 * ss(-.55, .55, (u1 + u2) * .62)))), room = 1e9, halo = 0;   // strong crossing waves along the 45° rows: the grid swells and sinks
       for (const w of ws) { const gap = Math.hypot(bx - w.x, by - w.y) - w.R; room = Math.min(room, gap - 7); halo = Math.max(halo, 1 - ss(0, S * 2.2, gap)); }
       for (const a of AR) room = Math.min(room, Math.hypot(bx - a.x, by - a.y) - a.R - 6);
       r = Math.max(r, rmax * .8 * halo);   // near a word the dots stay generous and taper away
