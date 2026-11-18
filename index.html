@@ -2163,7 +2163,15 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 .river .w.fun{font-weight:300;font-style:italic;letter-spacing:-.01em}
 .river .w span{display:block}
 .river.lf{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;height:clamp(360px,40vw,580px) !important}
-@media (max-width:700px){.river.lf{height:540px !important}}   /* phones keep the taller band */.river.lf.drag{cursor:grabbing}.river.lf canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+@media (max-width:700px){.river.lf{height:540px !important}}   /* phones keep the taller band */.river.lf.drag{cursor:grabbing}
+.rv-nav{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:14px;margin:clamp(14px,2vw,26px) auto 0;rotate:-3.5deg}
+.rv-b{width:48px;height:48px;border:0;padding:0;cursor:pointer;background:#e7aa4d;border-radius:52% 46% 50% 48% / 47% 52% 46% 53%;display:grid;place-items:center;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.rv-r{border-radius:47% 53% 46% 52% / 52% 46% 54% 48%}
+.rv-b i{width:22px;height:22px;background:#2c5494;-webkit-mask:url(assets/arrow-back.svg?v=3) center/contain no-repeat;mask:url(assets/arrow-back.svg?v=3) center/contain no-repeat}
+.rv-r i{-webkit-mask-image:url(assets/arrow.svg?v=3);mask-image:url(assets/arrow.svg?v=3);rotate:45deg}
+.rv-b:hover,.rv-b:focus-visible{transform:scale(1.1) rotate(-4deg)}.rv-b:active{transform:scale(.94)}
+.rv-t{font-weight:300;font-style:italic;font-size:15px;color:#2c5494;letter-spacing:.01em}
+@media (prefers-reduced-motion:reduce){.rv-b{transition:none}}.river.lf canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .river-words{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .river .rd.pp .rb::before{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,rvPop var(--pd,11s) ease-in-out var(--pdd,0s) infinite}   /* a few little dots pop out and back now and then */
 @keyframes rvPop{0%,80%{scale:1}85%,90%{scale:0}96%{scale:1.18}100%{scale:1}}
@@ -2345,6 +2353,12 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   river.addEventListener('pointermove', e => { if (!held || e.pointerId !== held.id) return; const now = performance.now(), dx = e.clientX - held.x;
     drag += dx; dv = dx / Math.max(8, now - held.t) * 16; held.x = e.clientX; held.t = now; });
   const letGo = e => { if (!held || (e && e.pointerId !== held.id)) return; held = null; river.classList.remove('drag'); };
+  // a quiet hint under the river: two gold dots with arrows to nudge it either way, and a word that says you can drag it
+  const nav = document.createElement('div'); nav.className = 'rv-nav';
+  nav.innerHTML = '<button type="button" class="rv-b rv-l" aria-label="Move the river left"><i></i></button><span class="rv-t">drag to explore</span><button type="button" class="rv-b rv-r" aria-label="Move the river right"><i></i></button>';
+  river.after(nav);
+  nav.querySelector('.rv-l').addEventListener('click', () => { dv = 30 * Math.max(1, sc); });
+  nav.querySelector('.rv-r').addEventListener('click', () => { dv = -30 * Math.max(1, sc); });
   river.addEventListener('pointerup', letGo); river.addEventListener('pointercancel', letGo); river.addEventListener('lostpointercapture', letGo);
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; requestAnimationFrame(frame); } else if (!v) visible = false; }, { rootMargin: '120px 0px' }).observe(river);
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { build(); if (visible) requestAnimationFrame(frame); });
