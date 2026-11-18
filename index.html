@@ -2237,26 +2237,31 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2, k = 1 + .045 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); }
     p.closePath(); return p; });
 
+  let nRows = 3, rowH = 180, rowEnd = [], gone = 0;
   let W = 0, H = 0, dpr = 1, S = 50, L = 0, sc = 1, dots = [], words = [], wq = 0, visible = false, last = 0, clock = 0, sy = 0, rmax = 20, rmin = 3, built = 0;
   let ri = 0, fi = 0; const nextWord = () => { const fun = wq++ % 3 === 2; return fun ? { w: FUN[fi++ % FUN.length], fun } : { w: RES[ri++ % RES.length], fun }; };
   // a word's lines and the opening that holds them: one to three balanced lines, the opening just big enough
-  const dress = slot => { const { w, fun } = nextWord(), fs = Math.round((fun ? 21 : 19) * sc); mc.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif';
-    const parts = w.split(' '); let best = { ls: [w], r: 0 };
-    for (let n = 1; n <= Math.min(3, parts.length); n++) { const per = Math.ceil(parts.length / n), ls = []; for (let i = 0; i < parts.length; i += per) ls.push(parts.slice(i, i + per).join(' '));
-      const tw = Math.max(...ls.map(l => mc.measureText(l).width)), th = ls.length * fs * 1.08, r = Math.hypot(tw / 2, th / 2) + fs * .6; if (!best.r || r < best.r * .92) best = { ls, r }; }
-    slot.w = w; slot.fun = fun; slot.fs = fs; slot.ls = best.ls; slot.R = Math.max(S * .95, best.r);
+  const dress = (slot, cap) => { const { w, fun } = nextWord(); let fs = Math.round((fun ? 21 : 19) * sc), best;
+    for (; fs >= 12; fs--) { mc.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif'; const parts = w.split(' '); best = { ls: [w], r: 0 };
+      for (let n = 1; n <= Math.min(3, parts.length); n++) { const per = Math.ceil(parts.length / n), ls = []; for (let i = 0; i < parts.length; i += per) ls.push(parts.slice(i, i + per).join(' '));
+        const tw = Math.max(...ls.map(l => mc.measureText(l).width)), th = ls.length * fs * 1.08, r = Math.hypot(tw / 2, th / 2) + fs * .6; if (!best.r || r < best.r * .92) best = { ls, r }; }
+      if (best.r <= cap) break; }   // a long phrase steps its type down rather than outgrowing its row
+    slot.w = w; slot.fun = fun; slot.fs = fs; slot.ls = best.ls; slot.R = Math.min(cap, Math.max(S * .95, best.r));
     slot.k = fun ? (Math.random() < .6 ? 'gold' : 'blue') : (Math.random() < .8 ? 'blue' : 'gold'); slot.tc = slot.k === 'gold' ? COL.blue : Math.random() < .25 ? COL.gold : COL.cream;
     slot.p = SH[Math.floor(Math.random() * SH.length)]; slot.y = Math.min(H - slot.R - 14, Math.max(slot.R + 14, slot.y0)); };
 
+  const fillRows = upTo => { for (let k = 0; k < nRows; k++) while (rowEnd[k] < upTo) { const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3) };
+      dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.3, S * 2.8); words.push(slot); } };
   const build = () => {
     W = river.offsetWidth; H = river.offsetHeight; if (!W || !H) return; built = W; dpr = Math.min(2, devicePixelRatio || 1);
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
     sc = Math.min(1.25, Math.max(.8, innerWidth / 1100)); S = Math.round((innerWidth < 700 ? 40 : 54) * Math.max(1, sc * .95));
     rmax = S * .34 - 4; rmin = Math.max(2.4, S * .06);
     L = Math.ceil(Math.max(W * 2.6, 1800) / S) * S;   // the river's length before it repeats
-    // word slots: spaced along the river, alternating high and low
+    // words ride in rows; each row adds its next word just past its last, so the river never runs out of them
     words = []; wq = 0; ri = Math.floor(Math.random() * RES.length); fi = Math.floor(Math.random() * FUN.length);
-    for (let x = S * 2, n = 0; x < L - S * 4; n++) { const slot = { x: 0, y0: (n % 2 ? .3 : .7) * H + R(-.07, .07) * H, ph: R(0, 6.3) }; dress(slot); slot.x = x + slot.R; words.push(slot); x += slot.R * 2 + R(S * 1.8, S * 3.6); }
+    nRows = Math.max(2, Math.round(H / (innerWidth < 700 ? 175 : 215))); rowH = H / nRows; rowEnd = [...Array(nRows)].map((_, k) => -W * .1 + k * rowH * .55);
+    fillRows(W * 1.3);
     // the field: a lattice turned 45°, its sizes rising and falling along the diagonals
     dots = [];
     for (let i = 0; i < L / S; i++) for (let j = 0; j <= H / S * 2; j++) { const x = i * S + (j % 2 ? S / 2 : 0), y = j * S / 2 + S * .25; if (y > H - 4) continue;
@@ -2278,13 +2283,14 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     sy += (scrollY * .32 - sy) * Math.min(1, dt * 7);   // the slide follows the scroll, eased so it glides
     const shift = still ? 0 : ((clock * 14 + sy) % L + L) % L;
     // leaving at the top of the screen, the dots dance off: the small ones shrink away first, then the rest, then the words
-    const rr = river.getBoundingClientRect(), out = ss(.4, .95, -rr.top / Math.max(1, rr.height));
+    const rr = river.getBoundingClientRect(), ex = Math.max(0, Math.min(1, -rr.top / Math.max(1, rr.height)));   // 0 while the river is on screen, 1 once it has gone off the top
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     const wrap = x => { x = ((x - shift) % L + L) % L; return x > W + 80 ? x - L : x; };
     // words: a slot that has slipped off the left takes the next word before it comes round again
-    const ws = [];
-    for (const s of words) { const x = wrap(s.x); if (x < -s.R - 60 && !s.fresh) { dress(s); s.fresh = true; } else if (x > -s.R) s.fresh = false;
-      if (x > -s.R - 40 && x < W + s.R + 40) ws.push({ s, x, y: s.y, R: s.R * (.975 + .025 * Math.sin(clock * 1.1 + s.ph)) * (1 - ss(.55, 1, out)) }); }
+    const travel = still ? 0 : clock * 14 + sy, ws = [];
+    fillRows(travel + W * 1.3); words = words.filter(s => s.x - travel > -s.R - 80);
+    for (const s of words) { const x = s.x - travel; if (x > W + s.R + 40) continue;
+      ws.push({ s, x, y: s.y, R: s.R * (.975 + .025 * Math.sin(clock * 1.1 + s.ph)) }); }
     // dots: wander, keep clear of the words with a gentle swell around each, then settle any that bump
     const vis = [];
     for (const d of inView(shift - 40, shift + W + 40)) { const x0 = wrap(d.hx); if (x0 < -40 || x0 > W + 40) continue;
@@ -2295,10 +2301,15 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       for (const w of ws) { const gap = Math.hypot(bx - w.x, by - w.y) - w.R; room = Math.min(room, gap - 7); halo = Math.max(halo, 1 - ss(0, S * 2.2, gap)); }
       r = Math.max(r, rmax * .8 * halo);   // near a word the dots stay generous and taper away
       r = Math.min(r, room) * (.94 + .06 * Math.sin(clock * 1.3 + d.ph)) * (1 + .2 * d.pop);
-      const o = ss(0, .6, out * 1.25 - d.st * .25 - (r > rmax * .6 ? .15 : 0)); r *= 1 - o;   // the exit dance
-      if (r < .8) continue; vis.push({ d, x: bx, y: by - o * 30, r }); }
+      if (r < .8) continue; vis.push({ d, x: bx, y: by, r }); }
+    const dance = v => { const small = v.r < rmax * .45, t = small ? (ex - .4) / .45 : (ex - .4) / .55; if (t <= 0) return 1; if (t >= 1) return 0;
+      if (small) return 1 - t;   // the small ones simply shrink away
+      const d = v.d || v.s, sway = t < .35 ? t / .35 : t < .7 ? 1 - 2 * (t - .35) / .35 : -1 + (t - .7) / .3;   // sway one way, then the other
+      v.x += (d.dx || (d.dx = R(-.35, .35))) * W * t + (d.sw || (d.sw = R(-40, 40))) * sway; v.y += (d.dy || (d.dy = R(-.65, -.25))) * H * t; v.rot = (d.sr || (d.sr = R(-3, 3))) * t;
+      return t < .7 ? 1 - .15 * t / .7 : .85 * (1 - (t - .7) / .3); };
+    if (ex > .4) { for (const v of vis) v.r *= dance(v); for (const w of ws) w.R *= dance(w); }
     const cell = Math.max(48, rmax * 2.6), grid = new Map(), K = (a, b) => a + ',' + b;
-    for (const v of vis) { const k = K(Math.floor(v.x / cell), Math.floor(v.y / cell)); (grid.get(k) || grid.set(k, []).get(k)).push(v); }
+    if (ex <= .4) for (const v of vis) { const k = K(Math.floor(v.x / cell), Math.floor(v.y / cell)); (grid.get(k) || grid.set(k, []).get(k)).push(v); }
     for (const v of vis) { const gx = Math.floor(v.x / cell), gy = Math.floor(v.y / cell);
       for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (const u of grid.get(K(gx + a, gy + b)) || []) { if (u === v) continue;
         const dx = v.x - u.x, dy = v.y - u.y, dist = Math.hypot(dx, dy) || .01, need = v.r + u.r + 6;
@@ -2312,11 +2323,11 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     for (const w of ws) { if (w.R < 2) continue; const k = K(Math.floor(w.x / cell), Math.floor(w.y / cell)); (drawn.get(k) || drawn.set(k, []).get(k)).push([w.x, w.y, w.R]); }
     vis.sort((a, b) => b.r - a.r);
     for (const v of vis) { let r = Math.min(v.r, v.y - 3, H - 3 - v.y); for (const w of ws) r = Math.min(r, Math.hypot(w.x - v.x, w.y - v.y) - w.R - 5); if (r < .8) continue;
-      g.save(); g.translate(v.x, v.y); g.scale(r, r); g.rotate(v.d.ph);
+      g.save(); g.translate(v.x, v.y); g.scale(r, r); g.rotate(v.d.ph + (v.rot || 0));
       if (v.d.ring && r > 6) { g.lineWidth = .22; g.strokeStyle = COL[v.d.k]; g.stroke(v.d.p); } else { g.fillStyle = COL[v.d.k]; g.fill(v.d.p); } g.restore();
     }
     for (const w of ws) { if (w.R < 4) continue; const s = w.s, f = w.R / s.R;
-      g.save(); g.translate(w.x, w.y); g.save(); g.scale(w.R, w.R); g.rotate(s.ph); g.fillStyle = COL[s.k]; g.fill(s.p); g.restore();
+      g.save(); g.translate(w.x, w.y); g.rotate(w.rot || 0); g.save(); g.scale(w.R, w.R); g.rotate(s.ph); g.fillStyle = COL[s.k]; g.fill(s.p); g.restore();
       if (f > .55) { g.scale(f, f); g.globalAlpha = ss(.55, .8, f); g.fillStyle = s.tc; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = (s.fun ? 'italic 300 ' : '700 ') + s.fs + 'px Inter, sans-serif';
         const lh = s.fs * 1.08; s.ls.forEach((ln, j) => g.fillText(ln, 0, (j - (s.ls.length - 1) / 2) * lh)); }
       g.restore(); }
@@ -2503,14 +2514,16 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     p.closePath(); return p; });
   const TMIX = [['blue', .7], ['gold', .2], ['orange', .035], ['pink', .035], ['purple', .03]];   // blue and gold lead; the rest are sprinkles
   const tPick = () => { let t = Math.random(); for (const [c, w] of TMIX) { t -= w; if (t <= 0) return c; } return 'blue'; };
-  let wi = 0; const nextWord = () => { const fun = wi % 3 === 2, list = fun ? FUN : RES, w = list[Math.floor(wi / (fun ? 3 : 1.5)) % list.length]; wi++; return { w, fun }; };
+  let wi = Math.floor(Math.random() * 60); const nextWord = () => { const fun = wi % 3 === 2, list = fun ? FUN : RES, w = list[Math.floor(wi / (fun ? 3 : 1.5)) % list.length]; wi++; return { w, fun }; };
   const TUN = [[.3, .3, 1, 1], [.72, .48, .82, -1], [.44, .76, 1.14, 1]].map(([x, y, sp, dir]) => ({ x, y, sp, dir, ph: R(0, 6.3),
     layers: [...Array(12)].map((_, L) => ({ off: L / 12 + R(-.015, .015), rot: R(0, Math.PI / 4), spin: R(-.3, .3),
       dots: [...Array(24)].map(() => ({ gone: Math.random() < .12, jr: R(-.07, .07), ja: R(-.06, .06), ph: R(0, 6.3), k: tPick(), p: DSH[Math.floor(Math.random() * DSH.length)], sz: R(.6, 1.35),
-        ring: Math.random() < .08, bl: Math.random(), rp: Math.random(), word: Math.random() < .07 ? nextWord() : null })) })) }));
+        ring: Math.random() < .08, bl: Math.random(), rp: Math.random(), word: null })) })) }));
+  TUN.forEach(tn => tn.layers.forEach(l => { const o = Math.floor(Math.random() * 8), n = l.dots.length;   // three words to every ring, each with room of its own
+    for (const i of [o, o + 8, o + 16]) { const d = l.dots[i % n]; d.word = nextWord(); d.gone = false; d.rp = 0; d.k = Math.random() < .72 ? 'blue' : 'gold'; d.ring = false;   /* words only ever sit on blue or gold */ l.dots[(i + 1) % n].gone = true; l.dots[(i + n - 1) % n].gone = true; } }));
   const fitT = (w, fun, r) => {   // the word wraps into the dot in one or two lines, as large as fits; too small and the dot stays plain
     const parts2 = w.split(' '); let best = null;
-    for (let fs = Math.min(22 * Math.max(1, k), r * .42); fs >= 12; fs -= 1) { mctx.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif';
+    for (let fs = Math.min(22 * Math.max(1, k), r * .42); fs >= 11; fs -= 1) { mctx.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif';
       const tries = [[w]]; if (parts2.length > 1) { const h = Math.ceil(parts2.length / 2); tries.push([parts2.slice(0, h).join(' '), parts2.slice(h).join(' ')]); }
       for (const ls of tries) { const tw = Math.max(...ls.map(l => mctx.measureText(l).width)), th = ls.length * fs * 1.08; if (Math.hypot(tw / 2, th / 2) <= r * .86) { best = { fs, ls }; break; } }
       if (best) return best; }
@@ -2528,7 +2541,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         for (const dt of l.dots) { if (dt.gone || dt.rp > ramp) continue; const i = l.dots.indexOf(dt), a = i / n * Math.PI * 2 + dt.ja * .6, seg = Math.PI / 4, kk = Math.cos(seg / 2) / Math.cos(((a % seg) + seg) % seg - seg / 2);
           const rr = sc * kk * (1 + dt.jr * .6 + .02 * Math.sin(clock * 1.3 + dt.ph)), aa = a + rot, x = cx + Math.cos(aa) * rr, y = cy + Math.sin(aa) * rr;
           if (x < -40 || x > W + 40 || y < -40 || y > H + 40) continue;
-          const room = Math.min(Math.PI * sc / n * .72, 2.2 * sc / (12 * Math.max(d, .05)) * .36) * .8, size = Math.min(room, sc * .042 * dt.sz) * fade * (dt.word ? 1.5 : 1);
+          const room = Math.min(Math.PI * sc / n * .72, 2.2 * sc / (12 * Math.max(d, .05)) * .36) * .8, size = (dt.word ? Math.min(room * 2.4, sc * .13) : Math.min(room, sc * .042 * dt.sz)) * fade;
           if (size >= .7) TQ.push([dt, x, y, size, aa, dt.bl < blue ? 'blue' : dt.k]); } } });
     // obstacles: the grin and the white rabbit, so the field makes room around them
     const obs = parts.filter(p => !p.dead).map(p => { const o = screen(p); return [o.x, o.y, o.d / 2]; });
@@ -2542,7 +2555,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       if (rr < .8) continue;
       tg.save(); tg.translate(x, y); tg.scale(rr, rr); tg.rotate(rot);
       if (dt.ring && rr > 6 && !dt.word) { tg.lineWidth = .22; tg.strokeStyle = COL[col]; tg.stroke(dt.p); } else { tg.fillStyle = COL[col]; tg.fill(dt.p); } tg.restore();
-      if (dt.word && rr > 30 * k) { const f = fitT(dt.word.w, dt.word.fun, rr); if (f) { tg.save(); tg.translate(x, y); tg.fillStyle = col === 'gold' ? '#2c5494' : '#f2eedd'; tg.textAlign = 'center'; tg.textBaseline = 'middle';
+      if (dt.word && rr > 24 * k) { const f = fitT(dt.word.w, dt.word.fun, rr); if (f) { tg.save(); tg.translate(x, y); tg.fillStyle = col === 'gold' ? '#2c5494' : '#f2eedd'; tg.textAlign = 'center'; tg.textBaseline = 'middle';
         tg.font = (dt.word.fun ? 'italic 300 ' : '700 ') + f.fs + 'px Inter, sans-serif'; const lh = f.fs * 1.08; f.ls.forEach((ln, j) => tg.fillText(ln, 0, (j - (f.ls.length - 1) / 2) * lh)); tg.restore(); } }
       const kq = key(gx, gy); (grid.get(kq) || grid.set(kq, []).get(kq)).push([x, y, rr]); }
     TQ = []; };
