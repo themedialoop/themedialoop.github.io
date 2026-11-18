@@ -2261,7 +2261,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       const x = c * rr, y = sn * rr, xr = (x - y) * Math.SQRT1_2, yr = (x + y) * Math.SQRT1_2; i ? p.lineTo(xr, yr) : p.moveTo(xr, yr); } p.closePath(); return p; });
   let nRows = 3, rowH = 180, rowEnd = [], gone = 0;
   let W = 0, H = 0, dpr = 1, S = 50, L = 0, sc = 1, dots = [], words = [], wq = 0, visible = false, last = 0, clock = 0, sy = 0, rmax = 20, rmin = 3, built = 0;
-  let ri = 0, fi = 0; const nextWord = () => { const fun = wq++ % 3 === 2; return fun ? { w: FUN[fi++ % FUN.length], fun } : { w: RES[ri++ % RES.length], fun }; };
+  let ri = 0, fi = 0, rn = 0, fn = 0; const nextWord = () => { wq++; const fun = fn / FUN.length < rn / RES.length; if (fun) { fn++; return { w: FUN[fi++ % FUN.length], fun }; } rn++; return { w: RES[ri++ % RES.length], fun }; };
   // a word's lines and the opening that holds them: one to three balanced lines, the opening just big enough
   const dress = (slot, cap) => { let w, fun, fs, best; for (let tries = 0; tries < 6; tries++) { ({ w, fun } = nextWord()); fs = Math.round((innerWidth < 700 ? (fun ? 21 : 19) : (fun ? 18 : 16)) * sc);
     for (; fs >= 11; fs--) { mc.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif'; const parts = w.split(' '); best = { ls: [w], r: 0 };
@@ -2282,9 +2282,12 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     rmax = S * .34 - 4; rmin = Math.max(2.4, S * .06);
     L = Math.ceil(Math.max(W * 2.6, 1800) / S) * S;   // the river's length before it repeats
     // words ride in rows; each row adds its next word just past its last, so the river never runs out of them
-    words = []; wq = 0; ri = Math.floor(Math.random() * RES.length); fi = Math.floor(Math.random() * FUN.length);
-    nRows = Math.max(2, Math.round(H / (innerWidth < 700 ? 175 : 150))); rowH = H / nRows; rowEnd = [...Array(nRows)].map((_, k) => -W * .1 + k * rowH * .55);
-    fillRows(W * 1.3);
+    words = []; wq = 0; rn = 0; fn = 0; ri = Math.floor(Math.random() * RES.length); fi = Math.floor(Math.random() * FUN.length);
+    nRows = Math.max(2, Math.round(H / (innerWidth < 700 ? 175 : 150))); rowH = H / nRows; rowEnd = [...Array(nRows)].map((_, k) => k * rowH * .55);
+    while (rn < RES.length || fn < FUN.length) { const k = rowEnd.indexOf(Math.min(...rowEnd)); const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3),
+        per: R(30, 55), pp: R(0, 6.3) };   // each word now and then sinks back into a plain dot, then swells into a word again
+      dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.8, S * 3.6); words.push(slot); }
+    L = Math.max(L, Math.ceil((Math.max(...rowEnd) + S) / S) * S);   // the loop is long enough to hold every word once
     // the field: a lattice turned 45°, its sizes rising and falling along the diagonals
     dots = [];
     for (let i = 0; i < L / S; i++) for (let j = 0; j <= H / S * 2; j++) { const x = i * S + (j % 2 ? S / 2 : 0), y = j * S / 2 + S * .25; if (y > H - 4) continue;
@@ -2315,10 +2318,10 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     const wrap = x => { x = ((x - shift) % L + L) % L; return x > W + 80 ? x - L : x; };
     // words: a slot that has slipped off the left takes the next word before it comes round again
     const travel = (still ? 0 : clock * 14 + sy) - drag, ws = [], AR = arrowsAt();
-    fillRows(travel + W * 1.3); words = words.filter(s => s.x - travel > -W * 2.5);   // keep the ones just behind, in case the river is pulled back
-    for (const s of words) { const x = s.x - travel; if (x > W + s.R + 40 || x < -s.R - 40) continue;
+    for (const s of words) { let x = ((s.x - shift) % L + L) % L; if (x > W + s.R + 40) x -= L; if (x > W + s.R + 40 || x < -s.R - 40) continue;
       const gi = (((s.x % L) + L) % L) / S, gj = 2 * s.y / S, v1 = Math.sin((gi + gj / 2) * .42 - clock * 1.5 - sy * .008), v2 = Math.sin((gi - gj / 2) * .36 + clock * 1.05);
-      let RR = s.R * (still ? 1 : .94 + .06 * ss(-.55, .55, (v1 + v2) * .62));   /* the word bubbles ride the same ripple, more gently: the text scales with them */ let wy = s.y;   // a word passing an arrow glides over or under it, keeping its size
+      let RR = s.R * (still ? 1 : .94 + .06 * ss(-.55, .55, (v1 + v2) * .62));   /* the word bubbles ride the same ripple, more gently: the text scales with them */ const pv = Math.sin(clock * 6.283 / s.per + s.pp), pres = still ? 1 : 1 - ss(.5, .85, pv); if (pres < 1) RR = RR * pres + Math.min(RR, rmax * .9) * (1 - pres);   /* sinking into a plain dot, or swelling back into a word */
+      let wy = s.y;   // a word passing an arrow glides over or under it, keeping its size
       for (const a of AR) { const need = a.R + RR + 12, dx = Math.abs(x - a.x); if (dx < need) { const lift = Math.sqrt(need * need - dx * dx), up = s.y < a.y ? -1 : 1, yy = a.y + up * lift;
         if (up < 0 ? wy > yy : wy < yy) wy = yy; } }
       if (wy - RR < 4 || wy + RR > H - 4) { const room = Math.min(wy - 4, H - 4 - wy); RR = Math.max(0, Math.min(RR, room)); }   // squeezed at the band's edge, it shrinks a little instead
