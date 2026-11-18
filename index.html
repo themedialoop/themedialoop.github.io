@@ -2197,7 +2197,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 @media (max-width:760px){.bub-hold{height:calc(100vh + 520vh);height:calc(100lvh + 520svh)}}   /* phones: a quicker trip, so it never feels like wading */   /* the last thing on the page: a long way down (about ten seconds of scrolling) */
 .bub.warp{position:fixed;inset:0;z-index:9999}   /* for the trip back to the top */
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.7s;animation-timing-function:cubic-bezier(.4,0,.2,1)}
-.bub .cover{position:absolute;z-index:3;left:50%;top:50%;background:#2c5494;border-radius:52% 48% 55% 45% / 46% 54% 47% 53%;transform:translate(-50%,-50%) scale(0);transition:transform 1.35s cubic-bezier(.55,0,.25,1)}
+.bub .cover{position:absolute;z-index:3;left:50%;top:50%;background:#2c5494;border-radius:52% 48% 55% 45% / 46% 54% 47% 53%;transform:translate(-50%,-50%) scale(0);transition:transform 1.1s cubic-bezier(.65,0,.35,1)}
 .rabbit{margin-inline:0;width:100vw;margin-left:calc(50% - 50vw)}   /* full bleed on every screen */
 .bub{position:sticky;top:0;width:100%;height:100vh;height:100lvh;overflow:hidden}   /* the large viewport: it reaches under a phone's toolbars, so the field always meets the bottom of the screen */
 .bub .dot{position:absolute;left:0;top:0;transform-origin:50% 50%}
@@ -2598,10 +2598,10 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     return null; };
   let TQ = [];
   const drawTun = () => {
-    const dpr = Math.min(2, devicePixelRatio || 1); if (!warping && (tcv.width !== Math.round(W * dpr) || tcv.height !== Math.round(H * dpr))) { tcv.width = Math.round(W * dpr); tcv.height = Math.round(H * dpr); }
+    const dpr = Math.min(2, devicePixelRatio || 1); if (tcv.width !== Math.round(W * dpr) || tcv.height !== Math.round(H * dpr)) { tcv.width = Math.round(W * dpr); tcv.height = Math.round(H * dpr); }
     tg.setTransform(dpr, 0, 0, dpr, 0, 0); tg.clearRect(0, 0, W, H); if (!W || !H) return;
     const max = Math.hypot(W, H) * .42, ramp = Math.max(.35, Math.min(1, prog / .14));   // a few dots already there as you arrive; the rest arrive as you go in
-    const bt = Math.max(0, Math.min(1, (prog - .45) / .5)), blue = warping ? 1 : bt * bt * (3 - 2 * bt) * .95;   // the field turns blue as you near the bottom
+    const bt = Math.max(0, Math.min(1, (prog - .45) / .5)), blue = bt * bt * (3 - 2 * bt) * .95;   // the field turns blue as you near the bottom
     TUN.forEach((tn, T) => { const z = (zl * .3 + clock * .03) * tn.sp + T * .33;
       const cx = tn.x * W + W * .06 * Math.sin(clock * .23 + tn.ph), cy = tn.y * H + H * .05 * Math.cos(clock * .19 + tn.ph);   // each tunnel's centre drifts a little
       for (const l of tn.layers) { const d = (l.off + z) % 1, sc = Math.pow(d, 2.2) * max, fade = Math.min(1, d * 6, (1 - d) * 10); if (sc < 6) continue;
@@ -2640,10 +2640,10 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   };
   // at the bottom of the rabbit hole you fall through: the field rushes outward, one blue dot opens up from the middle
   // until it fills the screen, and you come out on the blue of the landing page as it opens again
-  let warping = false, warpAt = 0;
+  let warping = false;
   let lastHush = 0; const hush = e => { if (e.cancelable) e.preventDefault(); e.stopImmediatePropagation(); lastHush = performance.now(); };
   const holdInput = on => ['wheel', 'touchstart', 'touchmove', 'keydown'].forEach(t => (on ? addEventListener : removeEventListener)(t, hush, { capture: true, passive: false }));
-  const warp = () => { warping = true; warpAt = performance.now(); auto = false; av = 0; inAt = 0; document.documentElement.style.scrollBehavior = ''; band.classList.add('warp'); holdInput(true);   // no scrolling until 0.4 s after the blue starts to lift
+  const warp = () => { warping = true; auto = false; av = 0; inAt = 0; document.documentElement.style.scrollBehavior = ''; band.classList.add('warp'); holdInput(true);   // no scrolling until 0.4 s after the blue starts to lift
     const c = document.createElement('div'); c.className = 'cover'; const D = Math.hypot(W, H) * 1.35; c.style.width = c.style.height = D + 'px'; band.append(c);
     requestAnimationFrame(() => requestAnimationFrame(() => { c.style.transform = 'translate(-50%,-50%) scale(1)'; }));
     setTimeout(() => {   // the screen is all blue now: behind it, back to the top and the opener begins
@@ -2652,9 +2652,9 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo({ top: 0, behavior: 'instant' }); document.documentElement.style.scrollBehavior = '';
       const replayed = window.mlPlayOpener && window.mlPlayOpener();
       if (!replayed) { window.scrollTo({ top: 0, behavior: 'instant' }); }
-      setTimeout(() => { band.style.transition = 'opacity 1.3s cubic-bezier(.25,.1,.25,1)'; band.style.opacity = '0'; const t0 = performance.now(); const release = () => { const now = performance.now(); if (now - t0 >= 400 && (now - lastHush > 250 || now - t0 > 1600)) holdInput(false); else setTimeout(release, 60); }; setTimeout(release, 400);   // at least 0.4 s, and until any coasting scroll has stopped   // the blue melts away into the opener's blue net
-        setTimeout(() => { band.classList.remove('warp'); c.remove(); band.style.transition = ''; band.style.opacity = ''; warping = false; visible = false; nextMark = 0; build(); }, 1350); }, 220);
-    }, 1450); };
+      setTimeout(() => { band.style.transition = 'opacity .9s cubic-bezier(.4,0,.2,1)'; band.style.opacity = '0'; const t0 = performance.now(); const release = () => { const now = performance.now(); if (now - t0 >= 400 && (now - lastHush > 250 || now - t0 > 1600)) holdInput(false); else setTimeout(release, 60); }; setTimeout(release, 400);   // at least 0.4 s, and until any coasting scroll has stopped   // the blue melts away into the opener's blue net
+        setTimeout(() => { band.classList.remove('warp'); c.remove(); band.style.transition = ''; band.style.opacity = ''; warping = false; visible = false; nextMark = 0; build(); }, 950); }, 120);
+    }, 1050); };
   // once you are in, the rabbit hole takes over: after about four scrolls or two and a half seconds it carries you down on its own,
   // gathering speed, to the fall at the bottom. Scrolling back up hands control back to you.
   let inAt = 0, gestures = 0, lastGest = 0, auto = false, av = 0, aA = 0, autoOff = 0;
@@ -2672,7 +2672,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (!warping && (++frameN % 90 === 0)) measureHold();   // now and then, in case the page above changed height
     window.mlRabbitCovers = scrollY >= holdTop && scrollY <= holdTop + holdSpan;   // the field fills the screen: the net behind can rest
     const first = !last, dt = first ? 16 : Math.min(100, now - last); last = now;
-    if (warping) { clock += dt / 1000; const wt = (performance.now() - warpAt) / 1000; zl += dt / 1000 * 1.6 * Math.min(1, wt / .7) ** 2; tick(); drawTun(); requestAnimationFrame(loop); return; }   // falling: the field gathers speed, never a jolt   // falling: the field rushes outward
+    if (warping) { clock += dt / 1000; zl += dt / 1000 * 2.2; tick(); drawTun(); requestAnimationFrame(loop); return; }   // falling: the field rushes outward
     const p = progress(); prog = p; drive(p, dt, now); const x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
     if (!still && p >= .985) { warp(); requestAnimationFrame(loop); return; }
     while (nextMark < MARK_AT.length && p >= MARK_AT[nextMark]) { if (p - MARK_AT[nextMark] < .04 && !addMark()) break; nextMark++; }   // no room yet: try again next frame
