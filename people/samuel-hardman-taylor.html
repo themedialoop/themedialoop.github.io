@@ -844,7 +844,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
   };
   /* a few dots spill out past the header's curved hem onto the cream, thinning out as they fall */
   const spill = document.createElement('canvas'); spill.className = 'side-spill'; spill.setAttribute('aria-hidden', 'true');
-  spill.style.cssText = 'position:absolute;left:0;pointer-events:none;z-index:40'; document.body.append(spill);
+  spill.style.cssText = 'position:absolute;left:0;pointer-events:none;z-index:3';   /* just under the header (z 4), so the dots slip in beneath it */ document.body.append(spill);
   const drawSpill = time => {
     const aside = document.querySelector('.p-side'); if (!aside) return;
     const ar = aside.getBoundingClientRect(), mob = innerWidth < 760, D = mob ? 60 : 110, depth = mob ? 260 : 360;   /* a fuller spill, a few rows deep, stopping short of the first heading */
@@ -868,10 +868,10 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     for (const d of spill._dots) { const ks = Math.max(0, Math.min(1, exs * 1.4 - (d.ph / 6.3) * .4)), e2 = ks * ks * (3 - 2 * ks), sway = Math.sin(ks * Math.PI * 2);
       if (d.fx === undefined) { d.fx = (Math.random() * 2 - 1) * .12 * w; d.fy = -(U * (.55 + Math.random() * .4) + (d.y / dpr - D)) * dpr; d.sw = (Math.random() * 50 - 25) * dpr; d.sr = Math.random() * 6 - 3; }
       const px = d.x + d.fx * e2 + d.sw * sway * (1 - ks), py = U * dpr + d.y + 1.5 * dpr * Math.sin(time * .5 + d.ph) + d.fy * e2;   // they rise and fly up into the header
-      const s = d.r * (.82 + .18 * mlRipple(d.x / dpr, d.y / dpr, time)) * (ks < .8 ? 1 : 1 - (ks - .8) / .2); if (s < .4) continue;
+      const s = d.r * (.82 + .18 * mlRipple(d.x / dpr, d.y / dpr, time)); if (s < .4 || ks >= 1) continue;
       const inside = py < spill._hem(px / dpr) + U * dpr;   // over the blue, a blue dot turns cream
       g.setTransform(s, 0, 0, s, px, py); g.rotate(d.rot + d.sr * ks);
-      const c = d.gold ? '#e7aa4d' : inside ? '#f2eedd' : '#2c5494'; if (d.ring) { g.lineWidth = .3; g.strokeStyle = c; g.stroke(d.p); } else { g.fillStyle = c; g.fill(d.p); } }
+      const c = d.gold ? '#e7aa4d' : '#2c5494';   /* they keep their colour and disappear under the blue */ if (d.ring) { g.lineWidth = .3; g.strokeStyle = c; g.stroke(d.p); } else { g.fillStyle = c; g.fill(d.p); } }
     g.setTransform(1, 0, 0, 1, 0, 0); };
   const cardLoop = t => { const tt = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : t / 1000; drawCards(tt); drawSide(tt); drawSpill(tt); requestAnimationFrame(cardLoop); };
   requestAnimationFrame(cardLoop);
