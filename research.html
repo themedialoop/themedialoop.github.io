@@ -1279,11 +1279,9 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
 .r-list li{border-bottom:1px solid var(--blue-soft)}
 .r-list li:last-child{border-bottom:0}
 .r-list a{display:grid;grid-template-columns:minmax(0,1fr);gap:6px 24px;padding-block:clamp(16px,2vw,24px);text-decoration:none;transition:padding .4s cubic-bezier(.2,.7,.2,1)}
-.r-list a:hover,.r-list a:focus-visible{padding-left:14px}
 .r-type{grid-column:1;display:flex;align-items:center;gap:.5em;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
 .r-type::before{content:"";width:.6em;height:.6em;border-radius:52% 46% 50% 48%;background:var(--gold)}
 .r-ttl{grid-column:1;font-size:clamp(22px,2.3vw,34px);line-height:1.12;letter-spacing:-.025em;font-weight:350;transition:font-weight .45s cubic-bezier(.2,.7,.2,1),letter-spacing .45s}
-.r-list a:hover .r-ttl,.r-list a:focus-visible .r-ttl{font-weight:650;letter-spacing:-.035em}
 .r-tm{background-image:linear-gradient(var(--gold),var(--gold));background-repeat:no-repeat;background-position:0 96%;background-size:0% .09em;transition:background-size .5s cubic-bezier(.2,.7,.2,1)}
 .r-list a:hover .r-tm,.r-list a:focus-visible .r-tm{background-size:100% .09em}
 .r-meta{grid-column:1;font-size:var(--step--1);opacity:.75}
@@ -1720,7 +1718,10 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 .pubs a:not([href])::before{display:none}
 /* on the Research page the year sits to the left, so the band starts just before the paper and runs to the right edge */
 .r-list a::before{left:-24px}
-.pubs a:hover,.pubs a:focus-visible,.r-list a:hover,.r-list a:focus-visible{color:var(--cream) !important;padding-left:14px}
+.pubs a:hover,.pubs a:focus-visible,.r-list a:hover,.r-list a:focus-visible{color:var(--cream) !important}
+/* the highlighted paper slides over a touch without changing size, so nothing below it jumps */
+.r-list a > *{transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+.r-list a:hover > :not(.arrow),.r-list a:focus-visible > :not(.arrow){transform:translateX(14px)}
 .pubs a:hover *,.pubs a:focus-visible *,.r-list a:hover *,.r-list a:focus-visible *{color:var(--cream) !important}
 .pubs a:hover .ttl-main,.pubs a:focus-visible .ttl-main{background-size:0 0 !important}
 .r-list a:hover .r-tm,.r-list a:focus-visible .r-tm{background-size:0 0 !important}

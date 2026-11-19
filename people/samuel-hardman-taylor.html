@@ -660,6 +660,18 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     </ul>
   </section>
 
+  <section class="mm" aria-labelledby="mm-h">
+    <h2 class="bz-h sec-h" id="mm-h"><span class="bz-a">More</span> <span class="bz-b">is More</span></h2>
+    <p class="mm-sub">Quick little links to some information you might find useful</p>
+    <ul class="mm-row">
+      <li><a class="mm-c mm-blue" href="../index.html"><span class="mm-k">The collective</span><span class="mm-t">medialoop Research Collective</span><span class="mm-a" aria-hidden="true">↗</span></a></li>
+      <li><a class="mm-c mm-gold" href="https://comm.uic.edu/profiles/taylor-samuel/" target="_blank" rel="noopener"><span class="mm-k">At UIC</span><span class="mm-t">UIC Profile</span><span class="mm-a" aria-hidden="true">↗</span></a></li>
+      <li><a class="mm-c mm-orange" href="https://scholar.google.com/citations?user=rNF6k_AAAAAJ&amp;hl=en" target="_blank" rel="noopener"><span class="mm-k">Citations</span><span class="mm-t">Google Scholar</span><span class="mm-a" aria-hidden="true">↗</span></a></li>
+      <li><a class="mm-c mm-pink" href="../assets/people/samuel-hardman-taylor-cv.pdf" target="_blank" rel="noopener"><span class="mm-k">The long version</span><span class="mm-t">CV</span><span class="mm-a" aria-hidden="true">↗</span></a></li>
+      <li><a class="mm-c mm-purple" href="../contact.html"><span class="mm-k">Say hello</span><span class="mm-t">Contact Sam</span><span class="mm-a" aria-hidden="true">↗</span></a></li>
+    </ul>
+  </section>
+
   <footer class="p-foot">
     <svg class="foot-mark" viewBox="0 0 4278 1185" role="img" aria-label="medialoop"><use href="#wm"/></svg>
     <span>© <span id="yr">2026</span> medialoop</span>
@@ -1377,5 +1389,27 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 (() => { const on = a => { if (!a.dataset.m) return; a.href = 'mailto:' + a.dataset.m.split('').reverse().join('').replace('|', '@'); };
   ['pointerdown', 'touchstart', 'focusin', 'click'].forEach(t => addEventListener(t, e => { const a = e.target.closest && e.target.closest('a[data-m]'); if (a) on(a); }, { capture: true, passive: true })); })();
 </script>
+<style>
+/* More is More: little link cards, one in each medialoop colour; on hover each takes on another colour and tilts */
+.mm{padding-top:clamp(30px,5vw,70px)}
+.mm-sub{margin:0 0 clamp(24px,3.4vw,44px);max-width:36ch;font-size:var(--step-1);font-weight:300;line-height:1.3}
+.mm-row{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(12px,1.6vw,22px)}
+@media (max-width:900px){.mm-row{grid-template-columns:repeat(2,minmax(0,1fr))}.mm-row li:last-child{grid-column:1 / -1}}
+.mm-c{--bg:#2c5494;--fg:#f2eedd;--hb:#d8708e;--hf:#2c5494;position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:18px;min-height:clamp(150px,13vw,200px);height:100%;box-sizing:border-box;
+  padding:clamp(16px,1.6vw,22px);text-decoration:none;background:var(--bg);color:var(--fg);border-radius:20px 16px 22px 17px / 17px 22px 16px 20px;
+  transition:background-color .3s,color .3s,transform .45s cubic-bezier(.3,1.6,.5,1)}
+.mm-gold{--bg:#e7aa4d;--fg:#2c5494;--hb:#9b6aa6;--hf:#f2eedd}
+.mm-orange{--bg:#e0773a;--fg:#2c5494;--hb:#2c5494;--hf:#f2eedd}
+.mm-pink{--bg:#d8708e;--fg:#2c5494;--hb:#e7aa4d;--hf:#2c5494}
+.mm-purple{--bg:#9b6aa6;--fg:#f2eedd;--hb:#e0773a;--hf:#2c5494}   /* hover colours: never the same as any other card in the row */
+.mm-row li:nth-child(odd) .mm-c{--tilt:-3deg}.mm-row li:nth-child(even) .mm-c{--tilt:2.5deg}
+.mm-c:hover,.mm-c:focus-visible{background:var(--hb);color:var(--hf);transform:translateY(-6px) rotate(var(--tilt));outline:none}
+.mm-c:focus-visible{box-shadow:0 0 0 4px var(--cream,#f2eedd),0 0 0 7px var(--blue,#2c5494)}
+.mm-k{font-size:clamp(12px,.9vw,14px);font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.9}
+.mm-t{font-weight:700;font-size:clamp(20px,1.7vw,26px);line-height:1.02;letter-spacing:-.03em;text-wrap:balance}
+.mm-a{align-self:flex-end;font-size:22px;line-height:1;transition:transform .35s}
+.mm-c:hover .mm-a,.mm-c:focus-visible .mm-a{transform:translate(3px,-3px)}
+@media (prefers-reduced-motion:reduce){.mm-c,.mm-a{transition:background-color .3s,color .3s}.mm-c:hover,.mm-c:focus-visible{transform:none}}
+</style>
 </body>
 </html>
