@@ -2589,7 +2589,8 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         ring: Math.random() < .08, bl: Math.random(), rp: Math.random(), word: null })) })) }));
   TUN.forEach(tn => tn.layers.forEach(l => { const o = Math.floor(Math.random() * 8), n = l.dots.length;   // three words to every ring, each with room of its own
     for (const i of [o, o + 8, o + 16]) { const d = l.dots[i % n]; d.word = nextWord(); d.gone = false; d.rp = 0; d.k = Math.random() < .72 ? 'blue' : 'gold'; d.ring = false;   /* words only ever sit on blue or gold */ l.dots[(i + 1) % n].gone = true; l.dots[(i + n - 1) % n].gone = true; } }));
-  const fitT = (w, fun, r) => {   // the word wraps into the dot in one or two lines, as large as fits; too small and the dot stays plain
+  const fitC = new Map(), fitT = (w, fun, r) => { const key = w + (fun ? '/' : '|') + Math.round(r / 3); if (fitC.has(key)) return fitC.get(key); if (fitC.size > 4000) fitC.clear(); const f = fitT0(w, fun, Math.round(r / 3) * 3); fitC.set(key, f); return f; };   /* measuring text every frame was the phone's biggest cost */
+  const fitT0 = (w, fun, r) => {   // the word wraps into the dot in one or two lines, as large as fits; too small and the dot stays plain
     const parts2 = w.split(' '); let best = null;
     for (let fs = Math.min(22 * Math.max(1, k), r * .42); fs >= 11; fs -= 1) { mctx.font = (fun ? 'italic 300 ' : '700 ') + fs + 'px Inter, sans-serif';
       const tries = [[w]]; if (parts2.length > 1) { const h = Math.ceil(parts2.length / 2); tries.push([parts2.slice(0, h).join(' '), parts2.slice(h).join(' ')]); }
@@ -2637,8 +2638,8 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       const gx = Math.floor(x / cell), gy = Math.floor(y / cell);
       for (let a = -2; a <= 2; a++) for (let b = -2; b <= 2; b++) for (const o of grid.get(key(gx + a, gy + b)) || []) rr = Math.min(rr, Math.hypot(o[0] - x, o[1] - y) - o[2] - (4 + .12 * Math.min(rr, o[2])));
       if (rr < .8) continue;
-      tg.save(); tg.translate(x, y); tg.scale(rr, rr); tg.rotate(rot);
-      if (dt.ring && rr > 6 && !dt.word) { tg.lineWidth = .22; tg.strokeStyle = COL[col]; tg.stroke(dt.p); } else { tg.fillStyle = COL[col]; tg.fill(dt.p); } tg.restore();
+      { const cq = Math.cos(rot) * rr * dpr, sq = Math.sin(rot) * rr * dpr; tg.setTransform(cq, sq, -sq, cq, x * dpr, y * dpr); }   /* one matrix per dot, no save and restore */
+      if (dt.ring && rr > 6 && !dt.word) { tg.lineWidth = .22; tg.strokeStyle = COL[col]; tg.stroke(dt.p); } else { tg.fillStyle = COL[col]; tg.fill(dt.p); } tg.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (dt.word && rr > 24 * k) { const f = fitT(dt.word.w, dt.word.fun, rr); if (f) { tg.save(); tg.translate(x, y); tg.fillStyle = col === 'gold' ? '#2c5494' : '#f2eedd'; tg.textAlign = 'center'; tg.textBaseline = 'middle';
         tg.font = (dt.word.fun ? 'italic 300 ' : '700 ') + f.fs + 'px Inter, sans-serif'; const lh = f.fs * 1.08; f.ls.forEach((ln, j) => tg.fillText(ln, 0, (j - (f.ls.length - 1) / 2) * lh)); tg.restore(); } }
       const kq = key(gx, gy); (grid.get(kq) || grid.set(kq, []).get(kq)).push([x, y, rr]); }
@@ -3135,6 +3136,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   // ---- drawing
   let visible = true, raf = 0;
   const frame = now => { raf = 0; if (!visible && !on) return;
+    if (window.mlRabbitCovers && !on) { lastT = 0; raf = requestAnimationFrame(frame); return; }   /* the rabbit hole fills the screen: nothing here shows, so it rests */
     const t = reduce ? 0 : now / 1000, dt = lastT ? Math.min(64, now - lastT) : 16; lastT = now;
     if (on) { if (going) pv = Math.min(1, pv + dt / 760); else { idle += dt; if (idle > 5000) going = true; }   // a steady pace; after 5 quiet seconds it carries on
       if (pv >= 1) finish(); }
