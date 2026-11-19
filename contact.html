@@ -21,7 +21,7 @@
 <meta name="twitter:title" content="Contact · medialoop">
 <meta name="twitter:description" content="Get in touch with medialoop, a research collective at the University of Illinois Chicago.">
 <meta name="twitter:image" content="https://themedialoop.github.io/assets/share.png">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="noindex">
 <script type="application/ld+json">
 {
  "@context": "https://schema.org",
@@ -438,19 +438,16 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 <style>
 /* contact page */
 .cf{display:grid;gap:clamp(22px,3vw,34px);max-width:760px;padding-bottom:clamp(30px,5vw,60px)}
-.cf label,.cf legend{display:block;font-size:var(--step--1);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:10px;padding:0}
+.cf label{display:block;font-size:clamp(19px,1.5vw,22px);font-weight:500;letter-spacing:-.01em;margin-bottom:12px;padding:0}
 .cf fieldset{border:0;margin:0;padding:0}
-.cf input,.cf textarea{width:100%;box-sizing:border-box;font:300 19px/1.45 Inter,sans-serif;color:var(--blue);background:#faf7ec;border:2px solid var(--blue);border-radius:22px 18px 24px 19px / 19px 24px 18px 22px;padding:14px 18px;outline:none;transition:box-shadow .25s}
+.cf input,.cf textarea{width:100%;box-sizing:border-box;font:300 19px/1.45 Inter,sans-serif;color:var(--blue);background:#faf7ec;border:0;border-radius:20px;padding:16px 20px;outline:none}
+.fld{position:relative;display:block}
+.fld svg{position:absolute;inset:-7px;width:calc(100% + 14px);height:calc(100% + 14px);pointer-events:none;overflow:visible}
+.fld svg path{fill:var(--blue);transition:fill .25s}
+.fld:focus-within svg path{fill:var(--gold)}
 .cf textarea{min-height:200px;resize:vertical;border-radius:26px 20px 28px 22px / 22px 28px 20px 26px}
-.cf input:focus-visible,.cf textarea:focus-visible{box-shadow:0 0 0 4px var(--gold)}
 .cf .two{display:grid;gap:clamp(22px,3vw,34px);grid-template-columns:1fr 1fr}
 @media (max-width:640px){.cf .two{grid-template-columns:1fr}}
-.cf .chips{display:flex;flex-wrap:wrap;gap:10px}
-.cf .chips label{text-transform:none;letter-spacing:0;font-weight:500;margin:0}
-.cf .chips input{position:absolute;opacity:0;width:1px;height:1px}
-.cf .chips span{display:inline-block;font-size:17px;font-weight:500;padding:.55em 1.05em;border:2px solid var(--blue);border-radius:99px;cursor:pointer;transition:background .2s,color .2s}
-.cf .chips input:checked + span{background:var(--blue);color:var(--cream)}
-.cf .chips input:focus-visible + span{box-shadow:0 0 0 4px var(--gold)}
 .cf button{justify-self:start;font:700 19px Inter,sans-serif;color:var(--blue);background:var(--gold);border:0;padding:.85em 1.6em;border-radius:52% 48% 55% 45% / 46% 54% 47% 53%;cursor:pointer;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
 .cf button:hover,.cf button:focus-visible{transform:translateX(4px) rotate(-2deg);outline:none;box-shadow:0 0 0 4px var(--blue)}
 .cf-note{margin:0;font-size:17px;font-weight:300;min-height:1.4em}
@@ -458,6 +455,9 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 .cf-alt{margin:0 0 clamp(40px,6vw,80px);font-size:var(--step-1);font-weight:300}
 .cf-alt a{color:inherit;text-decoration-color:var(--gold);text-decoration-thickness:2px;text-underline-offset:4px}
 .cf .req{color:#c2410c;font-weight:400}
+.ct-title .w2{color:#d8708e}
+.sea{position:relative;height:clamp(260px,38vh,440px);margin-top:clamp(10px,3vw,40px)}
+.sea canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 </head>
 <body>
@@ -480,25 +480,15 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 <main class="wrap research" id="main" tabindex="-1">
   <a class="back" href="index.html#contact"><span class="arr back-arr" aria-hidden="true"></span> Home</a>
   <header class="r-hero">
-    <h1 class="r-h al-h" id="r-h">Drop Us a Line</h1>
-    <p class="r-sub">Questions, collaborations, ideas, or a book we simply must read. <span class="t4">Pressing send opens your email app with your note ready to go.</span></p>
+    <h1 class="r-h al-h ct-title" id="r-h">Drop Us a Line</h1>
+    <p class="r-sub">Curious questions, half-baked ideas, wild collaborations, a book we simply must read: all of it is welcome here. <span class="t4">Pressing send opens your email app with your note ready to go.</span></p>
   </header>
   <form class="cf" id="cf" novalidate>
     <div class="two">
-      <div><label for="cf-name">Your name</label><input id="cf-name" name="name" autocomplete="name"></div>
-      <div><label for="cf-email">Your email</label><input id="cf-email" name="email" type="email" autocomplete="email" inputmode="email"></div>
+      <div><label for="cf-name">What should we call you?</label><input id="cf-name" name="name" autocomplete="name"></div>
+      <div><label for="cf-email">Where can we write back?</label><input id="cf-email" name="email" type="email" autocomplete="email" inputmode="email"></div>
     </div>
-    <fieldset>
-      <legend>What is it about?</legend>
-      <div class="chips">
-        <label><input type="radio" name="topic" value="Joining the collective"><span>Joining the collective</span></label>
-        <label><input type="radio" name="topic" value="A collaboration"><span>A collaboration</span></label>
-        <label><input type="radio" name="topic" value="Using our materials"><span>Using our materials</span></label>
-        <label><input type="radio" name="topic" value="Talks and press"><span>Talks and press</span></label>
-        <label><input type="radio" name="topic" value="Just saying hello" checked><span>Just saying hello</span></label>
-      </div>
-    </fieldset>
-    <div><label for="cf-msg">Your note <span class="req" aria-hidden="true">*</span></label><textarea id="cf-msg" name="message" required aria-required="true"></textarea></div>
+    <div><label for="cf-msg">What is on your mind? <span class="req" aria-hidden="true">*</span></label><textarea id="cf-msg" name="message" required aria-required="true"></textarea></div>
     <button type="submit">Send it our way</button>
     <p class="cf-note" id="cf-note" role="status" aria-live="polite"></p>
   </form>
@@ -508,6 +498,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
     <span>© <span id="yr">2026</span> medialoop</span>
   </footer>
 </main>
+<div class="sea" aria-hidden="true"><canvas></canvas></div>
 <script src="assets/net-holes.js"></script>
 <script>
 (() => {
@@ -710,7 +701,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 
   /* research page: letters that hop, years that fill in when you reach them, and the type filter */
   { const h = document.getElementById('r-h');
-    if (h) { const w = h.textContent.trim(); h.setAttribute('aria-label', w); h.innerHTML = w.split(/\s+/).map(wd => `<span style="white-space:nowrap">${[...wd].map(c => `<span class="el" aria-hidden="true">${c}</span>`).join('')}</span>`).join(' ');   /* letters dance, words stay whole */ }
+    if (h) { const w = h.textContent.trim(); h.setAttribute('aria-label', w); h.innerHTML = w.split(/\s+/).map((wd, wi) => `<span style="white-space:nowrap"${h.classList.contains('ct-title') && wi >= 2 ? ' class="w2"' : ''}>${[...wd].map(c => `<span class="el" aria-hidden="true">${c}</span>`).join('')}</span>`).join(' ');   /* letters dance, words stay whole */ }
     const yrs = [...document.querySelectorAll('.r-year')];
     if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('lit', e.isIntersecting)), { rootMargin: '-30% 0px -45% 0px' }); yrs.forEach(y => io.observe(y)); }
     else yrs.forEach(y => y.classList.add('lit'));
@@ -837,7 +828,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   const addr = () => 'ude.ciu|thleumas'.split('').reverse().join('').replace('|', '@');
   f.addEventListener('submit', async e => { e.preventDefault();
     if (!msg.value.trim()) { note.textContent = 'Please write a note first.'; msg.focus(); return; }
-    const name = f.name.value.trim(), mail = f.email.value.trim(), topic = (f.querySelector('input[name=topic]:checked') || {}).value || 'Hello';
+    const name = f.name.value.trim(), mail = f.email.value.trim(), topic = 'a note';
     if (ENDPOINT) { note.textContent = 'Sending…';
       try { const r = await fetch(ENDPOINT, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(f) });
         if (r.ok) { f.reset(); note.textContent = 'Sent. Thank you! We will write back soon.'; return; } } catch (_) {}
@@ -847,6 +838,76 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
     location.href = 'mailto:' + addr() + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
     note.innerHTML = 'Your email app should open with your note. Nothing happened? <a href="#" id="cf-show">Show our address</a>.';
     document.getElementById('cf-show').onclick = ev => { ev.preventDefault(); note.textContent = 'Write to us at ' + addr() + '.'; }; });
+})();
+</script>
+<script>
+/* the fields are outlined by hand, in the same chunky pen as the logo: the line swells and thins, starts and ends in a little
+   blob of ink, and runs a touch past where it began, the way a hand closes a loop */
+(() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const pen = (w, h, seed) => {   /* a rounded rectangle traced once round, as a filled brush shape */
+    let k = seed; const rnd = () => (k = (k * 16807) % 2147483647) / 2147483647;
+    const P = 7, r = Math.min(22, h / 2 - 2), x0 = P, y0 = P, x1 = w - P, y1 = h - P, pts = [];
+    const seg = (ax, ay, bx, by, n) => { for (let i = 0; i < n; i++) pts.push([ax + (bx - ax) * i / n, ay + (by - ay) * i / n]); };
+    const arc = (cx, cy, a0, n) => { for (let i = 0; i < n; i++) { const a = a0 + i / n * Math.PI / 2; pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); } };
+    const nw = Math.max(8, Math.round((x1 - x0) / 9)), nh = Math.max(6, Math.round((y1 - y0) / 9));
+    seg(x0 + r, y0, x1 - r, y0, nw); arc(x1 - r, y0 + r, -Math.PI / 2, 8); seg(x1, y0 + r, x1, y1 - r, nh); arc(x1 - r, y1 - r, 0, 8);
+    seg(x1 - r, y1, x0 + r, y1, nw); arc(x0 + r, y1 - r, Math.PI / 2, 8); seg(x0, y1 - r, x0, y0 + r, nh); arc(x0 + r, y0 + r, Math.PI, 8);
+    const N = pts.length, start = Math.floor(N * (.55 + rnd() * .2)), over = Math.round(N * .035);   /* the loop closes low on one side, out of the way */
+    const ph = [rnd() * 6.3, rnd() * 6.3, rnd() * 6.3], C = [];
+    for (let i = 0; i <= N + over; i++) { const p = pts[(start + i) % N], t = i / (N + over);
+      const wob = 1.6 * Math.sin(t * 6.283 * 2 + ph[0]) + .9 * Math.sin(t * 6.283 * 5 + ph[1]);   /* a slow wander, as a hand does */
+      const q = pts[(start + i + 1) % N], dx = q[0] - p[0], dy = q[1] - p[1], L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L;
+      const lift = i > N ? (i - N) / over * 1.2 : 0;   /* the overshoot drifts off the line a little */
+      C.push([p[0] + nx * (wob + lift), p[1] + ny * (wob + lift), nx, ny, t]); }
+    const wid = t => (4.4 + 1.6 * Math.sin(t * 6.283 * 3 + ph[2]) + .9 * Math.sin(t * 6.283 * 7 + ph[1])) * Math.min(1, .7 + t * 12) * Math.min(1, .7 + (1 - t) * 12);   /* swelling and thinning */
+    const L1 = C.map(([x, y, nx, ny, t]) => [x + nx * wid(t) / 2, y + ny * wid(t) / 2]), L2 = C.map(([x, y, nx, ny, t]) => [x - nx * wid(t) / 2, y - ny * wid(t) / 2]).reverse();
+    const f = p => p[0].toFixed(1) + ' ' + p[1].toFixed(1), blob = (x, y, rr) => `M${(x + rr).toFixed(1)} ${y.toFixed(1)}a${rr} ${rr * .92} 0 1 0 ${-2 * rr} 0a${rr} ${rr * .92} 0 1 0 ${2 * rr} 0Z`;
+    const a = C[0], z = C[C.length - 1];
+    return 'M' + L1.map(f).join('L') + 'L' + L2.map(f).join('L') + 'Z' + blob(a[0], a[1], 3.6) + blob(z[0], z[1], 3.3);   /* ink blobs where the pen lands and lifts */
+  };
+  const fields = [...document.querySelectorAll('.cf input, .cf textarea')];
+  fields.forEach((el, n) => { const wrap = document.createElement('span'); wrap.className = 'fld'; el.before(wrap); wrap.append(el);
+    const svg = document.createElementNS(NS, 'svg'), path = document.createElementNS(NS, 'path'); svg.setAttribute('aria-hidden', 'true'); svg.append(path); wrap.append(svg);
+    const draw = () => { const w = el.offsetWidth + 14, h = el.offsetHeight + 14; if (w < 20) return; svg.setAttribute('viewBox', `0 0 ${w} ${h}`); path.setAttribute('d', pen(w, h, 101 + n * 977)); };
+    draw(); if ('ResizeObserver' in window) new ResizeObserver(draw).observe(el); });
+})();
+
+/* a sea of bubbles along the bottom, laid out on Netsch's turned grid: big bubbles on the grid's corners, smaller ones in its
+   middles, all breathing in a slow diagonal swell. They grow from nothing at the top edge, never touch, and never run off the edge */
+(() => {
+  const box = document.querySelector('.sea'); if (!box) return; const cv = box.querySelector('canvas'), g = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COLS = [['#2c5494', .62], ['#e7aa4d', .24], ['#e0773a', .05], ['#d8708e', .05], ['#9b6aa6', .04]];
+  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const pick = () => { let u = rnd(); for (const [c, w] of COLS) { u -= w; if (u <= 0) return c; } return COLS[0][0]; };
+  const SH = [...Array(12)].map(() => { const q = [rnd() * 6.3, rnd() * 6.3, rnd() * 6.3], p = new Path2D();
+    for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2, k = 1 + .045 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); }
+    p.closePath(); return p; });
+  let W = 0, H = 0, dpr = 1, D = [];
+  const build = () => { W = box.clientWidth; H = box.clientHeight; dpr = Math.min(2, devicePixelRatio || 1); cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); seed = 11;
+    const gs = Math.max(54, Math.min(92, W / 13)), P = [];
+    const lattice = (step, ang, kind) => { const ca = Math.cos(ang), sa = Math.sin(ang), n = Math.ceil(Math.hypot(W, H) / step) + 2;
+      for (let i = -n; i <= n; i++) for (let j = -n; j <= n; j++) { const u = i * step, v = j * step, x = W / 2 + u * ca - v * sa, y = H / 2 + u * sa + v * ca;
+        if (x < -step || x > W + step || y < -step || y > H + step) continue;
+        const depth = Math.max(0, Math.min(1, y / H + (rnd() - .5) * .12)), jx = (rnd() - .5) * step * .2, jy = (rnd() - .5) * step * .2;
+        let r = (kind === 2 ? step * .44 : step * .3) * Math.pow(depth, 1.25) * (.62 + rnd() * .5);   /* a sea: bubbles swell the deeper they sit */
+        if (kind === 1 && rnd() < .3) r *= .4; if (r < 1.2 || rnd() < (kind === 2 ? .06 : .12)) continue;
+        P.push({ x: x + jx, y: y + jy, r, c: pick(), s: SH[Math.floor(rnd() * SH.length)], rot: rnd() * 6.3, ring: rnd() < .07 }); } };
+    lattice(gs, Math.PI / 4 + .14, 2);   /* the big bubbles: a square grid turned on its corner, then tipped a little more */
+    lattice(gs * .5, Math.PI / 8 + .14, 1);   /* the middling ones: a finer grid turned against it, squares inside squares */
+    P.sort((a, b) => b.r - a.r); D = [];
+    for (const d of P) { let r = Math.min(d.r, d.x - 3, W - 3 - d.x, d.y - 3, H - 3 - d.y);   /* never cut by an edge */
+      for (const o of D) { if (Math.abs(o.x - d.x) > 90 || Math.abs(o.y - d.y) > 90) continue; r = Math.min(r, Math.hypot(o.x - d.x, o.y - d.y) - o.r - 4); }   /* never touching, even at the top of a swell */
+      if (r >= 1.2) { d.r = r; D.push(d); } } };
+  const draw = t => { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    for (const d of D) { const k = reduce ? 1 : .88 + .12 * Math.sin(t * 1.1 - (d.x + d.y) * .011), r = d.r * k, cq = Math.cos(d.rot) * r * dpr, sq = Math.sin(d.rot) * r * dpr;
+      g.setTransform(cq, sq, -sq, cq, d.x * dpr, d.y * dpr);
+      if (d.ring && r > 7) { g.lineWidth = .16; g.strokeStyle = d.c; g.stroke(d.s); } else { g.fillStyle = d.c; g.fill(d.s); } } };
+  let on = false, raf = 0; const loop = now => { raf = 0; if (!on) return; draw(now / 1000); if (!reduce) raf = requestAnimationFrame(loop); };
+  build(); draw(0);
+  if ('IntersectionObserver' in window) new IntersectionObserver(es => { on = es[0].isIntersecting; if (on && !raf) raf = requestAnimationFrame(loop); }, { rootMargin: '80px' }).observe(box);
+  let lw = innerWidth; addEventListener('resize', () => { if (Math.abs(innerWidth - lw) < 2) return; lw = innerWidth; build(); draw(performance.now() / 1000); });
 })();
 </script>
 </body>
