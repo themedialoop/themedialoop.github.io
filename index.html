@@ -2596,13 +2596,13 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       for (const ls of tries) { const tw = Math.max(...ls.map(l => mctx.measureText(l).width)), th = ls.length * fs * 1.08; if (Math.hypot(tw / 2, th / 2) <= r * .86) { best = { fs, ls }; break; } }
       if (best) return best; }
     return null; };
-  let TQ = [], warping = false, warpAt = 0;
+  let TQ = [], warping = false, warpAt = 0, lineAt = 0;
   const drawTun = () => {
     const dpr = Math.min(coarse ? 1.5 : 2, devicePixelRatio || 1); if (tcv.width !== Math.round(W * dpr) || tcv.height !== Math.round(H * dpr)) { tcv.width = Math.round(W * dpr); tcv.height = Math.round(H * dpr); }
     tg.setTransform(dpr, 0, 0, dpr, 0, 0); tg.clearRect(0, 0, W, H); if (!W || !H) return;
     const max = Math.hypot(W, H) * .42, ramp = Math.max(.35, Math.min(1, prog / .14));   // a few dots already there as you arrive; the rest arrive as you go in
     const bt = Math.max(0, Math.min(1, (prog - .45) / .5)), blue = bt * bt * (3 - 2 * bt) * .95;   // the field turns blue as you near the bottom
-    const lt = warping ? 1 : Math.max(0, Math.min(1, (prog - .93) / .055)), lineIn = lt * lt * (3 - 2 * lt), LINES = [];   /* the last moment: the plan under the field draws itself in by hand */
+    const lt = warping ? 1 : lineAt ? Math.min(1, (performance.now() - lineAt) / 300) : 0, lineIn = lt * lt * (3 - 2 * lt), LINES = [];   /* the last moment: the plan under the field draws itself in by hand */
     TUN.forEach((tn, T) => { const z = (zl * .3 + clock * .03) * tn.sp + T * .33, rings = [];
       const cx = tn.x * W + W * .06 * Math.sin(clock * .23 + tn.ph), cy = tn.y * H + H * .05 * Math.cos(clock * .19 + tn.ph);   // each tunnel's centre drifts a little
       for (const l of tn.layers) { const d = (l.off + z) % 1, sc = Math.pow(d, 2.2) * max, fade = Math.min(1, d * 6, (1 - d) * 10); if (sc < 6) continue;
@@ -2692,7 +2692,8 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (warping && now - warpAt > 800) { requestAnimationFrame(loop); return; }   /* the blue already covers the whole screen: nothing under it needs drawing */
     if (warping) { clock += dt / 1000; zv += (2.2 - zv) * Math.min(1, dt / 1000 * 2.5); zl += dt / 1000 * zv; tick(); drawTun(); requestAnimationFrame(loop); return; }   // falling: carries on at the speed you arrived with, easing into the rush   // falling: the field rushes outward
     const p = progress(); prog = p; drive(p, dt, now); const x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
-    if (!still && p >= .985) { warp(); requestAnimationFrame(loop); return; }
+    if (!still) { if (p >= .95) { if (!lineAt) lineAt = now; } else lineAt = 0; }   /* near the bottom the Netsch lines draw in (0.3 s) */
+    if (!still && p >= .985 && lineAt && now - lineAt >= 500) { lineAt = 0; warp(); requestAnimationFrame(loop); return; }   /* and stay a full half second before the fall */
     while (nextMark < MARK_AT.length && p >= MARK_AT[nextMark]) { if (p - MARK_AT[nextMark] < .04 && !addMark()) break; nextMark++; }   // no room yet: try again next frame
     while (nextMark > 0 && p < MARK_AT[nextMark - 1] - .02) nextMark--;   // scrolling back up re-arms them
     if (!still) { clock += dt / 1000; const z0 = zl; zl = p * 5.6 + clock * .02; if (dt > 0) zv += (Math.max(0, (zl - z0) / (dt / 1000)) - zv) * .25;   // the zoom follows your scroll, and keeps sinking slowly on its own (its speed is remembered for the fall)
