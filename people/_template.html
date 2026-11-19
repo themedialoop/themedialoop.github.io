@@ -751,7 +751,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
   const cardLoop = t => { const tt = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : t / 1000; drawCards(tt); drawSide(tt); drawSpill(tt); requestAnimationFrame(cardLoop); };
   requestAnimationFrame(cardLoop);
   let W = 0, H = 0, DPR = 1;
-  const resize = () => { DPR = Math.min(devicePixelRatio || 1, 2); W = C.width = Math.round(innerWidth * DPR); H = C.height = Math.round(innerHeight * DPR); };
+  const resize = () => { DPR = 1; W = C.width = 1; H = C.height = 1; };   /* the old net is hidden on this page: keep its canvas tiny to save memory */
   addEventListener('resize', resize); resize();
   /* A single, small patch of the net in the top-right corner of the page. */
     const ease = t => t * t * (3 - 2 * t), lerp = (a, b, t) => a + (b - a) * t;

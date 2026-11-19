@@ -136,7 +136,7 @@ img{max-width:100%;display:block}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--blue);outline-offset:4px;border-radius:2px}
 
-#net{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+#net{display:none}
 /* opener */
 #intro{position:fixed;inset:0;z-index:20;display:grid;place-items:center;pointer-events:none}
 #introMark{width:min(84vw,1300px);height:auto;display:block;transform-origin:0 0;overflow:visible}
@@ -1208,7 +1208,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
           g.setTransform(1, 0, 0, 1, 0, 0); };
         sizeEv(); let rz; const onRz = () => { clearTimeout(rz); rz = setTimeout(sizeEv, 150); }; addEventListener('resize', onRz);
         if ('ResizeObserver' in window) new ResizeObserver(onRz).observe(evs);
-        if ('IntersectionObserver' in window) new IntersectionObserver(es => { evOn = es[0].isIntersecting; }, { rootMargin: '100px' }).observe(evs); else evOn = true;
+        if ('IntersectionObserver' in window) new IntersectionObserver(es => { evOn = es[0].isIntersecting; if (evOn) sizeEv(); else { cv.width = cv.height = 0; } }, { rootMargin: '100px' }).observe(evs);   /* freed while off screen */ else evOn = true;
         const loopEvBand = t => { if (evOn) drawEv(t / 1000); requestAnimationFrame(loopEvBand); }; requestAnimationFrame(loopEvBand); } }
     const tc = document.createElement('canvas'), tx = tc.getContext('2d'), TS = 880, kk = TS / TILE;
     tc.width = tc.height = TS; tx.fillStyle = 'rgba(242,238,221,.09)';
@@ -1310,7 +1310,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   let DPR = 1, W = 0, H = 0;
   function resize() {
     DPR = Math.min(devicePixelRatio || 1, 2);   // full screen sharpness, so the dots have crisp edges (was capped at 1.25, which left them jagged on sharp screens)
-    W = C.width = Math.round(innerWidth * DPR); H = C.height = Math.round(innerHeight * DPR);
+    W = C.width = 1; H = C.height = 1;   /* the old blue net no longer shows anywhere: keep its canvas tiny to save memory */
     WP = way();
   }
   addEventListener('resize', resize); resize();
@@ -2684,7 +2684,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       const target = coarse ? 0 : Math.max(-26, Math.min(26, -dy * 1.6)); vel = (vel + (target - sv) * .2) * .68; sv += vel; }
     tick(); drawTun(); spawn(still ? 0 : Math.ceil(7 * W * H / (1280 * 800)));   // bigger screens fill faster
     requestAnimationFrame(loop); };
-  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; lastY = scrollY; measureHold(); requestAnimationFrame(loop); } else if (!v) visible = false; }, { rootMargin: '100px 0px' }).observe(band);
+  new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !visible) { visible = true; lastY = scrollY; measureHold(); requestAnimationFrame(loop); } else if (!v) { visible = false; if (!warping) tcv.width = tcv.height = 0; } }, { rootMargin: '100px 0px' }).observe(band);
   // follow the band's real size, however the browser changes it (phone toolbars sliding in and out do not always fire a resize)
   let bw = 0; new ResizeObserver(() => { if (Math.abs(band.clientWidth - bw) > 40 || Math.abs(band.clientHeight - H) > 260) { bw = band.clientWidth; build(); } else { W = band.clientWidth; H = band.clientHeight; } }).observe(band);
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { bw = band.clientWidth; build(); });
@@ -3170,7 +3170,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     raf = requestAnimationFrame(frame);
   };
   const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
-  new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) go(); else root.classList.remove('st-on', 'st-blue'); }).observe(stage);
+  new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible) { if (C.width < 2 && W) { C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); } go(); } else { root.classList.remove('st-on', 'st-blue'); if (!on) C.width = C.height = 1; } }).observe(stage);   /* freed while off screen */
   addEventListener('resize', () => { measure(); if (Math.abs(pin.clientWidth - builtW) > 30) build(); else { H = pin.clientHeight; C.height = Math.round(H * DPR); } go(); });
   measure(); build();
   // once per visit, and only when arriving at the top of the home page from outside the site
@@ -3262,7 +3262,9 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     raf = requestAnimationFrame(frame); };
   const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
   const seen = new Set();
-  const io = new IntersectionObserver(es => { es.forEach(e => e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)); active = seen.size; go(); }, { rootMargin: '30% 0px' });
+  const io = new IntersectionObserver(es => { es.forEach(e => e.isIntersecting ? seen.add(e.target) : seen.delete(e.target)); active = seen.size;
+    if (!active) { C.width = C.height = 1; blank = true; } else if (C.width < 2 && W) { C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); blank = false; }   /* freed while no section needs it */
+    go(); }, { rootMargin: '30% 0px' });
   secs.forEach(q => io.observe(q.el));
   addEventListener('resize', () => { if (Math.abs(innerWidth - builtW) > 30 || Math.abs(innerHeight - H) > 160) build(); else { H = innerHeight; C.height = Math.round(H * DPR); } go(); });
   build();
