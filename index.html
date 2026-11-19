@@ -41,7 +41,6 @@
  "url": "https://themedialoop.github.io/",
  "logo": "https://themedialoop.github.io/assets/medialoop-wordmark.svg",
  "description": "medialoop is a boutique research collective at the University of Illinois Chicago studying how media, algorithms, and AI shape the ways people connect.",
- "email": "samuelht@uic.edu",
  "parentOrganization": {
   "@type": "Organization",
   "name": "Department of Communication, University of Illinois Chicago",
@@ -833,7 +832,8 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   <h2 class="bz-h sec-h ct-h"><span class="bz-a">Join</span> <span class="bz-b">Our Orbit</span></h2>
   <p class="contact">There is something rather magical about finding another person who thinks like you. <span class="t4">Please take a moment to connect.</span></p>
   <div class="mail-row">
-  <a class="mail" href="mailto:samuelht@uic.edu"><span class="glink">You can find our email here.</span></a>
+  <a class="mail" href="contact.html" data-m="ude.ciu|thleumas"><span class="glink">You can find our email here.</span></a>
+  <a class="mail" href="contact.html"><span class="glink">Or drop us a note</span></a>
   <a class="mail mail-li" href="https://www.linkedin.com/in/samuelht/" target="_blank" rel="noopener"><span class="glink">You can find us on LinkedIn</span></a>
   </div>
   <a class="apply" href="https://comm.uic.edu/academics/graduate-studies/prospective-students/" target="_blank" rel="noopener">
@@ -3330,6 +3330,11 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   addEventListener('resize', () => { if (innerWidth !== lw || Math.abs(innerHeight - lh) > 120) { lw = innerWidth; lh = innerHeight; later(); } });   /* not on every toolbar wobble */
   fit(); if (document.fonts) document.fonts.ready.then(fit); addEventListener('load', fit);
 })();
+</script>
+<script>
+/* email links: the address is not written anywhere in the page; it is put together only when someone reaches for the link */
+(() => { const on = a => { if (!a.dataset.m) return; a.href = 'mailto:' + a.dataset.m.split('').reverse().join('').replace('|', '@'); };
+  ['pointerdown', 'touchstart', 'focusin', 'click'].forEach(t => addEventListener(t, e => { const a = e.target.closest && e.target.closest('a[data-m]'); if (a) on(a); }, { capture: true, passive: true })); })();
 </script>
 </body>
 </html>

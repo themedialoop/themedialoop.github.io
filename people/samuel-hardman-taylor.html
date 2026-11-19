@@ -58,7 +58,6 @@
    "height": 824,
    "caption": "Samuel Hardman Taylor"
   },
-  "email": "mailto:samuelht@uic.edu",
   "worksFor": {
    "@type": "CollegeOrUniversity",
    "name": "University of Illinois Chicago",
@@ -603,7 +602,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
         <!-- CV: put the PDF at assets/people/samuel-hardman-taylor-cv.pdf -->
         <li><a href="../assets/people/samuel-hardman-taylor-cv.pdf" target="_blank" rel="noopener"><span class="glink">CV</span></a></li>
         <li><a href="https://www.linkedin.com/in/samuelht/" target="_blank" rel="noopener me"><span class="glink">LinkedIn</span></a></li>
-        <li><a href="mailto:samuelht@uic.edu"><span class="glink">Email</span></a></li>
+        <li><a href="../contact.html" data-m="ude.ciu|thleumas"><span class="glink">Email</span></a></li>
       </ul>
     </div>
   </div>
@@ -1372,6 +1371,11 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 (() => { const P = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6'];
   [...document.querySelectorAll('.pubs li > a[href]')].forEach((a, i) => { const c = P[i % P.length];
     a.style.setProperty('--hl', c); if (c === '#e7aa4d') a.classList.add('hl-gold'); }); })();
+</script>
+<script>
+/* email links: the address is not written anywhere in the page; it is put together only when someone reaches for the link */
+(() => { const on = a => { if (!a.dataset.m) return; a.href = 'mailto:' + a.dataset.m.split('').reverse().join('').replace('|', '@'); };
+  ['pointerdown', 'touchstart', 'focusin', 'click'].forEach(t => addEventListener(t, e => { const a = e.target.closest && e.target.closest('a[data-m]'); if (a) on(a); }, { capture: true, passive: true })); })();
 </script>
 </body>
 </html>
