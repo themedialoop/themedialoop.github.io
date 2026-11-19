@@ -2598,7 +2598,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       for (const ls of tries) { const tw = Math.max(...ls.map(l => mctx.measureText(l).width)), th = ls.length * fs * 1.08; if (Math.hypot(tw / 2, th / 2) <= r * .86) { best = { fs, ls }; break; } }
       if (best) return best; }
     return null; };
-  let TQ = [], warping = false, warpAt = 0, lineAt = 0, zAdd = 0, zLine = 0;
+  const SWELL = 820; let TQ = [], warping = false, warpAt = 0, lineAt = 0, zAdd = 0, zLine = 0;
   const drawTun = () => {
     const dpr = Math.min(coarse ? 1.5 : 2, devicePixelRatio || 1); if (tcv.width !== Math.round(W * dpr) || tcv.height !== Math.round(H * dpr)) { tcv.width = Math.round(W * dpr); tcv.height = Math.round(H * dpr); }
     tg.setTransform(dpr, 0, 0, dpr, 0, 0); tg.clearRect(0, 0, W, H); if (!W || !H) return;
@@ -2634,6 +2634,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     TQ.sort((a, b) => b[3] - a[3]); const cell = 60, grid = new Map(), key = (a, b) => a + ',' + b;
     for (const o of obs) { const kq = key(Math.floor(o[0] / cell), Math.floor(o[1] / cell)); (grid.get(kq) || grid.set(kq, []).get(kq)).push(o); }
     const big = obs.filter(o => o[2] > cell);
+    let swR = 0; if (warping) { const x = Math.min(1, (performance.now() - warpAt) / SWELL); swR = (.04 + .96 * (1 - Math.pow(1 - x, 1.9))) * Math.hypot(W, H) * .56; big.push([W / 2, H / 2, swR]); }   /* the blue swells quickly, then settles; dots near its edge give way so nothing touches it */
     for (const q of TQ) { let [dt, x, y, rr, rot, col] = q; rr = Math.min(rr, x - 4, W - 4 - x, y - 4, H - 4 - y);   // never cut by the screen's edge
       for (const o of big) rr = Math.min(rr, Math.hypot(o[0] - x, o[1] - y) - o[2] - 8);
       const gx = Math.floor(x / cell), gy = Math.floor(y / cell);
@@ -2644,6 +2645,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       if (dt.word && rr > 24 * k) { const f = fitT(dt.word.w, dt.word.fun, rr); if (f) { tg.save(); tg.translate(x, y); tg.fillStyle = col === 'gold' ? '#2c5494' : '#f2eedd'; tg.textAlign = 'center'; tg.textBaseline = 'middle';
         tg.font = (dt.word.fun ? 'italic 300 ' : '700 ') + f.fs + 'px Inter, sans-serif'; const lh = f.fs * 1.08; f.ls.forEach((ln, j) => tg.fillText(ln, 0, (j - (f.ls.length - 1) / 2) * lh)); tg.restore(); } }
       const kq = key(gx, gy); (grid.get(kq) || grid.set(kq, []).get(kq)).push([x, y, rr]); }
+    if (swR) { tg.setTransform(swR * dpr, 0, 0, swR * dpr, W / 2 * dpr, H / 2 * dpr); tg.fillStyle = '#2c5494'; tg.fill(DSH[0]); tg.setTransform(dpr, 0, 0, dpr, 0, 0); }
     TQ = []; };
   let holdTop = 0, holdSpan = 1, frameN = 0;
   const measureHold = () => { const r = hold.getBoundingClientRect(); holdTop = r.top + scrollY; holdSpan = Math.max(1, r.height - innerHeight); };
@@ -2662,7 +2664,8 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   const holdInput = on => ['wheel', 'touchstart', 'touchmove', 'keydown'].forEach(t => (on ? addEventListener : removeEventListener)(t, hush, { capture: true, passive: false }));
   const warp = () => { warping = true; warpAt = performance.now(); auto = false; av = 0; inAt = 0; document.documentElement.style.scrollBehavior = ''; band.classList.add('warp'); holdInput(true);   // no scrolling until 0.4 s after the blue starts to lift
     const c = document.createElement('div'); c.className = 'cover'; const D = Math.hypot(W, H) * 1.35; c.style.width = c.style.height = D + 'px'; band.append(c);
-    requestAnimationFrame(() => requestAnimationFrame(() => { c.style.transform = 'translate(-50%,-50%) scale(1)'; }));
+    c.style.transition = 'none'; c.style.visibility = 'hidden'; c.style.transform = 'translate(-50%,-50%) scale(1)';   /* the swell itself is drawn on the canvas; this solid blue only takes over once the screen is covered */
+    setTimeout(() => { c.style.visibility = ''; }, SWELL + 20);
     setTimeout(() => {   // the screen is all blue now: behind it, back to the top and the opener begins
       tcv.style.visibility = 'hidden'; tcv.width = tcv.height = 0; band.style.background = '#2c5494';   /* nothing left under the blue to flash through when the phone's toolbar resizes the screen */
       parts.forEach(q => q.el.remove()); parts = []; marks.forEach(m => m.el.remove()); marks = []; shown = new Set();
@@ -2672,7 +2675,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       if (!replayed) { window.scrollTo({ top: 0, behavior: 'instant' }); }
       setTimeout(() => { band.style.transition = 'opacity .9s cubic-bezier(.4,0,.2,1)'; band.style.opacity = '0'; const t0 = performance.now(); const release = () => { const now = performance.now(); if (now - t0 >= 400 && (now - lastHush > 250 || now - t0 > 1600)) holdInput(false); else setTimeout(release, 60); }; setTimeout(release, 400);   // at least 0.4 s, and until any coasting scroll has stopped   // the blue melts away into the opener's blue net
         setTimeout(() => { band.classList.remove('warp'); c.remove(); band.style.transition = ''; band.style.opacity = ''; band.style.background = ''; tcv.style.visibility = ''; warping = false; visible = false; nextMark = 0; build(); }, 950); }, 120);
-    }, 1050); };
+    }, SWELL + 120); };
   // once you are in, the rabbit hole takes over: after about four scrolls or two and a half seconds it carries you down on its own,
   // gathering speed, to the fall at the bottom. Scrolling back up hands control back to you.
   let inAt = 0, gestures = 0, lastGest = 0, auto = false, av = 0, aA = 0, autoOff = 0;
@@ -2691,7 +2694,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     window.mlRabbitCovers = scrollY >= holdTop && scrollY <= holdTop + holdSpan;   // the field fills the screen: the net behind can rest
     const first = !last, dt = first ? 16 : Math.min(100, now - last); last = now;
     if (warping && tcv.style.visibility === 'hidden') { requestAnimationFrame(loop); return; }
-    if (warping && now - warpAt > 800) { requestAnimationFrame(loop); return; }   /* the blue already covers the whole screen: nothing under it needs drawing */
+    if (warping && now - warpAt > SWELL + 40) { requestAnimationFrame(loop); return; }   /* the blue already covers the whole screen: nothing under it needs drawing */
     if (warping) { clock += dt / 1000; zv += (2.2 - zv) * Math.min(1, dt / 1000 * 2.5); zl += dt / 1000 * zv; tick(); drawTun(); requestAnimationFrame(loop); return; }   // falling: carries on at the speed you arrived with, easing into the rush   // falling: the field rushes outward
     const p = progress(); prog = p; drive(p, dt, now); const x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
     if (!still) { if (p >= .95) { if (!lineAt) { lineAt = now; zLine = Math.max(zv, 1); } } else lineAt = 0; }   /* near the bottom the Netsch lines draw in (0.3 s) */
