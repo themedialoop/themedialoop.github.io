@@ -1403,7 +1403,6 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 .mm-row li:nth-child(odd) .mm-c{--tilt:-3deg}.mm-row li:nth-child(even) .mm-c{--tilt:2.5deg}
 .mm-c:hover,.mm-c:focus-visible{background:var(--hb);color:var(--hf);transform:translateY(-6px) rotate(var(--tilt));outline:none}
 .mm-c:focus-visible{box-shadow:0 0 0 4px var(--cream,#f2eedd),0 0 0 7px var(--blue,#2c5494)}
-.mm-c canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:-1}
 .mm-t{position:relative;max-width:80%;font-weight:700;font-size:clamp(20px,1.7vw,26px);line-height:1.02;letter-spacing:-.03em;text-wrap:balance}
 .mm-a{position:absolute;right:clamp(14px,1.4vw,20px);bottom:clamp(12px,1.2vw,18px);font-size:22px;line-height:1;transition:transform .35s}
 .mm-c:hover .mm-a,.mm-c:focus-visible .mm-a{transform:translate(3px,-3px)}
@@ -1447,41 +1446,6 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
   if ('IntersectionObserver' in window) new IntersectionObserver(es => { on = es[0].isIntersecting; if (on && !raf) raf = requestAnimationFrame(loop); }, { rootMargin: '80px' }).observe(box);
   let lw = 0, lh = 0; const fit = () => { if (box.clientWidth === lw && box.clientHeight === lh) return; lw = box.clientWidth; lh = box.clientHeight; build(); draw(performance.now() / 1000); };   /* measure again whenever the space changes size, so dots are never stretched */
   if ('ResizeObserver' in window) new ResizeObserver(fit).observe(box); else addEventListener('resize', fit);
-})();
-</script>
-<script>
-/* More is More cards: like the people cards on the home page, a field of dots on Netsch's turned grid rings each card,
-   breathing slowly and clearing into a calm bean around the name. The dots take the card's text colour, so they swap with it on hover */
-(() => {
-  const cards = [...document.querySelectorAll('.mm-c')]; if (!cards.length) return;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let k = 5; const rnd = () => (k = (k * 16807) % 2147483647) / 2147483647;
-  const SH = [...Array(10)].map(() => { const q = [rnd() * 6.3, rnd() * 6.3, rnd() * 6.3], p = new Path2D();
-    for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, f = 1 + .07 * Math.sin(2 * a + q[0]) + .045 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * f, Math.sin(a) * f) : p.moveTo(Math.cos(a) * f, Math.sin(a) * f); }
-    p.closePath(); return p; });
-  const C = cards.map((el, n) => { const cv = document.createElement('canvas'); cv.setAttribute('aria-hidden', 'true'); el.prepend(cv); return { el, cv, n, D: null, w: 0, h: 0 }; });
-  const layout = c => { const r = c.el.getBoundingClientRect(), w = r.width, h = r.height; c.w = w; c.h = h; k = 31 + c.n * 101;
-    const t = c.el.querySelector('.mm-t').getBoundingClientRect(), bx = t.left - r.left + t.width / 2, by = t.top - r.top + t.height / 2, rx = t.width * .5 + 14, ry = t.height * .5 + 18;
-    const ar = c.el.querySelector('.mm-a').getBoundingClientRect(), axp = ar.left - r.left + ar.width / 2, ayp = ar.top - r.top + ar.height / 2;
-    const step = Math.max(11, Math.min(16, w / 13)), ang = Math.PI / 4 + .1 * (c.n % 2 ? 1 : -1), ca = Math.cos(ang), sa = Math.sin(ang), N = Math.ceil(Math.hypot(w, h) / step) + 2, D = [];
-    for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) { const u = i * step, v = j * step, x = w / 2 + u * ca - v * sa + (rnd() - .5) * step * .3, y = h / 2 + u * sa + v * ca + (rnd() - .5) * step * .3;
-      if (x < 4 || y < 4 || x > w - 4 || y > h - 4) continue;
-      const e = Math.hypot((x - bx) / rx, (y - by) / ry), m = Math.max(0, Math.min(1, (e - 1) / .7)) * Math.max(0, Math.min(1, (Math.hypot(x - axp, y - ayp) - 18) / 10));   /* a calm bean around the name, and a little room for the arrow */
-      const rr = step * .3 * m * (.7 + rnd() * .5); if (rr < .7) continue;
-      D.push({ x, y, r: Math.min(rr, x - 2, w - 2 - x, y - 2, h - 2 - y), s: SH[Math.floor(rnd() * SH.length)], rot: rnd() * 6.3, ph: rnd() * 6.3 }); }
-    c.D = D; };
-  const draw = (c, t) => { const dpr = Math.min(2, devicePixelRatio || 1), W = Math.round(c.w * dpr), H = Math.round(c.h * dpr), g = c.cv.getContext('2d');
-    if (c.cv.width !== W || c.cv.height !== H) { c.cv.width = W; c.cv.height = H; }
-    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H); g.fillStyle = getComputedStyle(c.el).color; g.globalAlpha = .9;
-    for (const d of c.D) { const b = reduce ? .85 : .7 + .25 * (.5 + .5 * Math.sin(t * .9 - (d.x + d.y) / c.w * 3 + d.ph * .35)), r = d.r * b * dpr, cq = Math.cos(d.rot) * r, sq = Math.sin(d.rot) * r;
-      g.setTransform(cq, sq, -sq, cq, d.x * dpr, d.y * dpr); g.fill(d.s); } };
-  const all = () => C.forEach(c => { layout(c); draw(c, performance.now() / 1000); });
-  all(); if (document.fonts) document.fonts.ready.then(all);
-  let on = false, raf = 0; const loop = now => { raf = 0; if (!on) return; C.forEach(c => draw(c, now / 1000)); if (!reduce) raf = requestAnimationFrame(loop); };
-  const row = document.querySelector('.mm-row');
-  if ('IntersectionObserver' in window) new IntersectionObserver(es => { on = es[0].isIntersecting; if (on && !raf) raf = requestAnimationFrame(loop); }).observe(row);
-  if ('ResizeObserver' in window) { let lw = 0; new ResizeObserver(() => { if (row.clientWidth === lw) return; lw = row.clientWidth; all(); }).observe(row); }
-  C.forEach(c => ['pointerenter', 'pointerleave', 'focus', 'blur'].forEach(ev => c.el.addEventListener(ev, () => setTimeout(() => draw(c, performance.now() / 1000), 20))));   /* follow the colour swap even when still */
 })();
 </script>
 </body>
