@@ -568,6 +568,8 @@ button,input,select,textarea,optgroup{font-family:inherit}
 .res.bd4{background:#d8708e;color:#f2eedd;--net:#df8aa2}.res.bd4 .r-kind::before{background:#2c5494}.res.bd4 .r-go{--gd-bg:#2c5494;color:#f2eedd}
 .res.bd5{background:#e0773a;color:#f2eedd;--net:#e58d57}.res.bd5 .r-kind::before{background:#2c5494}.res.bd5 .r-go{--gd-bg:#2c5494;color:#f2eedd}
 .res.bd6{background:#e7aa4d;color:#2c5494;--net:#e49746}.res.bd6 .r-kind::before{background:#2c5494}.res.bd6 .r-go{--gd-bg:#2c5494;color:#f2eedd}
+
+.skip{position:fixed;left:12px;top:-60px;z-index:10000;background:#2c5494;color:#f2eedd;padding:10px 16px;border-radius:12px;font-weight:600;text-decoration:none;transition:top .2s}.skip:focus{top:12px}
 </style>
 <style>
 /* ---------- the landing ---------- */
@@ -726,6 +728,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 @media (max-width:600px){html body .bz-h.tilt-h{font-size:17vw !important}}   /* (its rows are longer: smaller on phones so each stays on one line) */</style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <canvas id="net" aria-hidden="true"></canvas>
 <header class="top" id="top">
   <a href="#home" aria-label="medialoop home"><img class="mark" src="assets/medialoop-wordmark.svg" alt="medialoop"></a>
@@ -751,7 +754,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   </div>
 </section>
 
-<main class="wrap">
+<main class="wrap" id="main" tabindex="-1">
   <!-- data-net: where the net sits for this section — x, y as fractions of the window, r as a fraction of the window's longer side -->
   <section class="hero" hidden>
     <div aria-hidden="true"><img id="heroMark" src="assets/medialoop-wordmark.svg" alt="" width="4278" height="1185"></div>
@@ -770,7 +773,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   <section id="people" data-net="-0.03 0.0 0.17" data-net-m="-0.1 0.17 0.18" data-net-at="1 0.7">
     <h2 class="bz-h sec-h"><span class="bz-a">The</span> <span class="bz-b">Company<br><span style="color:#d8708e">We Keep</span></span></h2>
     <div class="people">
-      <a class="card" href="people/samuel-hardman-taylor.html"><div class="photo"><img src="assets/people/samuel-hardman-taylor.jpg" alt="Samuel Hardman Taylor" width="824" height="824" loading="lazy"></div><h3>Samuel Hardman Taylor</h3></a>
+      <a class="card" href="people/samuel-hardman-taylor.html"><div class="photo"><img src="assets/people/samuel-hardman-taylor.jpg" alt="" width="824" height="824" loading="lazy"></div><h3>Samuel Hardman Taylor</h3></a>
       <article class="card"><div class="photo"><img src="https://y-anthonychen.github.io/assets/images/headshot.jpg" alt="Y. Anthony Chen" loading="lazy"></div><h3>Y.&nbsp;Anthony Chen</h3></article>
     </div>
     <script>/* people appear in a fresh random order on every visit: no hierarchy */
@@ -781,9 +784,9 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   </section>
 </main>
 
-<div class="marquee hm-marq" id="marquee" data-band="none"><canvas id="ribbonC" hidden></canvas><h2 class="bz-h"><span class="st-sr">Our Favorite Things: research interests</span><span aria-hidden="true"><span class="bz-a">Our</span> <span class="bz-b">Favorite<br><span class="bz-pu" style="color:#9b6aa6">Things</span></span></span></h2><ul class="river-words"><li>Algorithms</li><li>Perceived algorithm responsiveness</li><li>Social connectedness</li><li>Loneliness</li><li>Close relationships</li><li>AI-mediated communication</li><li>Self-disclosure</li><li>Interpersonal communication</li><li>Social media</li><li>Subjective well-being</li><li>Imagined audience</li><li>Affordances</li><li>Media multiplexity</li><li>Algorithm awareness</li><li>Intimacy</li><li>Human-machine communication</li><li>Human-AI relationships</li><li>Cyberbullying</li><li>Bystander intervention</li><li>Open science</li><li>Mobile phones</li><li>Experience sampling</li><li>Longitudinal methods</li><li>Adolescents and young adults</li><li>LGBTQ+ youth</li><li>Identity</li><li>Social comparison</li><li>Media psychology</li><li>Social media cognition</li><li>Mobile phone habits</li><li>Marriage</li><li>Friends</li><li>Strong ties</li><li>Weak ties</li><li>Parenting</li><li>Love</li><li>Relations</li><li>Responsiveness</li><li>Emotion regulation</li><li>Self-esteem</li><li>Community</li><li>Self-presentation</li><li>Hyperpersonal</li></ul></div>
+<div class="marquee hm-marq" id="marquee" data-band="none" role="region" aria-label="Our Favorite Things"><canvas id="ribbonC" hidden aria-hidden="true"></canvas><h2 class="bz-h"><span class="st-sr">Our Favorite Things: research interests</span><span aria-hidden="true"><span class="bz-a">Our</span> <span class="bz-b">Favorite<br><span class="bz-pu" style="color:#9b6aa6">Things</span></span></span></h2><ul class="river-words"><li>Algorithms</li><li>Perceived algorithm responsiveness</li><li>Social connectedness</li><li>Loneliness</li><li>Close relationships</li><li>AI-mediated communication</li><li>Self-disclosure</li><li>Interpersonal communication</li><li>Social media</li><li>Subjective well-being</li><li>Imagined audience</li><li>Affordances</li><li>Media multiplexity</li><li>Algorithm awareness</li><li>Intimacy</li><li>Human-machine communication</li><li>Human-AI relationships</li><li>Cyberbullying</li><li>Bystander intervention</li><li>Open science</li><li>Mobile phones</li><li>Experience sampling</li><li>Longitudinal methods</li><li>Adolescents and young adults</li><li>LGBTQ+ youth</li><li>Identity</li><li>Social comparison</li><li>Media psychology</li><li>Social media cognition</li><li>Mobile phone habits</li><li>Marriage</li><li>Friends</li><li>Strong ties</li><li>Weak ties</li><li>Parenting</li><li>Love</li><li>Relations</li><li>Responsiveness</li><li>Emotion regulation</li><li>Self-esteem</li><li>Community</li><li>Self-presentation</li><li>Hyperpersonal</li></ul></div>
 
-<div class="wrap">
+<div class="wrap" role="region" aria-label="Events, publications and resources">
 
   <section id="events" class="events" aria-labelledby="events-h">
     <h2 class="ev-h" id="events-h">Soir&eacute;es, Events, and other special occasions</h2>
@@ -841,9 +844,9 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   </a>
 </footer>
 
-<div class="wrap more-h"><h2 class="bz-h sec-h tilt-h"><span class="bz-a">Keep</span> <span class="bz-b">Scrolling</span> <span class="tilt-sub">Getting Lost is a Rite of Passage Here</span></h2></div>
+<div class="wrap more-h" role="region" aria-label="Keep scrolling"><h2 class="bz-h sec-h tilt-h"><span class="bz-a">Keep</span> <span class="bz-b">Scrolling</span> <span class="tilt-sub">Getting Lost is a Rite of Passage Here</span></h2></div>
 
-<div class="rabbit" id="rabbit"></div>
+<div class="rabbit" id="rabbit" aria-hidden="true"></div>
 
 <script src="assets/net-holes.js"></script>
 <script>
