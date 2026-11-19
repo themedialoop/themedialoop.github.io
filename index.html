@@ -427,7 +427,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) clamp(8
 .r-kind::before{content:"";width:.7em;height:.7em;border-radius:52% 46% 50% 48%;background:var(--gold)}
 .r-gold .r-kind::before{background:var(--blue)}
 .r-n{font-size:13px;font-weight:300;letter-spacing:.08em;font-variant-numeric:tabular-nums}
-.r-name{margin-top:clamp(12px,3vh,36px);font-weight:800;font-size:clamp(56px,9.6vw,168px);line-height:.96;letter-spacing:-.04em;max-width:9.5ch;text-wrap:balance}   /* big titles that run three or four rows */
+.r-name{margin-top:clamp(12px,3vh,36px);font-weight:800;font-size:clamp(44px,7vw,120px);line-height:.96;letter-spacing:-.04em;max-width:9.5ch;text-wrap:balance}   /* big titles that run three or four rows */
 .res.tight{--strip:40px;padding-bottom:14px}.res.tight .r-name{margin-top:4px}.res.tight .r-desc{margin-top:12px;line-height:1.36}.res.tight .r-go{margin-top:10px}
 .r-desc{margin-top:clamp(26px,3.6vh,44px);font-size:clamp(19px,1.4vw,22px);line-height:1.45;max-width:52ch}
 .r-go{margin-top:clamp(18px,2.6vh,28px);justify-self:start;font-size:15px;font-weight:600;padding:.6em 1.2em;border-radius:99px;background:color-mix(in srgb,currentColor 14%,transparent);transition:filter .3s,transform .35s cubic-bezier(.3,1.6,.5,1)}
@@ -2684,7 +2684,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   let tY = null; addEventListener('touchstart', e => { tY = e.touches[0].clientY; }, { passive: true });
   addEventListener('touchend', e => { if (!inAt || tY == null) return; const dy = tY - (e.changedTouches[0] || {}).clientY; if (dy < -20) { auto = false; av = 0; autoOff = performance.now(); gestures = 0; inAt = performance.now(); } else if (dy > 10) gesture(); tY = null; }, { passive: true });
   const drive = (p, dt, now) => {
-    if (still || warping) return;
+    if (still || warping || lineAt) return;
     if (p > .004 && p < .985) { if (!inAt) { inAt = now; gestures = 0; } } else if (p <= .004) { inAt = 0; auto = false; av = 0; return; }
     if (!auto && inAt && now - autoOff > 1500 && (gestures >= 4 || now - inAt > 2500)) { auto = true; av = .15; aA = 2 * Math.max(1, holdTop + holdSpan - scrollY) / (3600 * 3600); }   // about 3.5 seconds to the bottom, speeding up all the way
     if (!auto) return;
@@ -2697,8 +2697,8 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (warping && now - warpAt > SWELL + 40) { requestAnimationFrame(loop); return; }   /* the blue already covers the whole screen: nothing under it needs drawing */
     if (warping) { clock += dt / 1000; zv += (2.2 - zv) * Math.min(1, dt / 1000 * 2.5); zl += dt / 1000 * zv; tick(); drawTun(); requestAnimationFrame(loop); return; }   // falling: carries on at the speed you arrived with, easing into the rush   // falling: the field rushes outward
     const p = progress(); prog = p; drive(p, dt, now); const x = Math.max(0, Math.min(1, p / .35)); fill = still ? .6 : x * x * (3 - 2 * x);
-    if (!still) { if (p >= .95) { if (!lineAt) { lineAt = now; zLine = Math.max(zv, 1); } } else lineAt = 0; }   /* near the bottom the Netsch lines draw in (0.3 s) */
-    if (!still && p >= .985 && lineAt && now - lineAt >= 500) { lineAt = 0; warp(); requestAnimationFrame(loop); return; }   /* and stay a full half second before the fall */
+    if (!still) { if (p >= .95) { if (!lineAt) { lineAt = now; zLine = Math.max(zv, 1); auto = false; av = 0; band.classList.add('warp'); holdInput(true); } }   /* from here the field is pinned in place: nothing can scroll it up before the fall */ else lineAt = 0; }   /* near the bottom the Netsch lines draw in (0.3 s) */
+    if (!still && lineAt && now - lineAt >= 500) { lineAt = 0; warp(); requestAnimationFrame(loop); return; }   /* and stay a full half second before the fall */
     while (nextMark < MARK_AT.length && p >= MARK_AT[nextMark]) { if (p - MARK_AT[nextMark] < .04 && !addMark()) break; nextMark++; }   // no room yet: try again next frame
     while (nextMark > 0 && p < MARK_AT[nextMark - 1] - .02) nextMark--;   // scrolling back up re-arms them
     if (!still) { clock += dt / 1000; const z0 = zl; if (lineAt) { zLine += (2.2 - zLine) * Math.min(1, dt / 1000 * 2.5); zAdd = Math.max(zAdd, z0 + dt / 1000 * zLine - (p * 5.6 + clock * .02)); }   /* while the lines are up the tunnel keeps rushing on, never waiting on the scroll */
