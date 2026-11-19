@@ -493,10 +493,6 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
     <p class="cf-note" id="cf-note" role="status" aria-live="polite"></p>
   </form>
   <p class="cf-alt">Or find us on <a href="https://www.linkedin.com/in/samuelht/" target="_blank" rel="noopener">LinkedIn</a>.</p>
-  <footer class="p-foot">
-    <svg class="foot-mark" viewBox="0 0 4278 1185" role="img" aria-label="medialoop"><use href="#wm"/></svg>
-    <span>© <span id="yr">2026</span> medialoop</span>
-  </footer>
 </main>
 <div class="sea" aria-hidden="true"><canvas></canvas></div>
 <script src="assets/net-holes.js"></script>
@@ -864,7 +860,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
     const L1 = C.map(([x, y, nx, ny, t]) => [x + nx * wid(t) / 2, y + ny * wid(t) / 2]), L2 = C.map(([x, y, nx, ny, t]) => [x - nx * wid(t) / 2, y - ny * wid(t) / 2]).reverse();
     const f = p => p[0].toFixed(1) + ' ' + p[1].toFixed(1), blob = (x, y, rr) => `M${(x + rr).toFixed(1)} ${y.toFixed(1)}a${rr} ${rr * .92} 0 1 0 ${-2 * rr} 0a${rr} ${rr * .92} 0 1 0 ${2 * rr} 0Z`;
     const a = C[0], z = C[C.length - 1];
-    return 'M' + L1.map(f).join('L') + 'L' + L2.map(f).join('L') + 'Z' + blob(a[0], a[1], 3.6) + blob(z[0], z[1], 3.3);   /* ink blobs where the pen lands and lifts */
+    return 'M' + L1.map(f).join('L') + 'L' + L2.map(f).join('L') + 'Z';   /* ink blobs where the pen lands and lifts */
   };
   const fields = [...document.querySelectorAll('.cf input, .cf textarea')];
   fields.forEach((el, n) => { const wrap = document.createElement('span'); wrap.className = 'fld'; el.before(wrap); wrap.append(el);
