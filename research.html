@@ -1774,5 +1774,11 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   [...document.querySelectorAll('.pubs li > a[href], .r-list li > a[href]')].forEach((a, i) => { const c = P[i % P.length];
     a.style.setProperty('--hl', c); if (c === '#e7aa4d') a.classList.add('hl-gold'); }); })();
 </script>
+<style>
+/* links inside text: no underline, a marker highlight in gold behind blue text; pink when hovered, focused or pressed */
+:is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a){color:#2c5494 !important;text-decoration:none !important;background:#e7aa4d !important;
+  padding:0 .16em;margin:0 -.04em;border-radius:.28em .22em .3em .2em;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-color .2s,color .2s}
+:is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):is(:hover,:focus-visible,:active){background:#d8708e !important;color:#2c5494 !important;outline:none}
+</style>
 </body>
 </html>
