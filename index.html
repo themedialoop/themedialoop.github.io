@@ -428,6 +428,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) clamp(8
 .r-gold .r-kind::before{background:var(--blue)}
 .r-n{font-size:13px;font-weight:300;letter-spacing:.08em;font-variant-numeric:tabular-nums}
 .r-name{margin-top:clamp(12px,3vh,36px);font-weight:800;font-size:clamp(56px,9.6vw,168px);line-height:.96;letter-spacing:-.04em;max-width:9.5ch;text-wrap:balance}   /* big titles that run three or four rows */
+.res.tight{--strip:40px;padding-bottom:14px}.res.tight .r-name{margin-top:4px}.res.tight .r-desc{margin-top:12px;line-height:1.36}.res.tight .r-go{margin-top:10px}
 .r-desc{margin-top:clamp(26px,3.6vh,44px);font-size:clamp(21px,1.6vw,26px);line-height:1.45;max-width:52ch}
 .r-go{margin-top:clamp(18px,2.6vh,28px);justify-self:start;font-size:15px;font-weight:600;padding:.6em 1.2em;border-radius:99px;background:color-mix(in srgb,currentColor 14%,transparent);transition:filter .3s,transform .35s cubic-bezier(.3,1.6,.5,1)}
 /* one colour scheme per card colour, shared by the resource cards and the Apply card, and it never changes while you scroll:
@@ -3303,6 +3304,28 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const k = [...el.parentNode.children].indexOf(el);
     el.style.setProperty('--fd', (Math.min(k, 5) * (el.closest('.bz-h') ? .12 : .08)).toFixed(2) + 's'); el.style.setProperty('--ft', (k % 2 ? 3 : -3) + 'deg');
     el.classList.add('fw'); io.observe(el); }));
+})();
+</script>
+<script>
+/* resource cards: each card must fit on screen below its sticky spot, or the next card covers the end of its text.
+   Its title shrinks first, then its description (never below 19 px); on a very small screen the card sticks a little higher instead. */
+(() => { const cards = [...document.querySelectorAll('.res')]; if (!cards.length) return;
+  const fit = () => { const H = innerHeight;
+    cards.forEach(c => { const nm = c.querySelector('.r-name'), ds = c.querySelector('.r-desc'); if (!nm || !ds) return;
+      nm.style.fontSize = ds.style.fontSize = c.style.top = ''; c.classList.remove('tight');
+      const top = parseFloat(getComputedStyle(c).top) || 0, room = () => H - top - 10;
+      let t = parseFloat(getComputedStyle(nm).fontSize), d = parseFloat(getComputedStyle(ds).fontSize);
+      const tMin = Math.min(t, Math.max(36, innerWidth * .065)), dMin = Math.min(d, 19);
+      while (c.scrollHeight > room() && t > tMin) { t = Math.max(tMin, t * .95); nm.style.fontSize = t.toFixed(1) + 'px'; }   /* the title gives way first, but stays big */
+      if (c.scrollHeight > room()) c.style.top = Math.max(8, H - c.scrollHeight - 10) + 'px';   /* then the card rides a little higher, over the name strips beneath */
+      const room2 = () => H - (parseFloat(c.style.top) || top) - 10;
+      while (c.scrollHeight > room2() && d > dMin) { d = Math.max(dMin, d - .5); ds.style.fontSize = d + 'px'; }   /* the text only shrinks if it must, never below 19 px */
+      while (c.scrollHeight > room2() && t > 26) { t = Math.max(26, t * .95); nm.style.fontSize = t.toFixed(1) + 'px'; }
+      if (c.scrollHeight > room2()) { c.classList.add('tight'); c.style.top = Math.max(4, H - c.scrollHeight - 6) + 'px'; } }); };   /* the smallest phones: tighter spacing inside the card */
+  let lw = innerWidth, lh = innerHeight, tm = 0;
+  const later = () => { clearTimeout(tm); tm = setTimeout(fit, 150); };
+  addEventListener('resize', () => { if (innerWidth !== lw || Math.abs(innerHeight - lh) > 120) { lw = innerWidth; lh = innerHeight; later(); } });   /* not on every toolbar wobble */
+  fit(); if (document.fonts) document.fonts.ready.then(fit); addEventListener('load', fit);
 })();
 </script>
 </body>
