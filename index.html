@@ -3076,13 +3076,14 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   const shapes = [...Array(8)].map(() => { const p = new Path2D(), ph = [R(0, 6.3), R(0, 6.3), R(0, 6.3)], n = 40;   // organic dots, never perfect circles
     for (let i = 0; i <= n; i++) { const a = i / n * Math.PI * 2, k = 1 + .045 * Math.sin(2 * a + ph[0]) + .03 * Math.sin(3 * a + ph[1]) + .015 * Math.sin(5 * a + ph[2]);
       i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); } p.closePath(); return p; });
-  let W = 0, H = 0, DPR = 1, dots = [], mob = false, AMP = 3, builtW = 0, t0 = performance.now(), colX = 24, ledeH = 150;
+  let W = 0, H = 0, DPR = 1, dots = [], mob = false, AMP = 3, builtW = 0, t0 = performance.now(), colX = 24, ledeH = 150, LS = 60, PLAN = [];
   const measure = () => { const a = document.querySelector('#about .sec-h, #about .label'); if (a) colX = a.getBoundingClientRect().left; ledeH = lede.offsetHeight; };
   const build = () => {
     DPR = Math.min(2, devicePixelRatio || 1); W = pin.clientWidth; H = pin.clientHeight; mob = W < 760; AMP = reduce ? 0 : mob ? 2.6 : 3.4; builtW = W;
     C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); dots = [];
     const m = Math.min(W, H), lo = m * (mob ? .012 : .008), hi = m * (mob ? .075 : .06), cell = hi * 2.4, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
-    const S = hi * 3.2, cand = [];   /* Netsch's Field Theory: the big dots sit on a hidden grid of squares turned 45°; the small ones scatter around them as before */
+    const S = hi * 3.2, cand = []; LS = S; PLAN = [];
+      for (let j = -2; j <= H / S * 2 + 2; j++) for (let i = -1; i <= W / S + 2; i++) PLAN.push([i * S + (j % 2 ? S / 2 : 0), j * S / 2]);   /* every spot on the hidden grid, for the plan drawn under the dots */   /* Netsch's Field Theory: the big dots sit on a hidden grid of squares turned 45°; the small ones scatter around them as before */
       for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) if (Math.random() < .45) cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.05, .05) * S, y: j * S / 2 + R(-.05, .05) * S, r: R(hi * .45, hi * .85), big: true });
       for (let j = -1; j <= H / S * 4 + 1; j++) for (let i = -1; i <= W / S * 2 + 1; i++) if (Math.random() < .3) cand.push({ x: (i + (j % 2 ? .5 : 0)) * S / 2 + R(-.04, .04) * S, y: j * S / 4 + R(-.04, .04) * S, r: R(hi * .18, hi * .3), big: false });   /* a finer turned grid for the middling dots, so the diagonals read */
       for (let n = 0, tries = Math.round(W * H / (lo * lo) * 3); n < tries; n++) { const r = R(lo, hi * .35); cand.push({ x: R(-r, W + r), y: R(-r, H + r), r, big: false }); }
@@ -3169,13 +3170,25 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
  cue.tabIndex = on && !going ? 0 : -1; }
     // the dots
     ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, C.width, C.height);
-    const pad = Math.min(W, H) * .045, pr = pin.getBoundingClientRect(), born = reduce || !on && pv >= 1 && now - t0 > 1500 ? 1 : (now - t0) / 1500,
+    const pad = Math.min(W, H) * .045, pr = pin.getBoundingClientRect(), born = reduce || !on && pv >= 1 && now - t0 > 2600 ? 1 : (now - t0) / 2600,
       boxes = [h1.getBoundingClientRect(), pv < .6 ? tag.getBoundingClientRect() : null, lo > .01 ? lede.getBoundingClientRect() : null, menu ? menu.getBoundingClientRect() : null].filter(Boolean);
     // as you scroll down from the home page, the dots dance off the screen: each heads away from the words (up and out to
     // the right), swaying from side to side and spinning as it goes; scroll back up and they dance home again
     const sq = on || reduce ? 0 : Math.min(1, Math.max(0, -sr.top / (H * 1.05))), sqe = sq * sq * (3 - 2 * sq), hx = wx + ww * .35, hy = wy + ww * asp;
+    /* Netsch's plan under the dots: on the first landing, a hairline octagon tiling (one shade lighter than the blue) draws itself
+       out from the logo on the very grid the big dots sit on. The dots then grow out of it in a ripple, and the plan gives way just behind them */
+    const bt = (now - t0) / 1000, diag = Math.hypot(W, H);
+    if (!reduce && on && bt < 3.2 && pv < .4) { const front = (bt - .72) / 1.1 * diag, feather = diag * .14, fadeAll = 1 - ss(0, .3, pv), Ro = LS / 2 / Math.SQRT2 / Math.cos(Math.PI / 8), edge = 2 * (LS / 2 / Math.SQRT2) * Math.tan(Math.PI / 8);
+      const B = new Map();
+      for (const [x, y] of PLAN) { const dist = Math.hypot(x - gc.x, y - gc.y), dl = dist / diag * .45, a = ss(dl, .35 + dl, bt); if (a <= 0) continue;
+        const ge = Math.hypot((x - gc.x) / gc.rx, (y - gc.y) / gc.ry), al = a * ss(front - feather, front + feather * .25, dist) * ss(.85, 1.15, ge) * fadeAll;   /* gone where the dots have arrived, and around the logo */
+        if (al < .03) continue; const q = Math.round(al * 6) / 6; let P = B.get(q); if (!P) B.set(q, P = new Path2D());
+        const R = Ro * (.55 + .45 * a); for (let i = 0; i <= 8; i++) { const an = Math.PI / 8 + i * Math.PI / 4, px = x + Math.cos(an) * R, py = y + Math.sin(an) * R; i ? P.lineTo(px, py) : P.moveTo(px, py); }
+        const hx2 = x, hy2 = y + LS / 2, e2 = edge * .3 * a; P.moveTo(hx2 - e2, hy2 - e2); P.lineTo(hx2 + e2, hy2 - e2); P.lineTo(hx2 + e2, hy2 + e2); P.lineTo(hx2 - e2, hy2 + e2); P.closePath(); }   /* and a little square in each gap */
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.strokeStyle = '#3961a5'; ctx.lineWidth = .6; ctx.lineJoin = 'round';
+      for (const [q, P] of B) { ctx.globalAlpha = q; ctx.stroke(P); } ctx.globalAlpha = 1; }
     for (const d of dots) {
-      arcOn = d.few ? 1 : 0; const k = ss(d.z * .45, d.z * .45 + .55, e); let m = lerp(maskLanding(d.x, d.y, t), maskHome(d.x, d.y, t), k) * ss(d.z * .6, d.z * .6 + .4, born);   // each makes the trip at its own moment
+      arcOn = d.few ? 1 : 0; const k = ss(d.z * .45, d.z * .45 + .55, e); let m = lerp(maskLanding(d.x, d.y, t), maskHome(d.x, d.y, t), k) * (born >= 1 ? 1 : ss(.4 + Math.hypot(d.x - gc.x, d.y - gc.y) / diag * 1.1 + d.z * .12, .95 + Math.hypot(d.x - gc.x, d.y - gc.y) / diag * 1.1 + d.z * .12, bt));   /* the dots grow out in a ripple from the logo */   // each makes the trip at its own moment
       { const cg = Math.hypot(d.x - W / 2, d.y - (H - Math.max(28, 18) - 42)) - d.r - AMP * 2; m *= 1 - (1 - k) * (1 - ss(54, 78, cg)); }   /* on the landing, nothing sits behind the gold ^ dot */
       if (m < .02) continue;
       let px = d.x + AMP * Math.sin(t * d.fx + d.ph), py = d.y + AMP * Math.cos(t * d.fy + d.ph * 1.3), spin = 0;   // each wanders on its own small loop
@@ -3199,7 +3212,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   measure(); build();
   // once per visit, and only when arriving at the top of the home page from outside the site
   let seen = false; try { seen = !!sessionStorage.getItem('ml-opener-seen'); sessionStorage.setItem('ml-opener-seen', '1'); } catch (_) {}
-  if (!reduce && !seen && !(location.hash && location.hash.length > 1) && scrollY < 20) open(); else { pv = 1; t0 = performance.now() - 2000; }
+  if (!reduce && !seen && !(location.hash && location.hash.length > 1) && scrollY < 20) open(); else { pv = 1; t0 = performance.now() - 4000; }   /* returning visits: the dots are simply there */
   go(); addEventListener('load', measure); document.fonts && document.fonts.ready.then(measure);
 })();
 </script>
