@@ -46,6 +46,12 @@ window.mlApplyD = (ox, oy, S, ang, W, H) => { const c = Math.cos(ang), sn = Math
   for (let I = -N; I <= N; I++) for (let J = -N; J <= N; J++) { const cx = ox + ((I + .5) * c - (J + .5) * sn) * S, cy = oy + ((I + .5) * sn + (J + .5) * c) * S; if (cx < -S || cy < -S || cx > W + S || cy > H + S) continue;
     for (const L of mlApplyTile) { d += 'M'; for (let k = 0; k < L.length; k += 2) { const U = (I + L[k] / 1092) * S, V = (J + L[k + 1] / 1092) * S; d += (k ? 'L' : '') + (ox + U * c - V * sn).toFixed(1) + ' ' + (oy + U * sn + V * c).toFixed(1); } } }
   return d; };
+window.mlPeopleTile = { x0: 550, y0: 87, pw: 483, ph: 435, segs: [[550,152,667,85,758,140,758,260,653,325,550,265,550,152],[667,435,667,522],[758,140,853,197,1033,197],[962,112,962,197],[853,197,853,313],[758,140,878,63,962,112,1033,70],[878,330,878,498],[1033,70,1033,265],[758,260,853,313],[653,325,653,437],[653,437,853,313,1033,418],[905,345,1033,268],[878,497,758,573],[878,497,962,545],[553,500,668,433],[550,415,653,415],[550,415,550,500]],
+  dots: [[654, 205, 1], [766, 440, .7], [945, 262, .32], [997, 142, .26], [600, 455, .26]] };   /* Samuel's hexagon drawing, one repeat traced: dots in its hexagons, smaller ones in the shapes between */
+window.mlTileWalk = (T, ox, oy, k, ang, W, H, fn) => { const c = Math.cos(ang), sn = Math.sin(ang), PW = T.pw * k, PH = T.ph * k, N = Math.ceil(Math.hypot(W, H) / Math.min(PW, PH)) + 2;
+  for (let I = -N; I <= N; I++) for (let J = -N; J <= N; J++) { const at = (x, y) => { const U = I * PW + (x - T.x0) * k, V = J * PH + (y - T.y0) * k; return [ox + U * c - V * sn, oy + U * sn + V * c]; }; const [cx, cy] = at(T.x0 + T.pw / 2, T.y0 + T.ph / 2);
+    if (cx < -PW || cy < -PH || cx > W + PW || cy > H + PH) continue; fn(at, I, J); } };
+window.mlTileSegs = (T, ox, oy, k, ang, W, H) => { let d = ''; mlTileWalk(T, ox, oy, k, ang, W, H, at => { for (const L of T.segs) { d += 'M'; for (let i = 0; i < L.length; i += 2) { const [x, y] = at(L[i], L[i + 1]); d += (i ? 'L' : '') + x.toFixed(1) + ' ' + y.toFixed(1); } } }); return d; };
 window.mlPlanD = (kind, ox, oy, S, ang, W, H) => {   /* the whole plan as one path, turned by ang, with octagon centres every S */
   const c = Math.cos(ang), sn = Math.sin(ang), N = Math.ceil(Math.hypot(W, H) / S) + 2; let d = '';
   for (let I = -N; I <= N; I++) for (let J = -N; J <= N; J++) { const cx = ox + (I * c - J * sn) * S, cy = oy + (I * sn + J * c) * S; if (cx < -S * 1.5 || cy < -S * 1.5 || cx > W + S * 1.5 || cy > H + S * 1.5) continue;
@@ -1293,17 +1299,14 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
         const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, w, h);
         const tilePx = (isMobile() ? 820 : 1100) * dpr * [1, .75, 1.25, .9, 1.1][pcards.findIndex(p => p.el === el) % 5], k = tilePx / TILE, bx0 = -off[0] * tilePx, by0 = -off[1] * tilePx;
-        { const Sg = (isMobile() ? 52 : 60) * dpr, ang = .26, ca = Math.cos(ang), sa = Math.sin(ang), ox = w * off[0], oy = h * off[1], N = Math.ceil(Math.hypot(w, h) / Sg) + 2;
-          if (el.matches(':hover, :focus-visible')) { const bc = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [231, 170, 77]).slice(0, 3).map(Number);   /* the plan: nested octagons, a deeper shade of the colour the card turns */
-            const col = mlDeeper(bc, .13), key = w + 'x' + h + col; if (el._pk !== key) { el._pk = key; const pts = [];   /* the plan only where the dots are */
-              for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [p, big] of [[0, 1], [.5, 0]]) { const u = (i + p) * Sg, v = (j + p) * Sg, px = ox + u * ca - v * sa, py = oy + u * sa + v * ca; if (px > -Sg && py > -Sg && px < w + Sg && py < h + Sg) pts.push([px, py, big ? 1 : .6]); }
-              el._pp = mlFaded(w, h, mlPlanD('nest', ox, oy, Sg, ang, w, h), pts, Sg * .9, col, 1.1 * dpr); }
+        { const T = mlPeopleTile, k = (isMobile() ? 118 : 138) * dpr / T.pw, ang = -.08, ox = w * off[0], oy = h * off[1], pts = [];   /* Samuel's hexagon drawing under the dots */
+          mlTileWalk(T, ox, oy, k, ang, w, h, (at, I, J) => T.dots.forEach(([x, y, f], q) => { const [px, py] = at(x, y); if (px > -40 && py > -40 && px < w + 40 && py < h + 40) pts.push([px, py, f, I * 31 + J * 17 + q * 7]); }));
+          if (el.matches(':hover, :focus-visible')) { const bc = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [231, 170, 77]).slice(0, 3).map(Number);
+            const col = mlDeeper(bc, .13), key = w + 'x' + h + col; if (el._pk !== key) { el._pk = key; el._pp = mlFaded(w, h, mlTileSegs(T, ox, oy, k, ang, w, h), pts.map(([x, y, f]) => [x, y, f > .5 ? 1 : .6]), T.pw * k * .42, col, 1.1 * dpr); }
             g.drawImage(el._pp, 0, 0); }
           g.fillStyle = ink;
-          for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [p, big] of [[0, 1], [.5, 0]]) {
-            const u = (i + p) * Sg, v = (j + p) * Sg, px = ox + u * ca - v * sa, py = oy + u * sa + v * ca; if (px < -Sg || py < -Sg || px > w + Sg || py > h + Sg) continue;
-            const hh = holes[((i * 73 + j * 151 + (big ? 0 : 11)) % holes.length + holes.length) % holes.length | 0], wave = .5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35);
-            const r = (big ? Sg * .17 : Sg * .085) * (.84 + .16 * wave), sc = r / (hh.rad || 14); g.setTransform(sc, 0, 0, sc, px, py); g.fill(hh.p); }   /* big dots inside each octagon's square, small ones inside the diamonds */
+          for (const [px, py, f, hs] of pts) { const hh = holes[(hs % holes.length + holes.length) % holes.length | 0], wave = .5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35);
+            const r = T.pw * k * .085 * f * (.84 + .16 * wave), sc = r / (hh.rad || 14); g.setTransform(sc, 0, 0, sc, px, py); g.fill(hh.p); }   /* big dots in the hexagons, smaller ones in the shapes between */
           g.setTransform(1, 0, 0, 1, 0, 0); }
         // one calm clearing shaped like a bean (or a soft figure 8) that joins the photo and the name, so the net never runs
         // between them: two round fields blended together, drawn small and scaled up so its edge is soft
