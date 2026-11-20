@@ -3675,5 +3675,13 @@ html body .about-grid .ab-pill.closing h3{font-size:clamp(44px,5.4vw,80px) !impo
 html body .ab-pill.closing .pm{width:clamp(54px,4.6vw,66px) !important;height:clamp(51px,4.4vw,63px) !important;rotate:0deg !important}
 html body .ab-pill{overflow-anchor:none}
 </style>
+<script>
+/* people cards: the name always starts a clear step past the photo */
+(() => { const cards = [...document.querySelectorAll('.people .card')]; if (!cards.length) return;
+  const fit = () => cards.forEach(c => { const ph = c.querySelector('.ph-wrap'); if (!ph) return; c.style.removeProperty('padding-left');
+    const cw = c.clientWidth, right = ph.offsetLeft + ph.offsetWidth, gap = Math.max(30, cw * .055);
+    c.style.setProperty('padding-left', Math.round(right + gap) + 'px', 'important'); });
+  fit(); addEventListener('load', fit); addEventListener('resize', fit); document.fonts && document.fonts.ready.then(fit); })();
+</script>
 </body>
 </html>
