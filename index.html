@@ -2416,12 +2416,15 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       if (ta < 1.6) { const X = x => Math.max(0, Math.min(1, x / W)), grow = x => ss(0, 1, (ta - .35 - X(x) * .45) / .55);
         /* the blueprint first: hairline octagons on the river's own hidden grid, a soft darker cream, drawn in from the left;
            each dot then grows out of its octagon and the lines there give way, as on the opening page */
-        const s2 = S / Math.SQRT2, P = new Map(); g.setTransform(dpr, 0, 0, dpr, 0, 0);   /* Samuel's octagon plan on the river's turned grid: every dot in an octagon, bars and small frames between */
+        const Ro = S / 2 / Math.SQRT2 / Math.cos(Math.PI / 8), e2 = 2 * (S / 2 / Math.SQRT2) * Math.tan(Math.PI / 8) * .3, P = new Map(), G = new Map(); g.setTransform(dpr, 0, 0, dpr, 0, 0);   /* the landing page's own lattice: edge-to-edge octagons on the river's turned grid, a small square in each gap where four meet, and the diagonal grid beneath */
         for (const v of vis) { const d = v.d; if (!d || d.gi === undefined) continue; const gx = wrap(d.gi * S + (d.gj % 2 ? S / 2 : 0)), gy = d.gj * S / 2 + S * .25;
-          const a = ss(0, .3, ta - X(gx) * .3) * (1 - ss(.55, 1, grow(gx))); if (a < .03) continue; const q = Math.round(a * 5) / 5; let p = P.get(q); if (!p) P.set(q, p = new Path2D());
-          for (const [pts, cl] of mlPlanCell('river', d.gj % 2, ((d.gi * 7 + d.gj * 13) % 5 + 5) % 5)) { pts.forEach(([u, v2], k) => { const px = v.x + u * S, py = v.y + v2 * S;   /* the octagon rows and the in-between rows of the river's grid, each shape centred on its own dot */
-            k ? p.lineTo(px, py) : p.moveTo(px, py); }); if (cl) p.closePath(); } }
-        g.strokeStyle = '#dbd0ae'; g.lineWidth = .9; g.lineJoin = 'round'; for (const [q, p] of P) { g.globalAlpha = q; g.stroke(p); } g.globalAlpha = 1;
+          const hold = 1 - ss(.45, 1, grow(gx)); v.x += (gx - v.x) * hold; v.y += (gy - v.y) * hold;   /* while the lattice shows, each dot sits exactly in its octagon; it drifts off only as the lines give way */
+          const a = ss(0, .3, ta - X(gx) * .3) * (1 - ss(.55, 1, grow(gx))); if (a < .03) continue; const q = Math.round(a * 5) / 5; let p = P.get(q); if (!p) P.set(q, p = new Path2D()); let gl = G.get(q); if (!gl) G.set(q, gl = new Path2D());
+          for (let i = 0; i <= 8; i++) { const an = Math.PI / 8 + i * Math.PI / 4, px = gx + Math.cos(an) * Ro, py = gy + Math.sin(an) * Ro; i ? p.lineTo(px, py) : p.moveTo(px, py); }
+          const hy = gy + S / 2; p.moveTo(gx - e2, hy - e2); p.lineTo(gx + e2, hy - e2); p.lineTo(gx + e2, hy + e2); p.lineTo(gx - e2, hy + e2); p.closePath();
+          gl.moveTo(gx, gy); gl.lineTo(gx + S / 2, gy + S / 2); gl.moveTo(gx, gy); gl.lineTo(gx - S / 2, gy + S / 2); }
+        g.lineJoin = 'round'; g.strokeStyle = '#e3dabd'; g.lineWidth = .8; for (const [q, p] of G) { g.globalAlpha = q; g.stroke(p); }
+        g.strokeStyle = '#dbd0ae'; g.lineWidth = .9; for (const [q, p] of P) { g.globalAlpha = q; g.stroke(p); } g.globalAlpha = 1;
         for (const v of vis) v.r *= grow(v.x); for (const w of ws) w.R *= grow(w.x); } }
     const cell = Math.max(48, rmax * 2.6), grid = new Map(), K = (a, b) => a + ',' + b;
     if (ex <= .4) for (const v of vis) { const k = K(Math.floor(v.x / cell), Math.floor(v.y / cell)); (grid.get(k) || grid.set(k, []).get(k)).push(v); }
