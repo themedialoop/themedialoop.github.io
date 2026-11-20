@@ -3414,7 +3414,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   transform-origin:center;transition:transform .7s cubic-bezier(.3,1.4,.4,1)}
 .res:is(:hover,:focus-within)::after{transform:scale(1.09) rotate(30deg)}
 .res.fitting::after{display:none}
-@media (max-width:560px){.res::after{--hs:calc(var(--gs,160px) * 2.4);--mk:linear-gradient(to bottom,transparent calc(var(--hs) / 2 - var(--gs,160px) * .62),#000 calc(var(--hs) / 2 - var(--gs,160px) * .38));-webkit-mask-image:var(--mk);mask-image:var(--mk)}}   /* on phones the ripple stays tight round the dot, clear of the words */
+@media (max-width:560px){.res::after{--hs:calc(var(--gs,160px) * 2.5);background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22%23fff%22%3E%3Cpath%20d%3D%22M79.82%2086.33%20L33.44%2093.99%20L3.63%2057.65%20L20.18%2013.67%20L66.56%206.01%20L96.37%2042.35Z%22%20fill-opacity%3D%220.07%22/%3E%3Cpath%20d%3D%22M77.45%2073.29%20L43.55%2085.42%20L16.10%2062.13%20L22.55%2026.71%20L56.45%2014.58%20L83.90%2037.87Z%22%20fill-opacity%3D%220.08%22/%3E%3Cpath%20d%3D%22M72.52%2063.00%20L50.00%2076.00%20L27.48%2063.00%20L27.48%2037.00%20L50.00%2024.00%20L72.52%2037.00Z%22%20fill-opacity%3D%220.1%22/%3E%3C/g%3E%3C/svg%3E") !important}}   /* on phones: three layered, see-through hexagons, lighter where they overlap */   /* on phones the ripple stays tight round the dot, clear of the words */
 @media (prefers-reduced-motion:reduce){.res::after{transition:none}.res:is(:hover,:focus-within)::after{transform:none}}
 </style>
 <style>
