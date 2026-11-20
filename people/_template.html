@@ -1293,8 +1293,6 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 /* wherever a publication is listed: a highlighted row carries a big kaleidoscope of Netsch geometry (hexagons, squares, octagons and lines,
    crossing), a shade darker than its band, a different one for each row. It fades in only past the words, never behind them */
 html body .pubs li > a[href]::before,html body .r-list li > a[href]::before,html body .pubs li > a:not([href])::before,html body .r-list li > a:not([href])::before{background-image:linear-gradient(to right,var(--hl,#2c5494) 0,var(--hl,#2c5494) calc(var(--te,70%) + 14px),transparent calc(var(--te,70%) + 90px)),var(--pat,none) !important;background-size:100% 100%,var(--ps,250px) auto !important;background-repeat:no-repeat,var(--pr,repeat) !important;background-position:0 0,var(--pp,100% 50%) !important;background-color:var(--hl,#2c5494) !important}
-/* every listed paper keeps a band clear at its right end, so its drawing always has room to show */
-html body .pubs li > a > .ttl,html body .r-list li > a > *{padding-right:clamp(70px,13vw,190px);box-sizing:border-box}
 </style>
 <script>
 /* where each listed paper's words end, so its pattern fades in just past them and never sits behind the text */
@@ -1304,6 +1302,5 @@ html body .pubs li > a > .ttl,html body .r-list li > a > *{padding-right:clamp(7
     a.style.setProperty('--te', (mx - ar.left - bl).toFixed(0) + 'px'); });
   place(); addEventListener('load', place); document.fonts && document.fonts.ready.then(place); let tm; addEventListener('resize', () => { clearTimeout(tm); tm = setTimeout(place, 150); }); })();
 </script>
-<script src="../assets/pubpat.js?v=3"></script>
 </body>
 </html>
