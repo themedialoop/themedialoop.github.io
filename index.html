@@ -3487,6 +3487,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   .res::before{content:"";position:absolute;z-index:-1;pointer-events:none;inset:0;opacity:1;
     background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cpath%20d%3D%22M50%202%2091.6%2026%2091.6%2074%2050%2098%208.4%2074%208.4%2026Z%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-opacity%3D%22.6%22%20stroke-width%3D%221.3%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E") calc(var(--gx,85%) - var(--gs,160px) * .8) calc(var(--gy,80%) - var(--gs,160px) * .8) / calc(var(--gs,160px) * 1.6) calc(var(--gs,160px) * 1.6) no-repeat !important;
     -webkit-mask-image:none;mask-image:none}
+  .res::after{display:none !important}   /* no crossing bands on phones; the thin hexagon stays */
 }   /* on phones the ripple stays tight round the dot, clear of the words */
 @media (prefers-reduced-motion:reduce){.res::after{transition:none}.res:is(:hover,:focus-within)::after{transform:none}}
 </style>
