@@ -3451,5 +3451,22 @@ html body .pubs li:nth-child(5n+5) a::before,html body .r-list li:nth-child(5n+5
 .res:is(:hover,:focus-within) .r-go::before{rotate:30deg;scale:1.09}
 @media (prefers-reduced-motion:reduce){.res:is(:hover,:focus-within) .r-go::before{rotate:none;scale:none}}
 </style>
+<style>
+/* cards with dots (Apply, the people, the events): when a card changes colour on hover, a Netsch plan shows through where its dots sit:
+   octagons, little squares and the 45 degree grid, so the dots read as grown from a plan rather than sprinkled */
+.apply,.people .card,.ev-cards .ev{isolation:isolate}
+.np{position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;opacity:0;transition:opacity .45s ease;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%232c5494%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M0%200L60%2060M60%200L0%2060%22%20stroke-opacity%3D%220.14%22%20stroke-width%3D%22.8%22/%3E%3Cpath%20d%3D%22M30.00%2012.43%20L12.43%2030.00%20L-12.43%2030.00%20L-30.00%2012.43%20L-30.00%20-12.43%20L-12.43%20-30.00%20L12.43%20-30.00%20L30.00%20-12.43ZM90.00%2012.43%20L72.43%2030.00%20L47.57%2030.00%20L30.00%2012.43%20L30.00%20-12.43%20L47.57%20-30.00%20L72.43%20-30.00%20L90.00%20-12.43ZM30.00%2072.43%20L12.43%2090.00%20L-12.43%2090.00%20L-30.00%2072.43%20L-30.00%2047.57%20L-12.43%2030.00%20L12.43%2030.00%20L30.00%2047.57ZM90.00%2072.43%20L72.43%2090.00%20L47.57%2090.00%20L30.00%2072.43%20L30.00%2047.57%20L47.57%2030.00%20L72.43%2030.00%20L90.00%2047.57ZM60.00%2042.43%20L42.43%2060.00%20L17.57%2060.00%20L-0.00%2042.43%20L-0.00%2017.57%20L17.57%200.00%20L42.43%200.00%20L60.00%2017.57ZM21.55%20-8.45h16.90v16.90h-16.90ZM-8.45%2021.55h16.90v16.90h-16.90ZM51.55%2021.55h16.90v16.90h-16.90ZM21.55%2051.55h16.90v16.90h-16.90Z%22%20stroke-opacity%3D%220.2%22%20stroke-width%3D%221%22/%3E%3C/g%3E%3C/svg%3E") 0 0 / 60px 60px;
+  -webkit-mask-image:var(--npm);mask-image:var(--npm)}
+.apply .np{--npm:radial-gradient(ellipse 48% 95% at 100% 100%,#000 45%,transparent 100%)}
+.people .card .np{--npm:radial-gradient(ellipse 62% 58% at 50% 50%,transparent 55%,#000 92%)}
+.ev-cards .ev .np{--npm:linear-gradient(to left,#000 20%,transparent 62%)}
+html body .apply:not(.a-blue):not(.a-deep) .np{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M0%200L60%2060M60%200L0%2060%22%20stroke-opacity%3D%220.15%22%20stroke-width%3D%22.8%22/%3E%3Cpath%20d%3D%22M30.00%2012.43%20L12.43%2030.00%20L-12.43%2030.00%20L-30.00%2012.43%20L-30.00%20-12.43%20L-12.43%20-30.00%20L12.43%20-30.00%20L30.00%20-12.43ZM90.00%2012.43%20L72.43%2030.00%20L47.57%2030.00%20L30.00%2012.43%20L30.00%20-12.43%20L47.57%20-30.00%20L72.43%20-30.00%20L90.00%20-12.43ZM30.00%2072.43%20L12.43%2090.00%20L-12.43%2090.00%20L-30.00%2072.43%20L-30.00%2047.57%20L-12.43%2030.00%20L12.43%2030.00%20L30.00%2047.57ZM90.00%2072.43%20L72.43%2090.00%20L47.57%2090.00%20L30.00%2072.43%20L30.00%2047.57%20L47.57%2030.00%20L72.43%2030.00%20L90.00%2047.57ZM60.00%2042.43%20L42.43%2060.00%20L17.57%2060.00%20L-0.00%2042.43%20L-0.00%2017.57%20L17.57%200.00%20L42.43%200.00%20L60.00%2017.57ZM21.55%20-8.45h16.90v16.90h-16.90ZM-8.45%2021.55h16.90v16.90h-16.90ZM51.55%2021.55h16.90v16.90h-16.90ZM21.55%2051.55h16.90v16.90h-16.90Z%22%20stroke-opacity%3D%220.22%22%20stroke-width%3D%221%22/%3E%3C/g%3E%3C/svg%3E")}
+.apply:is(:hover,:focus-visible) .np,.people .card:is(:hover,:focus-visible) .np,.ev-cards .ev:is(:hover,:focus-within) .np{opacity:1}
+html body .ev-cards .ev > .np,html body .apply > .np,html body .people .card > .np{position:absolute !important;inset:0 !important;z-index:-1 !important;display:block}
+@media (prefers-reduced-motion:reduce){.np{transition:none}}
+</style>
+<script>
+document.querySelectorAll('.apply, .people .card, .ev-cards .ev').forEach(el => { const n = document.createElement('span'); n.className = 'np'; n.setAttribute('aria-hidden', 'true'); el.prepend(n); });
+</script>
 </body>
 </html>
