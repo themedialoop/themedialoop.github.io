@@ -1163,8 +1163,11 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     nRows = Math.max(2, Math.round(H / (innerWidth < 700 ? 175 : 150))); rowH = H / nRows; rowEnd = [...Array(nRows)].map((_, k) => k * rowH * .55);
     while (rn < RES.length || fn < FUN.length || Math.min(...rowEnd) < W * 2) {   /* every word at least once, and enough of them to fill a couple of screens */ const k = rowEnd.indexOf(Math.min(...rowEnd)); const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3),
         per: R(30, 55), pp: R(0, 6.3) };   // each word now and then sinks back into a plain dot, then swells into a word again
-      dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.8, S * 3.6); words.push(slot); }
+      dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.4, S * 2.6); words.push(slot); }
     L = Math.max(L, Math.ceil((Math.max(...rowEnd) + S) / S) * S);   // the loop is long enough to hold every word once
+    for (let k = 0; k < nRows; k++) { const start = k * rowH * .55; let guard = 0;   /* top up every row right to the loop's seam, so no row has an empty stretch where it repeats */
+      while (guard++ < 40) { const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3), per: R(30, 55), pp: R(0, 6.3) };
+        dress(slot, rowH / 2 - 8); const x = rowEnd[k] + slot.R; if (x + slot.R + S * 1.4 > L + start) break; slot.x = x; rowEnd[k] = x + slot.R + R(S * 1.4, S * 2.6); words.push(slot); } }
     // the field: a lattice turned 45°, its sizes rising and falling along the diagonals
     dots = [];
     for (let i = 0; i < L / S; i++) for (let j = 0; j <= H / S * 2; j++) { const x = i * S + (j % 2 ? S / 2 : 0), y = j * S / 2 + S * .25; if (y > H - 4) continue;
@@ -1438,7 +1441,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
   padding:clamp(16px,1.6vw,22px);text-decoration:none;background:var(--bg);color:var(--fg);border-radius:20px 16px 22px 17px / 17px 22px 16px 20px;
   transition:background-color .3s,color .3s,transform .45s cubic-bezier(.3,1.6,.5,1)}
 .mm-gold{--bg:#e7aa4d;--fg:#2c5494;--hb:#2c5494;--hf:#f2eedd}
-.mm-orange{--bg:#e0773a;--fg:#f2eedd;--hb:#2c5494;--hf:#f2eedd}   /* blue and gold, over and over; each swaps to the other on hover */
+.mm-orange{--bg:#e0773a;--fg:#f2eedd;--hb:#9b6aa6;--hf:#f2eedd}   /* blue and gold, over and over; each swaps to the other on hover */
 .mm-row li:nth-child(odd) .mm-c{--tilt:-3deg}.mm-row li:nth-child(even) .mm-c{--tilt:2.5deg}
 .mm-c:hover,.mm-c:focus-visible{background:var(--hb);color:var(--hf);transform:translateY(-6px) rotate(var(--tilt));outline:none}
 .mm-c:focus-visible{box-shadow:0 0 0 4px var(--cream,#f2eedd),0 0 0 7px var(--blue,#2c5494)}

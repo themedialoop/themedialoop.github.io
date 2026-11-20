@@ -2356,8 +2356,11 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     nRows = Math.max(2, Math.round(H / (innerWidth < 700 ? 175 : 150))); rowH = H / nRows; rowEnd = [...Array(nRows)].map((_, k) => k * rowH * .55);
     while (rn < RES.length || fn < FUN.length || Math.min(...rowEnd) < W * 2) {   /* every word at least once, and enough of them to fill a couple of screens */ const k = rowEnd.indexOf(Math.min(...rowEnd)); const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3),
         per: R(30, 55), pp: R(0, 6.3) };   // each word now and then sinks back into a plain dot, then swells into a word again
-      dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.8, S * 3.6); words.push(slot); }
+      dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.4, S * 2.6); words.push(slot); }
     L = Math.max(L, Math.ceil((Math.max(...rowEnd) + S) / S) * S);   // the loop is long enough to hold every word once
+    for (let k = 0; k < nRows; k++) { const start = k * rowH * .55; let guard = 0;   /* top up every row right to the loop's seam, so no row has an empty stretch where it repeats */
+      while (guard++ < 40) { const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3), per: R(30, 55), pp: R(0, 6.3) };
+        dress(slot, rowH / 2 - 8); const x = rowEnd[k] + slot.R; if (x + slot.R + S * 1.4 > L + start) break; slot.x = x; rowEnd[k] = x + slot.R + R(S * 1.4, S * 2.6); words.push(slot); } }
     // the field: a lattice turned 45°, its sizes rising and falling along the diagonals
     dots = [];
     for (let i = 0; i < L / S; i++) for (let j = 0; j <= H / S * 2; j++) { const x = i * S + (j % 2 ? S / 2 : 0), y = j * S / 2 + S * .25; if (y > H - 4) continue;
@@ -3646,7 +3649,8 @@ document.querySelectorAll('.ab-pill summary h3').forEach(h => { const m = h.text
   h.innerHTML = `Our <span class="ab-w">${m[1]}</span>`; h.setAttribute('aria-label', h.textContent); });
 </script>
 <style>
-html body .ab-pill[open] summary h3 .ab-w{display:block;text-transform:capitalize}
+html body .ab-pill summary h3 .ab-w{display:block;text-transform:capitalize}   /* two lines, open or shut */
+html body .about-grid .ab-pill h3{line-height:.95}
 </style>
 <style>.ev-lat .lat{display:none !important}   /* the event cards keep their rings and dot, no plan */</style>
 <script>
@@ -3667,7 +3671,6 @@ html body .ab-pill[open] summary h3 .ab-w{display:block;text-transform:capitaliz
 html body .about-grid .ab-pill h3{transition:font-size .5s cubic-bezier(.25,.8,.3,1),line-height .5s}
 html body .about-grid .ab-pill.closing h3{font-size:clamp(28px,3.4vw,48px) !important}
 html body .ab-pill.closing .pm{width:40px !important;height:38px !important;rotate:0deg !important}
-html body .ab-pill.closing summary h3 .ab-w{display:inline}
 html body .ab-pill{overflow-anchor:none}
 </style>
 </body>
