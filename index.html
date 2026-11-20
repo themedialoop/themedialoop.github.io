@@ -3572,7 +3572,7 @@ html body .ev-cards .ev > svg.ev-lat{position:absolute !important;inset:0 !impor
     const line = light ? `rgb(${[r, g, b].map(v => Math.round(v * .84)).join(',')})` : `rgb(${[r, g, b].map(v => Math.round(v + (255 - v) * .26)).join(',')})`;
     return { line, dot: blue ? '#e7aa4d' : purple ? '#f2eedd' : '#2c5494' }; };
   pills.forEach((el, n) => { const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'pplan'); svg.setAttribute('aria-hidden', 'true'); el.querySelector('summary').prepend(svg);
-    const draw = () => { if (!el.open) { svg.innerHTML = ''; return; } const cr = el.getBoundingClientRect(), W = cr.width, H = cr.height; svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const draw = () => { svg.innerHTML = ''; if (true) return;   /* the info cards stay plain: no plan, no dots */ const cr = el.getBoundingClientRect(), W = cr.width, H = cr.height; svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
       const rects = []; el.querySelectorAll('h3, :scope > p, :scope > ul, .pm').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); for (const b of rg.getClientRects()) if (b.width) rects.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
         if (e.classList.contains('pm')) { const b = e.getBoundingClientRect(); rects.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]); } });
       const dist = (x, y) => Math.min(...rects.map(([a, b, c, d]) => Math.hypot(Math.max(0, a - x, x - c), Math.max(0, b - y, y - d))));
