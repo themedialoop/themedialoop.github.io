@@ -1299,14 +1299,14 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
         const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, w, h);
         const tilePx = (isMobile() ? 820 : 1100) * dpr * [1, .75, 1.25, .9, 1.1][pcards.findIndex(p => p.el === el) % 5], k = tilePx / TILE, bx0 = -off[0] * tilePx, by0 = -off[1] * tilePx;
-        { const T = mlPeopleTile, k = (isMobile() ? 118 : 138) * dpr / T.pw, ang = -.08, ox = w * off[0], oy = h * off[1], pts = [];   /* Samuel's hexagon drawing under the dots */
+        { const T = mlPeopleTile, k = (isMobile() ? 86 : 100) * dpr / T.pw, ang = -.08, ox = w * off[0], oy = h * off[1], pts = [];   /* Samuel's hexagon drawing under the dots */
           mlTileWalk(T, ox, oy, k, ang, w, h, (at, I, J) => T.dots.forEach(([x, y, f], q) => { const [px, py] = at(x, y); if (px > -40 && py > -40 && px < w + 40 && py < h + 40) pts.push([px, py, f, I * 31 + J * 17 + q * 7]); }));
           if (el.matches(':hover, :focus-visible')) { const bc = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [231, 170, 77]).slice(0, 3).map(Number);
             const col = mlDeeper(bc, .13), key = w + 'x' + h + col; if (el._pk !== key) { el._pk = key; el._pp = mlFaded(w, h, mlTileSegs(T, ox, oy, k, ang, w, h), pts.map(([x, y, f]) => [x, y, f > .5 ? 1 : .6]), T.pw * k * .42, col, 1.1 * dpr); }
             g.drawImage(el._pp, 0, 0); }
           g.fillStyle = ink;
           for (const [px, py, f, hs] of pts) { const hh = holes[(hs % holes.length + holes.length) % holes.length | 0], wave = .5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35);
-            const r = T.pw * k * .085 * f * (.84 + .16 * wave), sc = r / (hh.rad || 14); g.setTransform(sc, 0, 0, sc, px, py); g.fill(hh.p); }   /* big dots in the hexagons, smaller ones in the shapes between */
+            const r = T.pw * k * .1 * f * (.84 + .16 * wave), sc = r / (hh.rad || 14); g.setTransform(sc, 0, 0, sc, px, py); g.fill(hh.p); }   /* big dots in the hexagons, smaller ones in the shapes between */
           g.setTransform(1, 0, 0, 1, 0, 0); }
         // one calm clearing shaped like a bean (or a soft figure 8) that joins the photo and the name, so the net never runs
         // between them: two round fields blended together, drawn small and scaled up so its edge is soft
