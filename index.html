@@ -3100,7 +3100,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         gB: Math.random() < .17, gC: Math.random() < .17, few: Math.random() < .85, ring: !big && Math.random() < .06, big: !!big }; if (node) NODE.set(node, d);   // on the blue: cream with some gold; on the cream: blue with a few gold
       (grid.get(key(x, y)) || grid.set(key(x, y), []).get(key(x, y))).push(d); dots.push(d);
     }
-    { const bigs = dots.filter(d => d.big).sort(() => Math.random() - .5).slice(0, mob ? 8 : 14); bigs.forEach((d, i) => d.ghost = i % 2 ? 4 : 8); }   /* a few big dots carry a thin octagon or square while they fly: the blueprint showing through */
+    { const bigs = dots.filter(d => d.big).sort(() => Math.random() - .5).slice(0, mob ? 14 : 24); bigs.forEach((d, i) => d.ghost = [8, 4, 2][i % 3]);   /* octagons, squares and grid lines */ }   /* a few big dots carry a thin octagon or square while they fly: the blueprint showing through */
   };
   const wob = (a, t) => 1 + .09 * Math.sin(3 * a + 1.3 + t * .2) + .06 * Math.sin(5 * a + .4 - t * .15) + .03 * Math.sin(8 * a + 2);
   let gc = { x: 0, y: 0, rx: 1, ry: 1 }, arcY = 0, arcOn = 1;
@@ -3195,7 +3195,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         const hx2 = x, hy2 = y + LS / 2, e2 = edge * .3 * a; P.moveTo(hx2 - e2, hy2 - e2); P.lineTo(hx2 + e2, hy2 - e2); P.lineTo(hx2 + e2, hy2 + e2); P.lineTo(hx2 - e2, hy2 + e2); P.closePath(); }   /* and a little square in each gap */
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.strokeStyle = '#3961a5'; ctx.lineWidth = .6; ctx.lineJoin = 'round';
       for (const [q, P] of B) { ctx.globalAlpha = +q.slice(1); ctx.lineWidth = q[0] === 'h' ? 1.1 : q[0] === 'g' ? .9 : .6; ctx.strokeStyle = q[0] === 'g' ? '#4068ab' : '#3961a5'; ctx.stroke(P); }   /* the square grid a touch lighter and firmer, so it reads behind the octagons */ ctx.globalAlpha = 1; }
-    const fly = Math.max(e > 0 && e < 1 ? Math.sin(Math.PI * e) : 0, sqe > 0 && sqe < 1 ? Math.sin(Math.PI * sqe) : 0), GH = [];
+    const fly = Math.max(e > 0 && e < 1 ? ss(0, .1, e) * (1 - ss(.85, 1, e)) : 0, sqe > 0 && sqe < 1 ? ss(0, .06, sqe) * (1 - ss(.8, 1, sqe)) : 0), GH = [];   /* on as soon as the dots move, for the whole flight */
     for (const d of dots) {
       arcOn = d.few ? 1 : 0; const k = ss(d.z * .45, d.z * .45 + .55, e); let m = lerp(maskLanding(d.x, d.y, t), maskHome(d.x, d.y, t), k) * (born >= 1 ? 1 : ss(.8 + dly(d), 1.3 + dly(d), bt));   /* the dots grow out in a ripple from the logo */   // each makes the trip at its own moment
       { const cg = Math.hypot(d.x - W / 2, d.y - (H - Math.max(28, 18) - 42)) - d.r - AMP * 2; m *= 1 - (1 - k) * (1 - ss(54, 78, cg)); }   /* on the landing, nothing sits behind the gold ^ dot */
@@ -3214,8 +3214,9 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       const col = mix(d.gB ? '#e7aa4d' : '#f2eedd', d.gC ? '#e7aa4d' : '#2c5494', ce);
       if (d.ring) { ctx.lineWidth = .28; ctx.strokeStyle = col; ctx.stroke(d.s); } else { ctx.fillStyle = col; ctx.fill(d.s); }
     }
-    if (GH.length) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.strokeStyle = mix('#4068ab', '#2c5494', ce); ctx.lineWidth = .9; ctx.lineJoin = 'round'; ctx.globalAlpha = fly * (.95 - .45 * ce); ctx.beginPath();
-      for (const [x, y, r, n, sp] of GH) { const R = r * (n === 8 ? 1.6 : 1.5), a0 = (n === 8 ? Math.PI / 8 : Math.PI / 4) + sp * .25;   /* octagons and squares turned to the grid, wheeling a little with their dot */
+    if (GH.length) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.strokeStyle = mix('#5277b8', '#2c5494', ce); ctx.lineWidth = 1.3; ctx.lineJoin = ctx.lineCap = 'round'; ctx.globalAlpha = fly * (1 - .2 * ce); ctx.beginPath();
+      for (const [x, y, r, n, sp] of GH) { if (n === 2) { const L = Math.max(r * 3, 26), a = Math.PI / 4 + sp * .25; ctx.moveTo(x - Math.cos(a) * L, y - Math.sin(a) * L); ctx.lineTo(x + Math.cos(a) * L, y + Math.sin(a) * L); ctx.moveTo(x + Math.sin(a) * L * .6, y - Math.cos(a) * L * .6); ctx.lineTo(x - Math.sin(a) * L * .6, y + Math.cos(a) * L * .6); continue; }   /* a little crossing of grid lines */
+        const R = Math.max(r * (n === 8 ? 1.6 : 1.5), 12), a0 = (n === 8 ? Math.PI / 8 : Math.PI / 4) + sp * .25;   /* octagons and squares turned to the grid, wheeling a little with their dot */
         for (let i = 0; i <= n; i++) { const a = a0 + i * Math.PI * 2 / n; i ? ctx.lineTo(x + Math.cos(a) * R, y + Math.sin(a) * R) : ctx.moveTo(x + Math.cos(a) * R, y + Math.sin(a) * R); } }
       ctx.stroke(); ctx.globalAlpha = 1; }
     raf = requestAnimationFrame(frame);
