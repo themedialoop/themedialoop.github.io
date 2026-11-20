@@ -20,6 +20,23 @@ window.mlTile = (g, ox, oy, S, ang, W, H, keep) => { const ca = Math.cos(ang), s
     const [qx, qy] = at(i + .5, j + .5); if (!keep || keep(qx, qy)) { for (let k = 0; k <= 4; k++) { const a = ang + k * Math.PI / 2, px = qx + Math.cos(a) * d, py = qy + Math.sin(a) * d; k ? g.lineTo(px, py) : g.moveTo(px, py); } } } };
 /* a deeper shade of a colour, keeping its hue and liveliness (lightness down, saturation held) */
 window.mlTileD = (...a) => { let d = ''; const g = { moveTo: (x, y) => { d += 'M' + x.toFixed(1) + ' ' + y.toFixed(1); }, lineTo: (x, y) => { d += 'L' + x.toFixed(1) + ' ' + y.toFixed(1); } }; mlTile(g, ...a); return d; };   /* the same tiling as an SVG path */
+window.mlPlanD = (kind, ox, oy, S, ang, W, H) => {   /* Samuel's octagon plans as one path: octagons at the whole-number points (big dots), a small frame at each half point (small dots) */
+  const c = Math.cos(ang), sn = Math.sin(ang), N = Math.ceil(Math.hypot(W, H) / S) + 2, t = .4142; let d = '';
+  const oct = (a) => [[a, t * a], [t * a, a], [-t * a, a], [-a, t * a], [-a, -t * a], [-t * a, -a], [t * a, -a], [a, -t * a]], sq = (x, y, h) => [[x - h, y - h], [x + h, y - h], [x + h, y + h], [x - h, y + h]], dia = (x, y, h) => [[x, y - h], [x + h, y], [x, y + h], [x - h, y]];
+  for (let I = -N; I <= N; I++) for (let J = -N; J <= N; J++) { const cx = ox + (I * c - J * sn) * S, cy = oy + (I * sn + J * c) * S; if (cx < -S * 1.5 || cy < -S * 1.5 || cx > W + S * 1.5 || cy > H + S * 1.5) continue;
+    const odd = (I + J) & 1, sh = [];   /* [points, closed] in the cell's own units */
+    if (kind === 'nest') {   /* people: an octagon holding a square (or a square and its diamond), little bars between octagons, a diamond in each gap on a short stem */
+      const a = .42, b = t * a; sh.push([oct(a), 1], [sq(0, 0, .27), 1]); if (odd) sh.push([dia(0, 0, .27), 1]);
+      sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [[[b, a], [b, 1 - a]]], [[[-b, a], [-b, 1 - a]]], [dia(.5, .5, .17), 1], [[[.5, b], [.5, .33]]], [[[.5, .67], [.5, 1 - b]]]); }
+    else if (kind === 'band') {   /* Apply: long bands run through the octagons' flat sides; a square where the bands meet the columns, crossed or nested in turn */
+      const a = .38; sh.push([oct(a), 1], [dia(0, 0, .32), 1], [[[-.5, a], [.5, a]]], [[[-.5, 1 - a], [.5, 1 - a]]], [[[a, a], [a, 1 - a]]], [[[1 - a, a], [1 - a, 1 - a]]]);
+      if (odd) sh.push([[[a, a], [1 - a, 1 - a]]], [[[1 - a, a], [a, 1 - a]]]); else sh.push([sq(.5, .5, .06), 1]);
+      sh.push([[[a, t * a], [.5, t * a - (.5 - a)]]]); }   /* one octagon edge runs on toward the next band */
+    else {   /* info cards: an octagon inside an octagon (or a diamond), a small square in a diamond between them, tied by bars */
+      const a = .42, b = t * a; sh.push([oct(a), 1]); if (odd) sh.push([dia(0, 0, .28), 1], [sq(0, 0, .18), 1]); else sh.push([oct(.29), 1], [sq(0, 0, .18), 1]);
+      sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [dia(.5, .5, .2), 1], [sq(.5, .5, .1), 1], [[[.5, b], [.5, .3]]]); }
+    for (const [pts, cl] of sh) d += 'M' + pts.map(([u, v]) => { const U = (I + u) * S, V = (J + v) * S; return (ox + U * c - V * sn).toFixed(1) + ' ' + (oy + U * sn + V * c).toFixed(1); }).join('L') + (cl ? 'Z' : ''); }
+  return d; };
 window.mlLines = (g, ox, oy, fams, W, H) => { const L = Math.hypot(W, H) * 2;   /* families of parallel lines: each [dir, step] passes through ox,oy + k * step */
   for (const [d, st] of fams) { const dl = Math.hypot(d[0], d[1]), ux = d[0] / dl, uy = d[1] / dl, n = Math.ceil(L / Math.max(4, Math.abs(st[0] * uy - st[1] * ux))) + 2;
     for (let k = -n; k <= n; k++) { const cx = ox + k * st[0], cy = oy + k * st[1]; g.moveTo(cx - ux * L, cy - uy * L); g.lineTo(cx + ux * L, cy + uy * L); } } };
@@ -1262,14 +1279,15 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
         const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, w, h);
         const tilePx = (isMobile() ? 820 : 1100) * dpr * [1, .75, 1.25, .9, 1.1][pcards.findIndex(p => p.el === el) % 5], k = tilePx / TILE, bx0 = -off[0] * tilePx, by0 = -off[1] * tilePx;
-        { const Sg = (isMobile() ? 30 : 37) * dpr, ang = .26, A1 = mlRot([Sg, 0], ang), A2 = mlRot([Sg / 2, Sg * .866], ang), ox = w * off[0], oy = h * off[1], N = Math.ceil(Math.hypot(w, h) / Sg * 1.3) + 2;
-          if (el.matches(':hover, :focus-visible')) { const bc = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [231, 170, 77]).slice(0, 3).map(Number);   /* the plan: triangles, a deeper shade of the colour the card turns */
-            g.strokeStyle = mlDeeper(bc, .13); g.lineWidth = 1.2 * dpr; g.beginPath(); mlLines(g, ox, oy, [[A1, A2], [A2, A1], [[A2[0] - A1[0], A2[1] - A1[1]], A1]], w, h); g.stroke(); }
+        { const Sg = (isMobile() ? 52 : 60) * dpr, ang = .26, ca = Math.cos(ang), sa = Math.sin(ang), ox = w * off[0], oy = h * off[1], N = Math.ceil(Math.hypot(w, h) / Sg) + 2;
+          if (el.matches(':hover, :focus-visible')) { const bc = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [231, 170, 77]).slice(0, 3).map(Number);   /* the plan: nested octagons, a deeper shade of the colour the card turns */
+            const key = w + 'x' + h; if (el._pk !== key) { el._pk = key; el._pp = new Path2D(mlPlanD('nest', ox, oy, Sg, ang, w, h)); }
+            g.strokeStyle = mlDeeper(bc, .13); g.lineWidth = 1.1 * dpr; g.lineJoin = 'round'; g.stroke(el._pp); }
           g.fillStyle = ink;
-          for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [p, q, big] of [[0, 0, 1], [1 / 3, 1 / 3, 0], [2 / 3, 2 / 3, 0]]) {
-            const px = ox + (i + p) * A1[0] + (j + q) * A2[0], py = oy + (i + p) * A1[1] + (j + q) * A2[1]; if (px < -Sg || py < -Sg || px > w + Sg || py > h + Sg) continue;
-            const hh = holes[((i * 73 + j * 151 + (big ? 0 : p * 21)) % holes.length + holes.length) % holes.length | 0], wave = .5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35);
-            const r = (big ? Sg * .3 : Sg * .1) * (.84 + .16 * wave), sc = r / (hh.rad || 14); g.setTransform(sc, 0, 0, sc, px, py); g.fill(hh.p); }   /* big dots on the corners, small ones in the triangles */
+          for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [p, big] of [[0, 1], [.5, 0]]) {
+            const u = (i + p) * Sg, v = (j + p) * Sg, px = ox + u * ca - v * sa, py = oy + u * sa + v * ca; if (px < -Sg || py < -Sg || px > w + Sg || py > h + Sg) continue;
+            const hh = holes[((i * 73 + j * 151 + (big ? 0 : 11)) % holes.length + holes.length) % holes.length | 0], wave = .5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35);
+            const r = (big ? Sg * .17 : Sg * .085) * (.84 + .16 * wave), sc = r / (hh.rad || 14); g.setTransform(sc, 0, 0, sc, px, py); g.fill(hh.p); }   /* big dots inside each octagon's square, small ones inside the diamonds */
           g.setTransform(1, 0, 0, 1, 0, 0); }
         // one calm clearing shaped like a bean (or a soft figure 8) that joins the photo and the name, so the net never runs
         // between them: two round fields blended together, drawn small and scaled up so its edge is soft
@@ -2964,11 +2982,11 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     }
     const big2 = cd.kind === 'pill' || cd.kind === 'ap' ? 1.45 : 1.25, rM = (phone ? Math.min(24, rmax) : rmax) * big2, gp = side ? Math.max(8, rmax * .26) : phone ? 5 : Math.max(4, rmax * .09);   // side fields are airier   // the corner is packed full: dots sit close, never touching
     if (cd.kind === 'ap') {   /* Apply: every dot sits on Netsch's lattice (big ones in the octagons, small ones in the squares between), far from the words */
-      const S = Math.max(26, rM * 2.35), ang = Math.PI / 4 + .1, ca = Math.cos(ang), sa = Math.sin(ang), N = Math.ceil(Math.hypot(w, h) / S) + 2, far = pad * 2.6;
+      const S = Math.max(44, rM * 1.7), ang = Math.PI / 4 + .1, ca = Math.cos(ang), sa = Math.sin(ang), N = Math.ceil(Math.hypot(w, h) / S) + 2, far = pad * 2.6;
       cd.lat = { S, ca, sa, ox: w, oy: h, nodes: [] };
       for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [o, big] of [[0, 1], [.5, 0]]) {
         const u = (i + o) * S, v = (j + o) * S, x = w + u * ca - v * sa, y = h + u * sa + v * ca; if (x < 4 || y < 4 || x > w - 4 || y > h - 4) continue;
-        const f = field(x, y); if (f <= .05) continue; const r = big ? Math.min(S * .4, rmin + (rM - rmin) * f) : Math.min(S * .17, rmin + (rM * .38 - rmin) * f), R = r * 1.1 * BREATH;
+        const f = field(x, y); if (f <= .05) continue; const r = big ? Math.min(S * .19, rmin + (rM - rmin) * f) : Math.min(S * .08, rmin + (rM * .38 - rmin) * f), R = r * 1.1 * BREATH;
         if (r < rmin || distTo(x, y, rects) < R + far) continue;
         cd.lat.nodes.push({ x, y, big, f }); dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283, ring: big && r > 4 && rnd() < .18 }); }
     }
@@ -2993,8 +3011,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (cd.lat && cd.el.matches(':hover, :focus-visible')) { const L = cd.lat, S = L.S, e1 = [S * L.ca, S * L.sa], e2 = [-S * L.sa, S * L.ca];
       const bc = (getComputedStyle(cd.el).backgroundColor.match(/\d+/g) || [44, 84, 148]).slice(0, 3).map(Number);
       g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.beginPath(); g.ellipse(cd.w, cd.h, cd.w * .5, cd.h * 1.05, 0, 0, 6.3); g.clip();
-      g.strokeStyle = mlDeeper(bc, .1); g.lineWidth = 1.1; g.beginPath(); mlLines(g, L.ox, L.oy, [[e1, e2], [e2, e1]], cd.w, cd.h); g.stroke();
-      g.lineWidth = .7; g.beginPath(); mlLines(g, L.ox, L.oy, [[[e1[0] + e2[0], e1[1] + e2[1]], e1], [[e1[0] - e2[0], e1[1] - e2[1]], e1]], cd.w, cd.h); g.stroke(); g.restore(); }   /* straight lines: a grid and its diagonals, big dots on the grid's crossings, small ones where the diagonals cross */
+      if (!L.pd) L.pd = new Path2D(mlPlanD('band', L.ox, L.oy, S, Math.atan2(L.sa, L.ca), cd.w, cd.h)); g.strokeStyle = mlDeeper(bc, .1); g.lineWidth = 1.1; g.lineJoin = 'round'; g.stroke(L.pd); g.restore(); }   /* bands and octagons: big dots inside the octagons' diamonds, small ones in the squares where the bands meet */
     for (const d of cd.dots) { if (d.fixed) continue; const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .3 - Math.hypot(d.x - ox, d.y - oy) / Rn * 5 + d.ph * .35);   // a slow breath, about every 20 s
       const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
       g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); if (d.ring) { g.strokeStyle = g.fillStyle; g.lineWidth = .26; g.stroke(d.p); } else g.fill(d.p); }
@@ -3558,16 +3575,16 @@ html body .ev-cards .ev > svg.ev-lat{position:absolute !important;inset:0 !impor
       const rects = []; el.querySelectorAll('h3, :scope > p, :scope > ul, .pm').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); for (const b of rg.getClientRects()) if (b.width) rects.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
         if (e.classList.contains('pm')) { const b = e.getBoundingClientRect(); rects.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]); } });
       const dist = (x, y) => Math.min(...rects.map(([a, b, c, d]) => Math.hypot(Math.max(0, a - x, x - c), Math.max(0, b - y, y - d))));
-      const S = Math.max(62, Math.min(84, W * .075)), a = Math.PI / 4 + .1, ca = Math.cos(a), sa = Math.sin(a), T = tone(el), pmE = el.querySelector('.pm'), pb = pmE.getBoundingClientRect();
+      const S = Math.max(66, Math.min(86, W * .078)), a = Math.PI / 4 + .1, ca = Math.cos(a), sa = Math.sin(a), T = tone(el), pmE = el.querySelector('.pm'), pb = pmE.getBoundingClientRect();
       const ox = pb.left - cr.left + pb.width / 2, oy = pb.top - cr.top + pb.height / 2;   /* the open/close dot is one of the plan's dots: the grid runs from its centre */
       const inZone = (x, y) => Math.hypot((W - x) / (W * .4), y / (H * 1.05)) < 1 && (Math.hypot(x - ox, y - oy) < 4 || dist(x, y) > S * .8);
-      const P1 = mlRot([S, 0], -.35), P2 = mlRot([S * .45, S * .78], -.35);   /* parallelograms, leaning */
-      const oct = (() => { let d = ''; const gg = { moveTo: (x, y) => { d += 'M' + x.toFixed(1) + ' ' + y.toFixed(1); }, lineTo: (x, y) => { d += 'L' + x.toFixed(1) + ' ' + y.toFixed(1); } }; mlLines(gg, ox, oy, [[P1, P2], [P2, P1]], W, H); return d; })();
+      const PA = -.2, P1 = mlRot([S, 0], PA), P2 = mlRot([0, S], PA);   /* the plan turns a little, from the button */
+      const oct = mlPlanD('ring', ox, oy, S, PA, W, H);
       let dots = '', rings = '';
       for (let i = -14; i <= 14; i++) for (let j = -14; j <= 14; j++) for (const [p, big] of [[0, 1], [.5, 0]]) { if (!i && !j && big) continue;
         const x = ox + (i + p) * P1[0] + (j + p) * P2[0], y = oy + (i + p) * P1[1] + (j + p) * P2[1]; if (x < 8 || y < 8 || x > W - 8 || y > H - 8) continue;
         const e = Math.hypot((W - x) / (W * .36), y / (H * 1.05)); if (e > 1) continue; const f = 1 - e; if (dist(x, y) < S * .8 || f < .2) continue;
-        const r = big ? Math.min(S * .3, 6 + f * S * .26) : Math.min(S * .1, 3 + f * S * .08); if (big && (i + j * 3 + n) % 4 === 0) rings += blob(x, y, r, i + j); else dots += blob(x, y, r, i * 2 + j); }
+        const r = big ? Math.min(S * .15, 5 + f * S * .12) : Math.min(S * .08, 2.5 + f * S * .06); if (big && (i + j * 3 + n) % 4 === 0) rings += blob(x, y, r, i + j); else dots += blob(x, y, r, i * 2 + j); }
       svg.innerHTML = `<defs><radialGradient id="pf${n}" cx="${(ox / W).toFixed(3)}" cy="${(oy / H).toFixed(3)}" r="${(W * .4 / W).toFixed(3)}" gradientUnits="objectBoundingBox" gradientTransform="translate(${(ox / W).toFixed(3)} ${(oy / H).toFixed(3)}) scale(1 ${(W / H).toFixed(3)}) translate(${(-ox / W).toFixed(3)} ${(-oy / H).toFixed(3)})"><stop offset=".45" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><filter id="pb${n}"><feGaussianBlur stdDeviation="16"/></filter><mask id="pm${n}"><rect width="${W}" height="${H}" fill="url(#pf${n})"/><g filter="url(#pb${n})">${rects.filter(r => r[2] - r[0] > 60).map(([a, b, c, d]) => `<rect x="${a - 24}" y="${b - 20}" width="${c - a + 48}" height="${d - b + 40}" fill="#000"/>`).join('')}</g></mask></defs><path d="${oct}" fill="none" stroke="${T.line}" stroke-width="1.2" stroke-linejoin="round" mask="url(#pm${n})"/><path d="${rings}" fill="none" stroke="${T.dot}" stroke-width="${(S * .06).toFixed(1)}"/><path d="${dots}" fill="${T.dot}"/>`; };
     el.addEventListener('toggle', () => requestAnimationFrame(draw)); addEventListener('resize', draw); document.fonts && document.fonts.ready.then(draw); draw(); }); })();
 </script>
