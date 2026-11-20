@@ -2308,12 +2308,12 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   const inView = (a, b) => { const out = [], take = (x0, x1) => { for (let i = lo(x0); i < dots.length && dots[i].hx <= x1; i++) out.push(dots[i]); };
     if (a < 0) { take(L + a, L); take(0, b); } else if (b > L) { take(a, L); take(0, b - L); } else take(a, b); return out; };
   const frame = now => {
-    if (!visible) { last = 0; frame.on = false; return; } requestAnimationFrame(frame);
+    if (!visible) { last = 0; if (frame.on) frame.off = performance.now(); frame.on = false; return; } requestAnimationFrame(frame);
     if (Math.abs(river.offsetWidth - built) > 2) build(); if (!W) return;
     const dt = last ? Math.min(.05, (now - last) / 1000) : .016; last = now; if (!still) clock += dt;
     sy += (scrollY * .5 - sy) * Math.min(1, dt * 7);   // the slide follows the scroll, eased so it glides
     const rc = river.getBoundingClientRect(), par = Math.max(-1, Math.min(1, (rc.top + rc.height / 2 - innerHeight / 2) / innerHeight)) * (innerWidth < 700 ? 10 : 18);
-    if (!frame.on) { frame.ly = scrollY; frame.kk = 0; frame.on = true; }   /* coming back into view: start from rest, so the arrival doesn't read as a jolt */
+    if (!frame.on) { frame.ly = scrollY; frame.kk = 0; frame.on = true; if (!frame.off || performance.now() - frame.off > 2000) frame.arr = performance.now(); }   /* coming back into view after a while: the dots swell in again */   /* coming back into view: start from rest, so the arrival doesn't read as a jolt */
     const vy = scrollY - (frame.ly ?? scrollY); frame.ly = scrollY; frame.kk = (frame.kk || 0) + (Math.max(-40, Math.min(40, -vy)) * .5 - (frame.kk || 0)) * .08; const kick = still ? 0 : Math.max(-6, Math.min(6, frame.kk * .5));   /* a slight lean with the scroll's speed that eases back without bouncing */
     if (!held) { drag += dv; dv *= Math.pow(.92, dt * 60); }   // a flick keeps gliding, then eases off
     const shift = ((((still ? 0 : clock * 14 + sy) - drag) % L) + L) % L;
@@ -2356,6 +2356,8 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       v.x += (d.dx || (d.dx = R(-.35, .35))) * W * t + (d.sw || (d.sw = R(-40, 40))) * sway; v.y += (d.dy || (d.dy = R(-.65, -.25))) * H * t; v.rot = (d.sr || (d.sr = R(-3, 3))) * t;
       return t < .7 ? 1 - .15 * t / .7 : .85 * (1 - (t - .7) / .3); };
     if (ex > .4) { for (const v of vis) v.r *= dance(v); for (const w of ws) w.R *= dance(w); }
+    { const ta = still ? 9 : (performance.now() - (frame.arr || 0)) / 1000;   /* arriving: dots and words swell gently into place in a soft wave across the river, no overshoot */
+      if (ta < 1.2) { const grow = x => ss(0, 1, (ta - Math.max(0, Math.min(1, x / W)) * .45) / .55); for (const v of vis) v.r *= grow(v.x); for (const w of ws) w.R *= grow(w.x); } }
     const cell = Math.max(48, rmax * 2.6), grid = new Map(), K = (a, b) => a + ',' + b;
     if (ex <= .4) for (const v of vis) { const k = K(Math.floor(v.x / cell), Math.floor(v.y / cell)); (grid.get(k) || grid.set(k, []).get(k)).push(v); }
     for (const v of vis) { const gx = Math.floor(v.x / cell), gy = Math.floor(v.y / cell);
