@@ -3362,10 +3362,10 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   ['pointerdown', 'touchstart', 'focusin', 'click'].forEach(t => addEventListener(t, e => { const a = e.target.closest && e.target.closest('a[data-m]'); if (a) on(a); }, { capture: true, passive: true })); })();
 </script>
 <style>
-/* links inside text: no underline, a marker highlight in gold behind blue text; pink when hovered, focused or pressed */
+/* links inside text: no underline, a marker highlight in gold behind blue text; gold when hovered, focused or pressed */
 :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a){color:#f2eedd !important;text-decoration:none !important;background:#2c5494 !important;
   padding:0 .16em;margin:0 -.04em;border-radius:.28em .22em .3em .2em;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-color .2s,color .2s}
-:is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):is(:hover,:focus-visible,:active){background:#d8708e !important;color:#2c5494 !important;outline:none}
+:is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):is(:hover,:focus-visible,:active){background:#e7aa4d !important;color:#2c5494 !important;outline:none}
 /* on blue, a blue highlight would vanish: there it is cream with blue text */
 :is(.ab-pill a.ab-inl, .p-role a):not(:hover,:focus-visible,:active){background:#f2eedd !important;color:#2c5494 !important}
 </style>
