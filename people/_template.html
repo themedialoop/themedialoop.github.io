@@ -1101,7 +1101,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
         for (const v of vis) { const d = v.d; if (!d || d.gi === undefined) continue; const gx = wrap(d.gi * S + (d.gj % 2 ? S / 2 : 0)), gy = d.gj * S / 2 + S * .25;
           const a = ss(0, .3, ta - X(gx) * .3) * (1 - ss(.55, 1, grow(gx))); if (a < .03) continue; const q = Math.round(a * 5) / 5; let p = P.get(q); if (!p) P.set(q, p = new Path2D());
           const I = d.gi + (d.gj >> 1), J = (d.gj + 1) >> 1;   /* the node's place on the turned grid, for the alternation */
-          for (const [pts, cl] of mlPlanCell('river', (I * 3 + J) & 1)) { pts.forEach(([u, v2], k) => { const px = gx + (u - v2) * s2 * Math.SQRT1_2, py = gy + (u + v2) * s2 * Math.SQRT1_2; k ? p.lineTo(px, py) : p.moveTo(px, py); }); if (cl) p.closePath(); } }
+          for (const [pts, cl] of mlPlanCell('river', 0)) { pts.forEach(([u, v2], k) => { const px = v.x + (u - v2) * s2 * Math.SQRT1_2, py = v.y + (u + v2) * s2 * Math.SQRT1_2;   /* centred on the dot itself, wherever it has wandered */ k ? p.lineTo(px, py) : p.moveTo(px, py); }); if (cl) p.closePath(); } }
         g.strokeStyle = '#dbd0ae'; g.lineWidth = .9; g.lineJoin = 'round'; for (const [q, p] of P) { g.globalAlpha = q; g.stroke(p); } g.globalAlpha = 1;
         for (const v of vis) v.r *= grow(v.x); for (const w of ws) w.R *= grow(w.x); } }
     const cell = Math.max(48, rmax * 2.6), grid = new Map(), K = (a, b) => a + ',' + b;
