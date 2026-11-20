@@ -1,6 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>/* the blueprint marks that travel with a few dots while they fly: thin octagons, squares and little crossings of 45° grid lines */
+window.mlMarks = window.mlMarks || ((g, L, a, col, k = 1) => { if (!L.length || a < .02) return; g.save(); g.globalAlpha = a; g.strokeStyle = col; g.lineWidth = .75 * k; g.lineJoin = g.lineCap = 'round'; g.beginPath();
+  for (const [x, y, r, n, sp] of L) { if (n === 2) { const Ln = Math.max(r * 3, 26 * k), an = Math.PI / 4 + sp * .25, c = Math.cos(an), s = Math.sin(an); g.moveTo(x - c * Ln, y - s * Ln); g.lineTo(x + c * Ln, y + s * Ln); g.moveTo(x + s * Ln * .6, y - c * Ln * .6); g.lineTo(x - s * Ln * .6, y + c * Ln * .6); continue; }
+    const R = Math.max(r * (n === 8 ? 1.6 : 1.5), 12 * k), a0 = (n === 8 ? Math.PI / 8 : Math.PI / 4) + sp * .25; for (let i = 0; i <= n; i++) { const q = a0 + i * Math.PI * 2 / n; i ? g.lineTo(x + Math.cos(q) * R, y + Math.sin(q) * R) : g.moveTo(x + Math.cos(q) * R, y + Math.sin(q) * R); } }
+  g.stroke(); g.restore(); });
+window.mlMarkType = () => Math.random() < .13 ? [8, 4, 2][Math.floor(Math.random() * 3)] : 0;   /* only a few dots carry one */</script>
 <script>window.mlRipple = window.mlRipple || ((x, y, t) => { const S = 54, u1 = Math.sin((x + y) / S * .42 - t * 1.5), u2 = Math.sin((x - y) / S * .36 + t * 1.05), v = Math.max(-1, Math.min(1, (u1 + u2) * .62 / .55)); return .5 + .5 * v * (1.5 - .5 * v * v); });   /* one ripple for every dot field: two slow waves crossing along the 45° diagonals */
 </script>
 <script>try{sessionStorage.setItem("ml-opener-seen","1")}catch(e){}</script>
@@ -839,6 +845,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
       side._dots = dts; side._dkey = key; side._amp = AMP; }
     const pad = 16 * dpr, soft = 40 * dpr, AMP = side._amp, D = (innerWidth < 760 ? 60 : 110) * dpr;
     const edgeY = x => { const u = Math.min(1, Math.max(0, x / w)); return h - (window.mlHem ? window.mlHem(u, D / dpr) * dpr : 0); };   // the curve at the header's bottom
+    const MK = [];
     for (const d of side._dots) {
       let f = 1; for (const [x0, y0, x1, y1] of boxes) { const dx = Math.max(0, x0 - d.x, d.x - x1), dy = Math.max(0, y0 - d.y, d.y - y1); f *= sse((Math.hypot(dx, dy) - pad - d.r) / soft); if (f < .02) break; }
       f *= sse((edgeY(d.x) - d.y - d.r * 1.1) / (d.r * .9 + 12 * dpr));   // dots run right down to the hem, shrinking just before it   // shrink away before the curved edge
@@ -849,10 +856,12 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
           const k = Math.max(0, Math.min(1, ex * 1.35 - d.st * .35)), e2 = k * k * (3 - 2 * k), sway = k < .35 ? k / .35 : k < .7 ? 1 - 2 * (k - .35) / .35 : -1 + (k - .7) / .3;
           if (d.r < 6 * dpr) s *= 1 - k; else { px += d.dx * e2 + d.sw * sway; py += d.dy * e2; s *= k < .7 ? 1 - .15 * k / .7 : .85 * (1 - (k - .7) / .3); rot += d.sr * k; } } }
       if (s < .5) continue;
+      { const exh = Math.min(1, scrollY / Math.max(200, (side.clientHeight || 600) * .6)); if (exh > 0 && exh < 1 && d.r >= 6 * dpr) { if (d.gh === undefined) d.gh = mlMarkType(); if (d.gh) MK.push([px, py, s, d.gh, rot - d.rot]); } }
       g.setTransform(s, 0, 0, s, px, py); g.rotate(rot);
       if (d.ring) { g.lineWidth = .28; g.strokeStyle = d.gold ? '#e7aa4d' : '#f2eedd'; g.stroke(d.p); } else { g.fillStyle = d.gold ? '#e7aa4d' : '#f2eedd'; g.fill(d.p); }
     }
     g.setTransform(1, 0, 0, 1, 0, 0);
+    { const exh = Math.min(1, scrollY / Math.max(200, (side.clientHeight || 600) * .6)); mlMarks(g, MK, Math.min(1, exh / .08) * (1 - Math.max(0, (exh - .8) / .2)) * .7, '#5f84c4', dpr); }   /* a few blueprint marks fly away with them, one shade lighter than the blue */
   };
   /* a few dots spill out past the header's curved hem onto the cream, thinning out as they fall */
   const spill = document.createElement('canvas'); spill.className = 'side-spill'; spill.setAttribute('aria-hidden', 'true');
@@ -1206,6 +1215,8 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
       v.x += (d.dx || (d.dx = R(-.35, .35))) * W * t + (d.sw || (d.sw = R(-40, 40))) * sway; v.y += (d.dy || (d.dy = R(-.65, -.25))) * H * t; v.rot = (d.sr || (d.sr = R(-3, 3))) * t;
       return t < .7 ? 1 - .15 * t / .7 : .85 * (1 - (t - .7) / .3); };
     if (ex > .4) { for (const v of vis) v.r *= dance(v); for (const w of ws) w.R *= dance(w); }
+    if (ex > .4 && ex < 1 && !still) { const MK = []; for (const v of vis) { const d = v.d; if (d.gh === undefined) d.gh = d.r0 > rmax * .45 ? mlMarkType() : 0; if (d.gh && v.r > 1) MK.push([v.x, v.y, v.r, d.gh, v.rot || 0]); }
+      g.setTransform(dpr, 0, 0, dpr, 0, 0); mlMarks(g, MK, ss(.4, .5, ex) * (1 - ss(.85, 1, ex)) * .6, '#2c5494'); }   /* while the river dances off: a few blueprint marks go with it */
     { const ta = still ? 9 : (performance.now() - (frame.arr || 0)) / 1000;   /* arriving: dots and words swell gently into place in a soft wave across the river, no overshoot */
       if (ta < 1.2) { const grow = x => ss(0, 1, (ta - Math.max(0, Math.min(1, x / W)) * .45) / .55); for (const v of vis) v.r *= grow(v.x); for (const w of ws) w.R *= grow(w.x); } }
     const cell = Math.max(48, rmax * 2.6), grid = new Map(), K = (a, b) => a + ',' + b;
