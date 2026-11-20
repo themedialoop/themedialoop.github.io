@@ -337,7 +337,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) 40px}
   .p-hero{grid-template-columns:minmax(0,1fr)}
   .p-photo{max-width:300px}
 }
-.arrow,.arr,.go{display:inline-block;width:.95em;height:.95em;flex:none;background:currentColor;vertical-align:-.02em;-webkit-mask:url(../assets/arrow.svg?v=3) center/contain no-repeat;mask:url(../assets/arrow.svg?v=3) center/contain no-repeat}
+.arrow,.arr,.go{display:inline-block;width:.95em;height:.95em;flex:none;background:currentColor;vertical-align:-.02em;-webkit-mask:url(../assets/arrow.svg?v=5) center/contain no-repeat;mask:url(../assets/arrow.svg?v=5) center/contain no-repeat}
 .back-arr{-webkit-mask-image:url(../assets/arrow-back.svg?v=3);mask-image:url(../assets/arrow-back.svg?v=3)}
 /* arrows: hand-cut paper shapes, after Matisse's cut-outs */
 
@@ -572,14 +572,14 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
   background:#2c5494;box-shadow:0 0 0 4px #f2eedd;border-radius:52% 46% 50% 48% / 47% 52% 46% 53%;opacity:0;scale:.4;transition:opacity .2s,scale .35s cubic-bezier(.3,1.6,.5,1)}
 .rv-cur.on{opacity:1;scale:1}.rv-cur.down{scale:.82}
 .rv-cur i{width:24px;height:24px;background:#e7aa4d;-webkit-mask:url(../assets/arrow-back.svg?v=3) center/contain no-repeat;mask:url(../assets/arrow-back.svg?v=3) center/contain no-repeat}
-.rv-cur i + i{-webkit-mask-image:url(../assets/arrow.svg?v=3);mask-image:url(../assets/arrow.svg?v=3);rotate:45deg}
+.rv-cur i + i{-webkit-mask-image:url(../assets/arrow.svg?v=5);mask-image:url(../assets/arrow.svg?v=5);rotate:45deg}
 .rv-nav{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,3vw,40px);margin-top:clamp(10px,2vw,22px);rotate:-3.5deg;pointer-events:none}
 .rv-nav .rv-b{pointer-events:auto}
    /* a cream halo keeps the dots clear of the river behind */
 .rv-b{width:52px;height:52px;border:0;padding:0;cursor:pointer;background:#2c5494;box-shadow:none;transition:transform .35s cubic-bezier(.3,1.6,.5,1),background-color .25s;border-radius:52% 46% 50% 48% / 47% 52% 46% 53%;display:grid;place-items:center;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
 .rv-r{border-radius:47% 53% 46% 52% / 52% 46% 54% 48%}
-.rv-b i{width:32px;height:32px;background:#f2eedd;-webkit-mask:url(../assets/chev-l.svg) center/contain no-repeat;mask:url(../assets/chev-l.svg) center/contain no-repeat}
-.rv-r i{-webkit-mask-image:url(../assets/chev-r.svg);mask-image:url(../assets/chev-r.svg)}
+.rv-b i{width:32px;height:32px;background:#f2eedd;-webkit-mask:url(../assets/tri-l.svg) center/contain no-repeat;mask:url(../assets/tri-l.svg) center/contain no-repeat}
+.rv-r i{-webkit-mask-image:url(../assets/tri-r.svg);mask-image:url(../assets/tri-r.svg)}
 @media (min-width:900px){.rv-b{width:66px;height:66px}.rv-b i{width:38px;height:38px}}
 @media (hover:hover){.rv-b:hover{transform:scale(1.16) rotate(-6deg);}.rv-b:hover i{background:#e7aa4d}}.rv-b:focus-visible{outline:3px solid #e7aa4d;outline-offset:3px}.rv-b i{transition:background-color .25s}.rv-b:active{transform:scale(.94)}
 .rv-t{font-weight:300;font-style:italic;font-size:15px;color:#2c5494;letter-spacing:.01em}
@@ -1443,7 +1443,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 .mm-c:hover,.mm-c:focus-visible{background:var(--hb);color:var(--hf);transform:translateY(-6px) rotate(var(--tilt));outline:none}
 .mm-c:focus-visible{box-shadow:0 0 0 4px var(--cream,#f2eedd),0 0 0 7px var(--blue,#2c5494)}
 .mm-t{position:relative;max-width:80%;font-weight:700;font-size:clamp(20px,1.7vw,26px);line-height:1.02;letter-spacing:-.03em;text-wrap:balance}
-.mm-a{position:absolute;right:clamp(14px,1.4vw,20px);bottom:clamp(12px,1.2vw,18px);font-size:22px;line-height:1;transition:transform .35s}
+.mm-a{position:absolute;right:clamp(14px,1.4vw,20px);bottom:clamp(12px,1.2vw,18px);font-size:0;width:30px;height:30px;background:currentColor;-webkit-mask:url(../assets/arrow.svg?v=5) center/contain no-repeat;mask:url(../assets/arrow.svg?v=5) center/contain no-repeat;line-height:1;transition:transform .35s}   /* the hand-drawn arrow */
 .mm-c:hover .mm-a,.mm-c:focus-visible .mm-a{transform:translate(3px,-3px)}
 @media (prefers-reduced-motion:reduce){.mm-c,.mm-a{transition:background-color .3s,color .3s}.mm-c:hover,.mm-c:focus-visible{transform:none}}
 </style>

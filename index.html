@@ -404,7 +404,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) clamp(8
   .scroll-cue span{animation:none}
   *{transition-duration:.01ms!important}
 }
-.arrow,.arr,.go{display:inline-block;width:.95em;height:.95em;flex:none;background:currentColor;vertical-align:-.02em;-webkit-mask:url(assets/arrow.svg?v=3) center/contain no-repeat;mask:url(assets/arrow.svg?v=3) center/contain no-repeat}
+.arrow,.arr,.go{display:inline-block;width:.95em;height:.95em;flex:none;background:currentColor;vertical-align:-.02em;-webkit-mask:url(assets/arrow.svg?v=5) center/contain no-repeat;mask:url(assets/arrow.svg?v=5) center/contain no-repeat}
 .back-arr{-webkit-mask-image:url(assets/arrow-back.svg?v=3);mask-image:url(assets/arrow-back.svg?v=3)}
 /* arrows: hand-cut paper shapes, after Matisse's cut-outs */
 
@@ -2240,14 +2240,14 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   background:#2c5494;box-shadow:0 0 0 4px #f2eedd;border-radius:52% 46% 50% 48% / 47% 52% 46% 53%;opacity:0;scale:.4;transition:opacity .2s,scale .35s cubic-bezier(.3,1.6,.5,1)}
 .rv-cur.on{opacity:1;scale:1}.rv-cur.down{scale:.82}
 .rv-cur i{width:24px;height:24px;background:#e7aa4d;-webkit-mask:url(assets/arrow-back.svg?v=3) center/contain no-repeat;mask:url(assets/arrow-back.svg?v=3) center/contain no-repeat}
-.rv-cur i + i{-webkit-mask-image:url(assets/arrow.svg?v=3);mask-image:url(assets/arrow.svg?v=3);rotate:45deg}
+.rv-cur i + i{-webkit-mask-image:url(assets/arrow.svg?v=5);mask-image:url(assets/arrow.svg?v=5);rotate:45deg}
 .rv-nav{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,3vw,40px);margin-top:clamp(10px,2vw,22px);rotate:-3.5deg;pointer-events:none}
 .rv-nav .rv-b{pointer-events:auto}
    /* a cream halo keeps the dots clear of the river behind */
 .rv-b{width:52px;height:52px;border:0;padding:0;cursor:pointer;background:#2c5494;box-shadow:none;transition:transform .35s cubic-bezier(.3,1.6,.5,1),background-color .25s;border-radius:52% 46% 50% 48% / 47% 52% 46% 53%;display:grid;place-items:center;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
 .rv-r{border-radius:47% 53% 46% 52% / 52% 46% 54% 48%}
-.rv-b i{width:32px;height:32px;background:#f2eedd;-webkit-mask:url(assets/chev-l.svg) center/contain no-repeat;mask:url(assets/chev-l.svg) center/contain no-repeat}
-.rv-r i{-webkit-mask-image:url(assets/chev-r.svg);mask-image:url(assets/chev-r.svg)}
+.rv-b i{width:32px;height:32px;background:#f2eedd;-webkit-mask:url(assets/tri-l.svg) center/contain no-repeat;mask:url(assets/tri-l.svg) center/contain no-repeat}
+.rv-r i{-webkit-mask-image:url(assets/tri-r.svg);mask-image:url(assets/tri-r.svg)}
 @media (min-width:900px){.rv-b{width:66px;height:66px}.rv-b i{width:38px;height:38px}}
 @media (hover:hover){.rv-b:hover{transform:scale(1.16) rotate(-6deg);}.rv-b:hover i{background:#e7aa4d}}.rv-b:focus-visible{outline:3px solid #e7aa4d;outline-offset:3px}.rv-b i{transition:background-color .25s}.rv-b:active{transform:scale(.94)}
 .rv-t{font-weight:300;font-style:italic;font-size:15px;color:#2c5494;letter-spacing:.01em}
@@ -2818,7 +2818,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   color:var(--ink);background:#e7aa4d;box-shadow:none;transition:transform .35s cubic-bezier(.3,1.6,.5,1),filter .3s}
 #contact .mail:hover,#contact .mail:focus-visible{transform:translateY(-3px) rotate(-1.5deg);filter:brightness(.95)}
 #contact .mail .glink{background:none !important;padding:0}
-#contact .mail::after{content:"";width:.85em;height:.85em;flex:none;background:currentColor;-webkit-mask:url(assets/arrow.svg?v=3) center/contain no-repeat;mask:url(assets/arrow.svg?v=3) center/contain no-repeat}
+#contact .mail::after{content:"";width:.85em;height:.85em;flex:none;background:currentColor;-webkit-mask:url(assets/arrow.svg?v=5) center/contain no-repeat;mask:url(assets/arrow.svg?v=5) center/contain no-repeat}
 #contact .mail-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
 /* the LinkedIn button: blue with cream type, so it sits beside the gold email button without competing */
 #contact .mail.mail-li{color:var(--cream);background:#2c5494}
@@ -3500,9 +3500,9 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
 .res:is(:hover,:focus-within)::after{transform:scale(1.09) rotate(30deg)}
 .res.fitting::after{display:none}
 @media (min-width:561px){
-/* underneath the turning hexagons, a second set that stays put, a deeper (or, on dark cards, lighter) shade of the card: revealed as the top set turns */
+/* underneath the turning hexagons, a second set that stays put, the same cream rings: revealed as the top set turns */
 .res::before{content:"";position:absolute;z-index:-1;pointer-events:none;--hs:calc(var(--gs,160px) * 2.8);left:calc(var(--gx,85%) - var(--hs) / 2);top:calc(var(--gy,80%) - var(--hs) / 2);width:var(--hs);height:var(--hs);
-  background:var(--hd,rgba(0,0,0,.12));-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M72.26%2062.85%20L50.00%2075.70%20L27.74%2062.85%20L27.74%2037.15%20L50.00%2024.30%20L72.26%2037.15Z%22%20stroke-opacity%3D%221%22%20stroke-width%3D%222.2%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M77.22%2073.10%20L43.61%2085.12%20L16.39%2062.03%20L22.78%2026.90%20L56.39%2014.88%20L83.61%2037.97Z%22%20stroke-opacity%3D%221%22%20stroke-width%3D%222%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M79.88%2086.41%20L33.41%2094.08%20L3.53%2057.67%20L20.12%2013.59%20L66.59%205.92%20L96.47%2042.33Z%22%20stroke-opacity%3D%221%22%20stroke-width%3D%221.8%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M72.26%2062.85%20L50.00%2075.70%20L27.74%2062.85%20L27.74%2037.15%20L50.00%2024.30%20L72.26%2037.15Z%22%20stroke-opacity%3D%221%22%20stroke-width%3D%222.2%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M77.22%2073.10%20L43.61%2085.12%20L16.39%2062.03%20L22.78%2026.90%20L56.39%2014.88%20L83.61%2037.97Z%22%20stroke-opacity%3D%221%22%20stroke-width%3D%222%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M79.88%2086.41%20L33.41%2094.08%20L3.53%2057.67%20L20.12%2013.59%20L66.59%205.92%20L96.47%2042.33Z%22%20stroke-opacity%3D%221%22%20stroke-width%3D%221.8%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat;opacity:0;transition:opacity .4s}
+  background:#f2eedd;-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M72.26%2062.85%20L50.00%2075.70%20L27.74%2062.85%20L27.74%2037.15%20L50.00%2024.30%20L72.26%2037.15Z%22%20stroke-opacity%3D%220.9%22%20stroke-width%3D%222.2%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M77.22%2073.10%20L43.61%2085.12%20L16.39%2062.03%20L22.78%2026.90%20L56.39%2014.88%20L83.61%2037.97Z%22%20stroke-opacity%3D%220.6%22%20stroke-width%3D%222%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M79.88%2086.41%20L33.41%2094.08%20L3.53%2057.67%20L20.12%2013.59%20L66.59%205.92%20L96.47%2042.33Z%22%20stroke-opacity%3D%220.35%22%20stroke-width%3D%221.8%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M72.26%2062.85%20L50.00%2075.70%20L27.74%2062.85%20L27.74%2037.15%20L50.00%2024.30%20L72.26%2037.15Z%22%20stroke-opacity%3D%220.9%22%20stroke-width%3D%222.2%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M77.22%2073.10%20L43.61%2085.12%20L16.39%2062.03%20L22.78%2026.90%20L56.39%2014.88%20L83.61%2037.97Z%22%20stroke-opacity%3D%220.6%22%20stroke-width%3D%222%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M79.88%2086.41%20L33.41%2094.08%20L3.53%2057.67%20L20.12%2013.59%20L66.59%205.92%20L96.47%2042.33Z%22%20stroke-opacity%3D%220.35%22%20stroke-width%3D%221.8%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat;opacity:0;transition:opacity .4s}
 .res:is(:hover,:focus-within)::before{opacity:1}
 .res.fitting::before{display:none}
 }
