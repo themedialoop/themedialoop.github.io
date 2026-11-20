@@ -405,7 +405,7 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) clamp(8
   *{transition-duration:.01ms!important}
 }
 .arrow,.arr,.go{display:inline-block;width:.95em;height:.95em;flex:none;background:currentColor;vertical-align:-.02em;-webkit-mask:url(assets/arrow.svg?v=5) center/contain no-repeat;mask:url(assets/arrow.svg?v=5) center/contain no-repeat}
-.back-arr{-webkit-mask-image:url(assets/arrow-back.svg?v=3);mask-image:url(assets/arrow-back.svg?v=3)}
+.back-arr{-webkit-mask-image:url(assets/arrow-back.svg?v=4);mask-image:url(assets/arrow-back.svg?v=4)}
 /* arrows: hand-cut paper shapes, after Matisse's cut-outs */
 
 /* arrows: a fine brush stroke, quiet blue at rest, gold when you hover the link */
@@ -815,7 +815,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     <h1 class="st-h1"><span class="st-sr">medialoop</span><span class="st-wm" aria-hidden="true"></span><svg class="st-idot" viewBox="0 0 155.6 136.6" preserveAspectRatio="none" aria-hidden="true"><path/></svg></h1>
     <p class="st-tag">a cozy research collective</p>
     <p class="st-lede">We fancy ourselves a cozy research boutique of scholars specializing in the entanglements of media, communication technology, and human behavior. Our orientation says the most valuable research strives for validity and precision without sacrificing warmth, personality, and <span class="vvv" tabindex="0"><span>v</span><span>a</span><span>-</span><span>v</span><span>a</span><span>-</span><span>v</span><span>o</span><span>o</span><span>m</span></span>.</p>
-    <button class="st-cue" type="button" aria-label="Enter the site"><svg class="st-cue-dot" viewBox="0 0 155.6 136.6" preserveAspectRatio="none" aria-hidden="true"><path/></svg><svg class="st-cue-up" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 15.2 C8 12.6 10 10.4 12.1 8.6 C14.3 10.6 16.3 12.7 18.6 15.4"/></svg></button>
+    <button class="st-cue" type="button" aria-label="Enter the site"><svg class="st-cue-dot" viewBox="0 0 155.6 136.6" preserveAspectRatio="none" aria-hidden="true"><path/></svg><svg class="st-cue-up" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.6 17.8 C7 13.6 9.4 9.5 12.1 5.4 C14.6 9.6 17.1 13.6 19.6 17.6 C17 18 14.5 17.4 12 17.5 C9.5 17.6 7 18.2 4.6 17.8 Z" stroke-linejoin="round"/></svg></button>
   </div>
 </section>
 
@@ -1947,7 +1947,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       const morph = m => { let d = ''; for (let i = 0; i < 64; i++) { const a = i / 64 * Math.PI * 2, r = 1 + .03 * Math.sin(3 * a + .8) + .02 * Math.sin(5 * a + 2);   // a round dot that turns into the i-dot
           const cx = 77.8 + Math.cos(a) * 73 * r, cy = 68.3 + Math.sin(a) * 64 * r;
           d += (i ? 'L' : 'M') + lerp(cx, IDOT[i * 2], m).toFixed(1) + ' ' + lerp(cy, IDOT[i * 2 + 1], m).toFixed(1); } return d + 'Z'; };
-      cue.innerHTML = `<svg viewBox="0 0 155.6 136.6" preserveAspectRatio="none"><path d="${morph(0)}"/></svg><i class="up"><svg viewBox="0 0 24 24"><path d="M5.5 15.2 C8 12.6 10 10.4 12.1 8.6 C14.3 10.6 16.3 12.7 18.6 15.4"/></svg></i>`;   // starts as a round gold dot with a small up mark
+      cue.innerHTML = `<svg viewBox="0 0 155.6 136.6" preserveAspectRatio="none"><path d="${morph(0)}"/></svg><i class="up"><svg viewBox="0 0 24 24"><path d="M4.6 17.8 C7 13.6 9.4 9.5 12.1 5.4 C14.6 9.6 17.1 13.6 19.6 17.6 C17 18 14.5 17.4 12 17.5 C9.5 17.6 7 18.2 4.6 17.8 Z" stroke-linejoin="round"/></svg></i>`;   // starts as a round gold dot with a small up mark
       const markSrc = heroMark.getAttribute('src'); heroMark.src = markSrc.replace('wordmark.svg', 'wordmark-nodot.svg');   // the logo waits for its dot
       document.body.appendChild(cue);
       const lock = document.createElement('div'); lock.id = 'openLock'; lock.setAttribute('aria-label', 'medialoop, a research boutique');
@@ -2239,7 +2239,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 .rv-cur{position:fixed;left:0;top:0;z-index:60;width:76px;height:76px;margin:-38px 0 0 -38px;pointer-events:none;display:flex;align-items:center;justify-content:center;gap:6px;
   background:#2c5494;box-shadow:0 0 0 4px #f2eedd;border-radius:52% 46% 50% 48% / 47% 52% 46% 53%;opacity:0;scale:.4;transition:opacity .2s,scale .35s cubic-bezier(.3,1.6,.5,1)}
 .rv-cur.on{opacity:1;scale:1}.rv-cur.down{scale:.82}
-.rv-cur i{width:24px;height:24px;background:#e7aa4d;-webkit-mask:url(assets/arrow-back.svg?v=3) center/contain no-repeat;mask:url(assets/arrow-back.svg?v=3) center/contain no-repeat}
+.rv-cur i{width:24px;height:24px;background:#e7aa4d;-webkit-mask:url(assets/arrow-back.svg?v=4) center/contain no-repeat;mask:url(assets/arrow-back.svg?v=4) center/contain no-repeat}
 .rv-cur i + i{-webkit-mask-image:url(assets/arrow.svg?v=5);mask-image:url(assets/arrow.svg?v=5);rotate:45deg}
 .rv-nav{position:relative;z-index:6;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,3vw,40px);margin-top:clamp(10px,2vw,22px);rotate:-3.5deg;pointer-events:none}
 .rv-nav .rv-b{pointer-events:auto}
