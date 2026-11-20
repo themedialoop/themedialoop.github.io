@@ -528,10 +528,10 @@ footer{position:relative;z-index:1;padding-block:clamp(110px,18vh,200px) clamp(8
 /* hover inverts the Apply card: gold becomes blue with gold words, blue becomes cream with blue words (dots follow in the script) */
 .apply{transition:transform .5s cubic-bezier(.3,1.5,.5,1),box-shadow .4s,background-color .3s,color .3s}
 @media (hover:hover){
-html body .apply:not(.a-blue):not(.a-deep):is(:hover,:focus-visible){background:#2c5494;color:#e7aa4d}
-html body .apply:not(.a-blue):not(.a-deep):is(:hover,:focus-visible) .ap-t{color:#f2eedd}
-html body .apply:not(.a-blue):not(.a-deep):is(:hover,:focus-visible) .ap-kind::before{background:#e7aa4d}
-html body .apply:not(.a-blue):not(.a-deep):is(:hover,:focus-visible) .ap-go{background:#e7aa4d;color:#2c5494;filter:none}
+html body .apply:not(.a-blue):not(.a-deep):is(:hover,:focus-visible){background:#e7aa4d;color:#2c5494}   /* stays gold with blue words on hover too */
+html body .apply:not(.a-blue):not(.a-deep):is(:hover,:focus-visible) .ap-t{color:#2c5494}
+html body .apply:not(.a-blue):not(.a-deep):is(:hover,:focus-visible) .ap-kind::before{background:#2c5494}
+html body .apply:not(.a-blue):not(.a-deep):is(:hover,:focus-visible) .ap-go{background:#2c5494;color:#f2eedd;filter:none}
 html body .apply:is(.a-blue,.a-deep):is(:hover,:focus-visible){background:#f2eedd;color:#2c5494;box-shadow:inset 0 0 0 2.5px #2c5494}
 html body .apply:is(.a-blue,.a-deep):is(:hover,:focus-visible) .ap-t{color:#2c5494}
 html body .apply:is(.a-blue,.a-deep):is(:hover,:focus-visible) .ap-kind::before{background:#2c5494}
@@ -2048,7 +2048,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   /* the Apply card: its colour and the UIC mark (its dots are set in the dots script at the end) */
   { const ap = document.querySelector('.apply'), cv = ap && ap.querySelector('canvas');
     // the Apply card's colour is picked at random from these (never sage or lavender: the cream UIC mark gets lost on them)
-    const AC = ['a-gold', 'a-blue']   // the Apply card is only ever gold or blue   // pink and orange stay sprinkles, never a background under words
+    const AC = ['a-gold']   // the Apply card is always gold with blue words   // pink and orange stay sprinkles, never a background under words
     , ac = AC[Math.floor(Math.random() * AC.length)]; if (ap) ap.classList.add(ac);
     // the UIC mark sits on the same line as the "More information" button: centred on it vertically
     const apUic = ap && ap.querySelector('.ap-uic'), apGo = ap && ap.querySelector('.ap-go');
@@ -3007,7 +3007,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   // each frame the dots swell and shrink a little, in a ripple that runs out from the corner, like the net's holes
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
   const paint = (cd, time) => { if (!cd.dots) return; const g = cd.cv.getContext('2d'), dpr = cd.dpr, ox = cd.w, oy = cd.top ? 0 : cd.h, Rn = Math.hypot(cd.w, cd.h);
-    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.classList.contains('h-cream') && cd.el.matches(':hover') ? GOLD : cd.kind === 'ap' && cd.el.matches(':hover') && matchMedia('(hover: hover)').matches ? (cd.el.matches('.a-blue,.a-deep') ? BLUE : GOLD) : cd.col;   /* the Apply card's dots take its old background colour when it inverts */   // cream dots turn gold on the cream hover, so they still show   // the card turns cream on hover; its dots turn gold
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.classList.contains('h-cream') && cd.el.matches(':hover') ? GOLD : cd.col;   /* the Apply card's dots take its old background colour when it inverts */   // cream dots turn gold on the cream hover, so they still show   // the card turns cream on hover; its dots turn gold
     if (cd.lat && cd.el.matches(':hover, :focus-visible')) { const L = cd.lat, S = L.S, e1 = [S * L.ca, S * L.sa], e2 = [-S * L.sa, S * L.ca];
       const bc = (getComputedStyle(cd.el).backgroundColor.match(/\d+/g) || [44, 84, 148]).slice(0, 3).map(Number);
       g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.beginPath(); g.ellipse(cd.w, cd.h, cd.w * .5, cd.h * 1.05, 0, 0, 6.3); g.clip();
