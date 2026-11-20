@@ -28,8 +28,7 @@ window.mlPlanCell = (kind, odd) => {   /* one cell of Samuel's octagon plans, in
     if (odd) sh.push([[[a, a], [1 - a, 1 - a]]], [[[1 - a, a], [a, 1 - a]]]); else sh.push([sq(.5, .5, .06), 1]); sh.push([[[a, t * a], [.5, t * a - (.5 - a)]]]); }
   else if (kind === 'kite') { const a = .42, b = t * a; sh.push([oct(a), 1], [dia(0, 0, .3), 1], [sq(0, 0, .15), 1], [[[0, -.3], [0, -.15]]], [[[0, .15], [0, .3]]], [[[-.3, 0], [-.15, 0]]], [[[.15, 0], [.3, 0]]]);   /* Apply: from Samuel's drawing, a diamond in each octagon holding a square, tied to it at four points; bars between octagons */
     sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [[[b, a], [b, 1 - a]]], [[[-b, a], [-b, 1 - a]]]); if (odd) sh.push([sq(.5, .5, .12), 1], [sq(.5, .5, .05), 1]); else sh.push([dia(.5, .5, .17), 1], [[[.33, .5], [.67, .5]]]); }
-  else if (kind === 'river') { const a = .4, b = t * a; sh.push([oct(a), 1]); if (odd) sh.push([sq(0, 0, .25), 1]); else sh.push([dia(0, 0, .3), 1]);   /* rivers: octagons tied by bars, a small square or a crossed one in each gap, an edge running on now and then */
-    sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [sq(.5, .5, .1), 1]); if (odd) sh.push([[[.4, .4], [.6, .6]]], [[[.6, .4], [.4, .6]]]); else sh.push([[[b, a], [-.1, a + b + .1]]]); }
+  else if (kind === 'river') { sh.push([oct(.4), 1]); if (odd) sh.push([sq(.5, .5, .1), 1]); }   /* rivers: just an octagon round each dot, and a small square in every other gap */
   else { const a = .42, b = t * a; sh.push([oct(a), 1]); if (odd) sh.push([sq(0, 0, .2), 1]);   /* info cards: a plain octagon (every other one holds a square), a small square in each gap, bars side to side */
     sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [sq(.5, .5, .12), 1]); }
   return sh; };
