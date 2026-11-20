@@ -3639,7 +3639,7 @@ html body .about-grid .ab-pill[open] h3{font-size:clamp(56px,7.4vw,120px);letter
 html body .about-grid .ab-pill[open] > p{font-size:clamp(19px,1.75vw,26px);line-height:1.42;max-width:34em;letter-spacing:-.01em}
 html body .about-grid .ab-pill[open] > p:first-of-type{margin-top:-6px}
 html body .ab-pill .pm{transition:width .5s cubic-bezier(.25,.8,.3,1),height .5s cubic-bezier(.25,.8,.3,1),rotate .5s cubic-bezier(.25,.8,.3,1),scale .3s}
-html body .ab-pill[open] .pm{width:clamp(50px,4.2vw,62px);height:clamp(48px,4vw,59px)}
+html body .ab-pill[open] .pm{width:clamp(64px,5.6vw,82px);height:clamp(61px,5.3vw,78px)}
 html body .ab-pill .pm::before{transition:width .45s,height .45s}
 html body .ab-pill[open] .pm::before{width:40%;height:40%}
 </style>
@@ -3650,7 +3650,9 @@ document.querySelectorAll('.ab-pill summary h3').forEach(h => { const m = h.text
 </script>
 <style>
 html body .ab-pill summary h3 .ab-w{display:block;text-transform:capitalize}   /* two lines, open or shut */
-html body .about-grid .ab-pill h3{line-height:.95}
+html body .ab-pill .pm{width:clamp(54px,4.6vw,66px);height:clamp(51px,4.4vw,63px)}
+html body .about-grid .ab-pill .pm::before{width:54% !important;height:54% !important;background-size:contain !important}
+html body .about-grid .ab-pill h3{line-height:.95;font-size:clamp(44px,5.4vw,80px);letter-spacing:-.045em}
 </style>
 <style>.ev-lat .lat{display:none !important}   /* the event cards keep their rings and dot, no plan */</style>
 <script>
@@ -3669,8 +3671,8 @@ html body .about-grid .ab-pill h3{line-height:.95}
 </script>
 <style>
 html body .about-grid .ab-pill h3{transition:font-size .5s cubic-bezier(.25,.8,.3,1),line-height .5s}
-html body .about-grid .ab-pill.closing h3{font-size:clamp(28px,3.4vw,48px) !important}
-html body .ab-pill.closing .pm{width:40px !important;height:38px !important;rotate:0deg !important}
+html body .about-grid .ab-pill.closing h3{font-size:clamp(44px,5.4vw,80px) !important}
+html body .ab-pill.closing .pm{width:clamp(54px,4.6vw,66px) !important;height:clamp(51px,4.4vw,63px) !important;rotate:0deg !important}
 html body .ab-pill{overflow-anchor:none}
 </style>
 </body>
