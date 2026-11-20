@@ -3422,7 +3422,18 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   transform-origin:center;transition:transform .7s cubic-bezier(.3,1.4,.4,1)}
 .res:is(:hover,:focus-within)::after{transform:scale(1.09) rotate(30deg)}
 .res.fitting::after{display:none}
-@media (max-width:560px){.res::after{--hs:calc(var(--gs,160px) * 2.5);background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22%23fff%22%3E%3Cpath%20d%3D%22M79.82%2086.33%20L33.44%2093.99%20L3.63%2057.65%20L20.18%2013.67%20L66.56%206.01%20L96.37%2042.35Z%22%20fill-opacity%3D%220.07%22/%3E%3Cpath%20d%3D%22M77.45%2073.29%20L43.55%2085.42%20L16.10%2062.13%20L22.55%2026.71%20L56.45%2014.58%20L83.90%2037.87Z%22%20fill-opacity%3D%220.08%22/%3E%3Cpath%20d%3D%22M72.52%2063.00%20L50.00%2076.00%20L27.48%2063.00%20L27.48%2037.00%20L50.00%2024.00%20L72.52%2037.00Z%22%20fill-opacity%3D%220.1%22/%3E%3C/g%3E%3C/svg%3E") !important}}   /* on phones: three layered, see-through hexagons, lighter where they overlap */   /* on phones the ripple stays tight round the dot, clear of the words */
+@media (max-width:560px){
+  /* on phones: option D, two broad 45° bands a shade lighter than the card, crossing behind the dot, with a thin hexagon where they meet */
+  .res::after{left:calc(var(--gx,85%) - 700px) !important;top:calc(var(--gy,80%) - 700px) !important;width:1400px !important;height:1400px !important;transform:none !important;transform-origin:center !important;
+    background:
+      linear-gradient(45deg,transparent calc(50% - 46px),rgba(255,255,255,.13) calc(50% - 46px),rgba(255,255,255,.13) calc(50% + 46px),transparent calc(50% + 46px)),
+      linear-gradient(-45deg,transparent calc(50% - 40px),rgba(255,255,255,.11) calc(50% - 40px),rgba(255,255,255,.11) calc(50% + 40px),transparent calc(50% + 40px)) !important;
+    transition:translate .6s cubic-bezier(.3,1.4,.4,1) !important}   /* both bands cross exactly at the dot */
+  .res:is(:hover,:focus-within,:active)::after{transform:rotate(8deg) !important}
+  .res::before{content:"";position:absolute;z-index:-1;pointer-events:none;inset:0;opacity:1;
+    background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cpath%20d%3D%22M50%202%2091.6%2026%2091.6%2074%2050%2098%208.4%2074%208.4%2026Z%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-opacity%3D%22.6%22%20stroke-width%3D%221.3%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E") calc(var(--gx,85%) - var(--gs,160px) * .8) calc(var(--gy,80%) - var(--gs,160px) * .8) / calc(var(--gs,160px) * 1.6) calc(var(--gs,160px) * 1.6) no-repeat !important;
+    -webkit-mask-image:none;mask-image:none}
+}   /* on phones the ripple stays tight round the dot, clear of the words */
 @media (prefers-reduced-motion:reduce){.res::after{transition:none}.res:is(:hover,:focus-within)::after{transform:none}}
 </style>
 <style>
