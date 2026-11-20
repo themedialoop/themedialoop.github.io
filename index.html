@@ -20,6 +20,10 @@ window.mlTile = (g, ox, oy, S, ang, W, H, keep) => { const ca = Math.cos(ang), s
     const [qx, qy] = at(i + .5, j + .5); if (!keep || keep(qx, qy)) { for (let k = 0; k <= 4; k++) { const a = ang + k * Math.PI / 2, px = qx + Math.cos(a) * d, py = qy + Math.sin(a) * d; k ? g.lineTo(px, py) : g.moveTo(px, py); } } } };
 /* a deeper shade of a colour, keeping its hue and liveliness (lightness down, saturation held) */
 window.mlTileD = (...a) => { let d = ''; const g = { moveTo: (x, y) => { d += 'M' + x.toFixed(1) + ' ' + y.toFixed(1); }, lineTo: (x, y) => { d += 'L' + x.toFixed(1) + ' ' + y.toFixed(1); } }; mlTile(g, ...a); return d; };   /* the same tiling as an SVG path */
+window.mlLines = (g, ox, oy, fams, W, H) => { const L = Math.hypot(W, H) * 2;   /* families of parallel lines: each [dir, step] passes through ox,oy + k * step */
+  for (const [d, st] of fams) { const dl = Math.hypot(d[0], d[1]), ux = d[0] / dl, uy = d[1] / dl, n = Math.ceil(L / Math.max(4, Math.abs(st[0] * uy - st[1] * ux))) + 2;
+    for (let k = -n; k <= n; k++) { const cx = ox + k * st[0], cy = oy + k * st[1]; g.moveTo(cx - ux * L, cy - uy * L); g.lineTo(cx + ux * L, cy + uy * L); } } };
+window.mlRot = (v, a) => [v[0] * Math.cos(a) - v[1] * Math.sin(a), v[0] * Math.sin(a) + v[1] * Math.cos(a)];
 window.mlDeeper = (rgb, k = .12) => { let [r, g, b] = rgb.map(v => v / 255); const mx = Math.max(r, g, b), mn = Math.min(r, g, b); let h = 0, s = 0, l = (mx + mn) / 2;
   if (mx !== mn) { const d = mx - mn; s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn); h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h /= 6; }
   l = Math.max(0, l - k); const f = (p, q, t) => { t = (t + 1) % 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < .5 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; };
@@ -1258,15 +1262,14 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
         const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, w, h);
         const tilePx = (isMobile() ? 820 : 1100) * dpr * [1, .75, 1.25, .9, 1.1][pcards.findIndex(p => p.el === el) % 5], k = tilePx / TILE, bx0 = -off[0] * tilePx, by0 = -off[1] * tilePx;
-        { const Sg = (isMobile() ? 27 : 33) * dpr, ang = Math.PI / 4 + .06, ca = Math.cos(ang), sa = Math.sin(ang), N = Math.ceil(Math.hypot(w, h) / Sg) + 2, ox = w * off[0], oy = h * off[1];
-          if (el.matches(':hover, :focus-visible')) { const bc = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [231, 170, 77]).slice(0, 3).map(Number);
-            g.strokeStyle = mlDeeper(bc, .13); g.lineWidth = 1.3 * dpr; g.lineJoin = 'round'; g.beginPath(); mlTile(g, ox, oy, Sg, ang, w, h); g.stroke(); }   /* the plan: a deeper shade of the colour the card turns */
+        { const Sg = (isMobile() ? 30 : 37) * dpr, ang = .26, A1 = mlRot([Sg, 0], ang), A2 = mlRot([Sg / 2, Sg * .866], ang), ox = w * off[0], oy = h * off[1], N = Math.ceil(Math.hypot(w, h) / Sg * 1.3) + 2;
+          if (el.matches(':hover, :focus-visible')) { const bc = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [231, 170, 77]).slice(0, 3).map(Number);   /* the plan: triangles, a deeper shade of the colour the card turns */
+            g.strokeStyle = mlDeeper(bc, .13); g.lineWidth = 1.2 * dpr; g.beginPath(); mlLines(g, ox, oy, [[A1, A2], [A2, A1], [[A2[0] - A1[0], A2[1] - A1[1]], A1]], w, h); g.stroke(); }
           g.fillStyle = ink;
-          for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [o, big] of [[0, 1], [.5, 0]]) {
-            const px = ox + (i + o) * Sg * ca - (j + o) * Sg * sa, py = oy + (i + o) * Sg * sa + (j + o) * Sg * ca; if (px < -Sg || py < -Sg || px > w + Sg || py > h + Sg) continue;
-            const hh = holes[((i * 73 + j * 151 + (big ? 0 : 7)) % holes.length + holes.length) % holes.length], wave = .5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35);
-            const r = (big ? Sg * .41 : Sg * .15) * (.84 + .16 * wave), sc = r / (hh.rad || 14);
-            g.setTransform(sc, 0, 0, sc, px, py); g.fill(hh.p); }   /* every dot sits on the plan: big ones in the octagons, small ones in the squares */
+          for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [p, q, big] of [[0, 0, 1], [1 / 3, 1 / 3, 0], [2 / 3, 2 / 3, 0]]) {
+            const px = ox + (i + p) * A1[0] + (j + q) * A2[0], py = oy + (i + p) * A1[1] + (j + q) * A2[1]; if (px < -Sg || py < -Sg || px > w + Sg || py > h + Sg) continue;
+            const hh = holes[((i * 73 + j * 151 + (big ? 0 : p * 21)) % holes.length + holes.length) % holes.length | 0], wave = .5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35);
+            const r = (big ? Sg * .3 : Sg * .1) * (.84 + .16 * wave), sc = r / (hh.rad || 14); g.setTransform(sc, 0, 0, sc, px, py); g.fill(hh.p); }   /* big dots on the corners, small ones in the triangles */
           g.setTransform(1, 0, 0, 1, 0, 0); }
         // one calm clearing shaped like a bean (or a soft figure 8) that joins the photo and the name, so the net never runs
         // between them: two round fields blended together, drawn small and scaled up so its edge is soft
@@ -2987,9 +2990,11 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
   const paint = (cd, time) => { if (!cd.dots) return; const g = cd.cv.getContext('2d'), dpr = cd.dpr, ox = cd.w, oy = cd.top ? 0 : cd.h, Rn = Math.hypot(cd.w, cd.h);
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.classList.contains('h-cream') && cd.el.matches(':hover') ? GOLD : cd.kind === 'ap' && cd.el.matches(':hover') && matchMedia('(hover: hover)').matches ? (cd.el.matches('.a-blue,.a-deep') ? BLUE : GOLD) : cd.col;   /* the Apply card's dots take its old background colour when it inverts */   // cream dots turn gold on the cream hover, so they still show   // the card turns cream on hover; its dots turn gold
-    if (cd.lat && cd.el.matches(':hover, :focus-visible')) { const L = cd.lat, ang0 = Math.atan2(L.sa, L.ca), near = (x, y) => L.nodes.some(n => Math.abs(n.x - x) < L.S * .8 && Math.abs(n.y - y) < L.S * .8);
+    if (cd.lat && cd.el.matches(':hover, :focus-visible')) { const L = cd.lat, S = L.S, e1 = [S * L.ca, S * L.sa], e2 = [-S * L.sa, S * L.ca];
       const bc = (getComputedStyle(cd.el).backgroundColor.match(/\d+/g) || [44, 84, 148]).slice(0, 3).map(Number);
-      g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.strokeStyle = mlDeeper(bc, .1); g.lineWidth = 1.1; g.lineJoin = 'round'; g.beginPath(); mlTile(g, L.ox, L.oy, L.S, ang0, cd.w, cd.h, near); g.stroke(); g.restore(); }   /* the exact plan under the dots, a deeper shade of the colour the card turns */
+      g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.beginPath(); g.ellipse(cd.w, cd.h, cd.w * .5, cd.h * 1.05, 0, 0, 6.3); g.clip();
+      g.strokeStyle = mlDeeper(bc, .1); g.lineWidth = 1.1; g.beginPath(); mlLines(g, L.ox, L.oy, [[e1, e2], [e2, e1]], cd.w, cd.h); g.stroke();
+      g.lineWidth = .7; g.beginPath(); mlLines(g, L.ox, L.oy, [[[e1[0] + e2[0], e1[1] + e2[1]], e1], [[e1[0] - e2[0], e1[1] - e2[1]], e1]], cd.w, cd.h); g.stroke(); g.restore(); }   /* straight lines: a grid and its diagonals, big dots on the grid's crossings, small ones where the diagonals cross */
     for (const d of cd.dots) { if (d.fixed) continue; const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .3 - Math.hypot(d.x - ox, d.y - oy) / Rn * 5 + d.ph * .35);   // a slow breath, about every 20 s
       const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
       g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); if (d.ring) { g.strokeStyle = g.fillStyle; g.lineWidth = .26; g.stroke(d.p); } else g.fill(d.p); }
@@ -3543,7 +3548,7 @@ html body .ev-cards .ev > svg.ev-lat{position:absolute !important;inset:0 !impor
   const poly = (x, y, R, n, rot) => 'M' + [...Array(n)].map((_, i) => { const a = rot + i * 2 * Math.PI / n; return (x + Math.cos(a) * R).toFixed(1) + ' ' + (y + Math.sin(a) * R).toFixed(1); }).join('L') + 'Z';
   const tone = el => { const m = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [44, 84, 148]).map(Number), [r, g, b] = m;
     const blue = Math.abs(r - 44) < 30 && Math.abs(b - 148) < 30, purple = Math.abs(r - 155) < 25 && Math.abs(g - 106) < 25, light = r + g + b > 520;
-    const line = light ? `rgb(${[r, g, b].map(v => Math.round(v * .84)).join(',')})` : `rgb(${[r, g, b].map(v => Math.round(v + (255 - v) * .18)).join(',')})`;
+    const line = light ? `rgb(${[r, g, b].map(v => Math.round(v * .84)).join(',')})` : `rgb(${[r, g, b].map(v => Math.round(v + (255 - v) * .26)).join(',')})`;
     return { line, dot: blue ? '#e7aa4d' : purple ? '#f2eedd' : '#2c5494' }; };
   pills.forEach((el, n) => { const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'pplan'); svg.setAttribute('aria-hidden', 'true'); el.querySelector('summary').prepend(svg);
     const draw = () => { if (!el.open) { svg.innerHTML = ''; return; } const cr = el.getBoundingClientRect(), W = cr.width, H = cr.height; svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
@@ -3553,11 +3558,14 @@ html body .ev-cards .ev > svg.ev-lat{position:absolute !important;inset:0 !impor
       const S = Math.max(62, Math.min(84, W * .075)), a = Math.PI / 4 + .1, ca = Math.cos(a), sa = Math.sin(a), T = tone(el), pmE = el.querySelector('.pm'), pb = pmE.getBoundingClientRect();
       const ox = pb.left - cr.left + pb.width / 2, oy = pb.top - cr.top + pb.height / 2;   /* the open/close dot is one of the plan's dots: the grid runs from its centre */
       const inZone = (x, y) => Math.hypot((W - x) / (W * .4), y / (H * 1.05)) < 1 && (Math.hypot(x - ox, y - oy) < 4 || dist(x, y) > S * .8);
-      const oct = mlTileD(ox, oy, S, a, W, H, inZone); let dots = '', rings = '';
-      for (let i = -12; i <= 12; i++) for (let j = -12; j <= 12; j++) { const x = ox + i * S * ca - j * S * sa, y = oy + i * S * sa + j * S * ca; if (!i && !j) continue; if (x < 8 || y < 8 || x > W - 8 || y > H - 8) continue;
-        const e = Math.hypot((W - x) / (W * .36), y / (H * 1.05)); if (e > 1) continue; const f = 1 - e; if (dist(x, y) < S * .9 || f < .25) continue;
-        const r = Math.min(S * .36, 6 + f * S * .3); if ((i + j * 3 + n) % 4 === 0) rings += blob(x, y, r, i + j); else dots += blob(x, y, r, i * 2 + j); }
-      svg.innerHTML = `<defs><radialGradient id="pf${n}" cx="${(ox / W).toFixed(3)}" cy="${(oy / H).toFixed(3)}" r="${(Math.max(W * .42, H) / W).toFixed(3)}" gradientUnits="objectBoundingBox"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><mask id="pm${n}"><rect width="${W}" height="${H}" fill="url(#pf${n})"/></mask></defs><path d="${oct}" fill="none" stroke="${T.line}" stroke-width="1.2" stroke-linejoin="round" mask="url(#pm${n})"/><path d="${rings}" fill="none" stroke="${T.dot}" stroke-width="${(S * .06).toFixed(1)}"/><path d="${dots}" fill="${T.dot}"/>`; };
+      const P1 = mlRot([S, 0], -.35), P2 = mlRot([S * .45, S * .78], -.35);   /* parallelograms, leaning */
+      const oct = (() => { let d = ''; const gg = { moveTo: (x, y) => { d += 'M' + x.toFixed(1) + ' ' + y.toFixed(1); }, lineTo: (x, y) => { d += 'L' + x.toFixed(1) + ' ' + y.toFixed(1); } }; mlLines(gg, ox, oy, [[P1, P2], [P2, P1]], W, H); return d; })();
+      let dots = '', rings = '';
+      for (let i = -14; i <= 14; i++) for (let j = -14; j <= 14; j++) for (const [p, big] of [[0, 1], [.5, 0]]) { if (!i && !j && big) continue;
+        const x = ox + (i + p) * P1[0] + (j + p) * P2[0], y = oy + (i + p) * P1[1] + (j + p) * P2[1]; if (x < 8 || y < 8 || x > W - 8 || y > H - 8) continue;
+        const e = Math.hypot((W - x) / (W * .36), y / (H * 1.05)); if (e > 1) continue; const f = 1 - e; if (dist(x, y) < S * .8 || f < .2) continue;
+        const r = big ? Math.min(S * .3, 6 + f * S * .26) : Math.min(S * .1, 3 + f * S * .08); if (big && (i + j * 3 + n) % 4 === 0) rings += blob(x, y, r, i + j); else dots += blob(x, y, r, i * 2 + j); }
+      svg.innerHTML = `<defs><radialGradient id="pf${n}" cx="${(ox / W).toFixed(3)}" cy="${(oy / H).toFixed(3)}" r="${(W * .4 / W).toFixed(3)}" gradientUnits="objectBoundingBox" gradientTransform="translate(${(ox / W).toFixed(3)} ${(oy / H).toFixed(3)}) scale(1 ${(W / H).toFixed(3)}) translate(${(-ox / W).toFixed(3)} ${(-oy / H).toFixed(3)})"><stop offset=".45" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><filter id="pb${n}"><feGaussianBlur stdDeviation="16"/></filter><mask id="pm${n}"><rect width="${W}" height="${H}" fill="url(#pf${n})"/><g filter="url(#pb${n})">${rects.filter(r => r[2] - r[0] > 60).map(([a, b, c, d]) => `<rect x="${a - 24}" y="${b - 20}" width="${c - a + 48}" height="${d - b + 40}" fill="#000"/>`).join('')}</g></mask></defs><path d="${oct}" fill="none" stroke="${T.line}" stroke-width="1.2" stroke-linejoin="round" mask="url(#pm${n})"/><path d="${rings}" fill="none" stroke="${T.dot}" stroke-width="${(S * .06).toFixed(1)}"/><path d="${dots}" fill="${T.dot}"/>`; };
     el.addEventListener('toggle', () => requestAnimationFrame(draw)); addEventListener('resize', draw); document.fonts && document.fonts.ready.then(draw); draw(); }); })();
 </script>
 <style>
