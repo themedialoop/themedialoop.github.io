@@ -20,22 +20,23 @@ window.mlTile = (g, ox, oy, S, ang, W, H, keep) => { const ca = Math.cos(ang), s
     const [qx, qy] = at(i + .5, j + .5); if (!keep || keep(qx, qy)) { for (let k = 0; k <= 4; k++) { const a = ang + k * Math.PI / 2, px = qx + Math.cos(a) * d, py = qy + Math.sin(a) * d; k ? g.lineTo(px, py) : g.moveTo(px, py); } } } };
 /* a deeper shade of a colour, keeping its hue and liveliness (lightness down, saturation held) */
 window.mlTileD = (...a) => { let d = ''; const g = { moveTo: (x, y) => { d += 'M' + x.toFixed(1) + ' ' + y.toFixed(1); }, lineTo: (x, y) => { d += 'L' + x.toFixed(1) + ' ' + y.toFixed(1); } }; mlTile(g, ...a); return d; };   /* the same tiling as an SVG path */
-window.mlPlanD = (kind, ox, oy, S, ang, W, H) => {   /* Samuel's octagon plans as one path: octagons at the whole-number points (big dots), a small frame at each half point (small dots) */
-  const c = Math.cos(ang), sn = Math.sin(ang), N = Math.ceil(Math.hypot(W, H) / S) + 2, t = .4142; let d = '';
-  const oct = (a) => [[a, t * a], [t * a, a], [-t * a, a], [-a, t * a], [-a, -t * a], [-t * a, -a], [t * a, -a], [a, -t * a]], sq = (x, y, h) => [[x - h, y - h], [x + h, y - h], [x + h, y + h], [x - h, y + h]], dia = (x, y, h) => [[x, y - h], [x + h, y], [x, y + h], [x - h, y]];
+window.mlPlanCell = (kind, odd) => {   /* one cell of Samuel's octagon plans, in the cell's own units: an octagon at 0,0 (a big dot), a small frame at .5,.5 */
+  const t = .4142, sh = [], oct = (a) => [[a, t * a], [t * a, a], [-t * a, a], [-a, t * a], [-a, -t * a], [-t * a, -a], [t * a, -a], [a, -t * a]], sq = (x, y, h) => [[x - h, y - h], [x + h, y - h], [x + h, y + h], [x - h, y + h]], dia = (x, y, h) => [[x, y - h], [x + h, y], [x, y + h], [x - h, y]];
+  if (kind === 'nest') { const a = .42, b = t * a; sh.push([oct(a), 1], [sq(0, 0, .27), 1]); if (odd) sh.push([dia(0, 0, .27), 1]);
+    sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [[[b, a], [b, 1 - a]]], [[[-b, a], [-b, 1 - a]]], [dia(.5, .5, .17), 1], [[[.5, b], [.5, .33]]], [[[.5, .67], [.5, 1 - b]]]); }
+  else if (kind === 'band') { const a = .38; sh.push([oct(a), 1], [dia(0, 0, .32), 1], [[[-.5, a], [.5, a]]], [[[-.5, 1 - a], [.5, 1 - a]]], [[[a, a], [a, 1 - a]]], [[[1 - a, a], [1 - a, 1 - a]]]);
+    if (odd) sh.push([[[a, a], [1 - a, 1 - a]]], [[[1 - a, a], [a, 1 - a]]]); else sh.push([sq(.5, .5, .06), 1]); sh.push([[[a, t * a], [.5, t * a - (.5 - a)]]]); }
+  else if (kind === 'kite') { const a = .42, b = t * a; sh.push([oct(a), 1], [dia(0, 0, .3), 1], [sq(0, 0, .15), 1], [[[0, -.3], [0, -.15]]], [[[0, .15], [0, .3]]], [[[-.3, 0], [-.15, 0]]], [[[.15, 0], [.3, 0]]]);   /* Apply: from Samuel's drawing, a diamond in each octagon holding a square, tied to it at four points; bars between octagons */
+    sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [[[b, a], [b, 1 - a]]], [[[-b, a], [-b, 1 - a]]]); if (odd) sh.push([sq(.5, .5, .12), 1], [sq(.5, .5, .05), 1]); else sh.push([dia(.5, .5, .17), 1], [[[.33, .5], [.67, .5]]]); }
+  else if (kind === 'river') { const a = .4, b = t * a; sh.push([oct(a), 1]); if (odd) sh.push([sq(0, 0, .25), 1]); else sh.push([dia(0, 0, .3), 1]);   /* rivers: octagons tied by bars, a small square or a crossed one in each gap, an edge running on now and then */
+    sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [sq(.5, .5, .1), 1]); if (odd) sh.push([[[.4, .4], [.6, .6]]], [[[.6, .4], [.4, .6]]]); else sh.push([[[b, a], [-.1, a + b + .1]]]); }
+  else { const a = .42, b = t * a; sh.push([oct(a), 1]); if (odd) sh.push([sq(0, 0, .2), 1]);   /* info cards: a plain octagon (every other one holds a square), a small square in each gap, bars side to side */
+    sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [sq(.5, .5, .12), 1]); }
+  return sh; };
+window.mlPlanD = (kind, ox, oy, S, ang, W, H) => {   /* the whole plan as one path, turned by ang, with octagon centres every S */
+  const c = Math.cos(ang), sn = Math.sin(ang), N = Math.ceil(Math.hypot(W, H) / S) + 2; let d = '';
   for (let I = -N; I <= N; I++) for (let J = -N; J <= N; J++) { const cx = ox + (I * c - J * sn) * S, cy = oy + (I * sn + J * c) * S; if (cx < -S * 1.5 || cy < -S * 1.5 || cx > W + S * 1.5 || cy > H + S * 1.5) continue;
-    const odd = (I + J) & 1, sh = [];   /* [points, closed] in the cell's own units */
-    if (kind === 'nest') {   /* people: an octagon holding a square (or a square and its diamond), little bars between octagons, a diamond in each gap on a short stem */
-      const a = .42, b = t * a; sh.push([oct(a), 1], [sq(0, 0, .27), 1]); if (odd) sh.push([dia(0, 0, .27), 1]);
-      sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [[[b, a], [b, 1 - a]]], [[[-b, a], [-b, 1 - a]]], [dia(.5, .5, .17), 1], [[[.5, b], [.5, .33]]], [[[.5, .67], [.5, 1 - b]]]); }
-    else if (kind === 'band') {   /* Apply: long bands run through the octagons' flat sides; a square where the bands meet the columns, crossed or nested in turn */
-      const a = .38; sh.push([oct(a), 1], [dia(0, 0, .32), 1], [[[-.5, a], [.5, a]]], [[[-.5, 1 - a], [.5, 1 - a]]], [[[a, a], [a, 1 - a]]], [[[1 - a, a], [1 - a, 1 - a]]]);
-      if (odd) sh.push([[[a, a], [1 - a, 1 - a]]], [[[1 - a, a], [a, 1 - a]]]); else sh.push([sq(.5, .5, .06), 1]);
-      sh.push([[[a, t * a], [.5, t * a - (.5 - a)]]]); }   /* one octagon edge runs on toward the next band */
-    else {   /* info cards: an octagon inside an octagon (or a diamond), a small square in a diamond between them, tied by bars */
-      const a = .42, b = t * a; sh.push([oct(a), 1]); if (odd) sh.push([dia(0, 0, .28), 1], [sq(0, 0, .18), 1]); else sh.push([oct(.29), 1], [sq(0, 0, .18), 1]);
-      sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [dia(.5, .5, .2), 1], [sq(.5, .5, .1), 1], [[[.5, b], [.5, .3]]]); }
-    for (const [pts, cl] of sh) d += 'M' + pts.map(([u, v]) => { const U = (I + u) * S, V = (J + v) * S; return (ox + U * c - V * sn).toFixed(1) + ' ' + (oy + U * sn + V * c).toFixed(1); }).join('L') + (cl ? 'Z' : ''); }
+    for (const [pts, cl] of mlPlanCell(kind, (I + J) & 1)) d += 'M' + pts.map(([u, v]) => { const U = (I + u) * S, V = (J + v) * S; return (ox + U * c - V * sn).toFixed(1) + ' ' + (oy + U * sn + V * c).toFixed(1); }).join('L') + (cl ? 'Z' : ''); }
   return d; };
 window.mlLines = (g, ox, oy, fams, W, H) => { const L = Math.hypot(W, H) * 2;   /* families of parallel lines: each [dir, step] passes through ox,oy + k * step */
   for (const [d, st] of fams) { const dl = Math.hypot(d[0], d[1]), ux = d[0] / dl, uy = d[1] / dl, n = Math.ceil(L / Math.max(4, Math.abs(st[0] * uy - st[1] * ux))) + 2;
@@ -2407,11 +2408,11 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       if (ta < 1.6) { const X = x => Math.max(0, Math.min(1, x / W)), grow = x => ss(0, 1, (ta - .35 - X(x) * .45) / .55);
         /* the blueprint first: hairline octagons on the river's own hidden grid, a soft darker cream, drawn in from the left;
            each dot then grows out of its octagon and the lines there give way, as on the opening page */
-        const oc = S / (2 * Math.SQRT2) / Math.cos(Math.PI / 8), P = new Map(); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const s2 = S / Math.SQRT2, P = new Map(); g.setTransform(dpr, 0, 0, dpr, 0, 0);   /* Samuel's octagon plan on the river's turned grid: every dot in an octagon, bars and small frames between */
         for (const v of vis) { const d = v.d; if (!d || d.gi === undefined) continue; const gx = wrap(d.gi * S + (d.gj % 2 ? S / 2 : 0)), gy = d.gj * S / 2 + S * .25;
           const a = ss(0, .3, ta - X(gx) * .3) * (1 - ss(.55, 1, grow(gx))); if (a < .03) continue; const q = Math.round(a * 5) / 5; let p = P.get(q); if (!p) P.set(q, p = new Path2D());
-          for (let i = 0; i <= 8; i++) { const an = Math.PI / 8 + i * Math.PI / 4, px = gx + Math.cos(an) * oc, py = gy + Math.sin(an) * oc; i ? p.lineTo(px, py) : p.moveTo(px, py); }
-          const e = oc * .32; p.moveTo(gx + S / 2 - e, gy - e); p.lineTo(gx + S / 2 + e, gy - e); p.lineTo(gx + S / 2 + e, gy + e); p.lineTo(gx + S / 2 - e, gy + e); p.closePath(); }
+          const I = d.gi + (d.gj >> 1), J = (d.gj + 1) >> 1;   /* the node's place on the turned grid, for the alternation */
+          for (const [pts, cl] of mlPlanCell('river', (I * 3 + J) & 1)) { pts.forEach(([u, v2], k) => { const px = gx + (u - v2) * s2 * Math.SQRT1_2, py = gy + (u + v2) * s2 * Math.SQRT1_2; k ? p.lineTo(px, py) : p.moveTo(px, py); }); if (cl) p.closePath(); } }
         g.strokeStyle = '#dbd0ae'; g.lineWidth = .9; g.lineJoin = 'round'; for (const [q, p] of P) { g.globalAlpha = q; g.stroke(p); } g.globalAlpha = 1;
         for (const v of vis) v.r *= grow(v.x); for (const w of ws) w.R *= grow(w.x); } }
     const cell = Math.max(48, rmax * 2.6), grid = new Map(), K = (a, b) => a + ',' + b;
@@ -2982,11 +2983,11 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     }
     const big2 = cd.kind === 'pill' || cd.kind === 'ap' ? 1.45 : 1.25, rM = (phone ? Math.min(24, rmax) : rmax) * big2, gp = side ? Math.max(8, rmax * .26) : phone ? 5 : Math.max(4, rmax * .09);   // side fields are airier   // the corner is packed full: dots sit close, never touching
     if (cd.kind === 'ap') {   /* Apply: every dot sits on Netsch's lattice (big ones in the octagons, small ones in the squares between), far from the words */
-      const S = Math.max(44, rM * 1.7), ang = Math.PI / 4 + .1, ca = Math.cos(ang), sa = Math.sin(ang), N = Math.ceil(Math.hypot(w, h) / S) + 2, far = pad * 2.6;
+      const S = Math.max(48, rM * 2.4), ang = Math.PI / 4 + .1, ca = Math.cos(ang), sa = Math.sin(ang), N = Math.ceil(Math.hypot(w, h) / S) + 2, far = pad * 2.6;
       cd.lat = { S, ca, sa, ox: w, oy: h, nodes: [] };
       for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [o, big] of [[0, 1], [.5, 0]]) {
         const u = (i + o) * S, v = (j + o) * S, x = w + u * ca - v * sa, y = h + u * sa + v * ca; if (x < 4 || y < 4 || x > w - 4 || y > h - 4) continue;
-        const f = field(x, y); if (f <= .05) continue; const r = big ? Math.min(S * .19, rmin + (rM - rmin) * f) : Math.min(S * .08, rmin + (rM * .38 - rmin) * f), R = r * 1.1 * BREATH;
+        const f = field(x, y); if (f <= .05) continue; const r = big ? Math.min(S * .13, rmin + (rM - rmin) * f) : Math.min(S * .07, rmin + (rM * .38 - rmin) * f), R = r * 1.1 * BREATH;
         if (r < rmin || distTo(x, y, rects) < R + far) continue;
         cd.lat.nodes.push({ x, y, big, f }); dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283, ring: big && r > 4 && rnd() < .18 }); }
     }
@@ -3011,7 +3012,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (cd.lat && cd.el.matches(':hover, :focus-visible')) { const L = cd.lat, S = L.S, e1 = [S * L.ca, S * L.sa], e2 = [-S * L.sa, S * L.ca];
       const bc = (getComputedStyle(cd.el).backgroundColor.match(/\d+/g) || [44, 84, 148]).slice(0, 3).map(Number);
       g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.beginPath(); g.ellipse(cd.w, cd.h, cd.w * .5, cd.h * 1.05, 0, 0, 6.3); g.clip();
-      if (!L.pd) L.pd = new Path2D(mlPlanD('band', L.ox, L.oy, S, Math.atan2(L.sa, L.ca), cd.w, cd.h)); g.strokeStyle = mlDeeper(bc, .1); g.lineWidth = 1.1; g.lineJoin = 'round'; g.stroke(L.pd); g.restore(); }   /* bands and octagons: big dots inside the octagons' diamonds, small ones in the squares where the bands meet */
+      if (!L.pd) L.pd = new Path2D(mlPlanD('kite', L.ox, L.oy, S, Math.atan2(L.sa, L.ca), cd.w, cd.h)); g.strokeStyle = mlDeeper(bc, .1); g.lineWidth = 1.1; g.lineJoin = 'round'; g.stroke(L.pd); g.restore(); }   /* octagons holding diamonds: big dots in the squares at their centres, small ones in the frames between */
     for (const d of cd.dots) { if (d.fixed) continue; const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .3 - Math.hypot(d.x - ox, d.y - oy) / Rn * 5 + d.ph * .35);   // a slow breath, about every 20 s
       const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
       g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); if (d.ring) { g.strokeStyle = g.fillStyle; g.lineWidth = .26; g.stroke(d.p); } else g.fill(d.p); }
