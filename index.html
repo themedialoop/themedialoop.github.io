@@ -6,6 +6,7 @@ window.mlMarks = window.mlMarks || ((g, L, a, col, k = 1) => { if (!L.length || 
   for (const [x, y, r, n, sp] of L) { if (n === 2) { const Ln = Math.max(r * 3, 26 * k), an = Math.PI / 4 + sp * .25, c = Math.cos(an), s = Math.sin(an); g.moveTo(x - c * Ln, y - s * Ln); g.lineTo(x + c * Ln, y + s * Ln); g.moveTo(x + s * Ln * .6, y - c * Ln * .6); g.lineTo(x - s * Ln * .6, y + c * Ln * .6); continue; }
     const R = Math.max(r * (n === 4 ? 1.5 : 1.6), 12 * k), a0 = (n === 8 ? Math.PI / 8 : n === 6 ? Math.PI / 6 : Math.PI / 4) + sp * .25; for (let i = 0; i <= n; i++) { const q = a0 + i * Math.PI * 2 / n; i ? g.lineTo(x + Math.cos(q) * R, y + Math.sin(q) * R) : g.moveTo(x + Math.cos(q) * R, y + Math.sin(q) * R); } }
   g.stroke(); g.restore(); });
+window.mlMoving = window.mlMoving || (() => { let t = -1e9; addEventListener('scroll', () => { t = performance.now(); }, { passive: true }); return () => { const k = Math.min(1, Math.max(0, (performance.now() - t - 120) / 380)); return 1 - k * k * (3 - 2 * k); }; })();   /* 1 while the page is being scrolled, easing to 0 soon after it stops: marks show only while dots are moving */
 window.mlMarkType = (p = .26) => Math.random() < p ? [8, 6, 4, 2][Math.floor(Math.random() * 4)] : 0;   /* about a quarter of the bigger dots carry one */</script>
 <script>window.mlRipple = window.mlRipple || ((x, y, t) => { const S = 54, u1 = Math.sin((x + y) / S * .42 - t * 1.5), u2 = Math.sin((x - y) / S * .36 + t * 1.05), v = Math.max(-1, Math.min(1, (u1 + u2) * .62 / .55)); return .5 + .5 * v * (1.5 - .5 * v * v); });   /* one ripple for every dot field: two slow waves crossing along the 45° diagonals */
 </script>
@@ -2363,7 +2364,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       return t < .7 ? 1 - .15 * t / .7 : .85 * (1 - (t - .7) / .3); };
     if (ex > .4) { for (const v of vis) v.r *= dance(v); for (const w of ws) w.R *= dance(w); }
     if (ex > .4 && ex < 1 && !still) { const MK = []; for (const v of vis) { const d = v.d; if (d.gh === undefined) d.gh = d.r0 > rmax * .45 ? mlMarkType() : 0; if (d.gh && v.r > 1) MK.push([v.x, v.y, v.r, d.gh, v.rot || 0]); }
-      g.setTransform(dpr, 0, 0, dpr, 0, 0); mlMarks(g, MK, ss(.4, .5, ex) * (1 - ss(.85, 1, ex)) * .6, '#2c5494'); }   /* while the river dances off: a few blueprint marks go with it */
+      g.setTransform(dpr, 0, 0, dpr, 0, 0); mlMarks(g, MK, ss(.4, .5, ex) * (1 - ss(.85, 1, ex)) * .6 * mlMoving(), '#2c5494'); }   /* while the river dances off: a few blueprint marks go with it */
     { const ta = still ? 9 : (performance.now() - (frame.arr || 0)) / 1000;   /* arriving: dots and words swell gently into place in a soft wave across the river, no overshoot */
       if (ta < 1.2) { const grow = x => ss(0, 1, (ta - Math.max(0, Math.min(1, x / W)) * .45) / .55); for (const v of vis) v.r *= grow(v.x); for (const w of ws) w.R *= grow(w.x);
         const MK = []; for (const v of vis) { const d = v.d; if (d.gh === undefined) d.gh = d.r0 > rmax * .45 ? mlMarkType() : 0; const gr = grow(v.x); if (d.gh && gr > .05 && gr < .98) MK.push([v.x, v.y, Math.max(v.r, d.r0 * .6), d.gh, (1 - gr) * 2]); }
@@ -3209,7 +3210,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         const hx2 = x, hy2 = y + LS / 2, e2 = edge * .3 * a; P.moveTo(hx2 - e2, hy2 - e2); P.lineTo(hx2 + e2, hy2 - e2); P.lineTo(hx2 + e2, hy2 + e2); P.lineTo(hx2 - e2, hy2 + e2); P.closePath(); }   /* and a little square in each gap */
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.strokeStyle = '#3961a5'; ctx.lineWidth = .6; ctx.lineJoin = 'round';
       for (const [q, P] of B) { ctx.globalAlpha = +q.slice(1); ctx.lineWidth = q[0] === 'h' ? 1.1 : q[0] === 'g' ? .9 : .6; ctx.strokeStyle = q[0] === 'g' ? '#4068ab' : '#3961a5'; ctx.stroke(P); }   /* the square grid a touch lighter and firmer, so it reads behind the octagons */ ctx.globalAlpha = 1; }
-    const fly = Math.max(e > 0 && e < 1 ? ss(0, .1, e) * (1 - ss(.85, 1, e)) : 0, sqe > 0 && sqe < 1 ? ss(0, .06, sqe) * (1 - ss(.8, 1, sqe)) : 0), GH = [], GI = [];   /* on as soon as the dots move, for the whole flight */
+    const fly = Math.max(e > 0 && e < 1 ? ss(0, .1, e) * (1 - ss(.85, 1, e)) : 0, sqe > 0 && sqe < 1 ? ss(0, .06, sqe) * (1 - ss(.8, 1, sqe)) * mlMoving() : 0), GH = [], GI = [];   /* on as soon as the dots move, for the whole flight */
     for (const d of dots) {
       arcOn = d.few ? 1 : 0; const k = ss(d.z * .45, d.z * .45 + .55, e); let m = lerp(maskLanding(d.x, d.y, t), maskHome(d.x, d.y, t), k) * (born >= 1 ? 1 : ss(.8 + dly(d), 1.3 + dly(d), bt));   /* the dots grow out in a ripple from the logo */   // each makes the trip at its own moment
       { const cg = Math.hypot(d.x - W / 2, d.y - (H - Math.max(28, 18) - 42)) - d.r - AMP * 2; m *= 1 - (1 - k) * (1 - ss(54, 78, cg)); }   /* on the landing, nothing sits behind the gold ^ dot */
@@ -3328,7 +3329,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       if (d.ring) { ctx.lineWidth = .28; ctx.strokeStyle = d.col; ctx.stroke(d.s); } else { ctx.fillStyle = d.col; ctx.fill(d.s); }
     }
 
-    if (MK.length) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); mlMarks(ctx, MK, ss(0, .08, ex) * (1 - ss(.8, 1, ex)) * .6, '#2c5494'); }   /* a few blueprint marks go with the dancing dots */
+    if (MK.length) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); mlMarks(ctx, MK, ss(0, .08, ex) * (1 - ss(.8, 1, ex)) * .6 * mlMoving(), '#2c5494'); }   /* a few blueprint marks go with the dancing dots */
     raf = requestAnimationFrame(frame); };
   const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
   const seen = new Set();
