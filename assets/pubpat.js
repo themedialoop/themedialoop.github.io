@@ -18,8 +18,8 @@
     for (const dx of P.once ? [0] : [-w, 0, w]) for (const dy of P.once ? [0] : [-h, 0, h]) for (const L of P.segs) { d += 'M'; for (let i = 0; i < L.length; i += 2) d += (i ? 'L' : '') + (L[i] + dx).toFixed(1) + ' ' + (L[i + 1] + dy).toFixed(1); }
     return `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0} ${y0} ${w} ${h}"><path d="${d}" fill="none" stroke="${col}" stroke-width="${(P.sw * k).toFixed(2)}" stroke-linejoin="round" stroke-linecap="round"/></svg>`)}")`; };
   const shade = c => { const m = c.trim().match(/^#?([0-9a-f]{6})$/i); const [r, g, b] = m ? [0, 2, 4].map(i => parseInt(m[1].slice(i, i + 2), 16)) : (c.match(/\d+/g) || [44, 84, 148]).map(Number);
-    const dark = r * .3 + g * .59 + b * .11 < 140; return `rgb(${[r, g, b].map(v => Math.round(dark ? v + (255 - v) * .3 : v * .78)).join(',')})`; };
-  const rows = [...document.querySelectorAll('.pubs li > a[href], .r-list li > a[href]')], cache = {};
+    const dark = r * .3 + g * .59 + b * .11 < 140; return `rgb(${[r, g, b].map(v => Math.round(dark ? v + (255 - v) * .19 : v * .9)).join(',')})`; };
+  const rows = [...document.querySelectorAll('.pubs li > a, .r-list li > a')], cache = {};
   const set = () => rows.forEach((a, i) => { const col = shade(getComputedStyle(a).getPropertyValue('--hl') || '#2c5494'), n = i % PATS.length, key = n + col;
     a.style.setProperty('--pat', cache[key] || (cache[key] = svg(PATS[n], col))); a.style.setProperty('--ps', PATS[n].size + 'px'); a.style.setProperty('--pr', PATS[n].once ? 'no-repeat' : 'repeat'); a.style.setProperty('--pp', PATS[n].once ? 'calc(var(--te, 70%) - 60px) 50%' : '100% 50%'); });
   set(); addEventListener('load', set); setTimeout(set, 800);

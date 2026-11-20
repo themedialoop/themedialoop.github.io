@@ -3520,13 +3520,13 @@ html body .bz-h.sec-h,html body .bz-h.tilt-h,html body .ev-h{font-size:clamp(30p
 <style>
 /* wherever a publication is listed: a highlighted row carries a big kaleidoscope of Netsch geometry (hexagons, squares, octagons and lines,
    crossing), a shade darker than its band, a different one for each row. It fades in only past the words, never behind them */
-html body .pubs li a[href]::before,html body .r-list li a[href]::before{background-image:linear-gradient(to right,var(--hl,#2c5494) 0,var(--hl,#2c5494) calc(var(--te,70%) + 14px),transparent calc(var(--te,70%) + 90px)),var(--pat,none) !important;background-size:100% 100%,var(--ps,250px) auto !important;background-repeat:no-repeat,var(--pr,repeat) !important;background-position:0 0,var(--pp,100% 50%) !important;background-color:var(--hl,#2c5494) !important}
+html body .pubs li > a[href]::before,html body .r-list li > a[href]::before,html body .pubs li > a:not([href])::before,html body .r-list li > a:not([href])::before{background-image:linear-gradient(to right,var(--hl,#2c5494) 0,var(--hl,#2c5494) calc(var(--te,70%) + 14px),transparent calc(var(--te,70%) + 90px)),var(--pat,none) !important;background-size:100% 100%,var(--ps,250px) auto !important;background-repeat:no-repeat,var(--pr,repeat) !important;background-position:0 0,var(--pp,100% 50%) !important;background-color:var(--hl,#2c5494) !important}
 /* every listed paper keeps a band clear at its right end, so its drawing always has room to show */
-html body .pubs li > a[href] > .ttl,html body .r-list li > a[href] > *{padding-right:clamp(70px,13vw,190px);box-sizing:border-box}
+html body .pubs li > a > .ttl,html body .r-list li > a > *{padding-right:clamp(70px,13vw,190px);box-sizing:border-box}
 </style>
 <script>
 /* where each listed paper's words end, so its pattern fades in just past them and never sits behind the text */
-(() => { const rows = [...document.querySelectorAll('.r-list li > a[href], .pubs li > a[href]')]; if (!rows.length) return;
+(() => { const rows = [...document.querySelectorAll('.r-list li > a, .pubs li > a')]; if (!rows.length) return;
   const place = () => rows.forEach(a => { const bl = parseFloat(getComputedStyle(a, '::before').left) || 0, ar = a.getBoundingClientRect(); let mx = 0;
     for (const n of a.querySelectorAll('*')) { if (n.children.length) continue; const rg = document.createRange(); rg.selectNodeContents(n); for (const b of rg.getClientRects()) mx = Math.max(mx, b.right); }
     a.style.setProperty('--te', (mx - ar.left - bl).toFixed(0) + 'px'); });
@@ -3632,7 +3632,7 @@ html body .about-grid .ab-pill.ab-b4{background:#e0773a;color:#f2eedd}
 html body .ab-pill.ab-b3 .pm{background:#2c5494}
 html body .ab-pill.ab-b3 .pm::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23f2eedd%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12.4%203.6c-.5%202.9-.3%205.6-.6%208.6-.2%202.8.2%205.4-.3%208.2%22/%3E%3Cpath%20d%3D%22M3.8%2011.6c2.7.5%205.4.2%208.3.4%202.8.1%205.4-.4%208.1.3%22/%3E%3C/svg%3E")}
 </style>
-<script src="assets/pubpat.js?v=1"></script>
+<script src="assets/pubpat.js?v=3"></script>
 <style>
 /* info cards, open: bigger, fuller type, and the open/close dot swells to fill its corner */
 html body .about-grid .ab-pill[open] h3{font-size:clamp(36px,4.6vw,72px);letter-spacing:-.04em;line-height:1}
@@ -3642,6 +3642,14 @@ html body .ab-pill .pm{transition:width .45s cubic-bezier(.3,1.4,.4,1),height .4
 html body .ab-pill[open] .pm{width:clamp(50px,4.2vw,62px);height:clamp(48px,4vw,59px)}
 html body .ab-pill .pm::before{transition:width .45s,height .45s}
 html body .ab-pill[open] .pm::before{width:40%;height:40%}
+</style>
+<script>
+/* open info cards: the title stacks, Our over the capitalised word */
+document.querySelectorAll('.ab-pill summary h3').forEach(h => { const m = h.textContent.trim().match(/^Our\s+(.+)$/); if (!m) return;
+  h.innerHTML = `Our <span class="ab-w">${m[1]}</span>`; h.setAttribute('aria-label', h.textContent); });
+</script>
+<style>
+html body .ab-pill[open] summary h3 .ab-w{display:block;text-transform:capitalize}
 </style>
 </body>
 </html>
