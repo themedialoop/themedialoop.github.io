@@ -3636,5 +3636,13 @@ html body .ab-pill .pm{width:40px;height:38px;border-radius:52% 48% 55% 45%/46% 
   el.style.setProperty('--hd', `rgb(${[r, g, b].map(v => Math.round(dark ? v + (255 - v) * .24 : v * .8)).join(',')})`); });
   set(); addEventListener('load', set); setTimeout(set, 1500); document.querySelectorAll('.res').forEach(el => el.addEventListener('mouseenter', set)); })();
 </script>
+<style>
+/* the info cards each in their own colour: blue, gold, orange */
+html body .about-grid .ab-pill.ab-b2{background:#2c5494;color:#f2eedd}
+html body .about-grid .ab-pill.ab-b3{background:#e7aa4d;color:#2c5494}
+html body .about-grid .ab-pill.ab-b4{background:#e0773a;color:#f2eedd}
+html body .ab-pill.ab-b3 .pm{background:#2c5494}
+html body .ab-pill.ab-b3 .pm::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23f2eedd%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12.4%203.6c-.5%202.9-.3%205.6-.6%208.6-.2%202.8.2%205.4-.3%208.2%22/%3E%3Cpath%20d%3D%22M3.8%2011.6c2.7.5%205.4.2%208.3.4%202.8.1%205.4-.4%208.1.3%22/%3E%3C/svg%3E")}
+</style>
 </body>
 </html>
