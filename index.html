@@ -3398,14 +3398,14 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   if ('ResizeObserver' in window) { const ro = new ResizeObserver(place); cards.forEach(c => ro.observe(c)); } else addEventListener('resize', place); })();
 </script>
 <style>
-/* resource cards, option A: one big hexagon a shade lighter than the card, centred on the button dot and cropped by the card's corner.
-   Drawn with a clip-path inside the card's own box, so it never changes the card's size. On hover it turns 30°, onto its next face */
-@property --hr{syntax:"<angle>";inherits:false;initial-value:0deg}
-.res::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:rgba(255,255,255,.13);--hR:calc(var(--gs,160px) * 1.5);
-  clip-path:polygon(calc(var(--gx,85%) + cos(var(--hr) + 30deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 30deg) * var(--hR)),calc(var(--gx,85%) + cos(var(--hr) + 90deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 90deg) * var(--hR)),calc(var(--gx,85%) + cos(var(--hr) + 150deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 150deg) * var(--hR)),calc(var(--gx,85%) + cos(var(--hr) + 210deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 210deg) * var(--hR)),calc(var(--gx,85%) + cos(var(--hr) + 270deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 270deg) * var(--hR)),calc(var(--gx,85%) + cos(var(--hr) + 330deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 330deg) * var(--hR)));transition:--hr .7s cubic-bezier(.3,1.4,.4,1)}
-.res:is(:hover,:focus-within)::after{--hr:30deg}
-.res.r-gold::after,.res.r-orange::after{background:rgba(255,255,255,.16)}
-@media (prefers-reduced-motion:reduce){.res::after{transition:none}.res:is(:hover,:focus-within)::after{--hr:0deg}}
+/* resource cards: a ripple of three hexagons round the button dot, in see-through lines, sized from the dot itself.
+   Drawn inside the card's own box, so the card keeps its size. On hover the rings spread a little and twist */
+.res::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;--hs:calc(var(--gs,160px) * 2.8);
+  background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M72.26%2062.85%20L50.00%2075.70%20L27.74%2062.85%20L27.74%2037.15%20L50.00%2024.30%20L72.26%2037.15Z%22%20stroke-opacity%3D%220.7%22%20stroke-width%3D%221.4%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M77.22%2073.10%20L43.61%2085.12%20L16.39%2062.03%20L22.78%2026.90%20L56.39%2014.88%20L83.61%2037.97Z%22%20stroke-opacity%3D%220.7%22%20stroke-width%3D%221.2%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M79.88%2086.41%20L33.41%2094.08%20L3.53%2057.67%20L20.12%2013.59%20L66.59%205.92%20L96.47%2042.33Z%22%20stroke-opacity%3D%220.7%22%20stroke-width%3D%221%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/g%3E%3C/svg%3E") calc(var(--gx,85%) - var(--hs) / 2) calc(var(--gy,80%) - var(--hs) / 2) / var(--hs) var(--hs) no-repeat;
+  transform-origin:var(--gx,85%) var(--gy,80%);transition:transform .7s cubic-bezier(.3,1.4,.4,1)}
+.res:is(:hover,:focus-within)::after{transform:scale(1.09) rotate(12deg)}
+@media (max-width:560px){.res::after{--hs:calc(var(--gs,160px) * 2.4);--mk:linear-gradient(to bottom,transparent calc(var(--gy,80%) - var(--gs,160px) * .62),#000 calc(var(--gy,80%) - var(--gs,160px) * .38));-webkit-mask-image:var(--mk);mask-image:var(--mk)}}   /* on phones the ripple stays tight round the dot, clear of the words */
+@media (prefers-reduced-motion:reduce){.res::after{transition:none}.res:is(:hover,:focus-within)::after{transform:none}}
 </style>
 </body>
 </html>
