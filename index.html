@@ -3385,12 +3385,9 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
 <style>
 /* resource cards: a couple of long 45° lines through the button dot, one shade lighter than the card, fading away from it */
 .res{isolation:isolate}
-.res::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.42;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%201000%201000%22%3E%3Cg%20stroke%3D%22%23fff%22%20stroke-opacity%3D%22.55%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M0%200%20L1000%201000%22%20stroke-width%3D%221.6%22/%3E%3Cpath%20d%3D%22M0%20110%20L890%201000%22%20stroke-width%3D%221.1%22%20stroke-opacity%3D%22.4%22/%3E%3C/g%3E%3C/svg%3E") calc(var(--gx,85%) - var(--gs,160px) * 4.5) calc(var(--gy,80%) - var(--gs,160px) * 4.5) / calc(var(--gs,160px) * 9) calc(var(--gs,160px) * 9) no-repeat;
-  --rad:radial-gradient(circle at var(--gx,85%) var(--gy,80%),#000 0,#000 calc(var(--gs,160px) * .55),rgba(0,0,0,.45) calc(var(--gs,160px) * 1.9),transparent calc(var(--gs,160px) * 3.8));-webkit-mask-image:var(--rad);mask-image:var(--rad)}   /* the lines fade out away from the dot */
 </style>
 <style>
 /* the button dot sits in one big, thin hexagon */
-.res::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cpath%20d%3D%22M91.57%2074.00%20L50.00%2098.00%20L8.43%2074.00%20L8.43%2026.00%20L50.00%202.00%20L91.57%2026.00Z%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-opacity%3D%22.55%22%20stroke-width%3D%221.4%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E") calc(var(--gx,85%) - var(--gs,160px) * 1.05) calc(var(--gy,80%) - var(--gs,160px) * 1.05) / calc(var(--gs,160px) * 2.1) calc(var(--gs,160px) * 2.1) no-repeat;opacity:.42}   /* kept inside the card's box, so it never changes the card's size */
 </style>
 <script>
 /* anchor each card's plan on its button dot: the grid's spot, the radiating fade and the dot's octagon all centre on it */
@@ -3400,5 +3397,15 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   place(); addEventListener('load', place); document.fonts && document.fonts.ready.then(place);
   if ('ResizeObserver' in window) { const ro = new ResizeObserver(place); cards.forEach(c => ro.observe(c)); } else addEventListener('resize', place); })();
 </script>
+<style>
+/* resource cards, option A: one big hexagon a shade lighter than the card, centred on the button dot and cropped by the card's corner.
+   Drawn with a clip-path inside the card's own box, so it never changes the card's size. On hover it turns 30°, onto its next face */
+@property --hr{syntax:"<angle>";inherits:false;initial-value:0deg}
+.res::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:rgba(255,255,255,.13);--hR:calc(var(--gs,160px) * 1.5);
+  clip-path:polygon(calc(var(--gx,85%) + cos(var(--hr) + 30deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 30deg) * var(--hR)),calc(var(--gx,85%) + cos(var(--hr) + 90deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 90deg) * var(--hR)),calc(var(--gx,85%) + cos(var(--hr) + 150deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 150deg) * var(--hR)),calc(var(--gx,85%) + cos(var(--hr) + 210deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 210deg) * var(--hR)),calc(var(--gx,85%) + cos(var(--hr) + 270deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 270deg) * var(--hR)),calc(var(--gx,85%) + cos(var(--hr) + 330deg) * var(--hR)) calc(var(--gy,80%) + sin(var(--hr) + 330deg) * var(--hR)));transition:--hr .7s cubic-bezier(.3,1.4,.4,1)}
+.res:is(:hover,:focus-within)::after{--hr:30deg}
+.res.r-gold::after,.res.r-orange::after{background:rgba(255,255,255,.16)}
+@media (prefers-reduced-motion:reduce){.res::after{transition:none}.res:is(:hover,:focus-within)::after{--hr:0deg}}
+</style>
 </body>
 </html>
