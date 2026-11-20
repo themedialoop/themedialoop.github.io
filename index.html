@@ -2936,7 +2936,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
           const d = distTo(x, y, rects); return f * sm(pad, pad + rmax * 2.2, d); };   // thin out well before the words
     const dots = [];
     if (cd.kind === 'pill') {
-      if (!cd.el.open) { cd.dots = []; cd.box.classList.remove('on'); return; }   // closed info cards stay plain
+      cd.dots = []; cd.box.classList.remove('on'); return;   // info cards now wear the people cards' net when open (drawn separately)
       // the gold open/close button is one of the dots: the others pack round it at the usual spacing
       const b = cd.el.querySelector('.pm').getBoundingClientRect(); dots.push({ x: b.left - cr.left + b.width / 2, y: b.top - cr.top + b.height / 2, r: 0, R: Math.max(b.width, b.height) / 2, fixed: true });
     }
@@ -3486,6 +3486,48 @@ document.querySelectorAll('.apply, .people .card, .ev-cards .ev').forEach(el => 
 /* an open info card makes room for the frame of dots round its words */
 html body .ab-pill[open] > :not(summary):not(canvas){box-sizing:border-box;padding-inline:clamp(40px,7vw,90px) !important;padding-bottom:clamp(30px,5vw,70px) !important}
 html body .ab-pill[open] > summary{box-sizing:border-box;padding-inline:clamp(40px,7vw,90px) !important;padding-top:clamp(26px,4vw,56px) !important}
+</style>
+<script>
+/* open info cards ("Our style" and the rest) wear the same net as the people cards: the net's own holes tiled across the whole card,
+   breathing in a slow wave, in the card's dot colour, with one soft clearing round the words */
+(() => { const pills = [...document.querySelectorAll('.ab-pill')]; if (!pills.length) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let holes = [], TILE = 1024;
+  const ready = (window.NET_HOLES ? Promise.resolve(window.NET_HOLES) : fetch('assets/net-holes.json').then(r => r.json())).then(j => { TILE = j.tile; const sc = j.scale;
+    holes = j.holes.map(h => { const cx = h[0] / sc, cy = h[1] / sc, pts = []; for (let i = 2; i < h.length; i += 2) pts.push([h[i] / sc, h[i + 1] / sc]);
+      const p = new Path2D(), n = pts.length, mid = i => [(pts[i % n][0] + pts[(i + 1) % n][0]) / 2, (pts[i % n][1] + pts[(i + 1) % n][1]) / 2]; let m = mid(0); p.moveTo(m[0], m[1]);
+      for (let i = 1; i <= n; i++) { const c = pts[i % n], q = mid(i); p.quadraticCurveTo(c[0], c[1], q[0], q[1]); } p.closePath();
+      return { cx, cy, p, ph: (cx * 12.9898 + cy * 78.233) % 6.283 }; }); });
+  const ink = el => { const m = getComputedStyle(el).backgroundColor.match(/\d+/g) || [44, 84, 148], [r, g, b] = m.map(Number);   /* gold on blue, blue on gold, pink and orange, cream on purple */
+    if (Math.abs(r - 44) < 30 && Math.abs(b - 148) < 30) return '#e7aa4d'; if (Math.abs(r - 155) < 25 && Math.abs(g - 106) < 25) return '#f2eedd'; return '#2c5494'; };
+  const P = pills.map((el, i) => { const cv = document.createElement('canvas'); cv.className = 'pnet'; cv.setAttribute('aria-hidden', 'true'); el.querySelector('summary').prepend(cv);
+    return { el, cv, off: [(i * .37 + .21) % 1, (i * .61 + .43) % 1] }; });
+  const draw = now => { const time = reduce ? 0 : now / 1000; let any = false;
+    for (const q of P) { const { el, cv, off } = q; if (!el.open) { if (cv.width > 1) cv.width = cv.height = 1; continue; }
+      const r = el.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) continue; any = true;
+      const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+      const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, w, h);
+      const tilePx = (innerWidth < 700 ? 820 : 1100) * dpr, k = tilePx / TILE, bx0 = -off[0] * tilePx, by0 = -off[1] * tilePx; g.fillStyle = ink(el);
+      for (let ty = 0; ty <= Math.ceil(h / tilePx) + 1; ty++) for (let tx = 0; tx <= Math.ceil(w / tilePx) + 1; tx++) for (const hh of holes) {
+        const px = bx0 + tx * tilePx + hh.cx * k, py = by0 + ty * tilePx + hh.cy * k; if (px < -30 || py < -30 || px > w + 30 || py > h + 30) continue;
+        const s = .62 + .3 * (.5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35)); g.setTransform(k * s, 0, 0, k * s, px, py); g.fill(hh.p); }
+      /* one soft clearing round the words: the title and text block together, its edge feathered */
+      g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'destination-out';
+      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; el.querySelectorAll('h3, :scope > p, :scope > ul, :scope > div').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e);
+        for (const b of rg.getClientRects()) { if (!b.width) continue; x0 = Math.min(x0, b.left); y0 = Math.min(y0, b.top); x1 = Math.max(x1, b.right); y1 = Math.max(y1, b.bottom); } });
+      if (x1 > x0) { const pad = 26 * dpr, fe = 46 * dpr, X0 = (x0 - r.left) * dpr - pad, Y0 = (y0 - r.top) * dpr - pad, X1 = (x1 - r.left) * dpr + pad, Y1 = (y1 - r.top) * dpr + pad;
+        g.fillStyle = '#000'; g.filter = `blur(${fe / 2}px)`; g.beginPath(); g.roundRect(X0 - fe * .4, Y0 - fe * .4, X1 - X0 + fe * .8, Y1 - Y0 + fe * .8, 70 * dpr); g.fill(); g.filter = 'none';
+        g.beginPath(); g.roundRect(X0, Y0, X1 - X0, Y1 - Y0, 50 * dpr); g.fill(); }   /* solid inside, feathered at the rim */
+      g.globalCompositeOperation = 'source-over'; }
+    if (any && !reduce) requestAnimationFrame(draw); else raf = 0; };
+  let raf = 0; const go = () => { if (!raf) raf = requestAnimationFrame(draw); };
+  ready.then(() => { pills.forEach(el => el.addEventListener('toggle', go)); addEventListener('scroll', go, { passive: true }); addEventListener('resize', go); go(); });
+})();
+</script>
+<style>
+.ab-pill summary > .pnet{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;border-radius:inherit}
+.ab-pill{position:relative}.ab-pill summary{position:static}
+.ab-pill > :not(summary),.ab-pill summary > :not(.pnet):not(.kdots){position:relative;z-index:1}
 </style>
 </body>
 </html>
