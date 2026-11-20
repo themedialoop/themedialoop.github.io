@@ -2923,7 +2923,10 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     const pad = phone ? 14 : Math.max(14, rmax * .45);            // clear space between any dot and the words
     const side = cd.kind === 'pill' || cd.kind === 'ap';   // info cards and Apply: an even field of dots across the whole right side
     const field = side
-      ? (x, y) => { const d = distTo(x, y, rects), cy2 = cd.kind === 'pill' ? 0 : h;   // the pills and Apply: the same packed dots, but only a small cluster tucked into one corner
+      ? cd.kind === 'pill'
+        ? (x, y) => { const d = distTo(x, y, rects), e = Math.min(x, w - x, y, h - y), fr = 1 - sm(0, Math.min(w, h) * (phone ? .2 : .26), e);   /* an open info card: a frame of dots round the words, like the people cards, biggest at the edges */
+            return Math.max(0, fr) * (.6 + .2 * Math.sin(x * .013 + y * .017)) * sm(pad * 1.6, pad * 1.6 + 40, d); }
+        : (x, y) => { const d = distTo(x, y, rects), cy2 = cd.kind === 'pill' ? 0 : h;   // the pills and Apply: the same packed dots, but only a small cluster tucked into one corner
           const c = 1 - sm(.35, 1, Math.hypot((w - x) / (w * (phone ? .3 : .34)), (y - cy2) / (h * (phone ? .45 : .95))));   // desktop: a fuller corner cluster
           return Math.max(0, c) * (.5 + .2 * Math.sin(x * .013 + y * .017)) * sm(pad * 2.4, pad * 2.4 + 50, d); }
       : phone
@@ -3468,5 +3471,10 @@ html body .ev-cards .ev > .np,html body .apply > .np,html body .people .card > .
 <script>
 document.querySelectorAll('.apply, .people .card, .ev-cards .ev').forEach(el => { const n = document.createElement('span'); n.className = 'np'; n.setAttribute('aria-hidden', 'true'); el.prepend(n); });
 </script>
+<style>
+/* an open info card makes room for the frame of dots round its words */
+html body .ab-pill[open] > :not(summary):not(canvas){box-sizing:border-box;padding-inline:clamp(40px,7vw,90px) !important;padding-bottom:clamp(30px,5vw,70px) !important}
+html body .ab-pill[open] > summary{box-sizing:border-box;padding-inline:clamp(40px,7vw,90px) !important;padding-top:clamp(26px,4vw,56px) !important}
+</style>
 </body>
 </html>
