@@ -8,13 +8,15 @@ window.mlMarks = window.mlMarks || ((g, L, a, col, k = 1) => { if (!L.length || 
   g.stroke(); g.restore(); });
 window.mlMoving = window.mlMoving || (() => { let t = -1e9; addEventListener('scroll', () => { t = performance.now(); }, { passive: true }); return () => { const k = Math.min(1, Math.max(0, (performance.now() - t - 120) / 380)); return 1 - k * k * (3 - 2 * k); }; })();   /* 1 while the page is being scrolled, easing to 0 soon after it stops: marks show only while dots are moving */
 window.mlMarkType = (p = .26) => Math.random() < p ? [8, 6, 4, 8, 6, 4, 8, 6, 4, 2][Math.floor(Math.random() * 10)] : 0;   /* crossings (the X) are rare */   /* about a quarter of the bigger dots carry one */</script>
-<script>window.mlPlanCell = (kind, odd) => {   /* one cell of Samuel's octagon plans, in the cell's own units: an octagon at 0,0 (a big dot), a small frame at .5,.5 */
+<script>window.mlPlanCell = (kind, odd, h = 0) => {   /* one cell of Samuel's octagon plans, in the cell's own units: an octagon at 0,0 (a big dot), a small frame at .5,.5 */
   const t = .4142, sh = [], oct = (a) => [[a, t * a], [t * a, a], [-t * a, a], [-a, t * a], [-a, -t * a], [-t * a, -a], [t * a, -a], [a, -t * a]], sq = (x, y, h) => [[x - h, y - h], [x + h, y - h], [x + h, y + h], [x - h, y + h]], dia = (x, y, h) => [[x, y - h], [x + h, y], [x, y + h], [x - h, y]];
   if (kind === 'nest') { const a = .42, b = t * a; sh.push([oct(a), 1], [sq(0, 0, .27), 1]); if (odd) sh.push([dia(0, 0, .27), 1]);
     sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [[[b, a], [b, 1 - a]]], [[[-b, a], [-b, 1 - a]]], [dia(.5, .5, .17), 1], [[[.5, b], [.5, .33]]], [[[.5, .67], [.5, 1 - b]]]); }
   else if (kind === 'band') { const a = .38; sh.push([oct(a), 1], [dia(0, 0, .32), 1], [[[-.5, a], [.5, a]]], [[[-.5, 1 - a], [.5, 1 - a]]], [[[a, a], [a, 1 - a]]], [[[1 - a, a], [1 - a, 1 - a]]]);
     if (odd) sh.push([[[a, a], [1 - a, 1 - a]]], [[[1 - a, a], [a, 1 - a]]]); else sh.push([sq(.5, .5, .06), 1]); sh.push([[[a, t * a], [.5, t * a - (.5 - a)]]]); }
-  else if (kind === 'river') { if (odd) sh.push([dia(0, 0, .2), 1], [sq(0, 0, .1), 1]); else sh.push([oct(.4), 1], [sq(0, 0, .2), 1]); }   /* rivers, from Samuel's drawing: an octagon holding a square, and between them a small square in a diamond */
+  else if (kind === 'river') {   /* rivers, from Samuel's drawing: octagons set in square frames (their corners become triangles), and small squares, whole or split, where the frames meet */
+    if (odd) { const e = .15; sh.push([sq(0, 0, e), 1]); if (h === 1) sh.push([[[0, -e], [0, e]]]); else if (h === 2) sh.push([[[-e, e], [e, -e]]]); else if (h === 3) sh.push([[[-e, 0], [e, 0]]]); }
+    else { const e = .35; if (h !== 3) sh.push([sq(0, 0, e), 1]); sh.push([oct(e), 1]); if (h === 2) sh.push([oct(.22), 1], [sq(0, 0, .11), 1]); } }
   else { const a = .42, b = t * a; sh.push([oct(a), 1]); if (odd) sh.push([dia(0, 0, .28), 1], [sq(0, 0, .18), 1]); else sh.push([oct(.29), 1], [sq(0, 0, .18), 1]);
     sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [dia(.5, .5, .2), 1], [sq(.5, .5, .1), 1], [[[.5, b], [.5, .3]]]); }
   return sh; };
@@ -1234,7 +1236,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
         const s2 = S / Math.SQRT2, P = new Map(); g.setTransform(dpr, 0, 0, dpr, 0, 0);   /* Samuel's octagon plan on the river's turned grid: every dot in an octagon, bars and small frames between */
         for (const v of vis) { const d = v.d; if (!d || d.gi === undefined) continue; const gx = wrap(d.gi * S + (d.gj % 2 ? S / 2 : 0)), gy = d.gj * S / 2 + S * .25;
           const a = ss(0, .3, ta - X(gx) * .3) * (1 - ss(.55, 1, grow(gx))); if (a < .03) continue; const q = Math.round(a * 5) / 5; let p = P.get(q); if (!p) P.set(q, p = new Path2D());
-          for (const [pts, cl] of mlPlanCell('river', d.gj % 2)) { pts.forEach(([u, v2], k) => { const px = v.x + u * S, py = v.y + v2 * S;   /* the octagon rows and the in-between rows of the river's grid, each shape centred on its own dot */
+          for (const [pts, cl] of mlPlanCell('river', d.gj % 2, ((d.gi * 7 + d.gj * 13) % 5 + 5) % 5)) { pts.forEach(([u, v2], k) => { const px = v.x + u * S, py = v.y + v2 * S;   /* the octagon rows and the in-between rows of the river's grid, each shape centred on its own dot */
             k ? p.lineTo(px, py) : p.moveTo(px, py); }); if (cl) p.closePath(); } }
         g.strokeStyle = '#dbd0ae'; g.lineWidth = .9; g.lineJoin = 'round'; for (const [q, p] of P) { g.globalAlpha = q; g.stroke(p); } g.globalAlpha = 1;
         for (const v of vis) v.r *= grow(v.x); for (const w of ws) w.R *= grow(w.x); } }
