@@ -39,6 +39,13 @@ window.mlFaded = (w, h, d, pts, R, col, lw) => {   /* a plan drawn only round th
   const lg = lc.getContext('2d'), mg = mc.getContext('2d'); lg.strokeStyle = col; lg.lineWidth = lw; lg.lineJoin = 'round'; lg.stroke(new Path2D(d)); mg.globalCompositeOperation = 'lighter';
   for (const [x, y, k] of pts) { const rr = R * (k || 1), gr = mg.createRadialGradient(x, y, 0, x, y, rr); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.5, 'rgba(0,0,0,.85)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); mg.fillStyle = gr; mg.fillRect(x - rr, y - rr, rr * 2, rr * 2); }
   lg.globalCompositeOperation = 'destination-in'; lg.drawImage(mc, 0, 0); return lc; };
+window.mlApplyTile = [[0,0,1092,0],[0,0,0,1092],[663,137,882,137,963,220,963,422,882,503,663,505,582,424,580,222,663,137],[215,612,380,612,470,700,470,825,375,920,208,920,125,840,125,700,215,612],
+  [0,5,212,215],[212,0,212,322],[315,0,315,322],[0,322,475,322],[0,422,582,422],[315,218,580,222],[315,218,530,0],[530,0,663,137],[663,0,663,137],[882,0,882,137],[920,172,1092,0],[963,220,1092,340],[963,422,1092,422],[380,422,580,222],
+  [0,485,175,650],[85,555,212,425],[215,425,215,612],[315,425,315,612],[215,610,560,610],[380,425,560,605],[380,612,470,700],[470,700,663,505],[663,505,663,700],[472,700,770,700],[772,505,772,1092],[882,503,882,1092],[885,665,1092,465],[885,700,1092,700],[472,822,1092,822],[472,700,472,1092],[0,700,125,700],[0,820,125,820],[0,1090,205,920],[208,920,208,1092],[375,920,375,1092],[505,1092,770,825],[885,825,1092,1030]];   /* Samuel's square drawing for the Apply card, traced: a big octagon top right, a smaller one bottom left */
+window.mlApplyD = (ox, oy, S, ang, W, H) => { const c = Math.cos(ang), sn = Math.sin(ang), N = Math.ceil(Math.hypot(W, H) / S) + 2; let d = '';
+  for (let I = -N; I <= N; I++) for (let J = -N; J <= N; J++) { const cx = ox + ((I + .5) * c - (J + .5) * sn) * S, cy = oy + ((I + .5) * sn + (J + .5) * c) * S; if (cx < -S || cy < -S || cx > W + S || cy > H + S) continue;
+    for (const L of mlApplyTile) { d += 'M'; for (let k = 0; k < L.length; k += 2) { const U = (I + L[k] / 1092) * S, V = (J + L[k + 1] / 1092) * S; d += (k ? 'L' : '') + (ox + U * c - V * sn).toFixed(1) + ' ' + (oy + U * sn + V * c).toFixed(1); } } }
+  return d; };
 window.mlPlanD = (kind, ox, oy, S, ang, W, H) => {   /* the whole plan as one path, turned by ang, with octagon centres every S */
   const c = Math.cos(ang), sn = Math.sin(ang), N = Math.ceil(Math.hypot(W, H) / S) + 2; let d = '';
   for (let I = -N; I <= N; I++) for (let J = -N; J <= N; J++) { const cx = ox + (I * c - J * sn) * S, cy = oy + (I * sn + J * c) * S; if (cx < -S * 1.5 || cy < -S * 1.5 || cx > W + S * 1.5 || cy > H + S * 1.5) continue;
@@ -2994,11 +3001,11 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     }
     const big2 = cd.kind === 'pill' || cd.kind === 'ap' ? 1.45 : 1.25, rM = (phone ? Math.min(24, rmax) : rmax) * big2, gp = side ? Math.max(8, rmax * .26) : phone ? 5 : Math.max(4, rmax * .09);   // side fields are airier   // the corner is packed full: dots sit close, never touching
     if (cd.kind === 'ap') {   /* Apply: every dot sits on Netsch's lattice (big ones in the octagons, small ones in the squares between), far from the words */
-      const S = Math.max(48, rM * 2.4), ang = Math.PI / 4 + .1, ca = Math.cos(ang), sa = Math.sin(ang), N = Math.ceil(Math.hypot(w, h) / S) + 2, far = pad * 2.6;
+      const S = Math.max(88, rM * 3.3), ang = .12, ca = Math.cos(ang), sa = Math.sin(ang), N = Math.ceil(Math.hypot(w, h) / S) + 2, far = pad * 2.6;
       cd.lat = { S, ca, sa, ox: w, oy: h, nodes: [] };
-      for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [o, big] of [[0, 1], [.5, 0]]) {
-        const u = (i + o) * S, v = (j + o) * S, x = w + u * ca - v * sa, y = h + u * sa + v * ca; if (x < 4 || y < 4 || x > w - 4 || y > h - 4) continue;
-        const f = field(x, y); if (f <= .05) continue; const r = big ? Math.min(S * .13, rmin + (rM - rmin) * f) : Math.min(S * .07, rmin + (rM * .38 - rmin) * f), R = r * 1.1 * BREATH;
+      for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [o, o2, big] of [[773 / 1092, 320 / 1092, 1], [298 / 1092, 765 / 1092, 0]]) {   /* big dots in the big octagons, smaller ones in the small octagons */
+        const u = (i + o) * S, v = (j + o2) * S, x = w + u * ca - v * sa, y = h + u * sa + v * ca; if (x < 4 || y < 4 || x > w - 4 || y > h - 4) continue;
+        const f = field(x, y); if (f <= .05) continue; const r = big ? Math.min(S * .125, rmin + (rM - rmin) * f) : Math.min(S * .1, rmin + (rM * .38 - rmin) * f), R = r * 1.1 * BREATH;
         if (r < rmin || distTo(x, y, rects) < R + far) continue;
         cd.lat.nodes.push({ x, y, big, f }); dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283, ring: big && r > 4 && rnd() < .18 }); }
     }
@@ -3023,7 +3030,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (cd.lat && cd.el.matches(':hover, :focus-visible')) { const L = cd.lat, S = L.S, e1 = [S * L.ca, S * L.sa], e2 = [-S * L.sa, S * L.ca];
       const bc = (getComputedStyle(cd.el).backgroundColor.match(/\d+/g) || [44, 84, 148]).slice(0, 3).map(Number);
       const col = mlDeeper(bc, .1); if (!L.fc || L.fk !== col) { L.fk = col;   /* the plan only round the dots, fading out where there are none */
-        L.fc = mlFaded(cd.cv.width, cd.cv.height, mlPlanD('kite', L.ox * dpr, L.oy * dpr, S * dpr, Math.atan2(L.sa, L.ca), cd.cv.width, cd.cv.height), cd.dots.filter(q => !q.fixed).map(q => [q.x * dpr, q.y * dpr, q.r > S * .09 ? 1 : .6]), S * .85 * dpr, col, 1.1 * dpr); }
+        L.fc = mlFaded(cd.cv.width, cd.cv.height, mlApplyD(L.ox * dpr, L.oy * dpr, S * dpr, Math.atan2(L.sa, L.ca), cd.cv.width, cd.cv.height), cd.dots.filter(q => !q.fixed).map(q => [q.x * dpr, q.y * dpr, q.r > S * .09 ? 1 : .6]), S * .85 * dpr, col, 1.1 * dpr); }
       g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(L.fc, 0, 0); }   /* octagons holding diamonds: big dots in the squares at their centres, small ones in the frames between */
     for (const d of cd.dots) { if (d.fixed) continue; const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .3 - Math.hypot(d.x - ox, d.y - oy) / Rn * 5 + d.ph * .35);   // a slow breath, about every 20 s
       const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
