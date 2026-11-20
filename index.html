@@ -2365,14 +2365,14 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (ex > .4) { for (const v of vis) v.r *= dance(v); for (const w of ws) w.R *= dance(w); }
     { const ta = still ? 9 : (performance.now() - (frame.arr || 0)) / 1000;   /* arriving: dots and words swell gently into place in a soft wave across the river, no overshoot */
       if (ta < 1.6) { const X = x => Math.max(0, Math.min(1, x / W)), grow = x => ss(0, 1, (ta - .35 - X(x) * .45) / .55);
-        /* the blueprint first: hairline octagons on the river's own hidden grid, a lighter cream than the page, drawn in from the left;
+        /* the blueprint first: hairline octagons on the river's own hidden grid, a soft darker cream, drawn in from the left;
            each dot then grows out of its octagon and the lines there give way, as on the opening page */
         const oc = S / (2 * Math.SQRT2) / Math.cos(Math.PI / 8), P = new Map(); g.setTransform(dpr, 0, 0, dpr, 0, 0);
         for (const v of vis) { const d = v.d; if (!d || d.gi === undefined) continue; const gx = wrap(d.gi * S + (d.gj % 2 ? S / 2 : 0)), gy = d.gj * S / 2 + S * .25;
           const a = ss(0, .3, ta - X(gx) * .3) * (1 - ss(.55, 1, grow(gx))); if (a < .03) continue; const q = Math.round(a * 5) / 5; let p = P.get(q); if (!p) P.set(q, p = new Path2D());
           for (let i = 0; i <= 8; i++) { const an = Math.PI / 8 + i * Math.PI / 4, px = gx + Math.cos(an) * oc, py = gy + Math.sin(an) * oc; i ? p.lineTo(px, py) : p.moveTo(px, py); }
           const e = oc * .32; p.moveTo(gx + S / 2 - e, gy - e); p.lineTo(gx + S / 2 + e, gy - e); p.lineTo(gx + S / 2 + e, gy + e); p.lineTo(gx + S / 2 - e, gy + e); p.closePath(); }
-        g.strokeStyle = '#fffdf6'; g.lineWidth = 1.4; g.lineJoin = 'round'; for (const [q, p] of P) { g.globalAlpha = q; g.stroke(p); } g.globalAlpha = 1;
+        g.strokeStyle = '#dbd0ae'; g.lineWidth = .9; g.lineJoin = 'round'; for (const [q, p] of P) { g.globalAlpha = q; g.stroke(p); } g.globalAlpha = 1;
         for (const v of vis) v.r *= grow(v.x); for (const w of ws) w.R *= grow(w.x); } }
     const cell = Math.max(48, rmax * 2.6), grid = new Map(), K = (a, b) => a + ',' + b;
     if (ex <= .4) for (const v of vis) { const k = K(Math.floor(v.x / cell), Math.floor(v.y / cell)); (grid.get(k) || grid.set(k, []).get(k)).push(v); }
