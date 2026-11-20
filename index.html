@@ -1241,6 +1241,11 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
         const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, w, h);
         const tilePx = (isMobile() ? 820 : 1100) * dpr * [1, .75, 1.25, .9, 1.1][pcards.findIndex(p => p.el === el) % 5], k = tilePx / TILE, bx0 = -off[0] * tilePx, by0 = -off[1] * tilePx;
+        if (el.matches(':hover, :focus-visible')) { const bc = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [231, 170, 77]).slice(0, 3).map(Number); g.strokeStyle = `rgb(${bc.map(v => Math.round(v * .82)).join(',')})`; g.lineWidth = 1.2 * dpr;   /* a shade deeper than the colour the card turns */ g.lineJoin = 'round'; g.beginPath();   /* the plan under the net: an octagon round every dot */
+          for (let ty = 0; ty <= Math.ceil(h / tilePx) + 1; ty++) for (let tx = 0; tx <= Math.ceil(w / tilePx) + 1; tx++) for (const hh of holes) {
+            const px = bx0 + tx * tilePx + hh.cx * k, py = by0 + ty * tilePx + hh.cy * k; if (px < -30 || py < -30 || px > w + 30 || py > h + 30) continue; const R = (hh.rad || 14) * k * 1.45;
+            for (let i = 0; i <= 8; i++) { const a = Math.PI / 8 + i * Math.PI / 4, qx = px + Math.cos(a) * R, qy = py + Math.sin(a) * R; i ? g.lineTo(qx, qy) : g.moveTo(qx, qy); } }
+          g.stroke(); }
         g.fillStyle = ink;
         for (let ty = 0; ty <= Math.ceil(h / tilePx) + 1; ty++) for (let tx = 0; tx <= Math.ceil(w / tilePx) + 1; tx++)
           for (const hh of holes) {
@@ -2941,7 +2946,16 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       const b = cd.el.querySelector('.pm').getBoundingClientRect(); dots.push({ x: b.left - cr.left + b.width / 2, y: b.top - cr.top + b.height / 2, r: 0, R: Math.max(b.width, b.height) / 2, fixed: true });
     }
     const big2 = cd.kind === 'pill' || cd.kind === 'ap' ? 1.45 : 1.25, rM = (phone ? Math.min(24, rmax) : rmax) * big2, gp = side ? Math.max(8, rmax * .26) : phone ? 5 : Math.max(4, rmax * .09);   // side fields are airier   // the corner is packed full: dots sit close, never touching
-    const NT = phone ? 14000 : 16000;
+    if (cd.kind === 'ap') {   /* Apply: every dot sits on Netsch's lattice (big ones in the octagons, small ones in the squares between), far from the words */
+      const S = Math.max(26, rM * 2.35), ang = Math.PI / 4 + .1, ca = Math.cos(ang), sa = Math.sin(ang), N = Math.ceil(Math.hypot(w, h) / S) + 2, far = pad * 2.6;
+      cd.lat = { S, ca, sa, ox: w, oy: h, nodes: [] };
+      for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [o, big] of [[0, 1], [.5, 0]]) {
+        const u = (i + o) * S, v = (j + o) * S, x = w + u * ca - v * sa, y = h + u * sa + v * ca; if (x < 4 || y < 4 || x > w - 4 || y > h - 4) continue;
+        const f = field(x, y); if (f <= .05) continue; const r = big ? Math.min(S * .4, rmin + (rM - rmin) * f) : Math.min(S * .17, rmin + (rM * .38 - rmin) * f), R = r * 1.1 * BREATH;
+        if (r < rmin || distTo(x, y, rects) < R + far) continue;
+        cd.lat.nodes.push({ x, y, big, f }); dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283, ring: big && r > 4 && rnd() < .18 }); }
+    }
+    const NT = cd.kind === 'ap' ? 0 : phone ? 14000 : 16000;
     for (let i = 0; i < NT; i++) {
       const x = rnd() * (w + 60) - 30, y = rnd() * (h + 60) - 30, f = field(x, y); if (f <= .05) continue;
       // first pass places the big dots; the second half of the tries places smaller ones in the gaps between them, so the
@@ -2959,6 +2973,11 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
   const paint = (cd, time) => { if (!cd.dots) return; const g = cd.cv.getContext('2d'), dpr = cd.dpr, ox = cd.w, oy = cd.top ? 0 : cd.h, Rn = Math.hypot(cd.w, cd.h);
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.classList.contains('h-cream') && cd.el.matches(':hover') ? GOLD : cd.kind === 'ap' && cd.el.matches(':hover') && matchMedia('(hover: hover)').matches ? (cd.el.matches('.a-blue,.a-deep') ? BLUE : GOLD) : cd.col;   /* the Apply card's dots take its old background colour when it inverts */   // cream dots turn gold on the cream hover, so they still show   // the card turns cream on hover; its dots turn gold
+    if (cd.lat && cd.el.matches(':hover, :focus-visible')) { const L = cd.lat, S = L.S, k = S / 2 / Math.cos(Math.PI / 8) * .98, e = S / 2 * Math.tan(Math.PI / 8) * .62, cream = cd.el.matches('.a-blue, .a-deep');
+      const ang0 = Math.atan2(L.sa, L.ca); g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.strokeStyle = cream ? '#d6cba8' : '#4c74b8'; g.lineWidth = 1.1; g.lineJoin = 'round'; g.beginPath();
+      for (const n of L.nodes) { if (n.big) { for (let i = 0; i <= 8; i++) { const a = ang0 + Math.PI / 8 + i * Math.PI / 4, px = n.x + Math.cos(a) * k, py = n.y + Math.sin(a) * k; i ? g.lineTo(px, py) : g.moveTo(px, py); } }
+        else { for (let i = 0; i <= 4; i++) { const a = ang0 + Math.PI / 4 + i * Math.PI / 2, px = n.x + Math.cos(a) * e * 1.41, py = n.y + Math.sin(a) * e * 1.41; i ? g.lineTo(px, py) : g.moveTo(px, py); } } }
+      g.stroke(); g.restore(); }   /* the plan the dots sit on: an octagon round every big dot, a square round every small one */
     for (const d of cd.dots) { if (d.fixed) continue; const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .3 - Math.hypot(d.x - ox, d.y - oy) / Rn * 5 + d.ph * .35);   // a slow breath, about every 20 s
       const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
       g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); if (d.ring) { g.strokeStyle = g.fillStyle; g.lineWidth = .26; g.stroke(d.p); } else g.fill(d.p); }
@@ -3466,23 +3485,6 @@ html body .pubs li:nth-child(5n+5) a::before,html body .r-list li:nth-child(5n+5
 @media (prefers-reduced-motion:reduce){.res:is(:hover,:focus-within) .r-go::before{rotate:none;scale:none}}
 </style>
 <style>
-/* cards with dots (Apply, the people, the events): when a card changes colour on hover, a Netsch plan shows through where its dots sit:
-   octagons, little squares and the 45 degree grid, so the dots read as grown from a plan rather than sprinkled */
-.apply,.people .card,.ev-cards .ev{isolation:isolate}
-.np{position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;opacity:0;transition:opacity .45s ease;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%232c5494%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M0%200L60%2060M60%200L0%2060%22%20stroke-opacity%3D%220.14%22%20stroke-width%3D%22.8%22/%3E%3Cpath%20d%3D%22M30.00%2012.43%20L12.43%2030.00%20L-12.43%2030.00%20L-30.00%2012.43%20L-30.00%20-12.43%20L-12.43%20-30.00%20L12.43%20-30.00%20L30.00%20-12.43ZM90.00%2012.43%20L72.43%2030.00%20L47.57%2030.00%20L30.00%2012.43%20L30.00%20-12.43%20L47.57%20-30.00%20L72.43%20-30.00%20L90.00%20-12.43ZM30.00%2072.43%20L12.43%2090.00%20L-12.43%2090.00%20L-30.00%2072.43%20L-30.00%2047.57%20L-12.43%2030.00%20L12.43%2030.00%20L30.00%2047.57ZM90.00%2072.43%20L72.43%2090.00%20L47.57%2090.00%20L30.00%2072.43%20L30.00%2047.57%20L47.57%2030.00%20L72.43%2030.00%20L90.00%2047.57ZM60.00%2042.43%20L42.43%2060.00%20L17.57%2060.00%20L-0.00%2042.43%20L-0.00%2017.57%20L17.57%200.00%20L42.43%200.00%20L60.00%2017.57ZM21.55%20-8.45h16.90v16.90h-16.90ZM-8.45%2021.55h16.90v16.90h-16.90ZM51.55%2021.55h16.90v16.90h-16.90ZM21.55%2051.55h16.90v16.90h-16.90Z%22%20stroke-opacity%3D%220.2%22%20stroke-width%3D%221%22/%3E%3C/g%3E%3C/svg%3E") 0 0 / 60px 60px;
-  -webkit-mask-image:var(--npm);mask-image:var(--npm)}
-.apply .np{--npm:radial-gradient(ellipse 48% 95% at 100% 100%,#000 45%,transparent 100%)}
-.people .card .np{--npm:radial-gradient(ellipse 62% 58% at 50% 50%,transparent 55%,#000 92%)}
-.ev-cards .ev .np{--npm:linear-gradient(to left,#000 20%,transparent 62%)}
-html body .apply:not(.a-blue):not(.a-deep) .np{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M0%200L60%2060M60%200L0%2060%22%20stroke-opacity%3D%220.15%22%20stroke-width%3D%22.8%22/%3E%3Cpath%20d%3D%22M30.00%2012.43%20L12.43%2030.00%20L-12.43%2030.00%20L-30.00%2012.43%20L-30.00%20-12.43%20L-12.43%20-30.00%20L12.43%20-30.00%20L30.00%20-12.43ZM90.00%2012.43%20L72.43%2030.00%20L47.57%2030.00%20L30.00%2012.43%20L30.00%20-12.43%20L47.57%20-30.00%20L72.43%20-30.00%20L90.00%20-12.43ZM30.00%2072.43%20L12.43%2090.00%20L-12.43%2090.00%20L-30.00%2072.43%20L-30.00%2047.57%20L-12.43%2030.00%20L12.43%2030.00%20L30.00%2047.57ZM90.00%2072.43%20L72.43%2090.00%20L47.57%2090.00%20L30.00%2072.43%20L30.00%2047.57%20L47.57%2030.00%20L72.43%2030.00%20L90.00%2047.57ZM60.00%2042.43%20L42.43%2060.00%20L17.57%2060.00%20L-0.00%2042.43%20L-0.00%2017.57%20L17.57%200.00%20L42.43%200.00%20L60.00%2017.57ZM21.55%20-8.45h16.90v16.90h-16.90ZM-8.45%2021.55h16.90v16.90h-16.90ZM51.55%2021.55h16.90v16.90h-16.90ZM21.55%2051.55h16.90v16.90h-16.90Z%22%20stroke-opacity%3D%220.22%22%20stroke-width%3D%221%22/%3E%3C/g%3E%3C/svg%3E")}
-.apply:is(:hover,:focus-visible) .np,.people .card:is(:hover,:focus-visible) .np,.ev-cards .ev:is(:hover,:focus-within) .np{opacity:1}
-html body .ev-cards .ev > .np,html body .apply > .np,html body .people .card > .np{position:absolute !important;inset:0 !important;z-index:-1 !important;display:block}
-@media (prefers-reduced-motion:reduce){.np{transition:none}}
-</style>
-<script>
-document.querySelectorAll('.apply, .people .card, .ev-cards .ev').forEach(el => { const n = document.createElement('span'); n.className = 'np'; n.setAttribute('aria-hidden', 'true'); el.prepend(n); });
-</script>
-<style>
 /* an open info card makes room for the frame of dots round its words */
 html body .ab-pill[open] > :not(summary):not(canvas){box-sizing:border-box;padding-inline:clamp(40px,7vw,90px) !important;padding-bottom:clamp(30px,5vw,70px) !important}
 html body .ab-pill[open] > summary{box-sizing:border-box;padding-inline:clamp(40px,7vw,90px) !important;padding-top:clamp(26px,4vw,56px) !important}
@@ -3528,6 +3530,24 @@ html body .ab-pill[open] > summary{box-sizing:border-box;padding-inline:clamp(40
 .ab-pill summary > .pnet{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;border-radius:inherit}
 .ab-pill{position:relative}.ab-pill summary{position:static}
 .ab-pill > :not(summary),.ab-pill summary > :not(.pnet):not(.kdots){position:relative;z-index:1}
+</style>
+<script>
+/* event cards: when the card turns cream, a thin octagon (a shade deeper than the cream) is traced round each ring and dot, right where they sit */
+(() => { document.querySelectorAll('.ev-cards .ev > .ev-dot').forEach(dot => {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('class', 'ev-plan'); svg.setAttribute('aria-hidden', 'true'); dot.append(svg);
+  const oct = (cx, cy, R) => 'M' + [...Array(8)].map((_, i) => { const a = Math.PI / 8 + i * Math.PI / 4; return (cx + Math.cos(a) * R).toFixed(1) + ' ' + (cy + Math.sin(a) * R).toFixed(1); }).join('L') + 'Z';
+  const place = () => { const W = dot.clientWidth, H = dot.clientHeight; if (!W) return; svg.setAttribute('viewBox', `0 0 ${W} ${H}`); let d = '';
+    for (const ps of ['::before', '::after']) { const c = getComputedStyle(dot, ps), w = parseFloat(c.width), h = parseFloat(c.height); if (!w) continue;
+      const l = c.left !== 'auto' ? parseFloat(c.left) : W - parseFloat(c.right) - w, t = c.top !== 'auto' ? parseFloat(c.top) : H - parseFloat(c.bottom) - h; d += oct(l + w / 2, t + h / 2, Math.max(w, h) / 2 * 1.32); }
+    const bg = getComputedStyle(dot).backgroundImage.match(/circle at ([\d.]+)% ([\d.]+)%[^,]*,\s*[^)]*\)\s*0\s+([\d.]+)%/); if (bg) d += oct(+bg[1] / 100 * W, +bg[2] / 100 * H, +bg[3] / 100 * Math.max(W, H) * 1.5);
+    svg.innerHTML = `<path d="${d}"/>`; };
+  place(); addEventListener('resize', place); addEventListener('load', place); }); })();
+</script>
+<style>
+.ev > .ev-dot > .ev-plan{position:absolute;inset:-30%;width:160%;height:160%;overflow:visible;pointer-events:none;z-index:-1;opacity:0;transition:opacity .35s}
+.ev > .ev-dot > .ev-plan{inset:0;width:100%;height:100%}
+.ev-plan path{fill:none;stroke:#d6cba8;stroke-width:1.4;stroke-linejoin:round}
+.ev.h-cream:is(:hover,:focus-within) > .ev-dot > .ev-plan{opacity:1}
 </style>
 </body>
 </html>
