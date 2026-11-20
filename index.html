@@ -3635,7 +3635,7 @@ html body .ab-pill.ab-b3 .pm::before{background-image:url("data:image/svg+xml,%3
 html body .about-grid .ab-pill[open] h3{font-size:clamp(56px,7.4vw,120px);letter-spacing:-.045em;line-height:.92}
 html body .about-grid .ab-pill[open] > p{font-size:clamp(19px,1.75vw,26px);line-height:1.42;max-width:34em;letter-spacing:-.01em}
 html body .about-grid .ab-pill[open] > p:first-of-type{margin-top:-6px}
-html body .ab-pill .pm{transition:width .45s cubic-bezier(.3,1.4,.4,1),height .45s cubic-bezier(.3,1.4,.4,1),rotate .45s,scale .3s}
+html body .ab-pill .pm{transition:width .5s cubic-bezier(.25,.8,.3,1),height .5s cubic-bezier(.25,.8,.3,1),rotate .5s cubic-bezier(.25,.8,.3,1),scale .3s}
 html body .ab-pill[open] .pm{width:clamp(50px,4.2vw,62px);height:clamp(48px,4vw,59px)}
 html body .ab-pill .pm::before{transition:width .45s,height .45s}
 html body .ab-pill[open] .pm::before{width:40%;height:40%}
@@ -3649,5 +3649,26 @@ document.querySelectorAll('.ab-pill summary h3').forEach(h => { const m = h.text
 html body .ab-pill[open] summary h3 .ab-w{display:block;text-transform:capitalize}
 </style>
 <style>.ev-lat .lat{display:none !important}   /* the event cards keep their rings and dot, no plan */</style>
+<script>
+/* info cards open and close smoothly: the card's height eases, the words fade, the title grows in step; no snapping */
+(() => { const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, E = 'cubic-bezier(.25,.8,.3,1)', D = 520;
+  document.querySelectorAll('.ab-pill').forEach(el => { const sm = el.querySelector('summary'); let anim = null;
+    sm.addEventListener('click', ev => { if (reduce) return; ev.preventDefault(); if (anim) anim.cancel();
+      const from = el.getBoundingClientRect().height, y0 = el.getBoundingClientRect().top, opening = !el.open;
+      if (opening) el.open = true; else el.classList.add('closing');
+      const to = opening ? el.getBoundingClientRect().height : (() => { el.open = false; const h = el.getBoundingClientRect().height; el.open = true; return h; })();
+      el.style.overflow = 'hidden';
+      anim = el.animate([{ height: from + 'px' }, { height: to + 'px' }], { duration: D, easing: E });
+      el.querySelectorAll(':scope > :not(summary):not(canvas)').forEach(c => c.animate(opening ? [{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }] : [{ opacity: 1 }, { opacity: 0 }], { duration: opening ? D : D * .5, easing: E, fill: 'both' }));
+      anim.onfinish = () => { anim = null; if (!opening) { el.open = false; el.classList.remove('closing'); } el.style.overflow = ''; el.querySelectorAll(':scope > *').forEach(c => c.getAnimations().forEach(a => a.cancel())); };
+      }); }); })();
+</script>
+<style>
+html body .about-grid .ab-pill h3{transition:font-size .5s cubic-bezier(.25,.8,.3,1),line-height .5s}
+html body .about-grid .ab-pill.closing h3{font-size:clamp(28px,3.4vw,48px) !important}
+html body .ab-pill.closing .pm{width:40px !important;height:38px !important;rotate:0deg !important}
+html body .ab-pill.closing summary h3 .ab-w{display:inline}
+html body .ab-pill{overflow-anchor:none}
+</style>
 </body>
 </html>
