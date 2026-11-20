@@ -3001,13 +3001,13 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     }
     const big2 = cd.kind === 'pill' || cd.kind === 'ap' ? 1.45 : 1.25, rM = (phone ? Math.min(24, rmax) : rmax) * big2, gp = side ? Math.max(8, rmax * .26) : phone ? 5 : Math.max(4, rmax * .09);   // side fields are airier   // the corner is packed full: dots sit close, never touching
     if (cd.kind === 'ap') {   /* Apply: every dot sits on Netsch's lattice (big ones in the octagons, small ones in the squares between), far from the words */
-      const S = Math.max(88, rM * 3.3), ang = .12, ca = Math.cos(ang), sa = Math.sin(ang), N = Math.ceil(Math.hypot(w, h) / S) + 2, far = pad * 2.6;
+      const S = Math.max(80, rM * 3), ang = .12, ca = Math.cos(ang), sa = Math.sin(ang), N = Math.ceil(Math.hypot(w, h) / S) + 2, far = pad * 2.6;
       cd.lat = { S, ca, sa, ox: w, oy: h, nodes: [] };
-      for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [o, o2, big] of [[773 / 1092, 320 / 1092, 1], [298 / 1092, 765 / 1092, 0]]) {   /* big dots in the big octagons, smaller ones in the small octagons */
+      for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [o, o2, big] of [[773 / 1092, 320 / 1092, 1], [298 / 1092, 765 / 1092, 0], ...[[772, 68], [827, 761], [988, 761], [62, 760], [291, 1006], [717, 602], [265, 517], [263, 160]].map(([a, b]) => [a / 1092, b / 1092, -1])]) {   /* plus tiny dots in the drawing's squares and bars */   /* big dots in the big octagons, smaller ones in the small octagons */
         const u = (i + o) * S, v = (j + o2) * S, x = w + u * ca - v * sa, y = h + u * sa + v * ca; if (x < 4 || y < 4 || x > w - 4 || y > h - 4) continue;
-        const f = field(x, y); if (f <= .05) continue; const r = big ? Math.min(S * .125, rmin + (rM - rmin) * f) : Math.min(S * .1, rmin + (rM * .38 - rmin) * f), R = r * 1.1 * BREATH;
+        const f = field(x, y); if (f <= .05) continue; const r = big < 0 ? Math.max(rmin, Math.min(S * .046, rmin + 4 * f)) : big ? Math.min(S * .125, rmin + (rM - rmin) * f) : Math.min(S * .1, rmin + (rM * .38 - rmin) * f), R = r * 1.1 * BREATH;
         if (r < rmin || distTo(x, y, rects) < R + far) continue;
-        cd.lat.nodes.push({ x, y, big, f }); dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283, ring: big && r > 4 && rnd() < .18 }); }
+        cd.lat.nodes.push({ x, y, big, f }); dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283, ring: big > 0 && r > 4 && rnd() < .18 }); }
     }
     const NT = cd.kind === 'ap' ? 0 : phone ? 14000 : 16000;
     for (let i = 0; i < NT; i++) {
