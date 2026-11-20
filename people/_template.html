@@ -7,7 +7,7 @@ window.mlMarks = window.mlMarks || ((g, L, a, col, k = 1) => { if (!L.length || 
     const R = Math.max(r * (n === 4 ? 1.5 : 1.6), 12 * k), a0 = (n === 8 ? Math.PI / 8 : n === 6 ? Math.PI / 6 : Math.PI / 4) + sp * .25; for (let i = 0; i <= n; i++) { const q = a0 + i * Math.PI * 2 / n; i ? g.lineTo(x + Math.cos(q) * R, y + Math.sin(q) * R) : g.moveTo(x + Math.cos(q) * R, y + Math.sin(q) * R); } }
   g.stroke(); g.restore(); });
 window.mlMoving = window.mlMoving || (() => { let t = -1e9; addEventListener('scroll', () => { t = performance.now(); }, { passive: true }); return () => { const k = Math.min(1, Math.max(0, (performance.now() - t - 120) / 380)); return 1 - k * k * (3 - 2 * k); }; })();   /* 1 while the page is being scrolled, easing to 0 soon after it stops: marks show only while dots are moving */
-window.mlMarkType = (p = .26) => Math.random() < p ? [8, 6, 4, 2][Math.floor(Math.random() * 4)] : 0;   /* about a quarter of the bigger dots carry one */</script>
+window.mlMarkType = (p = .26) => Math.random() < p ? [8, 6, 4, 8, 6, 4, 8, 6, 4, 2][Math.floor(Math.random() * 10)] : 0;   /* crossings (the X) are rare */   /* about a quarter of the bigger dots carry one */</script>
 <script>window.mlRipple = window.mlRipple || ((x, y, t) => { const S = 54, u1 = Math.sin((x + y) / S * .42 - t * 1.5), u2 = Math.sin((x - y) / S * .36 + t * 1.05), v = Math.max(-1, Math.min(1, (u1 + u2) * .62 / .55)); return .5 + .5 * v * (1.5 - .5 * v * v); });   /* one ripple for every dot field: two slow waves crossing along the 45° diagonals */
 </script>
 <script>try{sessionStorage.setItem("ml-opener-seen","1")}catch(e){}</script>

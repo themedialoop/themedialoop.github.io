@@ -7,7 +7,7 @@ window.mlMarks = window.mlMarks || ((g, L, a, col, k = 1) => { if (!L.length || 
     const R = Math.max(r * (n === 4 ? 1.5 : 1.6), 12 * k), a0 = (n === 8 ? Math.PI / 8 : n === 6 ? Math.PI / 6 : Math.PI / 4) + sp * .25; for (let i = 0; i <= n; i++) { const q = a0 + i * Math.PI * 2 / n; i ? g.lineTo(x + Math.cos(q) * R, y + Math.sin(q) * R) : g.moveTo(x + Math.cos(q) * R, y + Math.sin(q) * R); } }
   g.stroke(); g.restore(); });
 window.mlMoving = window.mlMoving || (() => { let t = -1e9; addEventListener('scroll', () => { t = performance.now(); }, { passive: true }); return () => { const k = Math.min(1, Math.max(0, (performance.now() - t - 120) / 380)); return 1 - k * k * (3 - 2 * k); }; })();   /* 1 while the page is being scrolled, easing to 0 soon after it stops: marks show only while dots are moving */
-window.mlMarkType = (p = .26) => Math.random() < p ? [8, 6, 4, 2][Math.floor(Math.random() * 4)] : 0;   /* about a quarter of the bigger dots carry one */</script>
+window.mlMarkType = (p = .26) => Math.random() < p ? [8, 6, 4, 8, 6, 4, 8, 6, 4, 2][Math.floor(Math.random() * 10)] : 0;   /* crossings (the X) are rare */   /* about a quarter of the bigger dots carry one */</script>
 <script>window.mlRipple = window.mlRipple || ((x, y, t) => { const S = 54, u1 = Math.sin((x + y) / S * .42 - t * 1.5), u2 = Math.sin((x - y) / S * .36 + t * 1.05), v = Math.max(-1, Math.min(1, (u1 + u2) * .62 / .55)); return .5 + .5 * v * (1.5 - .5 * v * v); });   /* one ripple for every dot field: two slow waves crossing along the 45° diagonals */
 </script>
 <meta charset="utf-8">
@@ -2659,7 +2659,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       if (dt.ring && rr > 6 && !dt.word) { tg.lineWidth = .22; tg.strokeStyle = COL[col]; tg.stroke(dt.p); } else { tg.fillStyle = COL[col]; tg.fill(dt.p); } tg.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (dt.word && rr > 24 * k) { const f = fitT(dt.word.w, dt.word.fun, rr); if (f) { tg.save(); tg.translate(x, y); tg.fillStyle = col === 'gold' ? '#2c5494' : '#f2eedd'; tg.textAlign = 'center'; tg.textBaseline = 'middle';
         tg.font = (dt.word.fun ? 'italic 300 ' : '700 ') + f.fs + 'px Inter, sans-serif'; const lh = f.fs * 1.08; f.ls.forEach((ln, j) => tg.fillText(ln, 0, (j - (f.ls.length - 1) / 2) * lh)); tg.restore(); } }
-      if (dt.ghr === undefined) { dt.ghr = Math.random(); dt.gh = [8, 6, 4, 2][Math.floor(Math.random() * 4)]; }
+      if (dt.ghr === undefined) { dt.ghr = Math.random(); dt.gh = [8, 6, 4, 8, 6, 4, 8, 6, 4, 2][Math.floor(Math.random() * 10)]; }
       if (!dt.word && rr > 5 && dt.ghr < .32 * (q => q * q * (3 - 2 * q))(Math.min(1, Math.max(0, (prog - .5) / .45)))) RM.push([x, y, rr, dt.gh, rot]);   /* from halfway down, more and more blueprint marks */
       const kq = key(gx, gy); (grid.get(kq) || grid.set(kq, []).get(kq)).push([x, y, rr]); }
     if (RM.length) { tg.setTransform(dpr, 0, 0, dpr, 0, 0); mlMarks(tg, RM, .55, '#2c5494'); }
@@ -3115,7 +3115,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         gB: Math.random() < .17, gC: Math.random() < .17, few: Math.random() < .85, ring: !big && Math.random() < .06, big: !!big }; if (node) NODE.set(node, d);   // on the blue: cream with some gold; on the cream: blue with a few gold
       (grid.get(key(x, y)) || grid.set(key(x, y), []).get(key(x, y))).push(d); dots.push(d);
     }
-    { const bigs = dots.filter(d => d.big).sort(() => Math.random() - .5).slice(0, mob ? 12 : 22); bigs.forEach((d, i) => d.ghost = [8, 6, 4, 2][i % 4]);   /* octagons, squares and grid lines */ }   /* a few big dots carry a thin octagon or square while they fly: the blueprint showing through */
+    { const bigs = dots.filter(d => d.big).sort(() => Math.random() - .5).slice(0, mob ? 5 : 8); bigs.forEach((d, i) => d.ghost = [8, 6, 4, 8, 6, 4, 8, 6, 4, 2][i % 10]);   /* octagons, squares and grid lines */ }   /* a few big dots carry a thin octagon or square while they fly: the blueprint showing through */
   };
   const wob = (a, t) => 1 + .09 * Math.sin(3 * a + 1.3 + t * .2) + .06 * Math.sin(5 * a + .4 - t * .15) + .03 * Math.sin(8 * a + 2);
   let gc = { x: 0, y: 0, rx: 1, ry: 1 }, arcY = 0, arcOn = 1;
@@ -3225,13 +3225,11 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       let c = 1; for (const b of boxes) { const g = Math.max(b.left - pr.left - px, px - (b.right - pr.left), b.top - pr.top - py, py - (b.bottom - pr.top), 0); if (g < pad + d.r) c *= ss(0, pad + d.r, g); }   // never over the words, wherever it dances
       let s = d.r * m * c * (reduce ? .97 : .82 + .18 * mlRipple(d.x, d.y, t)); s = Math.min(s, (H - 3 - py) / 1.1); if (s < .4) continue;   /* a ripple of breath across the field; a dot near the bottom shrinks rather than being cut by the edge */
       if (d.ghost && fly > .02) GH.push([px, py, s, d.ghost, spin]);
-      else if (d.ghost && born < 1 && s > .5 && s < d.r * .97) GI.push([px, py, Math.max(s, d.r * .6), d.ghost, 0]);   /* growing in: a mark round it too */
       ctx.setTransform(s * DPR, 0, 0, s * DPR, px * DPR, py * DPR); ctx.rotate(d.rot + t * d.sp + spin);
       const col = mix(d.gB ? '#e7aa4d' : '#f2eedd', d.gC ? '#e7aa4d' : '#2c5494', ce);
       if (d.ring) { ctx.lineWidth = .28; ctx.strokeStyle = col; ctx.stroke(d.s); } else { ctx.fillStyle = col; ctx.fill(d.s); }
     }
-    if (GI.length) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); mlMarks(ctx, GI, .6, '#5277b8'); }
-    if (GH.length) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.strokeStyle = mix('#5277b8', '#2c5494', ce); ctx.lineWidth = .75; ctx.lineJoin = ctx.lineCap = 'round'; ctx.globalAlpha = fly * (.75 - .2 * ce);   /* a few, drawn lightly */ ctx.beginPath();
+    if (GH.length) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.strokeStyle = mix('#5277b8', '#2c5494', ce); ctx.lineWidth = .7; ctx.lineJoin = ctx.lineCap = 'round'; ctx.globalAlpha = fly * (.5 - .15 * ce);   /* a few, drawn lightly */ ctx.beginPath();
       for (const [x, y, r, n, sp] of GH) { if (n === 2) { const L = Math.max(r * 3, 26), a = Math.PI / 4 + sp * .25; ctx.moveTo(x - Math.cos(a) * L, y - Math.sin(a) * L); ctx.lineTo(x + Math.cos(a) * L, y + Math.sin(a) * L); ctx.moveTo(x + Math.sin(a) * L * .6, y - Math.cos(a) * L * .6); ctx.lineTo(x - Math.sin(a) * L * .6, y + Math.cos(a) * L * .6); continue; }   /* a little crossing of grid lines */
         const R = Math.max(r * (n === 4 ? 1.5 : 1.6), 12), a0 = (n === 8 ? Math.PI / 8 : n === 6 ? Math.PI / 6 : Math.PI / 4) + sp * .25;   /* octagons and squares turned to the grid, wheeling a little with their dot */
         for (let i = 0; i <= n; i++) { const a = a0 + i * Math.PI * 2 / n; i ? ctx.lineTo(x + Math.cos(a) * R, y + Math.sin(a) * R) : ctx.moveTo(x + Math.cos(a) * R, y + Math.sin(a) * R); } }
