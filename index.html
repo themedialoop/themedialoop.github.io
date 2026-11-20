@@ -3100,7 +3100,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         gB: Math.random() < .17, gC: Math.random() < .17, few: Math.random() < .85, ring: !big && Math.random() < .06, big: !!big }; if (node) NODE.set(node, d);   // on the blue: cream with some gold; on the cream: blue with a few gold
       (grid.get(key(x, y)) || grid.set(key(x, y), []).get(key(x, y))).push(d); dots.push(d);
     }
-    { const bigs = dots.filter(d => d.big).sort(() => Math.random() - .5).slice(0, mob ? 14 : 24); bigs.forEach((d, i) => d.ghost = [8, 4, 2][i % 3]);   /* octagons, squares and grid lines */ }   /* a few big dots carry a thin octagon or square while they fly: the blueprint showing through */
+    { const bigs = dots.filter(d => d.big).sort(() => Math.random() - .5).slice(0, mob ? 6 : 10); bigs.forEach((d, i) => d.ghost = [8, 4, 2][i % 3]);   /* octagons, squares and grid lines */ }   /* a few big dots carry a thin octagon or square while they fly: the blueprint showing through */
   };
   const wob = (a, t) => 1 + .09 * Math.sin(3 * a + 1.3 + t * .2) + .06 * Math.sin(5 * a + .4 - t * .15) + .03 * Math.sin(8 * a + 2);
   let gc = { x: 0, y: 0, rx: 1, ry: 1 }, arcY = 0, arcOn = 1;
@@ -3214,7 +3214,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       const col = mix(d.gB ? '#e7aa4d' : '#f2eedd', d.gC ? '#e7aa4d' : '#2c5494', ce);
       if (d.ring) { ctx.lineWidth = .28; ctx.strokeStyle = col; ctx.stroke(d.s); } else { ctx.fillStyle = col; ctx.fill(d.s); }
     }
-    if (GH.length) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.strokeStyle = mix('#5277b8', '#2c5494', ce); ctx.lineWidth = 1.3; ctx.lineJoin = ctx.lineCap = 'round'; ctx.globalAlpha = fly * (1 - .2 * ce); ctx.beginPath();
+    if (GH.length) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.strokeStyle = mix('#5277b8', '#2c5494', ce); ctx.lineWidth = .75; ctx.lineJoin = ctx.lineCap = 'round'; ctx.globalAlpha = fly * (.75 - .2 * ce);   /* a few, drawn lightly */ ctx.beginPath();
       for (const [x, y, r, n, sp] of GH) { if (n === 2) { const L = Math.max(r * 3, 26), a = Math.PI / 4 + sp * .25; ctx.moveTo(x - Math.cos(a) * L, y - Math.sin(a) * L); ctx.lineTo(x + Math.cos(a) * L, y + Math.sin(a) * L); ctx.moveTo(x + Math.sin(a) * L * .6, y - Math.cos(a) * L * .6); ctx.lineTo(x - Math.sin(a) * L * .6, y + Math.cos(a) * L * .6); continue; }   /* a little crossing of grid lines */
         const R = Math.max(r * (n === 8 ? 1.6 : 1.5), 12), a0 = (n === 8 ? Math.PI / 8 : Math.PI / 4) + sp * .25;   /* octagons and squares turned to the grid, wheeling a little with their dot */
         for (let i = 0; i <= n; i++) { const a = a0 + i * Math.PI * 2 / n; i ? ctx.lineTo(x + Math.cos(a) * R, y + Math.sin(a) * R) : ctx.moveTo(x + Math.cos(a) * R, y + Math.sin(a) * R); } }
