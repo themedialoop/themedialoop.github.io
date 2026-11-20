@@ -2660,7 +2660,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       if (dt.word && rr > 24 * k) { const f = fitT(dt.word.w, dt.word.fun, rr); if (f) { tg.save(); tg.translate(x, y); tg.fillStyle = col === 'gold' ? '#2c5494' : '#f2eedd'; tg.textAlign = 'center'; tg.textBaseline = 'middle';
         tg.font = (dt.word.fun ? 'italic 300 ' : '700 ') + f.fs + 'px Inter, sans-serif'; const lh = f.fs * 1.08; f.ls.forEach((ln, j) => tg.fillText(ln, 0, (j - (f.ls.length - 1) / 2) * lh)); tg.restore(); } }
       if (dt.ghr === undefined) { dt.ghr = Math.random(); dt.gh = [8, 6, 4, 8, 6, 4, 8, 6, 4, 2][Math.floor(Math.random() * 10)]; }
-      if (!dt.word && rr > 5 && dt.ghr < .32 * (q => q * q * (3 - 2 * q))(Math.min(1, Math.max(0, (prog - .5) / .45)))) RM.push([x, y, rr, dt.gh, rot]);   /* from halfway down, more and more blueprint marks */
+      if (!dt.word && rr > 5 && dt.ghr < (prog > .12 ? .1 + .24 * (q => q * q * (3 - 2 * q))(Math.min(1, Math.max(0, (prog - .15) / .8))) : 0)) RM.push([x, y, rr, dt.gh, rot]);   /* from early on, a few blueprint marks, more and more as you go down */
       const kq = key(gx, gy); (grid.get(kq) || grid.set(kq, []).get(kq)).push([x, y, rr]); }
     if (RM.length) { tg.setTransform(dpr, 0, 0, dpr, 0, 0); mlMarks(tg, RM, .55, '#2c5494'); }
     if (swR) { tg.setTransform(swR * dpr, 0, 0, swR * dpr, W / 2 * dpr, H / 2 * dpr); tg.fillStyle = '#2c5494'; tg.fill(DSH[0]); tg.setTransform(dpr, 0, 0, dpr, 0, 0); }
