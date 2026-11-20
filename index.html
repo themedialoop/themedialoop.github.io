@@ -3489,71 +3489,68 @@ html body .pubs li:nth-child(5n+5) a::before,html body .r-list li:nth-child(5n+5
 html body .ab-pill[open] > :not(summary):not(canvas){box-sizing:border-box;padding-inline:clamp(40px,7vw,90px) !important;padding-bottom:clamp(30px,5vw,70px) !important}
 html body .ab-pill[open] > summary{box-sizing:border-box;padding-inline:clamp(40px,7vw,90px) !important;padding-top:clamp(26px,4vw,56px) !important}
 </style>
-<script>
-/* open info cards ("Our style" and the rest) wear the same net as the people cards: the net's own holes tiled across the whole card,
-   breathing in a slow wave, in the card's dot colour, with one soft clearing round the words */
-(() => { const pills = [...document.querySelectorAll('.ab-pill')]; if (!pills.length) return;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let holes = [], TILE = 1024;
-  const ready = (window.NET_HOLES ? Promise.resolve(window.NET_HOLES) : fetch('assets/net-holes.json').then(r => r.json())).then(j => { TILE = j.tile; const sc = j.scale;
-    holes = j.holes.map(h => { const cx = h[0] / sc, cy = h[1] / sc, pts = []; for (let i = 2; i < h.length; i += 2) pts.push([h[i] / sc, h[i + 1] / sc]);
-      const p = new Path2D(), n = pts.length, mid = i => [(pts[i % n][0] + pts[(i + 1) % n][0]) / 2, (pts[i % n][1] + pts[(i + 1) % n][1]) / 2]; let m = mid(0); p.moveTo(m[0], m[1]);
-      for (let i = 1; i <= n; i++) { const c = pts[i % n], q = mid(i); p.quadraticCurveTo(c[0], c[1], q[0], q[1]); } p.closePath();
-      return { cx, cy, p, ph: (cx * 12.9898 + cy * 78.233) % 6.283 }; }); });
-  const ink = el => { const m = getComputedStyle(el).backgroundColor.match(/\d+/g) || [44, 84, 148], [r, g, b] = m.map(Number);   /* gold on blue, blue on gold, pink and orange, cream on purple */
-    if (Math.abs(r - 44) < 30 && Math.abs(b - 148) < 30) return '#e7aa4d'; if (Math.abs(r - 155) < 25 && Math.abs(g - 106) < 25) return '#f2eedd'; return '#2c5494'; };
-  const P = pills.map((el, i) => { const cv = document.createElement('canvas'); cv.className = 'pnet'; cv.setAttribute('aria-hidden', 'true'); el.querySelector('summary').prepend(cv);
-    return { el, cv, off: [(i * .37 + .21) % 1, (i * .61 + .43) % 1] }; });
-  const draw = now => { const time = reduce ? 0 : now / 1000; let any = false;
-    for (const q of P) { const { el, cv, off } = q; if (!el.open) { if (cv.width > 1) cv.width = cv.height = 1; continue; }
-      const r = el.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) continue; any = true;
-      const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
-      const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, w, h);
-      const tilePx = (innerWidth < 700 ? 820 : 1100) * dpr, k = tilePx / TILE, bx0 = -off[0] * tilePx, by0 = -off[1] * tilePx; g.fillStyle = ink(el);
-      for (let ty = 0; ty <= Math.ceil(h / tilePx) + 1; ty++) for (let tx = 0; tx <= Math.ceil(w / tilePx) + 1; tx++) for (const hh of holes) {
-        const px = bx0 + tx * tilePx + hh.cx * k, py = by0 + ty * tilePx + hh.cy * k; if (px < -30 || py < -30 || px > w + 30 || py > h + 30) continue;
-        const s = .62 + .3 * (.5 + .5 * Math.sin(time * .9 - (px + py) / w * 3 + hh.ph * .35)); g.setTransform(k * s, 0, 0, k * s, px, py); g.fill(hh.p); }
-      /* one soft clearing round the words: the title and text block together, its edge feathered */
-      g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'destination-out';
-      let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; el.querySelectorAll('h3, :scope > p, :scope > ul, :scope > div').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e);
-        for (const b of rg.getClientRects()) { if (!b.width) continue; x0 = Math.min(x0, b.left); y0 = Math.min(y0, b.top); x1 = Math.max(x1, b.right); y1 = Math.max(y1, b.bottom); } });
-      if (x1 > x0) { const pad = 26 * dpr, fe = 46 * dpr, X0 = (x0 - r.left) * dpr - pad, Y0 = (y0 - r.top) * dpr - pad, X1 = (x1 - r.left) * dpr + pad, Y1 = (y1 - r.top) * dpr + pad;
-        g.fillStyle = '#000'; g.filter = `blur(${fe / 2}px)`; g.beginPath(); g.roundRect(X0 - fe * .4, Y0 - fe * .4, X1 - X0 + fe * .8, Y1 - Y0 + fe * .8, 70 * dpr); g.fill(); g.filter = 'none';
-        g.beginPath(); g.roundRect(X0, Y0, X1 - X0, Y1 - Y0, 50 * dpr); g.fill(); }   /* solid inside, feathered at the rim */
-      g.globalCompositeOperation = 'source-over'; }
-    if (any && !reduce) requestAnimationFrame(draw); else raf = 0; };
-  let raf = 0; const go = () => { if (!raf) raf = requestAnimationFrame(draw); };
-  ready.then(() => { pills.forEach(el => el.addEventListener('toggle', go)); addEventListener('scroll', go, { passive: true }); addEventListener('resize', go); go(); });
-})();
-</script>
-<style>
-.ab-pill summary > .pnet{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;border-radius:inherit}
-.ab-pill{position:relative}.ab-pill summary{position:static}
-.ab-pill > :not(summary),.ab-pill summary > :not(.pnet):not(.kdots){position:relative;z-index:1}
-</style>
-<script>
-/* event cards: when the card turns cream, a thin octagon (a shade deeper than the cream) is traced round each ring and dot, right where they sit */
-(() => { document.querySelectorAll('.ev-cards .ev > .ev-dot').forEach(dot => {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); svg.setAttribute('class', 'ev-plan'); svg.setAttribute('aria-hidden', 'true'); dot.append(svg);
-  const oct = (cx, cy, R) => 'M' + [...Array(8)].map((_, i) => { const a = Math.PI / 8 + i * Math.PI / 4; return (cx + Math.cos(a) * R).toFixed(1) + ' ' + (cy + Math.sin(a) * R).toFixed(1); }).join('L') + 'Z';
-  const place = () => { const W = dot.clientWidth, H = dot.clientHeight; if (!W) return; svg.setAttribute('viewBox', `0 0 ${W} ${H}`); let d = '';
-    for (const ps of ['::before', '::after']) { const c = getComputedStyle(dot, ps), w = parseFloat(c.width), h = parseFloat(c.height); if (!w) continue;
-      const l = c.left !== 'auto' ? parseFloat(c.left) : W - parseFloat(c.right) - w, t = c.top !== 'auto' ? parseFloat(c.top) : H - parseFloat(c.bottom) - h; d += oct(l + w / 2, t + h / 2, Math.max(w, h) / 2 * 1.32); }
-    const bg = getComputedStyle(dot).backgroundImage.match(/circle at ([\d.]+)% ([\d.]+)%[^,]*,\s*[^)]*\)\s*0\s+([\d.]+)%/); if (bg) d += oct(+bg[1] / 100 * W, +bg[2] / 100 * H, +bg[3] / 100 * Math.max(W, H) * 1.5);
-    svg.innerHTML = `<path d="${d}"/>`; };
-  place(); addEventListener('resize', place); addEventListener('load', place); }); })();
-</script>
-<style>
-.ev > .ev-dot > .ev-plan{position:absolute;inset:-30%;width:160%;height:160%;overflow:visible;pointer-events:none;z-index:-1;opacity:0;transition:opacity .35s}
-.ev > .ev-dot > .ev-plan{inset:0;width:100%;height:100%}
-.ev-plan path{fill:none;stroke:#d6cba8;stroke-width:1.4;stroke-linejoin:round}
-.ev.h-cream:is(:hover,:focus-within) > .ev-dot > .ev-plan{opacity:1}
-</style>
 <style>
 /* the people's names: heavier and a little bigger (the fitter still shrinks a long name to fit its card) */
 html body .people .card h3{font-weight:900 !important;letter-spacing:-.04em !important;font-size:clamp(30px,2.8vw,44px) !important}
 @media (max-width:600px){html body .people .card h3{font-size:clamp(28px,8vw,40px) !important}}
 @media (min-width:1100px){html body .people .card h3{font-size:clamp(48px,3.7vw,68px) !important}}
+</style>
+<script>
+/* event cards: the rings and the dot sit on an octagon lattice turned 45°. At rest only they show; when the card turns cream on hover,
+   the lattice itself appears (octagons and the little squares between, a shade deeper than the cream), filling the right side and fading toward the words */
+(() => { const NS = 'http://www.w3.org/2000/svg', cards = [...document.querySelectorAll('.ev-cards .ev')]; if (!cards.length) return;
+  const blob = (x, y, r, k) => { let d = ''; for (let i = 0; i <= 36; i++) { const a = i / 36 * 6.283, f = 1 + .06 * Math.sin(2 * a + k) + .04 * Math.sin(3 * a + k * 1.7); d += (i ? 'L' : 'M') + (x + Math.cos(a) * r * f).toFixed(1) + ' ' + (y + Math.sin(a) * r * f).toFixed(1); } return d + 'Z'; };
+  const poly = (x, y, R, n, rot) => 'M' + [...Array(n)].map((_, i) => { const a = rot + i * 2 * Math.PI / n; return (x + Math.cos(a) * R).toFixed(1) + ' ' + (y + Math.sin(a) * R).toFixed(1); }).join('L') + 'Z';
+  const LAY = [[[0, 0, .5, 1], [0, -1, .3, 1], [-1, -1, .1, 0]], [[0, 0, .46, 1], [-1, 0, .32, 1], [0, -1, .11, 0]], [[0, 0, .5, 1], [-1, -1, .28, 1], [0, -2, .1, 0]], [[0, 0, .44, 1], [-1, 0, .3, 1], [-1, -1, .12, 0]]];
+  cards.forEach((el, n) => { const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'ev-lat'); svg.setAttribute('aria-hidden', 'true'); el.prepend(svg);
+    const draw = () => { const W = el.clientWidth, H = el.clientHeight; if (!W) return; svg.setAttribute('viewBox', `0 0 ${W} ${H}`); const cr = el.getBoundingClientRect(), TX = [];
+      el.querySelectorAll('h3, p').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); for (const b of rg.getClientRects()) if (b.width) TX.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]); });
+      const clear = (x, y, r) => TX.every(([a, b, c, d]) => Math.hypot(Math.max(0, a - x, x - c), Math.max(0, b - y, y - d)) > r + 18);   /* never near the words */
+      const S = Math.max(40, Math.min(78, W * .12)), a = Math.PI / 4, ca = Math.cos(a), sa = Math.sin(a), ox = W - S * 1.15, oy = H - S * 1.15;
+      const at = (i, j) => [ox + i * S * ca - j * S * sa, oy + i * S * sa + j * S * ca];
+      let lat = ''; const Ro = S / 2 / Math.cos(Math.PI / 8) * .98, e = S / 2 * Math.tan(Math.PI / 8) * .62;
+      for (let i = -9; i <= 9; i++) for (let j = -9; j <= 9; j++) { const [x, y] = at(i, j); if (x < W * .35 || x > W + S || y < -S || y > H + S) continue; lat += poly(x, y, Ro, 8, a + Math.PI / 8); const [qx, qy] = at(i + .5, j + .5); lat += poly(qx, qy, e * 1.41, 4, a + Math.PI / 4); }
+      let rings = '', dots = ''; for (const [i, j, f, ring] of LAY[n % 4]) { const [x, y] = at(i, j), r = S * f; if (!clear(x, y, r) || x + r > W - 6 || y + r > H - 6) continue; if (ring) rings += blob(x, y, r, n + i * 3 + j); else dots += blob(x, y, r, n + 7); }
+      svg.innerHTML = `<defs><linearGradient id="evf${n}" x1="0" x2="1"><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset=".78" stop-color="#fff" stop-opacity="1"/></linearGradient><filter id="evb${n}"><feGaussianBlur stdDeviation="14"/></filter><mask id="evm${n}"><rect width="${W}" height="${H}" fill="url(#evf${n})"/><g filter="url(#evb${n})">${TX.map(([a, b, c, d]) => `<rect x="${a - 22}" y="${b - 18}" width="${c - a + 44}" height="${d - b + 36}" fill="#000"/>`).join('')}</g></mask></defs>
+        <path class="lat" d="${lat}" mask="url(#evm${n})"/><path class="ring" d="${rings}" style="stroke-width:${(S * .13).toFixed(1)}"/><path class="dot" d="${dots}"/>`; };
+    draw(); addEventListener('resize', draw); addEventListener('load', draw); document.fonts && document.fonts.ready.then(draw); }); })();
+</script>
+<style>
+.ev > .ev-dot{display:none !important}
+html body .ev-cards .ev > svg.ev-lat{position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;pointer-events:none;z-index:0 !important;overflow:visible;margin:0 !important}
+.ev-lat .lat{fill:none;stroke:#d3c7a2;stroke-width:1.3;stroke-linejoin:round;opacity:0;transition:opacity .4s}
+.ev-lat .ring{fill:none;stroke:var(--cream,#f2eedd);stroke-linejoin:round;transition:stroke .35s}
+.ev-lat .dot{fill:var(--cream,#f2eedd);transition:fill .35s}
+.ev.h-cream:is(:hover,:focus-within) .ev-lat .lat{opacity:1}
+.ev.h-cream:is(:hover,:focus-within) .ev-lat .ring{stroke:#2c5494}.ev.h-cream:is(:hover,:focus-within) .ev-lat .dot{fill:#2c5494}
+</style>
+<script>
+/* open info cards: a quiet corner plan. A few dots sit on a turned grid in the top right corner, each inside its own thin octagon,
+   with the octagons fading as they reach toward the words, which keep the rest of the card to themselves */
+(() => { const pills = [...document.querySelectorAll('.ab-pill')]; if (!pills.length) return; const NS = 'http://www.w3.org/2000/svg';
+  const blob = (x, y, r, k) => { let d = ''; for (let i = 0; i <= 36; i++) { const a = i / 36 * 6.283, f = 1 + .06 * Math.sin(2 * a + k) + .04 * Math.sin(3 * a + k * 1.7); d += (i ? 'L' : 'M') + (x + Math.cos(a) * r * f).toFixed(1) + ' ' + (y + Math.sin(a) * r * f).toFixed(1); } return d + 'Z'; };
+  const poly = (x, y, R, n, rot) => 'M' + [...Array(n)].map((_, i) => { const a = rot + i * 2 * Math.PI / n; return (x + Math.cos(a) * R).toFixed(1) + ' ' + (y + Math.sin(a) * R).toFixed(1); }).join('L') + 'Z';
+  const tone = el => { const m = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [44, 84, 148]).map(Number), [r, g, b] = m;
+    const blue = Math.abs(r - 44) < 30 && Math.abs(b - 148) < 30, purple = Math.abs(r - 155) < 25 && Math.abs(g - 106) < 25, light = r + g + b > 520;
+    const line = light ? `rgb(${[r, g, b].map(v => Math.round(v * .84)).join(',')})` : `rgb(${[r, g, b].map(v => Math.round(v + (255 - v) * .18)).join(',')})`;
+    return { line, dot: blue ? '#e7aa4d' : purple ? '#f2eedd' : '#2c5494' }; };
+  pills.forEach((el, n) => { const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'pplan'); svg.setAttribute('aria-hidden', 'true'); el.querySelector('summary').prepend(svg);
+    const draw = () => { if (!el.open) { svg.innerHTML = ''; return; } const cr = el.getBoundingClientRect(), W = cr.width, H = cr.height; svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      const rects = []; el.querySelectorAll('h3, :scope > p, :scope > ul, .pm').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); for (const b of rg.getClientRects()) if (b.width) rects.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]);
+        if (e.classList.contains('pm')) { const b = e.getBoundingClientRect(); rects.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]); } });
+      const dist = (x, y) => Math.min(...rects.map(([a, b, c, d]) => Math.hypot(Math.max(0, a - x, x - c), Math.max(0, b - y, y - d))));
+      const S = Math.max(62, Math.min(84, W * .075)), a = Math.PI / 4 + .1, ca = Math.cos(a), sa = Math.sin(a), Ro = S / 2 / Math.cos(Math.PI / 8) * .97, T = tone(el);
+      let oct = '', dots = '', rings = '';
+      for (let i = -12; i <= 12; i++) for (let j = -12; j <= 12; j++) { const x = W + i * S * ca - j * S * sa, y = i * S * sa + j * S * ca; if (x < 0 || y < 0 || x > W - 8 || y > H - 8) continue;
+        const e = Math.hypot((W - x) / (W * .36), y / (H * 1.05)); if (e > 1) continue; const f = 1 - e, dd = dist(x, y); if (dd < S * .9) continue;   /* never near the words */
+        oct += `<path d="${poly(x, y, Ro, 8, a + Math.PI / 8)}" opacity="${Math.min(1, f * 2.2).toFixed(2)}"/>`; if (f > .28) { const r = 6 + f * S * .3; if ((i + j * 3 + n) % 4 === 0) rings += blob(x, y, r, i + j); else dots += blob(x, y, r, i * 2 + j); } }
+      svg.innerHTML = `<g fill="none" stroke="${T.line}" stroke-width="1.2" stroke-linejoin="round">${oct}</g><path d="${rings}" fill="none" stroke="${T.dot}" stroke-width="${(S * .06).toFixed(1)}"/><path d="${dots}" fill="${T.dot}"/>`; };
+    el.addEventListener('toggle', () => requestAnimationFrame(draw)); addEventListener('resize', draw); document.fonts && document.fonts.ready.then(draw); draw(); }); })();
+</script>
+<style>
+.ab-pill summary > .pplan{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.ab-pill{position:relative}.ab-pill summary{position:static}
+.ab-pill > :not(summary),.ab-pill summary > :not(.pplan):not(.kdots){position:relative;z-index:1}
 </style>
 </body>
 </html>
