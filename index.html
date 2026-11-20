@@ -3561,7 +3561,7 @@ html body .people .card h3{font-weight:900 !important;letter-spacing:-.04em !imp
     [0,197,305,197],[0,333,147,333],[372,253,740,253],[307,428,465,428],[468,525,668,525],[742,320,1020,320],[875,200,1340,200],[1137,458,1340,458],[1255,333,1340,333],[0,608,150,608],[775,617,1098,617],[672,668,820,668],[325,752,740,752],[1098,782,1340,782],[1225,700,1340,700],
     [180,0,180,93],[372,0,372,253],[576,0,576,190],[740,0,740,480],[1002,0,1002,200],[1258,0,1258,115],[147,333,147,597],[307,200,307,428],[820,160,820,320],[1230,205,1230,355],[468,428,468,665],[898,400,898,617],[668,525,668,752],[153,608,153,800],[1098,612,1098,896],[576,752,576,896],[372,800,372,896],[740,752,740,896],[1258,782,1258,896]];   /* Samuel's angular drawing, traced */
   cards.forEach((el, n) => { const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'ev-lat'); svg.setAttribute('aria-hidden', 'true'); el.prepend(svg);
-    const draw = () => { const W = el.clientWidth, H = el.clientHeight; if (!W) return; svg.setAttribute('viewBox', `0 0 ${W} ${H}`); const cr = el.getBoundingClientRect(), TX = [];
+    const draw = () => { const W = el.clientWidth, H = el.clientHeight; if (!W) return; if (W < 380 || innerWidth <= 900) { svg.innerHTML = ''; return; }   /* small cards stay plain: no plan, no rings */ svg.setAttribute('viewBox', `0 0 ${W} ${H}`); const cr = el.getBoundingClientRect(), TX = [];
       el.querySelectorAll('h3, p').forEach(e => { const rg = document.createRange(); rg.selectNodeContents(e); for (const b of rg.getClientRects()) if (b.width) TX.push([b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top]); });
       const clear = (x, y, r) => TX.every(([a, b, c, d]) => Math.hypot(Math.max(0, a - x, x - c), Math.max(0, b - y, y - d)) > r + 18);   /* never near the words */
       const S = Math.max(40, Math.min(78, W * .12)), k = S / 240, ox = W - S * 1.1, oy = H - S * .95;   /* the drawing, scaled so its busiest corner sits at the main ring */
@@ -3633,5 +3633,16 @@ html body .ab-pill.ab-b3 .pm{background:#2c5494}
 html body .ab-pill.ab-b3 .pm::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23f2eedd%22%20stroke-width%3D%222.6%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12.4%203.6c-.5%202.9-.3%205.6-.6%208.6-.2%202.8.2%205.4-.3%208.2%22/%3E%3Cpath%20d%3D%22M3.8%2011.6c2.7.5%205.4.2%208.3.4%202.8.1%205.4-.4%208.1.3%22/%3E%3C/svg%3E")}
 </style>
 <script src="assets/pubpat.js?v=1"></script>
+<style>
+/* info cards, open: bigger, fuller type, and the open/close dot swells to fill its corner */
+html body .about-grid .ab-pill[open] h3{font-size:clamp(40px,6vw,100px);letter-spacing:-.045em;line-height:.98}
+html body .about-grid .ab-pill[open] > p{font-size:clamp(20px,2.15vw,31px);line-height:1.32;max-width:40ch;letter-spacing:-.015em}
+html body .about-grid .ab-pill[open] > p:first-of-type{margin-top:clamp(4px,1vw,14px)}
+@media (min-width:1000px){html body .about-grid .ab-pill[open] > p{max-width:none;columns:2;column-gap:clamp(44px,5vw,90px);font-size:clamp(20px,1.85vw,28px)}}   /* wide screens: the words fill the card in two columns */
+html body .ab-pill .pm{transition:width .45s cubic-bezier(.3,1.4,.4,1),height .45s cubic-bezier(.3,1.4,.4,1),rotate .45s,scale .3s}
+html body .ab-pill[open] .pm{width:clamp(70px,9vw,132px);height:clamp(66px,8.6vw,126px)}
+html body .ab-pill .pm::before{transition:width .45s,height .45s}
+html body .ab-pill[open] .pm::before{width:42%;height:42%}
+</style>
 </body>
 </html>
