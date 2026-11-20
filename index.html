@@ -3429,13 +3429,6 @@ html body .bz-h.sec-h,html body .bz-h.tilt-h,html body .ev-h{font-size:clamp(30p
 @media (max-width:600px){html body #publications .bz-h.sec-h{font-size:14.2vw !important}}   /* "Publications" is too long a word for 62px on a phone: just small enough to fit */
 </style>
 <style>
-/* resource cards: the button dot changes colour when the card is hovered, focused or pressed */
-.res .r-go{transition:background-color .3s ease,color .3s ease,filter .3s,transform .35s cubic-bezier(.3,1.6,.5,1)}
-html body .res:is(:hover,:focus-within,:active) .r-go{--gd-bg:#d8708e;color:#2c5494 !important}
-.res .r-go::before{transition:background-color .3s ease}
-html body .res.bd4:is(:hover,:focus-within,:active) .r-go,html body .res.r-lav:is(:hover,:focus-within,:active) .r-go{--gd-bg:#e7aa4d}   /* on the rose card, gold instead */
-</style>
-<style>
 /* wherever a publication is listed: a highlighted row carries a big kaleidoscope of Netsch geometry (hexagons, squares, octagons and lines,
    crossing), a shade darker than its band, a different one for each row. It fades in only past the words, never behind them */
 html body .pubs li:nth-child(5n+1) a::before,html body .r-list li:nth-child(5n+1) a::before{background-image:linear-gradient(to right,var(--hl,#2c5494) 0,var(--hl,#2c5494) calc(var(--te,70%) + 18px),transparent calc(var(--te,70%) + 140px)),url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22300%22%20height%3D%22300%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cpath%20d%3D%22M96.00%2050.00%20L73.00%2089.84%20L27.00%2089.84%20L4.00%2050.00%20L27.00%2010.16%20L73.00%2010.16ZM89.84%2073.00%20L50.00%2096.00%20L10.16%2073.00%20L10.16%2027.00%20L50.00%204.00%20L89.84%2027.00ZM76.00%2050.00%20L63.00%2072.52%20L37.00%2072.52%20L24.00%2050.00%20L37.00%2027.48%20L63.00%2027.48ZM96.00%2050.00L4.00%2050.00M89.84%2073.00L10.16%2027.00M73.00%2089.84L27.00%2010.16M50.00%2096.00L50.00%204.00M27.00%2089.84L73.00%2010.16M10.16%2073.00L89.84%2027.00%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-opacity%3D%22.12%22%20stroke-width%3D%220.367%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E") !important;background-size:100% 100%,300px 300px !important;background-repeat:no-repeat,repeat !important;background-position:0 0,100% 50% !important;background-color:var(--hl,#2c5494) !important}
@@ -3452,5 +3445,11 @@ html body .pubs li:nth-child(5n+5) a::before,html body .r-list li:nth-child(5n+5
     a.style.setProperty('--te', (mx - ar.left - bl).toFixed(0) + 'px'); });
   place(); addEventListener('load', place); document.fonts && document.fonts.ready.then(place); let tm; addEventListener('resize', () => { clearTimeout(tm); tm = setTimeout(place, 150); }); })();
 </script>
+<style>
+/* resource cards: on hover the button dot turns and swells with the hexagon rings around it, the same amount, the same spring */
+.res .r-go::before{transition:rotate .7s cubic-bezier(.3,1.4,.4,1),scale .7s cubic-bezier(.3,1.4,.4,1)}
+.res:is(:hover,:focus-within) .r-go::before{rotate:30deg;scale:1.09}
+@media (prefers-reduced-motion:reduce){.res:is(:hover,:focus-within) .r-go::before{rotate:none;scale:none}}
+</style>
 </body>
 </html>
