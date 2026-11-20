@@ -14,7 +14,7 @@ window.mlMarkType = (p = .26) => Math.random() < p ? [8, 6, 4, 8, 6, 4, 8, 6, 4,
     sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [[[b, a], [b, 1 - a]]], [[[-b, a], [-b, 1 - a]]], [dia(.5, .5, .17), 1], [[[.5, b], [.5, .33]]], [[[.5, .67], [.5, 1 - b]]]); }
   else if (kind === 'band') { const a = .38; sh.push([oct(a), 1], [dia(0, 0, .32), 1], [[[-.5, a], [.5, a]]], [[[-.5, 1 - a], [.5, 1 - a]]], [[[a, a], [a, 1 - a]]], [[[1 - a, a], [1 - a, 1 - a]]]);
     if (odd) sh.push([[[a, a], [1 - a, 1 - a]]], [[[1 - a, a], [a, 1 - a]]]); else sh.push([sq(.5, .5, .06), 1]); sh.push([[[a, t * a], [.5, t * a - (.5 - a)]]]); }
-  else if (kind === 'river') { sh.push([oct(.4), 1]); if (odd) sh.push([sq(.5, .5, .1), 1]); }   /* rivers: just an octagon round each dot, and a small square in every other gap */
+  else if (kind === 'river') { if (odd) sh.push([dia(0, 0, .2), 1], [sq(0, 0, .1), 1]); else sh.push([oct(.4), 1], [sq(0, 0, .2), 1]); }   /* rivers, from Samuel's drawing: an octagon holding a square, and between them a small square in a diamond */
   else { const a = .42, b = t * a; sh.push([oct(a), 1]); if (odd) sh.push([dia(0, 0, .28), 1], [sq(0, 0, .18), 1]); else sh.push([oct(.29), 1], [sq(0, 0, .18), 1]);
     sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [dia(.5, .5, .2), 1], [sq(.5, .5, .1), 1], [[[.5, b], [.5, .3]]]); }
   return sh; };
@@ -1100,8 +1100,8 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
         const s2 = S / Math.SQRT2, P = new Map(); g.setTransform(dpr, 0, 0, dpr, 0, 0);   /* Samuel's octagon plan on the river's turned grid: every dot in an octagon, bars and small frames between */
         for (const v of vis) { const d = v.d; if (!d || d.gi === undefined) continue; const gx = wrap(d.gi * S + (d.gj % 2 ? S / 2 : 0)), gy = d.gj * S / 2 + S * .25;
           const a = ss(0, .3, ta - X(gx) * .3) * (1 - ss(.55, 1, grow(gx))); if (a < .03) continue; const q = Math.round(a * 5) / 5; let p = P.get(q); if (!p) P.set(q, p = new Path2D());
-          const I = d.gi + (d.gj >> 1), J = (d.gj + 1) >> 1;   /* the node's place on the turned grid, for the alternation */
-          for (const [pts, cl] of mlPlanCell('river', 0)) { pts.forEach(([u, v2], k) => { const px = v.x + (u - v2) * s2 * Math.SQRT1_2, py = v.y + (u + v2) * s2 * Math.SQRT1_2;   /* centred on the dot itself, wherever it has wandered */ k ? p.lineTo(px, py) : p.moveTo(px, py); }); if (cl) p.closePath(); } }
+          for (const [pts, cl] of mlPlanCell('river', d.gj % 2)) { pts.forEach(([u, v2], k) => { const px = v.x + u * S, py = v.y + v2 * S;   /* the octagon rows and the in-between rows of the river's grid, each shape centred on its own dot */
+            k ? p.lineTo(px, py) : p.moveTo(px, py); }); if (cl) p.closePath(); } }
         g.strokeStyle = '#dbd0ae'; g.lineWidth = .9; g.lineJoin = 'round'; for (const [q, p] of P) { g.globalAlpha = q; g.stroke(p); } g.globalAlpha = 1;
         for (const v of vis) v.r *= grow(v.x); for (const w of ws) w.R *= grow(w.x); } }
     const cell = Math.max(48, rmax * 2.6), grid = new Map(), K = (a, b) => a + ',' + b;
