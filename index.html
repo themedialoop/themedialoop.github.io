@@ -3497,28 +3497,18 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   left:calc(var(--gx,85%) - var(--hs) / 2);top:calc(var(--gy,80%) - var(--hs) / 2);right:auto;bottom:auto;width:var(--hs);height:var(--hs);background-size:100% 100% !important;background-position:center !important;
   background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23f2eedd%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M72.26%2062.85%20L50.00%2075.70%20L27.74%2062.85%20L27.74%2037.15%20L50.00%2024.30%20L72.26%2037.15Z%22%20stroke-opacity%3D%220.9%22%20stroke-width%3D%221.4%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M77.22%2073.10%20L43.61%2085.12%20L16.39%2062.03%20L22.78%2026.90%20L56.39%2014.88%20L83.61%2037.97Z%22%20stroke-opacity%3D%220.6%22%20stroke-width%3D%221.2%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M79.88%2086.41%20L33.41%2094.08%20L3.53%2057.67%20L20.12%2013.59%20L66.59%205.92%20L96.47%2042.33Z%22%20stroke-opacity%3D%220.35%22%20stroke-width%3D%221%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/g%3E%3C/svg%3E") calc(var(--gx,85%) - var(--hs) / 2) calc(var(--gy,80%) - var(--hs) / 2) / var(--hs) var(--hs) no-repeat;
   transform-origin:center;transition:transform .7s cubic-bezier(.3,1.4,.4,1)}
-.res:is(:hover,:focus-within)::after{transform:scale(1.09) rotate(30deg)}
+.res:is(:hover,:focus-within,:active)::after{transform:scale(1.09) rotate(30deg)}
 .res.fitting::after{display:none}
-@media (min-width:561px){
+@media all{
 /* underneath the turning hexagons, a second set that stays put, the same cream rings: revealed as the top set turns */
 .res::before{content:"";position:absolute;z-index:-1;pointer-events:none;--hs:calc(var(--gs,160px) * 2.8);left:calc(var(--gx,85%) - var(--hs) / 2);top:calc(var(--gy,80%) - var(--hs) / 2);width:var(--hs);height:var(--hs);
   background:#f2eedd;-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M72.26%2062.85%20L50.00%2075.70%20L27.74%2062.85%20L27.74%2037.15%20L50.00%2024.30%20L72.26%2037.15Z%22%20stroke-opacity%3D%220.9%22%20stroke-width%3D%222.2%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M77.22%2073.10%20L43.61%2085.12%20L16.39%2062.03%20L22.78%2026.90%20L56.39%2014.88%20L83.61%2037.97Z%22%20stroke-opacity%3D%220.6%22%20stroke-width%3D%222%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M79.88%2086.41%20L33.41%2094.08%20L3.53%2057.67%20L20.12%2013.59%20L66.59%205.92%20L96.47%2042.33Z%22%20stroke-opacity%3D%220.35%22%20stroke-width%3D%221.8%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M72.26%2062.85%20L50.00%2075.70%20L27.74%2062.85%20L27.74%2037.15%20L50.00%2024.30%20L72.26%2037.15Z%22%20stroke-opacity%3D%220.9%22%20stroke-width%3D%222.2%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M77.22%2073.10%20L43.61%2085.12%20L16.39%2062.03%20L22.78%2026.90%20L56.39%2014.88%20L83.61%2037.97Z%22%20stroke-opacity%3D%220.6%22%20stroke-width%3D%222%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3Cpath%20d%3D%22M79.88%2086.41%20L33.41%2094.08%20L3.53%2057.67%20L20.12%2013.59%20L66.59%205.92%20L96.47%2042.33Z%22%20stroke-opacity%3D%220.35%22%20stroke-width%3D%221.8%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/g%3E%3C/svg%3E") center/100% 100% no-repeat;opacity:0;transition:opacity .4s}
-.res:is(:hover,:focus-within)::before{opacity:1}
+.res:is(:hover,:focus-within,:active)::before{opacity:1}
 .res.fitting::before{display:none}
 }
 
-@media (max-width:560px){
-  /* on phones: option D, two broad 45° bands a shade lighter than the card, crossing behind the dot, with a thin hexagon where they meet */
-  .res::after{left:calc(var(--gx,85%) - 700px) !important;top:calc(var(--gy,80%) - 700px) !important;width:1400px !important;height:1400px !important;transform:none !important;transform-origin:center !important;
-    background:
-      linear-gradient(45deg,transparent calc(50% - 46px),rgba(255,255,255,.13) calc(50% - 46px),rgba(255,255,255,.13) calc(50% + 46px),transparent calc(50% + 46px)),
-      linear-gradient(-45deg,transparent calc(50% - 40px),rgba(255,255,255,.11) calc(50% - 40px),rgba(255,255,255,.11) calc(50% + 40px),transparent calc(50% + 40px)) !important;
-    transition:translate .6s cubic-bezier(.3,1.4,.4,1) !important}   /* both bands cross exactly at the dot */
-  .res:is(:hover,:focus-within,:active)::after{transform:rotate(8deg) !important}
-  .res::before{content:"";position:absolute;z-index:-1;pointer-events:none;inset:0;opacity:1;   /* the hexagon in a shade of the card itself: deeper on light cards, lighter on dark ones */
-    background:var(--hd,rgba(0,0,0,.15)) !important;-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cpath%20d%3D%22M50%202%2091.6%2026%2091.6%2074%2050%2098%208.4%2074%208.4%2026Z%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-opacity%3D%221%22%20stroke-width%3D%221.3%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E") calc(var(--gx,85%) - var(--gs,160px) * .8) calc(var(--gy,80%) - var(--gs,160px) * .8) / calc(var(--gs,160px) * 1.6) calc(var(--gs,160px) * 1.6) no-repeat !important;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cpath%20d%3D%22M50%202%2091.6%2026%2091.6%2074%2050%2098%208.4%2074%208.4%2026Z%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-opacity%3D%221%22%20stroke-width%3D%221.3%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E") calc(var(--gx,85%) - var(--gs,160px) * .8) calc(var(--gy,80%) - var(--gs,160px) * .8) / calc(var(--gs,160px) * 1.6) calc(var(--gs,160px) * 1.6) no-repeat !important}
-  .res::after{display:none !important}   /* no crossing bands on phones; the thin hexagon stays */
-}   /* on phones the ripple stays tight round the dot, clear of the words */
+/* phones get the same cream rings as desktop, drawn a little tighter so they stay clear of the words */
+@media (max-width:560px){.res::after,.res::before{--hs:calc(var(--gs,160px) * 1.6) !important}}
 @media (prefers-reduced-motion:reduce){.res::after{transition:none}.res:is(:hover,:focus-within)::after{transform:none}}
 </style>
 <style>
