@@ -3097,6 +3097,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         gB: Math.random() < .17, gC: Math.random() < .17, few: Math.random() < .85, ring: !big && Math.random() < .06, big: !!big }; if (node) NODE.set(node, d);   // on the blue: cream with some gold; on the cream: blue with a few gold
       (grid.get(key(x, y)) || grid.set(key(x, y), []).get(key(x, y))).push(d); dots.push(d);
     }
+    { const bigs = dots.filter(d => d.big).sort(() => Math.random() - .5).slice(0, mob ? 8 : 14); bigs.forEach((d, i) => d.ghost = i % 2 ? 4 : 8); }   /* a few big dots carry a thin octagon or square while they fly: the blueprint showing through */
   };
   const wob = (a, t) => 1 + .09 * Math.sin(3 * a + 1.3 + t * .2) + .06 * Math.sin(5 * a + .4 - t * .15) + .03 * Math.sin(8 * a + 2);
   let gc = { x: 0, y: 0, rx: 1, ry: 1 }, arcY = 0, arcOn = 1;
@@ -3191,6 +3192,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         const hx2 = x, hy2 = y + LS / 2, e2 = edge * .3 * a; P.moveTo(hx2 - e2, hy2 - e2); P.lineTo(hx2 + e2, hy2 - e2); P.lineTo(hx2 + e2, hy2 + e2); P.lineTo(hx2 - e2, hy2 + e2); P.closePath(); }   /* and a little square in each gap */
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.strokeStyle = '#3961a5'; ctx.lineWidth = .6; ctx.lineJoin = 'round';
       for (const [q, P] of B) { ctx.globalAlpha = +q.slice(1); ctx.lineWidth = q[0] === 'h' ? 1.1 : q[0] === 'g' ? .9 : .6; ctx.strokeStyle = q[0] === 'g' ? '#4068ab' : '#3961a5'; ctx.stroke(P); }   /* the square grid a touch lighter and firmer, so it reads behind the octagons */ ctx.globalAlpha = 1; }
+    const fly = Math.max(e > 0 && e < 1 ? Math.sin(Math.PI * e) : 0, sqe > 0 && sqe < 1 ? Math.sin(Math.PI * sqe) : 0), GH = [];
     for (const d of dots) {
       arcOn = d.few ? 1 : 0; const k = ss(d.z * .45, d.z * .45 + .55, e); let m = lerp(maskLanding(d.x, d.y, t), maskHome(d.x, d.y, t), k) * (born >= 1 ? 1 : ss(.8 + dly(d), 1.3 + dly(d), bt));   /* the dots grow out in a ripple from the logo */   // each makes the trip at its own moment
       { const cg = Math.hypot(d.x - W / 2, d.y - (H - Math.max(28, 18) - 42)) - d.r - AMP * 2; m *= 1 - (1 - k) * (1 - ss(54, 78, cg)); }   /* on the landing, nothing sits behind the gold ^ dot */
@@ -3204,10 +3206,15 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
         px += vx * far - vy * sway; py += vy * far + vx * sway; spin = sqe * (d.sp > 0 ? 1 : -1) * (2 + d.z * 3); }
       let c = 1; for (const b of boxes) { const g = Math.max(b.left - pr.left - px, px - (b.right - pr.left), b.top - pr.top - py, py - (b.bottom - pr.top), 0); if (g < pad + d.r) c *= ss(0, pad + d.r, g); }   // never over the words, wherever it dances
       let s = d.r * m * c * (reduce ? .97 : .82 + .18 * mlRipple(d.x, d.y, t)); s = Math.min(s, (H - 3 - py) / 1.1); if (s < .4) continue;   /* a ripple of breath across the field; a dot near the bottom shrinks rather than being cut by the edge */
+      if (d.ghost && fly > .02) GH.push([px, py, s, d.ghost, spin]);
       ctx.setTransform(s * DPR, 0, 0, s * DPR, px * DPR, py * DPR); ctx.rotate(d.rot + t * d.sp + spin);
       const col = mix(d.gB ? '#e7aa4d' : '#f2eedd', d.gC ? '#e7aa4d' : '#2c5494', ce);
       if (d.ring) { ctx.lineWidth = .28; ctx.strokeStyle = col; ctx.stroke(d.s); } else { ctx.fillStyle = col; ctx.fill(d.s); }
     }
+    if (GH.length) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.strokeStyle = mix('#4068ab', '#2c5494', ce); ctx.lineWidth = .9; ctx.lineJoin = 'round'; ctx.globalAlpha = fly * (.95 - .45 * ce); ctx.beginPath();
+      for (const [x, y, r, n, sp] of GH) { const R = r * (n === 8 ? 1.6 : 1.5), a0 = (n === 8 ? Math.PI / 8 : Math.PI / 4) + sp * .25;   /* octagons and squares turned to the grid, wheeling a little with their dot */
+        for (let i = 0; i <= n; i++) { const a = a0 + i * Math.PI * 2 / n; i ? ctx.lineTo(x + Math.cos(a) * R, y + Math.sin(a) * R) : ctx.moveTo(x + Math.cos(a) * R, y + Math.sin(a) * R); } }
+      ctx.stroke(); ctx.globalAlpha = 1; }
     raf = requestAnimationFrame(frame);
   };
   const go = () => { if (!raf) raf = requestAnimationFrame(frame); };
