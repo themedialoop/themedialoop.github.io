@@ -32,6 +32,11 @@ window.mlPlanCell = (kind, odd) => {   /* one cell of Samuel's octagon plans, in
   else { const a = .42, b = t * a; sh.push([oct(a), 1]); if (odd) sh.push([sq(0, 0, .2), 1]);   /* info cards: a plain octagon (every other one holds a square), a small square in each gap, bars side to side */
     sh.push([[[a, b], [1 - a, b]]], [[[a, -b], [1 - a, -b]]], [sq(.5, .5, .12), 1]); }
   return sh; };
+window.mlFaded = (w, h, d, pts, R, col, lw) => {   /* a plan drawn only round the dots: full near each dot, fading to nothing where there is none */
+  const lc = document.createElement('canvas'), mc = document.createElement('canvas'); lc.width = mc.width = w; lc.height = mc.height = h;
+  const lg = lc.getContext('2d'), mg = mc.getContext('2d'); lg.strokeStyle = col; lg.lineWidth = lw; lg.lineJoin = 'round'; lg.stroke(new Path2D(d)); mg.globalCompositeOperation = 'lighter';
+  for (const [x, y, k] of pts) { const rr = R * (k || 1), gr = mg.createRadialGradient(x, y, 0, x, y, rr); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.5, 'rgba(0,0,0,.85)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); mg.fillStyle = gr; mg.fillRect(x - rr, y - rr, rr * 2, rr * 2); }
+  lg.globalCompositeOperation = 'destination-in'; lg.drawImage(mc, 0, 0); return lc; };
 window.mlPlanD = (kind, ox, oy, S, ang, W, H) => {   /* the whole plan as one path, turned by ang, with octagon centres every S */
   const c = Math.cos(ang), sn = Math.sin(ang), N = Math.ceil(Math.hypot(W, H) / S) + 2; let d = '';
   for (let I = -N; I <= N; I++) for (let J = -N; J <= N; J++) { const cx = ox + (I * c - J * sn) * S, cy = oy + (I * sn + J * c) * S; if (cx < -S * 1.5 || cy < -S * 1.5 || cx > W + S * 1.5 || cy > H + S * 1.5) continue;
@@ -1281,8 +1286,10 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         const tilePx = (isMobile() ? 820 : 1100) * dpr * [1, .75, 1.25, .9, 1.1][pcards.findIndex(p => p.el === el) % 5], k = tilePx / TILE, bx0 = -off[0] * tilePx, by0 = -off[1] * tilePx;
         { const Sg = (isMobile() ? 52 : 60) * dpr, ang = .26, ca = Math.cos(ang), sa = Math.sin(ang), ox = w * off[0], oy = h * off[1], N = Math.ceil(Math.hypot(w, h) / Sg) + 2;
           if (el.matches(':hover, :focus-visible')) { const bc = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [231, 170, 77]).slice(0, 3).map(Number);   /* the plan: nested octagons, a deeper shade of the colour the card turns */
-            const key = w + 'x' + h; if (el._pk !== key) { el._pk = key; el._pp = new Path2D(mlPlanD('nest', ox, oy, Sg, ang, w, h)); }
-            g.strokeStyle = mlDeeper(bc, .13); g.lineWidth = 1.1 * dpr; g.lineJoin = 'round'; g.stroke(el._pp); }
+            const col = mlDeeper(bc, .13), key = w + 'x' + h + col; if (el._pk !== key) { el._pk = key; const pts = [];   /* the plan only where the dots are */
+              for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [p, big] of [[0, 1], [.5, 0]]) { const u = (i + p) * Sg, v = (j + p) * Sg, px = ox + u * ca - v * sa, py = oy + u * sa + v * ca; if (px > -Sg && py > -Sg && px < w + Sg && py < h + Sg) pts.push([px, py, big ? 1 : .6]); }
+              el._pp = mlFaded(w, h, mlPlanD('nest', ox, oy, Sg, ang, w, h), pts, Sg * .9, col, 1.1 * dpr); }
+            g.drawImage(el._pp, 0, 0); }
           g.fillStyle = ink;
           for (let i = -N; i <= N; i++) for (let j = -N; j <= N; j++) for (const [p, big] of [[0, 1], [.5, 0]]) {
             const u = (i + p) * Sg, v = (j + p) * Sg, px = ox + u * ca - v * sa, py = oy + u * sa + v * ca; if (px < -Sg || py < -Sg || px > w + Sg || py > h + Sg) continue;
@@ -3010,8 +3017,9 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.classList.contains('h-cream') && cd.el.matches(':hover') ? GOLD : cd.col;   /* the Apply card's dots take its old background colour when it inverts */   // cream dots turn gold on the cream hover, so they still show   // the card turns cream on hover; its dots turn gold
     if (cd.lat && cd.el.matches(':hover, :focus-visible')) { const L = cd.lat, S = L.S, e1 = [S * L.ca, S * L.sa], e2 = [-S * L.sa, S * L.ca];
       const bc = (getComputedStyle(cd.el).backgroundColor.match(/\d+/g) || [44, 84, 148]).slice(0, 3).map(Number);
-      g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.beginPath(); g.ellipse(cd.w, cd.h, cd.w * .5, cd.h * 1.05, 0, 0, 6.3); g.clip();
-      if (!L.pd) L.pd = new Path2D(mlPlanD('kite', L.ox, L.oy, S, Math.atan2(L.sa, L.ca), cd.w, cd.h)); g.strokeStyle = mlDeeper(bc, .1); g.lineWidth = 1.1; g.lineJoin = 'round'; g.stroke(L.pd); g.restore(); }   /* octagons holding diamonds: big dots in the squares at their centres, small ones in the frames between */
+      const col = mlDeeper(bc, .1); if (!L.fc || L.fk !== col) { L.fk = col;   /* the plan only round the dots, fading out where there are none */
+        L.fc = mlFaded(cd.cv.width, cd.cv.height, mlPlanD('kite', L.ox * dpr, L.oy * dpr, S * dpr, Math.atan2(L.sa, L.ca), cd.cv.width, cd.cv.height), cd.dots.filter(q => !q.fixed).map(q => [q.x * dpr, q.y * dpr, q.r > S * .09 ? 1 : .6]), S * .85 * dpr, col, 1.1 * dpr); }
+      g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(L.fc, 0, 0); }   /* octagons holding diamonds: big dots in the squares at their centres, small ones in the frames between */
     for (const d of cd.dots) { if (d.fixed) continue; const wave = reduce ? .5 : .5 + .5 * Math.sin(time * .3 - Math.hypot(d.x - ox, d.y - oy) / Rn * 5 + d.ph * .35);   // a slow breath, about every 20 s
       const s = d.r * (1 + (BREATH - 1) * wave) * dpr, c = Math.cos(d.rot) * s, sn = Math.sin(d.rot) * s;
       g.setTransform(c, sn, -sn, c, d.x * dpr, d.y * dpr); if (d.ring) { g.strokeStyle = g.fillStyle; g.lineWidth = .26; g.stroke(d.p); } else g.fill(d.p); }
@@ -3547,8 +3555,8 @@ html body .people .card h3{font-weight:900 !important;letter-spacing:-.04em !imp
       for (let j = -8; j <= 8; j++) { const [, y0] = at(0, j), [, y1] = at(0, j + 1); lat += `M-20 ${y0.toFixed(1)}L${W + 20} ${y0.toFixed(1)}`;
         for (let i = -16; i <= 8; i++) { const [x0] = at(i, 0), [x1] = at(i + 1, 0); if (x1 < W * .3 || x0 > W + HW) continue; const up = ((j % 2) + 2) % 2;
           if (((i % 2) + 2) % 2 === up) lat += `M${P(x0, y0)}L${P(x0, y1)}`; lat += up ? `M${P(x0, y1)}L${P(x1, y0)}` : `M${P(x0, y0)}L${P(x1, y1)}`; } }
-      let rings = '', dots = ''; for (const [i, j, f, ring] of LAY[n % 4]) { const [x, y] = at(i, j), r = S * f; if (!clear(x, y, r) || x + r > W - 6 || y + r > H - 6) continue; if (ring) rings += blob(x, y, r, n + i * 3 + j); else dots += blob(x, y, r, n + 7); }
-      svg.innerHTML = `<defs><linearGradient id="evf${n}" x1="0" x2="1"><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset=".78" stop-color="#fff" stop-opacity="1"/></linearGradient><filter id="evb${n}"><feGaussianBlur stdDeviation="14"/></filter><mask id="evm${n}"><rect width="${W}" height="${H}" fill="url(#evf${n})"/><g filter="url(#evb${n})">${TX.map(([a, b, c, d]) => `<rect x="${a - 22}" y="${b - 18}" width="${c - a + 44}" height="${d - b + 36}" fill="#000"/>`).join('')}</g></mask></defs>
+      let rings = '', dots = '', PL = ''; for (const [i, j, f, ring] of LAY[n % 4]) { const [x, y] = at(i, j), r = S * f; if (!clear(x, y, r) || x + r > W - 6 || y + r > H - 6) continue; PL += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(r + S * (ring ? 1.1 : .7)).toFixed(1)}" fill="#fff"/>`; if (ring) rings += blob(x, y, r, n + i * 3 + j); else dots += blob(x, y, r, n + 7); }
+      svg.innerHTML = `<defs><linearGradient id="evf${n}" x1="0" x2="1"><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset=".78" stop-color="#fff" stop-opacity="1"/></linearGradient><filter id="evb${n}"><feGaussianBlur stdDeviation="14"/></filter><filter id="evc${n}"><feGaussianBlur stdDeviation="${(S * .3).toFixed(1)}"/></filter><mask id="evm${n}"><g filter="url(#evc${n})">${PL}</g><g filter="url(#evb${n})">${TX.map(([a, b, c, d]) => `<rect x="${a - 22}" y="${b - 18}" width="${c - a + 44}" height="${d - b + 36}" fill="#000"/>`).join('')}</g></mask></defs>
         <path class="lat" d="${lat}" mask="url(#evm${n})"/><path class="ring" d="${rings}" style="stroke-width:${(S * .13).toFixed(1)}"/><path class="dot" d="${dots}"/>`; };
     draw(); addEventListener('resize', draw); addEventListener('load', draw); document.fonts && document.fonts.ready.then(draw); }); })();
 </script>
