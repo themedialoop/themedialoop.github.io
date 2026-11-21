@@ -1241,7 +1241,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
           const hold = 1 - ss(.45, 1, grow(gx)); v.x += (gx - v.x) * hold; v.y += (gy - v.y) * hold;   /* while the lattice shows, each dot sits exactly in its octagon; it drifts off only as the lines give way */
           const a = ss(0, .3, ta - X(gx) * .3) * (1 - ss(.55, 1, grow(gx))); if (a < .03) continue; const q = Math.round(a * 5) / 5; let p = P.get(q); if (!p) P.set(q, p = new Path2D()); let gl = G.get(q); if (!gl) G.set(q, gl = new Path2D());
           for (let i = 0; i <= 8; i++) { const an = Math.PI / 8 + i * Math.PI / 4, px = gx + Math.cos(an) * Ro, py = gy + Math.sin(an) * Ro; i ? p.lineTo(px, py) : p.moveTo(px, py); }
-          const hy = gy + S / 2; p.moveTo(gx - e2, hy - e2); p.lineTo(gx + e2, hy - e2); p.lineTo(gx + e2, hy + e2); p.lineTo(gx - e2, hy + e2); p.closePath();
+          const hy = gy + S / 2, e3 = e2 / .3 * Math.SQRT1_2; p.moveTo(gx, hy - e3); p.lineTo(gx + e3, hy); p.lineTo(gx, hy + e3); p.lineTo(gx - e3, hy); p.closePath();   /* a turned square in each square gap: together they make a star */
           gl.moveTo(gx, gy); gl.lineTo(gx + S / 2, gy + S / 2); gl.moveTo(gx, gy); gl.lineTo(gx - S / 2, gy + S / 2); }
         g.lineJoin = 'round'; g.strokeStyle = '#e3dabd'; g.lineWidth = .8; for (const [q, p] of G) { g.globalAlpha = q; g.stroke(p); }
         g.strokeStyle = '#dbd0ae'; g.lineWidth = .9; for (const [q, p] of P) { g.globalAlpha = q; g.stroke(p); } g.globalAlpha = 1;
