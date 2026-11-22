@@ -784,9 +784,9 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
       if (o.edgefade) { const reach = Math.min(W, H) * .16;   /* only the last stretch before the edge thins out */   /* the lines thin out to nothing before the edge, so no dot is ever cut */
         dots = dots.filter(d => { if (Math.min(d.x, d.y, W - d.x, H - d.y) < d.R * 1.8) return false; if (d.ring) return true;   /* nothing ever touches the edge */ const e = Math.min(d.x, d.y, W - d.x, H - d.y), f = Math.min(1, Math.max(0, e / reach)), k = f * f * (3 - 2 * f);
           d.sz *= .35 + .65 * k; d.R = D * .46 * d.sz; return k > .04 && e > d.R * 1.6; }); }
-      { const far = Math.hypot(W, H) * .55, step = D * 1.55;   /* the empty space between the lines filled with small dots: mostly gold, a few orange, the odd pink; some open */
+      { const far = Math.hypot(W, H) * .55, step = D * 1.9;   /* the empty space between the lines filled with small dots: mostly gold, a few orange, the odd pink; some open */
         for (let y = step * .6; y < H - step * .4; y += step * .87) for (let x = step * .6 + ((y / step | 0) % 2) * step * .5; x < W - step * .4; x += step) {
-          const px = x + (rnd() - .5) * step * .5, py = y + (rnd() - .5) * step * .5, ef = Math.min(1, Math.min(px, py, W - px, H - py) / (Math.min(W, H) * .4)), sz = (.42 + rnd() * .36) * (.65 + .35 * ef), R = D * .46 * sz;   /* thinning out toward the band's edges, so it has no hard border */
+          const px = x + (rnd() - .5) * step * .5, py = y + (rnd() - .5) * step * .5, ef = Math.min(1, Math.min(px, py, W - px, H - py) / (Math.min(W, H) * .4)), sz = (.84 + rnd() * .08) * (.9 + .1 * ef), R = D * .46 * sz;   /* 15% smaller than the blue dots, thinning a touch toward the band's edges */
           if (rnd() > Math.sqrt(ef) * .9 + .05) continue;
           if (dots.some(d => (d.x - px) ** 2 + (d.y - py) ** 2 < (R + d.R + D * .32) ** 2)) continue;
           const u = rnd(), col = u < .02 ? '#d8708e' : u < .12 ? ORANGE : GOLD;
