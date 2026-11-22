@@ -881,6 +881,9 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     <a class="more" href="research.html">More research</a>
   </section>
 
+  <!-- the BSB banner: Netsch's plan for the Behavioral Sciences Building in dots, drifting left to right at a slight downward tilt -->
+  <div class="bsb-band" aria-hidden="true"><canvas></canvas></div>
+
   <section id="resources" aria-labelledby="res-h">
     <h2 class="bz-h sec-h" id="res-h"><span class="bz-a">We&rsquo;d Love</span> <span class="bz-b">to Help Out</span></h2>
     <p class="res-intro">Here you will find tools created by members of the medialoop collective. They are free to use. If you have questions about how to use them, <a href="#contact">email us</a>.</p>
@@ -2499,7 +2502,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   ];
   const ALL = ROWS.flat(), RES = ALL.filter(w => w[0] !== '*'), FUN = ALL.filter(w => w[0] === '*').map(w => w.slice(1));
   const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', purple: '#9b6aa6' };
-  const MIX = [['blue', .34], ['gold', .3], ['orange', .13], ['pink', .11], ['purple', .12]];
+  const MIX = [['blue', .55], ['gold', .45]];   /* blue and gold only */
   const R = (a, b) => a + Math.random() * (b - a), pc = () => Math.round(R(42, 58)) + '%';
   const pickCol = () => { let t = Math.random(); for (const [c, w] of MIX) { t -= w; if (t <= 0) return c; } return 'blue'; };
   const textCol = c => c === 'gold' ? '#2c5494' : c === 'blue' && Math.random() < .25 ? '#e7aa4d' : '#f2eedd';
@@ -2621,7 +2624,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   // the medialoop logo lives in the field too: it appears small near the middle at a dozen points on the way down,
   // then grows and sails off the screen as you sink, like everything else
   const MARK_AT = [...Array(12)].map((_, i) => .03 + i * .08);
-  const MARK_COLS = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6'];
+  const MARK_COLS = ['#2c5494', '#e7aa4d'];
   // logos never overlap one another: each takes a spot whose circle is clear of the others, and since the whole field grows
   // evenly from the middle, two logos that start apart stay apart (their slow turn stays inside their own circle)
   const addMark = () => { const z = Z(), w0 = R(.07, .14) * Math.min(W, 900); let x, y, ok = false;
@@ -2649,13 +2652,13 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       else if (p.word) p.blob.tabIndex = p.on ? 0 : -1; }
   };
 
-  /* crossing octagon tunnels, after Walter Netsch's Field Theory: three tunnels of octagon rings, each with its own centre,
+  /* crossing hexagon tunnels, after Netsch's BSB plan (hexagons at the corridor crossings): three tunnels of hexagon rings, each with its own centre,
      speed and spin, falling toward you as you scroll; their rings weave through each other, and no two dots ever touch
      (a dot that would bump a neighbour shrinks instead). Toward the end the dots turn blue, ready for the fall into the landing page. */
   const DSH = [...Array(10)].map(() => { const q = [R(0, 6.3), R(0, 6.3), R(0, 6.3)], p = new Path2D();   // the landing page's organic dot
     for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2, kq = 1 + .045 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * kq, Math.sin(a) * kq) : p.moveTo(Math.cos(a) * kq, Math.sin(a) * kq); }
     p.closePath(); return p; });
-  const TMIX = [['blue', .7], ['gold', .2], ['orange', .035], ['pink', .035], ['purple', .03]];   // blue and gold lead; the rest are sprinkles
+  const TMIX = [['blue', .7], ['gold', .3]];   // blue and gold only
   const tPick = () => { let t = Math.random(); for (const [c, w] of TMIX) { t -= w; if (t <= 0) return c; } return 'blue'; };
   let wi = Math.floor(Math.random() * 60); const nextWord = () => { const fun = wi % 3 === 2, list = fun ? FUN : RES, w = list[Math.floor(wi / (fun ? 3 : 1.5)) % list.length]; wi++; return { w, fun }; };
   const TUN = [[.3, .3, 1, 1], [.72, .48, .82, -1], [.44, .76, 1.14, 1]].map(([x, y, sp, dir]) => ({ x, y, sp, dir, ph: R(0, 6.3),
@@ -2678,7 +2681,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     tg.setTransform(dpr, 0, 0, dpr, 0, 0); tg.clearRect(0, 0, W, H); if (!W || !H) return;
     const max = Math.hypot(W, H) * .42, ramp = Math.max(.35, Math.min(1, prog / .14));   // a few dots already there as you arrive; the rest arrive as you go in
     const bt = Math.max(0, Math.min(1, (prog - .45) / .5)), blue = bt * bt * (3 - 2 * bt) * .95;   // the field turns blue as you near the bottom
-    const lt = warping ? 1 : lineAt ? Math.min(1, (performance.now() - lineAt) / 300) : 0, lineIn = lt * lt * (3 - 2 * lt), LINES = [];   /* the last moment: the plan under the field draws itself in by hand */
+    const lineIn = 0, LINES = [];   /* no plan lines drawn in: just dots */   /* the last moment: the plan under the field draws itself in by hand */
     TUN.forEach((tn, T) => { const z = (zl * .3 + clock * .03) * tn.sp + T * .33, rings = [];
       const cx = tn.x * W + W * .06 * Math.sin(clock * .23 + tn.ph), cy = tn.y * H + H * .05 * Math.cos(clock * .19 + tn.ph);   // each tunnel's centre drifts a little
       for (const l of tn.layers) { const d = (l.off + z) % 1, sc = Math.pow(d, 2.2) * max, fade = Math.min(1, d * 6, (1 - d) * 10); if (sc < 6) continue;
@@ -2686,7 +2689,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         if (lineIn > 0) { const r1 = sc / Math.cos(Math.PI / 8), pts = [];   /* the ring's octagon, each corner nudged a little, closed on itself */
           for (let v = 0; v < 8; v++) { const j = l.jit[v], a = Math.PI / 8 + v * Math.PI / 4 + rot + j[1] * .5, rr = r1 * (1 + j[0] * .6); pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]); }
           rings.push({ sc, pts, w: Math.max(1, sc * .012), al: lineIn * Math.min(1, (1 - d) * 6) * Math.min(1, sc / 40) }); }
-        for (const dt of l.dots) { if (dt.gone || dt.rp > ramp) continue; const i = l.dots.indexOf(dt), a = i / n * Math.PI * 2 + dt.ja * .6, seg = Math.PI / 4, kk = Math.cos(seg / 2) / Math.cos(((a % seg) + seg) % seg - seg / 2);
+        for (const dt of l.dots) { if (dt.gone || dt.rp > ramp) continue; const i = l.dots.indexOf(dt), a = i / n * Math.PI * 2 + dt.ja * .6, seg = Math.PI / 3, kk = Math.cos(seg / 2) / Math.cos(((a % seg) + seg) % seg - seg / 2);   /* hexagon rings, after the BSB plan */
           const rr = sc * kk * (1 + dt.jr * .6 * (1 - lineIn) + .02 * Math.sin(clock * 1.3 + dt.ph)), aa = a + rot, x = cx + Math.cos(aa) * rr, y = cy + Math.sin(aa) * rr;
           if (x < -40 || x > W + 40 || y < -40 || y > H + 40) continue;
           const room = Math.min(Math.PI * sc / n * .72, 2.2 * sc / (12 * Math.max(d, .05)) * .36) * .8, size = (dt.word ? Math.min(room * 2.4, sc * .13) : Math.min(room, sc * .042 * dt.sz)) * fade;
@@ -2722,7 +2725,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       if (dt.ghr === undefined) { dt.ghr = Math.random(); dt.gh = [8, 6, 4, 8, 6, 4, 8, 6, 4, 2][Math.floor(Math.random() * 10)]; }
       if (!dt.word && rr > 5 && dt.ghr < (prog > .12 ? .1 + .24 * (q => q * q * (3 - 2 * q))(Math.min(1, Math.max(0, (prog - .15) / .8))) : 0)) RM.push([x, y, rr, dt.gh, rot]);   /* from early on, a few blueprint marks, more and more as you go down */
       const kq = key(gx, gy); (grid.get(kq) || grid.set(kq, []).get(kq)).push([x, y, rr]); }
-    if (RM.length) { tg.setTransform(dpr, 0, 0, dpr, 0, 0); mlMarks(tg, RM, .55, '#2c5494'); }
+    /* (no blueprint marks) */
     if (swR) { tg.setTransform(swR * dpr, 0, 0, swR * dpr, W / 2 * dpr, H / 2 * dpr); tg.fillStyle = '#2c5494'; tg.fill(DSH[0]); tg.setTransform(dpr, 0, 0, dpr, 0, 0); }
     TQ = []; };
   let holdTop = 0, holdSpan = 1, frameN = 0;
@@ -3321,7 +3324,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
    arrives and shrink away as it leaves, over a soft, wavy margin, so no dot is ever cut off by an edge. Dots also shrink
    away before they reach a card, a heading, a line of text or a button. */
 (() => {
-  const secs = [{ el: document.getElementById('resources'), kind: 'res' }, { el: document.getElementById('contact'), kind: 'ct' }].filter(q => q.el);
+  const secs = [{ el: document.getElementById('contact'), kind: 'ct' }].filter(q => q.el);   /* (no longer behind the resource cards) */
   if (!secs.length) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const C = document.createElement('canvas'); C.id = 'pageDots'; C.setAttribute('aria-hidden', 'true');
@@ -3654,5 +3657,42 @@ html body .ab-pill{overflow-anchor:none}
     c.style.setProperty('padding-left', Math.round(right + gap) + 'px', 'important'); });
   fit(); addEventListener('load', fit); addEventListener('resize', fit); document.fonts && document.fonts.ready.then(fit); })();
 </script>
+<style>
+/* the BSB banner after the publications: full width, a little wider than the screen so its ends never show, tipped slightly downward */
+.bsb-band{position:relative;height:clamp(260px,30vw,440px);width:112vw;margin:clamp(40px,6vw,90px) 0 clamp(20px,3vw,40px) calc(50% - 56vw);rotate:3deg;pointer-events:none}
+@media (max-width:700px){.bsb-band{height:300px}}
+.bsb-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+</style>
+<script>
+/* the banner's dots: assets/bsbfield.js, repeating left to right; the building blue, the field gold; a slow swell runs along the lines */
+(() => {
+  const box = document.querySelector('.bsb-band'); if (!box) return; const cv = box.querySelector('canvas'), g = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, CREAM = '#f2eedd';
+  const HOLES = ['M -0.138 0.486 Q -0.120 0.483 -0.102 0.479 Q -0.084 0.475 -0.066 0.470 Q -0.049 0.465 -0.031 0.458 Q -0.014 0.452 0.003 0.445 Q 0.020 0.437 0.036 0.429 Q 0.052 0.420 0.068 0.410 Q 0.085 0.401 0.100 0.390 Q 0.116 0.381 0.131 0.369 Q 0.146 0.358 0.161 0.347 Q 0.175 0.335 0.189 0.323 Q 0.203 0.311 0.218 0.299 Q 0.232 0.286 0.245 0.273 Q 0.259 0.261 0.271 0.247 Q 0.284 0.234 0.297 0.220 Q 0.309 0.206 0.321 0.192 Q 0.333 0.178 0.344 0.163 Q 0.356 0.148 0.367 0.133 Q 0.378 0.118 0.388 0.102 Q 0.398 0.087 0.408 0.071 Q 0.418 0.055 0.427 0.039 Q 0.436 0.022 0.444 0.005 Q 0.452 -0.011 0.460 -0.029 Q 0.467 -0.046 0.473 -0.063 Q 0.479 -0.081 0.484 -0.099 Q 0.489 -0.117 0.492 -0.135 Q 0.496 -0.153 0.498 -0.171 Q 0.500 -0.189 0.500 -0.208 Q 0.500 -0.226 0.498 -0.245 Q 0.497 -0.263 0.493 -0.281 Q 0.489 -0.299 0.483 -0.316 Q 0.477 -0.333 0.469 -0.350 Q 0.461 -0.366 0.450 -0.381 Q 0.440 -0.396 0.428 -0.409 Q 0.415 -0.422 0.401 -0.433 Q 0.387 -0.445 0.371 -0.454 Q 0.355 -0.463 0.339 -0.470 Q 0.322 -0.477 0.304 -0.481 Q 0.286 -0.486 0.268 -0.488 Q 0.250 -0.490 0.231 -0.491 Q 0.213 -0.491 0.195 -0.489 Q 0.176 -0.487 0.158 -0.484 Q 0.140 -0.481 0.122 -0.475 Q 0.104 -0.471 0.087 -0.464 Q 0.069 -0.458 0.052 -0.451 Q 0.035 -0.443 0.018 -0.435 Q 0.001 -0.427 -0.015 -0.418 Q -0.032 -0.409 -0.047 -0.399 Q -0.063 -0.389 -0.079 -0.379 Q -0.094 -0.369 -0.110 -0.358 Q -0.125 -0.347 -0.140 -0.336 Q -0.155 -0.325 -0.169 -0.314 Q -0.184 -0.302 -0.198 -0.290 Q -0.213 -0.278 -0.227 -0.266 Q -0.240 -0.253 -0.254 -0.240 Q -0.267 -0.228 -0.280 -0.214 Q -0.294 -0.202 -0.306 -0.188 Q -0.320 -0.175 -0.332 -0.161 Q -0.345 -0.147 -0.357 -0.133 Q -0.369 -0.119 -0.381 -0.104 Q -0.392 -0.089 -0.403 -0.074 Q -0.414 -0.059 -0.424 -0.043 Q -0.433 -0.027 -0.442 -0.011 Q -0.451 0.005 -0.459 0.022 Q -0.466 0.039 -0.473 0.056 Q -0.479 0.074 -0.484 0.092 Q -0.489 0.109 -0.493 0.127 Q -0.496 0.145 -0.498 0.164 Q -0.500 0.183 -0.500 0.201 Q -0.500 0.220 -0.499 0.238 Q -0.497 0.256 -0.493 0.274 Q -0.490 0.292 -0.483 0.309 Q -0.477 0.326 -0.468 0.342 Q -0.460 0.357 -0.449 0.372 Q -0.438 0.387 -0.425 0.399 Q -0.412 0.413 -0.398 0.424 Q -0.383 0.435 -0.368 0.444 Q -0.352 0.453 -0.335 0.460 Q -0.318 0.468 -0.301 0.474 Q -0.283 0.479 -0.265 0.483 Q -0.247 0.486 -0.229 0.489 Q -0.211 0.491 -0.193 0.490 Q -0.174 0.490 -0.165 0.489 Q -0.156 0.489 -0.138 0.486 Z','M -0.201 0.491 Q -0.181 0.485 -0.161 0.478 Q -0.141 0.471 -0.122 0.462 Q -0.102 0.453 -0.084 0.443 Q -0.065 0.433 -0.047 0.421 Q -0.028 0.410 -0.010 0.398 Q 0.007 0.386 0.024 0.373 Q 0.041 0.360 0.058 0.347 Q 0.075 0.333 0.091 0.319 Q 0.107 0.305 0.122 0.291 Q 0.138 0.276 0.153 0.260 Q 0.167 0.244 0.181 0.228 Q 0.195 0.212 0.208 0.196 Q 0.222 0.179 0.235 0.163 Q 0.249 0.146 0.262 0.129 Q 0.275 0.112 0.287 0.094 Q 0.299 0.077 0.311 0.059 Q 0.323 0.042 0.334 0.023 Q 0.345 0.005 0.355 -0.013 Q 0.366 -0.032 0.376 -0.051 Q 0.385 -0.070 0.395 -0.089 Q 0.404 -0.108 0.413 -0.128 Q 0.422 -0.147 0.430 -0.167 Q 0.439 -0.186 0.446 -0.206 Q 0.453 -0.227 0.459 -0.247 Q 0.465 -0.267 0.469 -0.288 Q 0.473 -0.308 0.475 -0.329 Q 0.476 -0.350 0.475 -0.370 Q 0.473 -0.390 0.467 -0.409 Q 0.461 -0.428 0.451 -0.444 Q 0.440 -0.459 0.425 -0.471 Q 0.410 -0.482 0.391 -0.489 Q 0.373 -0.496 0.353 -0.498 Q 0.332 -0.500 0.312 -0.498 Q 0.291 -0.497 0.270 -0.493 Q 0.250 -0.489 0.229 -0.483 Q 0.209 -0.477 0.189 -0.469 Q 0.169 -0.462 0.149 -0.454 Q 0.130 -0.445 0.111 -0.436 Q 0.091 -0.427 0.072 -0.417 Q 0.052 -0.407 0.034 -0.396 Q 0.015 -0.385 -0.003 -0.374 Q -0.021 -0.362 -0.038 -0.350 Q -0.056 -0.338 -0.073 -0.325 Q -0.090 -0.312 -0.107 -0.299 Q -0.123 -0.285 -0.140 -0.272 Q -0.156 -0.258 -0.172 -0.244 Q -0.189 -0.230 -0.204 -0.215 Q -0.219 -0.200 -0.234 -0.184 Q -0.248 -0.169 -0.262 -0.152 Q -0.276 -0.136 -0.290 -0.119 Q -0.303 -0.102 -0.316 -0.086 Q -0.329 -0.069 -0.341 -0.051 Q -0.353 -0.034 -0.365 -0.016 Q -0.376 0.002 -0.386 0.021 Q -0.397 0.040 -0.407 0.058 Q -0.417 0.077 -0.425 0.097 Q -0.434 0.116 -0.441 0.136 Q -0.449 0.156 -0.455 0.176 Q -0.461 0.196 -0.466 0.217 Q -0.471 0.237 -0.474 0.257 Q -0.476 0.278 -0.476 0.298 Q -0.475 0.319 -0.471 0.339 Q -0.467 0.359 -0.459 0.378 Q -0.451 0.397 -0.440 0.414 Q -0.428 0.431 -0.413 0.445 Q -0.398 0.459 -0.381 0.469 Q -0.363 0.480 -0.344 0.487 Q -0.325 0.494 -0.305 0.497 Q -0.284 0.500 -0.263 0.499 Q -0.243 0.499 -0.232 0.497 Q -0.222 0.496 -0.201 0.491 Z','M -0.169 0.475 Q -0.150 0.472 -0.132 0.467 Q -0.113 0.462 -0.096 0.456 Q -0.077 0.451 -0.060 0.444 Q -0.042 0.437 -0.024 0.430 Q -0.006 0.422 0.011 0.413 Q 0.028 0.404 0.045 0.395 Q 0.061 0.386 0.078 0.376 Q 0.094 0.366 0.111 0.355 Q 0.127 0.345 0.142 0.334 Q 0.158 0.323 0.173 0.311 Q 0.188 0.299 0.202 0.287 Q 0.217 0.274 0.231 0.261 Q 0.245 0.248 0.258 0.235 Q 0.273 0.221 0.286 0.208 Q 0.299 0.194 0.312 0.180 Q 0.325 0.166 0.338 0.152 Q 0.350 0.137 0.362 0.122 Q 0.374 0.107 0.386 0.092 Q 0.397 0.077 0.407 0.061 Q 0.418 0.045 0.428 0.028 Q 0.437 0.011 0.446 -0.006 Q 0.454 -0.023 0.461 -0.041 Q 0.469 -0.059 0.475 -0.077 Q 0.481 -0.095 0.486 -0.113 Q 0.491 -0.132 0.494 -0.150 Q 0.498 -0.169 0.499 -0.188 Q 0.500 -0.207 0.500 -0.225 Q 0.499 -0.244 0.495 -0.262 Q 0.492 -0.281 0.486 -0.299 Q 0.481 -0.317 0.473 -0.334 Q 0.466 -0.351 0.455 -0.367 Q 0.445 -0.383 0.432 -0.396 Q 0.419 -0.410 0.405 -0.422 Q 0.390 -0.434 0.374 -0.443 Q 0.358 -0.452 0.340 -0.459 Q 0.323 -0.467 0.305 -0.471 Q 0.287 -0.476 0.268 -0.479 Q 0.249 -0.482 0.230 -0.483 Q 0.211 -0.483 0.193 -0.482 Q 0.174 -0.481 0.155 -0.478 Q 0.136 -0.475 0.118 -0.470 Q 0.099 -0.466 0.082 -0.459 Q 0.064 -0.453 0.047 -0.446 Q 0.029 -0.438 0.012 -0.430 Q -0.005 -0.421 -0.022 -0.412 Q -0.038 -0.403 -0.054 -0.393 Q -0.071 -0.383 -0.087 -0.372 Q -0.103 -0.361 -0.118 -0.350 Q -0.134 -0.339 -0.149 -0.327 Q -0.163 -0.315 -0.178 -0.302 Q -0.193 -0.289 -0.207 -0.276 Q -0.220 -0.262 -0.234 -0.249 Q -0.248 -0.235 -0.261 -0.221 Q -0.275 -0.208 -0.288 -0.193 Q -0.301 -0.179 -0.314 -0.165 Q -0.327 -0.150 -0.339 -0.135 Q -0.351 -0.121 -0.363 -0.105 Q -0.374 -0.090 -0.386 -0.075 Q -0.397 -0.059 -0.407 -0.043 Q -0.417 -0.027 -0.427 -0.010 Q -0.436 0.007 -0.445 0.024 Q -0.453 0.041 -0.461 0.058 Q -0.468 0.076 -0.474 0.094 Q -0.481 0.112 -0.485 0.130 Q -0.490 0.148 -0.494 0.166 Q -0.497 0.185 -0.499 0.203 Q -0.500 0.222 -0.499 0.240 Q -0.498 0.258 -0.495 0.276 Q -0.491 0.294 -0.485 0.312 Q -0.480 0.329 -0.472 0.346 Q -0.464 0.363 -0.453 0.378 Q -0.443 0.394 -0.430 0.407 Q -0.417 0.420 -0.402 0.432 Q -0.387 0.443 -0.371 0.452 Q -0.354 0.460 -0.336 0.467 Q -0.318 0.472 -0.300 0.476 Q -0.281 0.480 -0.262 0.482 Q -0.244 0.483 -0.225 0.482 Q -0.206 0.481 -0.197 0.480 Q -0.187 0.479 -0.169 0.475 Z'].map(d => new Path2D(d));
+  let W, H, D, P, dots = [], dpr, seed;
+  const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const blob = () => { const k = []; for (let i = 0; i < 9; i++) k.push(1 + (rnd() - .5) * .26); return { k, ph: rnd() * 6.3 }; };
+  const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; seed = 11;
+    const F = mlBSB({ W: 1, H, u: H * .86 / 3, seed: 41, periodic: true, gap: 0, edge: H * .04 }); D = F.D; P = F.W;
+    dots = F.dots.map(q => ({ ...q, col: q.b ? '#2c5494' : '#e7aa4d', Pp: q.li < 0 ? 1e9 : D * 1.22 * 9, w: q.b ? 1 : 0, hi: Math.floor(rnd() * 3), bl: blob() })); };
+  build(); new ResizeObserver(build).observe(box);
+  const drawBlob = (x, y, b, r) => { const m = b.k.length; g.beginPath();
+    for (let i = 0; i <= m; i++) { const a = i / m * 6.283 + b.ph, qx = x + Math.cos(a) * r * b.k[i % m], qy = y + Math.sin(a) * r * b.k[i % m];
+      if (!i) g.moveTo(qx, qy); else { const a0 = (i - .5) / m * 6.283 + b.ph, r0 = r * (b.k[i - 1] + b.k[i % m]) / 2 * 1.06; g.quadraticCurveTo(x + Math.cos(a0) * r0, y + Math.sin(a0) * r0, qx, qy); } } };
+  const swell = (d, t) => { const ph = ((d.s - t * D * 1.25 - d.li * D * 3) % d.Pp + d.Pp) % d.Pp, u = Math.min(ph, d.Pp - ph) / (D * 1.3); return Math.exp(-u * u); };
+  let vis = false, raf = 0; const t0 = performance.now();
+  const frame = now => { raf = 0; if (!W || !vis) return; const t = reduce ? 0 : (now - t0) / 1000, shift = reduce ? 0 : (t * D * .9) % P;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    for (let k = -1; k * P < W + P; k++) { const ox = k * P + shift;
+      for (const d of dots) { const x = d.x + ox; if (x < -D || x > W + D) continue; const r = D * (.3 + .16 * swell(d, t) * d.w) * d.sz; g.fillStyle = d.col; drawBlob(x, d.y, d.bl, r); g.fill();
+        if (d.ring) { g.save(); g.translate(x, d.y); g.scale(r * 1.15, r * 1.15); g.fillStyle = CREAM; g.fill(HOLES[d.hi]); g.restore(); } } }
+    if (!reduce) raf = requestAnimationFrame(frame); };
+  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box);
+})();
+</script>
+<style>
+/* resource cards: no hexagon lines, still or moving */
+.res::after,.res::before{display:none !important}
+</style>
 </body>
 </html>
