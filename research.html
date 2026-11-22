@@ -1345,6 +1345,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped){background:var(--nh) !imp
 html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--nt) !important;transform:none !important}
 </style>
 <script src="assets/mlhole.js?v=1"></script>
+<script src="assets/bsbfield.js?v=2"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -1851,20 +1852,10 @@ html body .pubs li > a[href]::before,html body .r-list li > a[href]::before,html
     p.closePath(); return p; });
   const AMP = 5; let W = 0, H = 0, dpr = 1, D = [];
   const build = () => { W = box.clientWidth; H = box.clientHeight; dpr = Math.min(2, devicePixelRatio || 1); cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); seed = 11;
-    const gs = Math.max(60, Math.min(104, W / 11)), P = [];
-    const lattice = (step, ang, kind) => { const ca = Math.cos(ang), sa = Math.sin(ang), n = Math.ceil(Math.hypot(W, H) / step) + 2;
-      for (let i = -n; i <= n; i++) for (let j = -n; j <= n; j++) { const u = i * step, v = j * step, x = W / 2 + u * ca - v * sa, y = H / 2 + u * sa + v * ca;
-        if (x < -step || x > W + step || y < -step || y > H + step) continue;
-        const depth = Math.max(0, Math.min(1, y / H + (rnd() - .5) * .12)), jx = (rnd() - .5) * step * .2, jy = (rnd() - .5) * step * .2;
-        let r = (kind === 2 ? step * .26 : step * .2) * Math.pow(depth, 1.1) * (.55 + rnd() * .55);   /* a sea: bubbles swell the deeper they sit */
-        if (kind === 1 && rnd() < .3) r *= .4; if (r < 1.2 || rnd() < (kind === 2 ? .45 : .7)) continue;   /* only a little: most places are left empty */
-        P.push({ x: x + jx, y: y + jy, r, c: pick(), s: SH[Math.floor(rnd() * SH.length)], rot: rnd() * 6.3, ring: rnd() < .07, ph: rnd() * 6.3, sp: .35 + rnd() * .4 }); } };
-    lattice(gs, Math.PI / 4 + .14, 2);   /* the big bubbles: a square grid turned on its corner, then tipped a little more */
-    lattice(gs * .5, Math.PI / 8 + .14, 1);   /* the middling ones: a finer grid turned against it, squares inside squares */
-    P.sort((a, b) => b.r - a.r); D = [];
-    for (const d of P) { let r = Math.min(d.r, d.x - 3 - AMP, W - 3 - AMP - d.x, d.y - 3 - AMP, H - 3 - AMP - d.y);   /* never cut by an edge */
-      for (const o of D) { if (Math.abs(o.x - d.x) > 90 || Math.abs(o.y - d.y) > 90) continue; r = Math.min(r, Math.hypot(o.x - d.x, o.y - d.y) - o.r - 4 - 2 * AMP); }   /* never touching, even at the top of a swell */
-      if (r >= 1.2) { d.r = r; D.push(d); } } };
+    /* the BSB field (assets/bsbfield.js): the building in blue, the field in the other colours; nothing cut by an edge */
+    const FC = ['#e7aa4d', '#e0773a', '#e0503c', '#d8708e', '#9b6aa6', '#2a8c8c']; D = [];
+    for (const q of mlBSB({ W, H, u: Math.max(90, Math.min(H * .5, 150)), seed: 23, gap: 1 + AMP, edge: 3 + AMP }).dots)
+      D.push({ x: q.x, y: q.y, r: q.r, c: q.b ? '#2c5494' : FC[Math.floor(rnd() * FC.length)], s: SH[Math.floor(rnd() * SH.length)], rot: rnd() * 6.3, ring: q.ring, ph: rnd() * 6.3, sp: .35 + rnd() * .4 }); };
   const draw = t => { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     for (const d of D) { const k = reduce ? 1 : .88 + .12 * Math.sin(t * 1.1 - (d.x + d.y) * .011), r = d.r * k, cq = Math.cos(d.rot) * r * dpr, sq = Math.sin(d.rot) * r * dpr;
       const fx = reduce ? 0 : AMP * .6 * Math.sin(t * d.sp * .7 + d.ph * 2), fy = reduce ? 0 : AMP * Math.sin(t * d.sp + d.ph);   /* floating */

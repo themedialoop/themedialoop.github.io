@@ -792,6 +792,7 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
 html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-weight:300;letter-spacing:0;line-height:1.2;color:#2c5494;margin-top:.45em;white-space:normal}
 @media (max-width:600px){html body .bz-h.tilt-h{font-size:17vw !important}}   /* (its rows are longer: smaller on phones so each stays on one line) */</style>
 <script src="assets/mlhole.js?v=1"></script>
+<script src="assets/bsbfield.js?v=2"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -2317,7 +2318,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   const ALL = ROWS.flat(), RES = ALL.filter(w => w[0] !== '*'), FUN = ALL.filter(w => w[0] === '*').map(w => w.slice(1));
   const river = document.createElement('div'); river.className = 'river lf'; river.setAttribute('aria-hidden', 'true'); box.append(river);
   const cv = document.createElement('canvas'); river.append(cv); const g = cv.getContext('2d'), mc = document.createElement('canvas').getContext('2d');
-  const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', purple: '#9b6aa6', cream: '#f2eedd' };
+  const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', purple: '#9b6aa6', cream: '#f2eedd', teal: '#2a8c8c', red: '#e0503c' };
   const PAL = ['blue', 'gold', 'orange', 'pink', 'purple'];
   const MIX = [['blue', .7], ['gold', .21], ['orange', .03], ['pink', .03], ['purple', .03]];   // blue and gold lead; the rest are sprinkles
   const R = (a, b) => a + Math.random() * (b - a), ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
@@ -2358,18 +2359,15 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     while (rn < RES.length || fn < FUN.length || Math.min(...rowEnd) < W * 2) {   /* every word at least once, and enough of them to fill a couple of screens */ const k = rowEnd.indexOf(Math.min(...rowEnd)); const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3),
         per: R(30, 55), pp: R(0, 6.3) };   // each word now and then sinks back into a plain dot, then swells into a word again
       dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.4, S * 2.6); words.push(slot); }
-    L = Math.max(L, Math.ceil((Math.max(...rowEnd) + S) / S) * S);   // the loop is long enough to hold every word once
+    L = Math.max(L, Math.ceil((Math.max(...rowEnd) + S) / S) * S);   const BU = H / 3, BP = 6 * BU; L = Math.ceil(L / BP) * BP;   /* a whole number of BSB repeats, so the plan meets itself at the seam */   // the loop is long enough to hold every word once
     for (let k = 0; k < nRows; k++) { const start = k * rowH * .55; let guard = 0;   /* top up every row right to the loop's seam, so no row has an empty stretch where it repeats */
       while (guard++ < 40) { const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3), per: R(30, 55), pp: R(0, 6.3) };
         dress(slot, rowH / 2 - 8); const x = rowEnd[k] + slot.R; if (x + slot.R + S * 1.4 > L + start) break; slot.x = x; rowEnd[k] = x + slot.R + R(S * 1.4, S * 2.6); words.push(slot); } }
-    // the field: a lattice turned 45°, its sizes rising and falling along the diagonals
-    dots = [];
-    for (let i = 0; i < L / S; i++) for (let j = 0; j <= H / S * 2; j++) { const x = i * S + (j % 2 ? S / 2 : 0), y = j * S / 2 + S * .25; if (y > H - 4) continue;
-      if (Math.random() < .12) continue;   // a few spots left empty
-      const wave = .5 + .5 * Math.sin((i + j / 2) * .9) * Math.sin((i - j / 2) * .55), big = Math.random() < .08;
-      const r0 = big ? rmax * R(.85, 1) : (rmin + wave * (rmax * .78 - rmin)) * R(.85, 1.08);
-      dots.push({ gi: i, gj: j, sq: null, hx: Math.max(0, Math.min(L - .01, x + R(-.12, .12) * S)), hy: y + R(-.1, .1) * S, r0,
-        k: pickCol(), p: SH[Math.floor(Math.random() * SH.length)], ph: R(0, 6.3), fx: R(.3, .9), fy: R(.3, .9), wa: R(3, innerWidth < 700 ? 6.5 : 8.5), wb: R(0, 1) < .15 ? R(5, 10) : 0, fz: R(.15, .35), ring: Math.random() < .06, ox: 0, oy: 0, pop: 0, hit: -9, k0: null, st: Math.random() }); }
+    // the field: Netsch's BSB plan (assets/bsbfield.js), repeating along the river: the building in blue, the field in the other colours
+    dots = []; const FK = ['gold', 'orange', 'pink', 'purple', 'teal', 'red'];
+    for (const q of mlBSB({ W: L, H, u: H / 3, seed: 41, periodic: true, gap: 3, edge: 4 }).dots)
+      dots.push({ gi: q.x / S, gj: 2 * q.y / S, sq: null, hx: Math.max(0, Math.min(L - .01, q.x)), hy: q.y, r0: q.r * .95,
+        k: q.b ? 'blue' : FK[Math.floor(Math.random() * FK.length)], p: SH[Math.floor(Math.random() * SH.length)], ph: R(0, 6.3), fx: R(.3, .9), fy: R(.3, .9), wa: R(1, 2.2), wb: 0, fz: R(.15, .35), ring: q.ring, ox: 0, oy: 0, pop: 0, hit: -9, k0: null, st: Math.random() });
     dots.sort((a, b) => a.hx - b.hx);
   };
 
@@ -3188,22 +3186,12 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   const build = () => {
     DPR = Math.min(2, devicePixelRatio || 1); W = pin.clientWidth; H = pin.clientHeight; mob = W < 760; AMP = reduce ? 0 : mob ? 2.6 : 3.4; builtW = W;
     C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); dots = [];
-    const m = Math.min(W, H), lo = m * (mob ? .012 : .008), hi = m * (mob ? .075 : .06), cell = hi * 2.4, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
-    const S = hi * 3.2, cand = []; LS = S; PLAN = []; NODE = new Map();
-      for (let j = -2; j <= H / S * 2 + 2; j++) for (let i = -1; i <= W / S + 2; i++) PLAN.push([i * S + (j % 2 ? S / 2 : 0), j * S / 2, i + ',' + j]);   /* every spot on the hidden grid, for the plan drawn under the dots */   /* Netsch's Field Theory: the big dots sit on a hidden grid of squares turned 45°; the small ones scatter around them as before */
-      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) if (Math.random() < .45) cand.push({ x: i * S + (j % 2 ? S / 2 : 0), y: j * S / 2, r: R(hi * .45, hi * .85), big: true, node: i + ',' + j });   /* each big dot sits exactly in the middle of its octagon */
-      for (let j = -1; j <= H / S * 4 + 1; j++) for (let i = -1; i <= W / S * 2 + 1; i++) if (Math.random() < .3) cand.push({ x: (i + (j % 2 ? .5 : 0)) * S / 2 + R(-.04, .04) * S, y: j * S / 4 + R(-.04, .04) * S, r: R(hi * .18, hi * .3), big: false });   /* a finer turned grid for the middling dots, so the diagonals read */
-      for (let n = 0, tries = Math.round(W * H / (lo * lo) * 3); n < tries; n++) { const r = R(lo, hi * .35); cand.push({ x: R(-r, W + r), y: R(-r, H + r), r, big: false }); }
-    for (let n = 0; n < cand.length; n++) {
-      const { x, y, r, big, node } = cand[n]; if (x < -r || x > W + r || y < -r || y > H + r) continue;
-      const cx = Math.floor(x / cell), cy = Math.floor(y / cell); let ok = true;
-      for (let i = -1; i <= 1 && ok; i++) for (let j = -1; j <= 1 && ok; j++) for (const o of grid.get((cx + i) + ',' + (cy + j)) || [])
-        if (Math.hypot(o.x - x, o.y - y) < (o.r + r) * 1.1 + 4 + 2 * AMP) { ok = false; break; }   // never touching, even at their fullest breath and furthest drift
-      if (!ok) continue;
-      const d = { x, y, r, s: shapes[n % 8], rot: R(0, 6.3), ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), sp: R(-.25, .25), z: Math.random(),
-        gB: Math.random() < .17, gC: Math.random() < .17, few: Math.random() < .85, ring: !big && Math.random() < .06, big: !!big }; if (node) NODE.set(node, d);   // on the blue: cream with some gold; on the cream: blue with a few gold
-      (grid.get(key(x, y)) || grid.set(key(x, y), []).get(key(x, y))).push(d); dots.push(d);
-    }
+    /* the BSB field (assets/bsbfield.js): Netsch's plan for the Behavioral Sciences Building, big hexagons at the corridor crossings,
+       the corridors and serrated walls in fine dots, the rest filled with small ones. On the blue: the building cream, the field gold;
+       on the cream: the building blue, the field in the other colours */
+    const m = Math.min(W, H), u = mob ? W * .3 : m * .19, FIELD = ['#e7aa4d', '#e0773a', '#e0503c', '#d8708e', '#9b6aa6', '#2a8c8c']; LS = u; PLAN = []; NODE = new Map();
+    mlBSB({ W, H, u, seed: 17, gap: 2 + AMP, edge: null }).dots.forEach((q, n) => dots.push({ x: q.x, y: q.y, r: q.r, s: shapes[n % 8], rot: R(0, 6.3), ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), sp: R(-.25, .25), z: Math.random(),
+      few: Math.random() < .85, ring: q.ring, big: q.b && !q.fine, c0: q.b ? '#f2eedd' : '#e7aa4d', c1: q.b ? '#2c5494' : FIELD[Math.floor(Math.random() * FIELD.length)] }));
     { const bigs = dots.filter(d => d.big).sort(() => Math.random() - .5).slice(0, mob ? 5 : 8); bigs.forEach((d, i) => d.ghost = [8, 6, 4, 8, 6, 4, 8, 6, 4, 2][i % 10]); dots.forEach(d => { d.ghS = d.big ? mlMarkType(.3) : 0; });   /* the scroll fly-out on the cream gets its own, fuller set */   /* octagons, squares and grid lines */ }   /* a few big dots carry a thin octagon or square while they fly: the blueprint showing through */
   };
   const wob = (a, t) => 1 + .09 * Math.sin(3 * a + 1.3 + t * .2) + .06 * Math.sin(5 * a + .4 - t * .15) + .03 * Math.sin(8 * a + 2);
@@ -3315,7 +3303,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       let s = d.r * m * c * (reduce ? .97 : .82 + .18 * mlRipple(d.x, d.y, t)); s = Math.min(s, (H - 3 - py) / 1.1); if (s < .4) continue;   /* a ripple of breath across the field; a dot near the bottom shrinks rather than being cut by the edge */
       if (flyS > .02) { if (d.ghS) SM.push([px, py, s, d.ghS, spin]); } else if (d.ghost && fly > .02) GH.push([px, py, s, d.ghost, spin]);
       ctx.setTransform(s * DPR, 0, 0, s * DPR, px * DPR, py * DPR); ctx.rotate(d.rot + t * d.sp + spin);
-      const col = mix(d.gB ? '#e7aa4d' : '#f2eedd', d.gC ? '#e7aa4d' : '#2c5494', ce);
+      const col = mix(d.c0, d.c1, ce);
       if (d.ring) { ctx.fillStyle = col; mlHole(ctx, d.s); } else { ctx.fillStyle = col; ctx.fill(d.s); }
     }
     if (SM.length) { ctx.setTransform(DPR, 0, 0, DPR, 0, 0); mlMarks(ctx, SM, flyS * .65, '#2c5494'); }   /* dancing off the cream as you scroll */
@@ -3357,21 +3345,11 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   const build = () => {
     DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; mob = W < 760; AMP = reduce ? 0 : mob ? 2.6 : 3.4; builtW = W;
     C.width = Math.round(W * DPR); C.height = Math.round(H * DPR); dots = [];
-    const m = Math.min(W, H), lo = m * (mob ? .012 : .008), hi = m * (mob ? .075 : .06), cell = hi * 2.4, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
-    const S = hi * 3.2, cand = [];   /* Netsch's Field Theory: the big dots sit on a hidden grid of squares turned 45°; the small ones scatter around them as before */
-      for (let j = -1; j <= H / S * 2 + 1; j++) for (let i = -1; i <= W / S + 1; i++) if (Math.random() < .45) cand.push({ x: i * S + (j % 2 ? S / 2 : 0) + R(-.05, .05) * S, y: j * S / 2 + R(-.05, .05) * S, r: R(hi * .45, hi * .85), big: true });
-      for (let j = -1; j <= H / S * 4 + 1; j++) for (let i = -1; i <= W / S * 2 + 1; i++) if (Math.random() < .3) cand.push({ x: (i + (j % 2 ? .5 : 0)) * S / 2 + R(-.04, .04) * S, y: j * S / 4 + R(-.04, .04) * S, r: R(hi * .18, hi * .3), big: false });   /* a finer turned grid for the middling dots, so the diagonals read */
-      for (let n = 0, tries = Math.round(W * H / (lo * lo) * 3); n < tries; n++) { const r = R(lo, hi * .35); cand.push({ x: R(-r, W + r), y: R(-r, H + r), r, big: false }); }
-    for (let n = 0; n < cand.length; n++) {
-      const { x, y, r, big } = cand[n]; if (x < -r || x > W + r || y < -r || y > H + r) continue;
-      const cx = Math.floor(x / cell), cy = Math.floor(y / cell); let ok = true;
-      for (let i = -1; i <= 1 && ok; i++) for (let j = -1; j <= 1 && ok; j++) for (const o of grid.get((cx + i) + ',' + (cy + j)) || [])
-        if (Math.hypot(o.x - x, o.y - y) < (o.r + r) * 1.1 + 4 + 2 * AMP) { ok = false; break; }
-      if (!ok) continue;
-      const d = { x, y, r, s: shapes[n % 8], rot: R(0, 6.3), ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), sp: R(-.25, .25), col: Math.random() < .035 ? '#e7aa4d' : '#2c5494', ring: !big && Math.random() < .06, thin: Math.random() < .45,
-        st: Math.random(), dx: (x < W / 2 ? -1 : 1) * R(.45, .8) * W, dy: -R(.15, .5) * H, sw: R(-40, 40), sr: R(-3, 3) };
-      (grid.get(key(x, y)) || grid.set(key(x, y), []).get(key(x, y))).push(d); dots.push(d);
-    }
+    /* the BSB field (assets/bsbfield.js), as on the home page: the building in blue, the field in the other colours */
+    const m = Math.min(W, H), u = mob ? W * .3 : m * .19, FIELD = ['#e7aa4d', '#e0773a', '#e0503c', '#d8708e', '#9b6aa6', '#2a8c8c'];
+    mlBSB({ W, H, u, seed: 29, gap: 2 + AMP, edge: null }).dots.forEach((q, n) => { const x = q.x, y = q.y;
+      dots.push({ x, y, r: q.r, s: shapes[n % 8], rot: R(0, 6.3), ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), sp: R(-.25, .25), col: q.b ? '#2c5494' : FIELD[Math.floor(Math.random() * FIELD.length)], ring: q.ring, thin: !q.b && Math.random() < .45,
+        st: Math.random(), dx: (x < W / 2 ? -1 : 1) * R(.45, .8) * W, dy: -R(.15, .5) * H, sw: R(-40, 40), sr: R(-3, 3) }); });
   };
   // what each section keeps clear of
   const clearOf = { res: el => [...el.querySelectorAll('.sec-h, .label, .res-intro, .res'), ...document.querySelectorAll('#contact .ct-h')].map(e => Object.assign(e, { _wide: !e.classList.contains('res') })), ct: el => { const g = [...el.querySelectorAll('.label, .contact, .mail-row')].map(e => e.getBoundingClientRect()).filter(b => b.width);   // one clearing around them all
