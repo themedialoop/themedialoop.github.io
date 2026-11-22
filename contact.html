@@ -459,6 +459,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 .sea{position:relative;height:clamp(260px,38vh,440px);margin-top:clamp(10px,3vw,40px)}
 .sea canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
+<script src="assets/mlhole.js?v=1"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -899,7 +900,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   const draw = t => { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     for (const d of D) { const k = reduce ? 1 : .88 + .12 * Math.sin(t * 1.1 - (d.x + d.y) * .011), r = d.r * k, cq = Math.cos(d.rot) * r * dpr, sq = Math.sin(d.rot) * r * dpr;
       g.setTransform(cq, sq, -sq, cq, d.x * dpr, d.y * dpr);
-      if (d.ring && r > 7) { g.lineWidth = .16; g.strokeStyle = d.c; g.stroke(d.s); } else { g.fillStyle = d.c; g.fill(d.s); } } };
+      if (d.ring && r > 7) { g.fillStyle = d.c; mlHole(g, d.s); } else { g.fillStyle = d.c; g.fill(d.s); } } };
   let on = false, raf = 0; const loop = now => { raf = 0; if (!on) return; draw(now / 1000); if (!reduce) raf = requestAnimationFrame(loop); };
   build(); draw(0);
   if ('IntersectionObserver' in window) new IntersectionObserver(es => { on = es[0].isIntersecting; if (on && !raf) raf = requestAnimationFrame(loop); }, { rootMargin: '80px' }).observe(box);
