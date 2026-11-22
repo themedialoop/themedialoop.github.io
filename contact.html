@@ -460,7 +460,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 .sea canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 <script src="assets/mlhole.js?v=1"></script>
-<script src="assets/bsbfield.js?v=2"></script>
+<script src="assets/bsbfield.js?v=3"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -884,8 +884,8 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
     p.closePath(); return p; });
   let W = 0, H = 0, dpr = 1, D = [];
   const build = () => { W = box.clientWidth; H = box.clientHeight; dpr = Math.min(2, devicePixelRatio || 1); cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); seed = 11;
-    /* the BSB field (assets/bsbfield.js): the building in blue, the field in the other colours; nothing cut by an edge */
-    const FC = ['#e7aa4d', '#e0773a', '#e0503c', '#d8708e', '#9b6aa6', '#2a8c8c']; D = [];
+    /* the BSB field (assets/bsbfield.js): the building in blue, the field in gold; nothing cut by an edge */
+    const FC = ['#e7aa4d'];   /* blue and gold only */ D = [];
     for (const q of mlBSB({ W, H, u: Math.max(90, Math.min(H * .45, 150)), seed: 23, gap: 3, edge: 4 }).dots)
       D.push({ x: q.x, y: q.y, r: q.r, c: q.b ? '#2c5494' : FC[Math.floor(rnd() * FC.length)], s: SH[Math.floor(rnd() * SH.length)], rot: rnd() * 6.3, ring: q.ring }); };
   const draw = t => { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
