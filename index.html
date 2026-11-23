@@ -3877,7 +3877,7 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
   const M2 = ['.#####.##', '###.#####'];   /* two bays deep, a few bays missing, like the real block */
   const BANDS = [
     { name: 'E1 · Turned squares', note: 'The footprint’s serrated outer wall in big blue dots; inside, one turned square per bay in smaller blue dots, turning as you scroll (neighbours the other way); colour everywhere else.',
-      b: FP(M2, (x, y, U, dir) => [{ ...dia(x, y, U * .4), fine: 1, rc: [x, y], dir }]) },
+      b: FP(['#######'], (x, y, U, dir) => [{ ...sq(x, y, U * .3), fine: 1, rc: [x, y], dir }], 3) },   /* one row: a big square turning in each bay, the serrated wall above and below */
   ].map(o => ({ ...o, build: o.b, PW: o.b().PW }));
   const resample = (pts, step, closed) => { const P = closed ? [...pts, pts[0]] : pts, out = [P[0]]; let carry = 0;
     for (let i = 1; i < P.length; i++) { const [ax, ay] = P[i - 1], [bx, by] = P[i], seg = Math.hypot(bx - ax, by - ay); if (!seg) continue; let t = step - carry;
@@ -3899,9 +3899,9 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
       const add = d => { dots.push(d); const q = gk(Math.floor(d.x / cs) % nI, Math.floor(d.y / cs)); (G.get(q) || G.set(q, []).get(q)).push(d); };
       const put = (x, y, sz, col, gp, line, s) => { x = ((x % P) + P) % P; const R = D * .46 * sz; if (y < R + 1 || y > H - R - 1 || clash(x, y, R, gp)) return false; add({ x, y, R, sz, col, line, s, ring: rnd() < .15, hi: Math.floor(rnd() * 3), bl: blob() }); return true; };
       const shapes = bd.build(); for (const pass of [0, 1]) shapes.forEach((sh, li) => { if (!!sh.fine !== !!pass) return;
-        const pts = resample(sh.pts.map(([x, y]) => [x * k, oy + y * k]), 1, sh.closed), sp = sh.fine ? D * .82 : D * 1.05;
+        const pts = resample(sh.pts.map(([x, y]) => [x * k, oy + y * k]), 1, sh.closed), sp = sh.fine ? D * 1.15 : D * .62;
         if (sh.solo) { const ok = put(sh.pts[0][0] * k, oy + sh.pts[0][1] * k, sh.big ? 1.9 : 1.15, '#2c5494', D * .2, li, 0); if (ok && sh.rc) { const d = dots[dots.length - 1], cx = ((sh.rc[0] * k) % P + P) % P, cy = oy + sh.rc[1] * k; d.rc = [cx, cy]; d.rr = Math.hypot(d.x - cx, d.y - cy); d.ang = Math.atan2(d.y - cy, d.x - cx); d.dir = sh.dir; d.inner = sh.inner * k; } return; }
-        for (let s = 0; s < pts.length; s += sp) { const ok = put(pts[Math.floor(s)][0], pts[Math.floor(s)][1], sh.fine ? .82 + rnd() * .1 : 1 + rnd() * .2, '#2c5494', sh.fine ? D * .3 : D * .12, li, s); if (ok && sh.rc) { const d = dots[dots.length - 1], cx = ((sh.rc[0] * k) % P + P) % P, cy = oy + sh.rc[1] * k; d.rc = [cx, cy]; d.rr = Math.hypot(d.x - cx, d.y - cy); d.ang = Math.atan2(d.y - cy, d.x - cx); d.dir = sh.dir; d.spin = sh.spin || 1; d.inner = 0; } } });
+        for (let s = 0; s < pts.length; s += sp) { const ok = put(pts[Math.floor(s)][0], pts[Math.floor(s)][1], sh.fine ? 1.15 + rnd() * .15 : .5 + rnd() * .08, '#2c5494', sh.fine ? D * .3 : D * .12, li, s); if (ok && sh.rc) { const d = dots[dots.length - 1], cx = ((sh.rc[0] * k) % P + P) % P, cy = oy + sh.rc[1] * k; d.rc = [cx, cy]; d.rr = Math.hypot(d.x - cx, d.y - cy); d.ang = Math.atan2(d.y - cy, d.x - cx); d.dir = sh.dir; d.spin = sh.spin || 1; d.inner = 0; } } });
       const BAYS = []; for (const d of dots) if (d.rc) { const b = BAYS.find(b => b[0] === d.rc[0] && b[1] === d.rc[1]); if (b) { b[2] = Math.max(b[2], d.rr + d.R); b[3] = Math.min(b[3], (d.inner || d.rr) - d.R * 1.5); } else BAYS.push([d.rc[0], d.rc[1], d.rr + d.R, (d.inner || d.rr) - d.R * 1.5]); }
       const st = D * .66;   /* filler, packed in the band and sprinkling out past its edges */
       for (let y = st * .4, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < P; x += st) { const out = Math.max(0, oy - y, y - oy - core), pr = .88 * Math.exp(-Math.pow(out / (H * .09), 1.3));
@@ -3911,16 +3911,16 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
       if (!i) g.moveTo(qx, qy); else { const a0 = (i - .5) / m * 6.283 + b.ph, r0 = r * (b.k[i - 1] + b.k[i % m]) / 2 * 1.06; g.quadraticCurveTo(x + Math.cos(a0) * r0, y + Math.sin(a0) * r0, qx, qy); } } };
     let vis = false; new IntersectionObserver(e => { const was = vis; vis = e[0].isIntersecting; if (vis && !was) requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box);
     const t0 = performance.now();
-    const frame = now => { if (!W) return; const t = (now - t0) / 1000, shift = (((t * D * .3 + scrollY * .5) % P) + P) % P;
+    const frame = now => { if (!W) return; const t = (now - t0) / 1000, shift = -((((t * D * .55 + scrollY * .6) % P) + P) % P);   /* flowing to the left, downhill */ const spin = t * .5 + scrollY * .006;   /* the squares keep turning, faster as you scroll */
       g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
       const cs2 = D * 1.5, MG = new Map();   /* where every turning stair dot is right now, on a grid */
-      for (const d of dots) if (d.rc) { const a = d.ang + d.dir * (d.spin || 1) * scrollY * .004, x = ((d.rc[0] + Math.cos(a) * d.rr) % P + P) % P, y = d.rc[1] + Math.sin(a) * d.rr, q = Math.floor(x / cs2) * 4096 + Math.floor(y / cs2); (MG.get(q) || MG.set(q, []).get(q)).push([x, y, D * .38 * d.sz]); }
+      for (const d of dots) if (d.rc) { const a = d.ang + d.dir * (d.spin || 1) * spin, x = ((d.rc[0] + Math.cos(a) * d.rr) % P + P) % P, y = d.rc[1] + Math.sin(a) * d.rr, q = Math.floor(x / cs2) * 4096 + Math.floor(y / cs2); (MG.get(q) || MG.set(q, []).get(q)).push([x, y, D * .38 * d.sz]); }
       const nI2 = Math.ceil(P / cs2);
       const room = d => { const gi = Math.floor(d.x / cs2), gj = Math.floor(d.y / cs2), r = D * .38 * d.sz; let f = 1;
         for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) { const L = MG.get((((gi + a) % nI2) + nI2) % nI2 * 4096 + gj + b); if (L) for (const [hx, hy, hr] of L) { let dx = Math.abs(d.x - hx) % P; dx = Math.min(dx, P - dx); const dd = Math.hypot(dx, d.y - hy); if (dd < hr + r + D * .08) f = Math.min(f, Math.max(0, (dd - hr - D * .08) / r)); } }
         return f; };
       for (let kk = -1; kk * P < W + P; kk++) { const ox = kk * P + shift;
-        for (const d of dots) { let x = d.x + ox, y = d.y; if (d.rc) { const a = d.ang + d.dir * (d.spin || 1) * scrollY * .004; x = d.rc[0] + Math.cos(a) * d.rr + ox; y = d.rc[1] + Math.sin(a) * d.rr; }   /* the squares and octagons turn with your scroll */
+        for (const d of dots) { let x = d.x + ox, y = d.y; if (d.rc) { const a = d.ang + d.dir * (d.spin || 1) * spin; x = d.rc[0] + Math.cos(a) * d.rr + ox; y = d.rc[1] + Math.sin(a) * d.rr; }   /* the squares and octagons turn with your scroll */
           if (x < -D || x > W + D) continue; const sh2 = d.rc || d.line >= 0 ? 1 : room(d); if (sh2 < .15) continue; const sw = sh2 * (d.line >= 0 ? 1 + .18 * Math.sin(scrollY * .02 - d.s / (D * 3) - d.line + t * .6) : 1), r = D * .38 * d.sz * sw; g.fillStyle = d.col; drawBlob(x, y, d.bl, r); g.fill();
           if (d.ring && r > 3) { g.save(); g.translate(x, y); g.rotate(.12 * Math.sin(t * .45 + d.hi * 2)); g.scale(r * 1.15, r * 1.15); g.fillStyle = '#f2eedd'; g.fill(HOLES[d.hi]); g.restore(); } } }
       if (vis) requestAnimationFrame(frame); };
