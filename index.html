@@ -3761,9 +3761,9 @@ html body .ab-pill{overflow-anchor:none}
     if (!rs.length || !W) return; const top = Math.min(...rs.map(r => r.top)) - cr.top, bot = Math.max(...rs.map(r => r.bottom)) - cr.top;
     const cv = c.querySelector('.dotline'), dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; const g = cv.getContext('2d');
     const boxes = rs.map(r => [r.left - cr.left, r.top - cr.top, r.right - cr.left, r.bottom - cr.top]), k2 = W < 500 ? .75 : 1;
-    /* every line on the site leans at its own angle: about 8 degrees, never the same twice; scaled down together on short cards so the lines still clear the photo and name */
-    const ci = cards.indexOf(c), DEG = [[-8, -6], [7, 9.5], [-10, -6.5], [8.5, 5.5], [-9, -7.5], [6, 10.5]][ci % 6].map(v => v + Math.floor(ci / 6) * .3);
-    const gap = Math.min(top, H - bot), maxA = Math.max(.02, Math.atan((gap - 2 * 12 * k2 - 10) / W)), fA = Math.min(1, maxA / (Math.max(...DEG.map(Math.abs)) * Math.PI / 180));
+    /* every line on the site leans at its own angle: about 8 degrees, never the same twice, and a card's two lines lean opposite ways; scaled down together on short cards so the lines still clear the photo and name */
+    const ci = cards.indexOf(c), DEG = [[-8, 6], [7, -9.5], [-10, 5.5], [8.5, -6.5], [-9, 7.5], [6.5, -10.5]][ci % 6].map(v => v + Math.floor(ci / 6) * .3);
+    const gap = Math.min(top, H - bot), maxA = Math.max(.02, Math.atan((gap - 2 * 12 * k2 - 10) / W)), fA = Math.max(.6, Math.min(1, maxA / (Math.max(...DEG.map(Math.abs)) * Math.PI / 180)));   /* keep enough lean on small cards that the two lines clearly aren't parallel */
     const st = W < 500 ? 24 : 36, n = Math.floor(W / Math.cos(12 * Math.PI / 180) / st) + 2;
     if (!c._dl || c._dl.n !== n) c._dl = { n, a: line(n), b: line(n) };
     const y1 = top / 2, y2 = bot + (H - bot) / 2;   /* each line centred in the space above or below */
@@ -3947,8 +3947,8 @@ html body .res:is(:hover,:focus-within) .r-go canvas.rg-ring{scale:1.09}
 @media (prefers-reduced-motion:reduce){html body .res:is(:hover,:focus-within) .r-go canvas.rg-ring{scale:none}}
 </style>
 <style>
-/* people cards on hover: cream, with blue name and blue dots */
-html body .people .card:is(:hover,:focus-visible){background-color:#f2eedd !important;color:#2c5494 !important;--dl:#2c5494}
+/* people cards on hover: gold, with a blue name and orange dots */
+html body .people .card:is(:hover,:focus-visible){background-color:#e7aa4d !important;color:#2c5494 !important;--dl:#e0773a}
 html body .people .card:is(:hover,:focus-visible) h3,html body .people .card:is(:hover,:focus-visible) h3 *{color:#2c5494 !important;-webkit-text-fill-color:#2c5494 !important;opacity:1 !important;visibility:visible !important}
 .people .card{transition:background-color .35s,color .35s}
 /* big titles: never let two letters touch */
@@ -3976,15 +3976,15 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
     if (!d.open) { d._t0 = 0; return; }
     if (!d._t0) d._t0 = performance.now(); const el = reduce ? 1e9 : performance.now() - d._t0;
     const dr = d.getBoundingClientRect(), br = pm.getBoundingClientRect(), bx = br.left - dr.left + br.width / 2, by = br.top - dr.top + br.height / 2, bR = Math.min(br.width, br.height) / 2;
-    const dg = DEG[pi % 3], drift = Math.abs(dg) * 5, A = Math.sign(dg) * Math.min(Math.abs(dg) * Math.PI / 180, Math.atan(drift / Math.max(1, H - by))), sx = Math.sin(A)   /* the lean stays slight on a tall open card: at most a few px of drift per degree */, cy = Math.cos(A), st = bR * 2 * 1.32;
+    const sm = W < 600 ? .58 : W < 900 ? .78 : 1,   /* smaller dots on narrow screens */ dg = DEG[pi % 3], drift = Math.abs(dg) * 5, A = Math.sign(dg) * Math.min(Math.abs(dg) * Math.PI / 180, Math.atan(drift / Math.max(1, H - by))), sx = Math.sin(A)   /* the lean stays slight on a tall open card: at most a few px of drift per degree */, cy = Math.cos(A), st = bR * sm * 2 * 1.32;
     const n = Math.ceil((H + 2 * bR) / cy / st) + 2, k0 = Math.ceil((by + bR) / cy / st);
     while (d._dots.length < n + 2) d._dots.push({ f: .94 + Math.random() * .1, p: shape(), rot: Math.random() * 6.3, j: (Math.random() - .5) * 3, ring: Math.random() < .15 });
     g.fillStyle = getComputedStyle(pm).backgroundColor; let minX = W;
-    for (let i = 0; i < n; i++) { const k = i - k0; if (k === 0) continue; const t = k * st, q = d._dots[i], r = bR * q.f, x = bx + t * sx + q.j, y = by + t * cy;
+    for (let i = 0; i < n; i++) { const k = i - k0; if (k === 0) continue; const t = k * st, q = d._dots[i], r = bR * q.f * sm, x = bx + t * sx + q.j, y = by + t * cy;
       if (y < -r || y > H + r) continue; if (y > br.bottom - dr.top) minX = Math.min(minX, x - r);
       const s2 = Math.max(0, Math.min(1, (el - (Math.abs(k) - 1) * 70) / 260)); if (!s2) continue; const e = 1 - Math.pow(1 - s2, 3);
       g.setTransform(dpr * r * e, 0, 0, dpr * r * e, dpr * x, dpr * y); g.rotate(q.rot + (1 - e) * 1.5); q.ring ? mlHole(g, q.p) : g.fill(q.p); }
-    d.style.setProperty('--abl', Math.ceil(W - bx + bR * 1.1 + drift + 16) + 'px');   /* keeps the open text clear of the line */
+    d.style.setProperty('--abl', Math.ceil(W - bx + Math.max(bR, bR * sm * 1.1) + drift + 16) + 'px');   /* keeps the open text clear of the line */
     if (el < n * 70 + 300) requestAnimationFrame(() => draw1(d)); };
   const draw = () => pills.forEach(draw1), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   draw(); setTimeout(draw, 700); addEventListener('resize', draw); document.fonts && document.fonts.ready.then(draw);
