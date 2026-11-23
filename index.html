@@ -3770,7 +3770,7 @@ html body .apply:is(:hover,:focus-visible) .ap-go{background:#e7aa4d !important;
 </style>
 <style>
 /* resource cards: a ring of dots round the circle, drawn like the people cards' dot line (organic dots, a little uneven, an open circle or two), in a colour that answers the card */
-html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;inset:-16%;width:132%;height:132%;z-index:-1;pointer-events:none;animation:rgRing 70s linear infinite}
+html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;inset:-25%;width:150%;height:150%;z-index:-1;pointer-events:none;animation:rgRing 70s linear infinite}
 @keyframes rgRing{to{rotate:360deg}}
 @media (prefers-reduced-motion:reduce){.res .r-go .rg-ring{animation:none}}
 </style>
@@ -3783,7 +3783,7 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
   cards.forEach(c => { const go = c.querySelector('.r-go'); if (!go) return; const cv = document.createElement('canvas'); cv.className = 'rg-ring'; cv.setAttribute('aria-hidden', 'true'); go.append(cv);
     c._ring = { cv, col: RING[[...c.classList].find(k => RING[k])] || '#d8708e' }; });
   const draw = () => cards.forEach(c => { const R = c._ring; if (!R) return; const S = R.cv.clientWidth; if (!S) return; const dpr = Math.min(2, devicePixelRatio || 1);
-    R.cv.width = S * dpr; R.cv.height = S * dpr; const g = R.cv.getContext('2d'), rad = S / 2 / 1.32 * 1.22, st = S < 260 ? 30 : 36, n = Math.max(8, Math.round(2 * Math.PI * rad / st));
+    R.cv.width = S * dpr; R.cv.height = S * dpr; const g = R.cv.getContext('2d'), rad = S / 2 / 1.5 * 1.09 + 22,   /* the circle (with its wobble and swell) plus the biggest dot plus a clear buffer */ st = S < 260 ? 30 : 36, n = Math.max(8, Math.round(2 * Math.PI * rad / st));
     if (!R.dots || R.dots.length !== n) { const rings = new Set([Math.floor(Math.random() * n)]); if (n > 18) rings.add((Math.floor(Math.random() * n) + Math.floor(n / 2)) % n);
       R.dots = [...Array(n)].map((_, i) => ({ a: i / n * Math.PI * 2 + (Math.random() - .5) * .03, r: rings.has(i) ? 13 : 7.4 + Math.random() * 2.8, ring: rings.has(i), p: shape(), rot: Math.random() * 6.3, dr: (Math.random() - .5) * 2.5 })); }
     g.fillStyle = R.col; for (const d of R.dots) { const rr = rad + d.dr; g.setTransform(dpr * d.r, 0, 0, dpr * d.r, dpr * (S / 2 + Math.cos(d.a) * rr), dpr * (S / 2 + Math.sin(d.a) * rr)); g.rotate(d.rot); if (d.ring) mlHole(g, d.p); else g.fill(d.p); } });
