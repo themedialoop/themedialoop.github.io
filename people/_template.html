@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <script>/* the blueprint marks that travel with a few dots while they fly: thin octagons, squares and little crossings of 45° grid lines */
-window.mlMarks = window.mlMarks || ((g, L, a, col, k = 1) => { if (!L.length || a < .02) return; g.save(); g.globalAlpha = a; g.strokeStyle = col; g.lineWidth = .75 * k; g.lineJoin = g.lineCap = 'round'; g.beginPath();
+window.mlMarks = () => {};   /* no blueprint marks (hexagons, crossings, squares) fly with the dots anywhere on the site */
+window.mlMarksOld = ((g, L, a, col, k = 1) => { if (!L.length || a < .02) return; g.save(); g.globalAlpha = a; g.strokeStyle = col; g.lineWidth = .75 * k; g.lineJoin = g.lineCap = 'round'; g.beginPath();
   for (const [x, y, r, n, sp] of L) { if (n === 2) { const Ln = Math.max(r * 3, 26 * k), an = Math.PI / 4 + sp * .25, c = Math.cos(an), s = Math.sin(an); g.moveTo(x - c * Ln, y - s * Ln); g.lineTo(x + c * Ln, y + s * Ln); g.moveTo(x + s * Ln * .6, y - c * Ln * .6); g.lineTo(x - s * Ln * .6, y + c * Ln * .6); continue; }
     const R = Math.max(r * (n === 4 ? 1.5 : 1.6), 12 * k), a0 = (n === 8 ? Math.PI / 8 : n === 6 ? Math.PI / 6 : Math.PI / 4) + sp * .25; for (let i = 0; i <= n; i++) { const q = a0 + i * Math.PI * 2 / n; i ? g.lineTo(x + Math.cos(q) * R, y + Math.sin(q) * R) : g.moveTo(x + Math.cos(q) * R, y + Math.sin(q) * R); } }
   g.stroke(); g.restore(); });
