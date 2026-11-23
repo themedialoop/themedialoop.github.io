@@ -3975,7 +3975,7 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
     p.closePath(); return p; };
   pills.forEach(d => { const cv = document.createElement('canvas'); cv.className = 'ab-line'; cv.setAttribute('aria-hidden', 'true'); d.querySelector('summary').prepend(cv); d._dots = [];   /* inside the summary so it shows while the card is closed */ });
   /* the line only comes out when the card is opened: dots the size of the button grow out of it, up and down, one after another */
-  const DEG = [5, -5, -8];   // the first leans left to right, the second right to left, the third right to left and steeper; each card its own angle (none matches the people cards), all leaning inward so no dot is cut off at the side
+  const DEG = [1.2, -1.5, -2.5];   // the first leans left to right, the second right to left, the third right to left and steeper; each card its own angle (none matches the people cards), all leaning inward so no dot is cut off at the side
   const draw1 = (d) => { const pi = pills.indexOf(d), cv = d.querySelector('canvas.ab-line'), pm = d.querySelector('.pm'); if (!pm) return;
     const W = d.clientWidth, H = d.clientHeight; if (!W) return; const dpr = Math.min(2, devicePixelRatio || 1);
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = W * dpr; cv.height = H * dpr; }
@@ -3983,7 +3983,7 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
     if (!d.open) { d._t0 = 0; return; }
     if (!d._t0) d._t0 = performance.now(); const el = reduce ? 1e9 : performance.now() - d._t0;
     const dr = d.getBoundingClientRect(), br = pm.getBoundingClientRect(), bx = br.left - dr.left + br.width / 2, by = br.top - dr.top + br.height / 2, bR = Math.min(pm.offsetWidth, pm.offsetHeight) / 2;   /* the button's own size, not its turned bounding box */
-    const sm = .9,   /* about the button's diameter (the organic wobble adds the rest) */ dg = DEG[pi % 3], below = Math.max(1, H - by), room = dg > 0 ? Math.max(4, W - bx - bR * sm * 1.1 - 6) : Math.min(W * .3, 170) * Math.abs(dg) / 8,   /* on a tall open card the lean eases off so the line stays on the card and beside the text */ drift = Math.min(below * Math.tan(Math.abs(dg) * Math.PI / 180), room), A = Math.sign(dg) * Math.atan(drift / below), sx = Math.sin(A), cy = Math.cos(A), st = bR * sm * 2 * 1.32;
+    const sm = .9,   /* about the button's diameter (the organic wobble adds the rest) */ dg = DEG[pi % 3], below = Math.max(1, H - by), room = dg > 0 ? Math.max(4, W - bx - bR * sm * 1.1 - 6) : Math.min(W * .3, 170) * Math.abs(dg) / 2.5,   /* on a tall open card the lean eases off so the line stays on the card and beside the text */ drift = Math.min(below * Math.tan(Math.abs(dg) * Math.PI / 180), room), A = Math.sign(dg) * Math.atan(drift / below), sx = Math.sin(A), cy = Math.cos(A), st = bR * sm * 2 * 1.32;
     const n = Math.ceil((H + 2 * bR) / cy / st) + 2, k0 = Math.ceil((by + bR) / cy / st);
     while (d._dots.length < n + 2) d._dots.push({ f: .96 + Math.random() * .06, p: shape(), rot: Math.random() * 6.3, j: (Math.random() - .5) * 3, ring: Math.random() < .15 });
     g.fillStyle = getComputedStyle(pm).backgroundColor; let minX = W;
