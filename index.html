@@ -4004,7 +4004,7 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
 /* resource cards: keep the text clear of the circle and its ring of dots (with room for the hover swell); where the words would run into it,
    the card grows taller so the circle sits below them */
 (() => { const cards = [...document.querySelectorAll('#resources .res')];
-  const fit = () => cards.forEach(c => { const go = c.querySelector('.r-go'); if (!go) return; c.style.minHeight = ''; const base = c.getBoundingClientRect().height;
+  const fit = () => cards.forEach(c => { const go = c.querySelector('.r-go'); if (!go) return; c.style.minHeight = ''; go.style.marginTop = ''; const base = c.getBoundingClientRect().height, inflow = getComputedStyle(go).position !== 'absolute', mt0 = parseFloat(getComputedStyle(go).marginTop) || 0;
     const cr = c.getBoundingClientRect(), gr = go.getBoundingClientRect(), gw = go.offsetWidth;
     const cx = gr.left + gr.width / 2 - cr.left, cy = gr.top + gr.height / 2 - cr.top, Rz = (gw / 2 * 1.09 + 22 + 13) * 1.09 + 10;
     let need = 0;
@@ -4013,8 +4013,9 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
         const nx = Math.max(l, Math.min(cx, r)), dx = Math.abs(cx - nx); if (dx >= Rz) continue;   // a line beside the ring is fine
         const reach = Math.sqrt(Rz * Rz - dx * dx);   // how far the ring comes up above its centre at this line's nearest point
         need = Math.max(need, b + reach - cy); } }
-    if (need > 0) c.style.minHeight = Math.ceil(base + need) + 'px'; });
-  fit(); addEventListener('resize', fit); document.fonts && document.fonts.ready.then(fit); setTimeout(fit, 700); })();
+    if (need > 0) { if (inflow) go.style.marginTop = Math.ceil(mt0 + need) + 'px';   /* on phones the circle sits under the words: push it down */
+      else c.style.minHeight = Math.ceil(base + need) + 'px'; } });
+  fit(); addEventListener('resize', fit); addEventListener('load', fit); document.fonts && document.fonts.ready.then(fit); setTimeout(fit, 700); setTimeout(fit, 2000); })();
 </script>
 </body>
 </html>
