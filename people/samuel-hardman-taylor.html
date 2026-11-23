@@ -618,19 +618,22 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     <div class="p-intro">
       <h1>Samuel Hardman Taylor</h1>
       <p class="p-role">Associate Professor, <a class="inl" href="https://comm.uic.edu/" target="_blank" rel="noopener">Department of Communication</a>, University of Illinois Chicago</p>
-      <ul class="p-links">
-        <li><a href="https://comm.uic.edu/profiles/taylor-samuel/" target="_blank" rel="noopener me"><span class="glink">UIC profile</span></a></li>
-                <li><a href="https://scholar.google.com/citations?user=rNF6k_AAAAAJ&amp;hl=en" target="_blank" rel="noopener me"><span class="glink">Google Scholar</span></a></li>
-        <!-- CV: put the PDF at assets/people/samuel-hardman-taylor-cv.pdf -->
-        <li><a href="../assets/people/samuel-hardman-taylor-cv.pdf" target="_blank" rel="noopener"><span class="glink">CV</span></a></li>
-        <li><a href="https://www.linkedin.com/in/samuelht/" target="_blank" rel="noopener me"><span class="glink">LinkedIn</span></a></li>
-        <li><a href="../contact.html" data-m="ude.ciu|thleumas"><span class="glink">Email</span></a></li>
-      </ul>
     </div>
   </div>
 </div></aside>
 
 <main class="wrap person" id="main" tabindex="-1">
+  <!-- the profile's links, just under the header, as cards like the ones at the foot of the page -->
+  <section class="mm mm-top" aria-label="Links">
+    <ul class="mm-row">
+      <li><a class="mm-c mm-gold" href="https://comm.uic.edu/profiles/taylor-samuel/" target="_blank" rel="noopener me"><span class="mm-t">UIC profile</span><span class="mm-a" aria-hidden="true">↗</span></a></li>
+      <li><a class="mm-c mm-orange" href="https://scholar.google.com/citations?user=rNF6k_AAAAAJ&amp;hl=en" target="_blank" rel="noopener me"><span class="mm-t">Google Scholar</span><span class="mm-a" aria-hidden="true">↗</span></a></li>
+      <li><a class="mm-c mm-blue" href="../assets/people/samuel-hardman-taylor-cv.pdf" target="_blank" rel="noopener"><span class="mm-t">CV</span><span class="mm-a" aria-hidden="true">↗</span></a></li>
+      <li><a class="mm-c mm-gold" href="https://www.linkedin.com/in/samuelht/" target="_blank" rel="noopener me"><span class="mm-t">LinkedIn</span><span class="mm-a" aria-hidden="true">↗</span></a></li>
+      <li><a class="mm-c mm-orange" href="../contact.html" data-m="ude.ciu|thleumas"><span class="mm-t">Email</span><span class="mm-a" aria-hidden="true">↗</span></a></li>
+    </ul>
+  </section>
+
   <section>
     <h2 class="bz-h sec-h"><span class="bz-a">A Little</span> <span class="bz-b">About Sam</span></h2>
     <div class="p-bio">
@@ -1645,6 +1648,10 @@ html body .pubs li > a[href]::before,html body .r-list li > a[href]::before,html
   .river .rd.pp .rb.ring::before{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,rvPop var(--pd,11s) ease-in-out var(--pdd,0s) infinite,mlHoleRock 13s ease-in-out infinite}
   .ev-lat .ring{transform-box:fill-box;transform-origin:center;animation:mlHoleRock 15s ease-in-out infinite}
 }
+</style>
+<style>
+.mm-top{margin-top:clamp(28px,4vw,56px)}
+.mm-top .mm-row{margin-top:0}
 </style>
 </body>
 </html>
