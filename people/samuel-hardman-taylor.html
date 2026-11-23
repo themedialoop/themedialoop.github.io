@@ -1317,13 +1317,13 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     while (rn < RES.length || fn < FUN.length || Math.min(...rowEnd) < W * 2) {   /* every word at least once, and enough of them to fill a couple of screens */ const k = rowEnd.indexOf(Math.min(...rowEnd)); const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3),
         per: R(30, 55), pp: R(0, 6.3) };   // each word now and then sinks back into a plain dot, then swells into a word again
       dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.4, S * 2.6); words.push(slot); }
-    L = Math.max(L, Math.ceil((Math.max(...rowEnd) + S) / S) * S);   const BU = Math.min(H / 3, 190), BP = 6 * BU;   /* bays no bigger than before, so a taller river shows more of the plan, not bigger dots */ L = Math.ceil(L / BP) * BP;   /* a whole number of BSB repeats, so the plan meets itself at the seam */   // the loop is long enough to hold every word once
+    L = Math.max(L, Math.ceil((Math.max(...rowEnd) + S) / S) * S);   const BU = H / 3, BP = 6 * BU; L = Math.ceil(L / BP) * BP;   /* a whole number of BSB repeats, so the plan meets itself at the seam */   // the loop is long enough to hold every word once
     for (let k = 0; k < nRows; k++) { const start = k * rowH * .55; let guard = 0;   /* top up every row right to the loop's seam, so no row has an empty stretch where it repeats */
       while (guard++ < 40) { const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3), per: R(30, 55), pp: R(0, 6.3) };
         dress(slot, rowH / 2 - 8); const x = rowEnd[k] + slot.R; if (x + slot.R + S * 1.4 > L + start) break; slot.x = x; rowEnd[k] = x + slot.R + R(S * 1.4, S * 2.6); words.push(slot); } }
     // the field: Netsch's BSB plan (assets/bsbfield.js), repeating along the river: the building in blue, the field in gold
     dots = []; const FK = ['orange', 'orange', 'purple', 'purple', 'pink', 'pink', 'teal', 'red'];   /* the field gold, with about 15% of all the river's dots in the other colours, mostly orange, purple and pink */
-    const BQ = mlBSB({ W: L, H, u: BU, seed: 41, periodic: true, gap: 3, edge: 4 }).dots, pOther = Math.min(1, .15 * BQ.length / Math.max(1, BQ.filter(q => !q.b).length));
+    const BQ = mlBSB({ W: L, H, u: H / 3, seed: 41, periodic: true, gap: 3, edge: 4 }).dots, pOther = Math.min(1, .15 * BQ.length / Math.max(1, BQ.filter(q => !q.b).length));
     for (const q of BQ)
       dots.push({ gi: q.x / S, gj: 2 * q.y / S, sq: null, hx: Math.max(0, Math.min(L - .01, q.x)), hy: q.y, r0: q.r * .95,
         k: q.b ? 'blue' : Math.random() < pOther ? FK[Math.floor(Math.random() * FK.length)] : 'gold', p: SH[Math.floor(Math.random() * SH.length)], ph: R(0, 6.3), fx: R(.3, .9), fy: R(.3, .9), wa: R(1, 2.2), wb: 0, fz: R(.15, .35), ring: q.ring, ox: 0, oy: 0, pop: 0, hit: -9, k0: null, st: Math.random() });
@@ -1656,9 +1656,14 @@ html body .pubs li > a[href]::before,html body .r-list li > a[href]::before,html
 .mm-top .mm-row{margin-top:0}
 </style>
 <style>
-/* the dot rivers take up most of the screen as you scroll through them: about 80% of its height */
-.river.lf{height:80vh !important;height:80svh !important}
+/* the dot river keeps its own proportions and is simply drawn larger, so it fills about 80% of the screen's height */
+.river.lf{scale:var(--rvs,1);margin-block:var(--rvm,0px)}
 .bsb-band{height:80vh !important;height:80svh !important}
 </style>
+<script>
+(() => { const fit = () => document.querySelectorAll('.river.lf').forEach(el => { el.style.removeProperty('--rvs'); el.style.removeProperty('--rvm');
+    const h = el.offsetHeight, k = Math.max(1, innerHeight * .8 / (h || 1)); el.style.setProperty('--rvs', k.toFixed(3)); el.style.setProperty('--rvm', ((k - 1) * h / 2).toFixed(1) + 'px'); });
+  fit(); addEventListener('resize', fit); })();
+</script>
 </body>
 </html>
