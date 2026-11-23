@@ -2351,7 +2351,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
     if (best.r <= cap) break; }   // and one that still won't fit waits for a roomier river
     slot.w = w; slot.fun = fun; slot.fs = fs; slot.ls = best.ls; slot.R = Math.min(cap, Math.max(S * .72, best.r));
     slot.k = fun ? (Math.random() < .6 ? 'gold' : 'blue') : (Math.random() < .8 ? 'blue' : 'gold'); slot.tc = slot.k === 'gold' ? COL.blue : Math.random() < .25 ? COL.gold : COL.cream;
-    slot.p = ((window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * SH.length)]); slot.y = Math.min(H - slot.R - 14, Math.max(slot.R + 14, slot.y0)); };
+    slot.p = SH[Math.floor(Math.random() * SH.length)];   /* word bubbles are always round dots, never the i-dot shape */ slot.y = Math.min(H - slot.R - 14, Math.max(slot.R + 14, slot.y0)); };
 
   const fillRows = upTo => { for (let k = 0; k < nRows; k++) while (rowEnd[k] < upTo) { const slot = { y0: (k + .5) * rowH + R(-.1, .1) * rowH, ph: R(0, 6.3), dx: R(-.35, .35), dy: R(-.65, -.25), sw: R(-40, 40), sr: R(-3, 3) };
       dress(slot, rowH / 2 - 8); slot.x = rowEnd[k] + slot.R; rowEnd[k] = slot.x + slot.R + R(S * 1.8, S * 3.6); words.push(slot); } };
@@ -2724,7 +2724,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       for (let a = -2; a <= 2; a++) for (let b = -2; b <= 2; b++) for (const o of grid.get(key(gx + a, gy + b)) || []) rr = Math.min(rr, Math.hypot(o[0] - x, o[1] - y) - o[2] - (4 + .12 * Math.min(rr, o[2])));
       if (rr < .8) continue;
       { const cq = Math.cos(rot) * rr * dpr, sq = Math.sin(rot) * rr * dpr; tg.setTransform(cq, sq, -sq, cq, x * dpr, y * dpr); }   /* one matrix per dot, no save and restore */
-      if (dt.ring && rr > 6 && !dt.word) { tg.fillStyle = COL[col]; mlHole(tg, dt.p); } else { tg.fillStyle = COL[col]; tg.fill(dt.p); } tg.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (dt.ring && rr > 6 && !dt.word) { tg.fillStyle = COL[col]; mlHole(tg, dt.p); } else { tg.fillStyle = COL[col]; tg.fill(dt.word && dt.p === window.mlIDot ? DSH[1] : dt.p); } tg.setTransform(dpr, 0, 0, dpr, 0, 0);   /* a dot carrying a word is always round */
       if (dt.word && rr > 24 * k) { const f = fitT(dt.word.w, dt.word.fun, rr); if (f) { tg.save(); tg.translate(x, y); tg.fillStyle = col === 'gold' ? '#2c5494' : '#f2eedd'; tg.textAlign = 'center'; tg.textBaseline = 'middle';
         tg.font = (dt.word.fun ? 'italic 300 ' : '700 ') + f.fs + 'px Inter, sans-serif'; const lh = f.fs * 1.08; f.ls.forEach((ln, j) => tg.fillText(ln, 0, (j - (f.ls.length - 1) / 2) * lh)); tg.restore(); } }
       if (dt.ghr === undefined) { dt.ghr = Math.random(); dt.gh = [8, 6, 4, 8, 6, 4, 8, 6, 4, 2][Math.floor(Math.random() * 10)]; }
