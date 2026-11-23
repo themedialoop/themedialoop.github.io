@@ -3731,27 +3731,20 @@ html body .ab-pill{overflow-anchor:none}
   fit(); addEventListener('resize', fit); })();
 </script>
 <style>
-/* people cards: one big blue dot, larger than the card, with another colour peeping through where it falls short */
+/* people cards: plain blue, with a little line of gold dots under the photo and the name */
 .people .card canvas.cnet{display:none !important}
-.people .card{background-color:var(--peep,#e7aa4d) !important;background-image:none !important}
-.people .card .bigdot{position:absolute !important;z-index:0;pointer-events:none;height:auto !important;margin:0 !important;padding:0 !important;flex:none !important;aspect-ratio:1;left:var(--bx,-18%);top:var(--by,-38%);background:#2c5494;border-radius:50%;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
-.people .card > h3{position:relative;z-index:1}.people .card > .ph-wrap{z-index:1}
-.people .card:hover .bigdot,.people .card:focus-visible .bigdot{transform:scale(1.01)}
-.people .card:hover{color:#f2eedd !important}
-@media (prefers-reduced-motion:reduce){.people .card .bigdot{transition:none}}
+.people .card{background-color:#2c5494 !important;background-image:none !important}
+.people .card .dotline{position:absolute;z-index:1;pointer-events:none;height:10px;background:radial-gradient(circle at center,#e7aa4d 0 3.4px,transparent 3.9px) left center/16px 10px repeat-x;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.people .card > h3{position:relative;z-index:1}
+.people .card:hover .dotline,.people .card:focus-visible .dotline{transform:translateX(6px)}
+@media (prefers-reduced-motion:reduce){.people .card .dotline{transition:none}}
 </style>
 <script>
-/* each card: its own peeping colour, and the big dot shifted toward one corner so the opposite corner peeps through,
-   but never so far that the photo or the name leaves the blue */
-(() => { const P = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c'], CORN = [[1, 1], [-1, 1], [1, -1], [-1, -1]];
-  const cards = [...document.querySelectorAll('.people .card')], k0 = Math.floor(Math.random() * 20);
-  cards.forEach((c, i) => { const d = document.createElement('span'); d.className = 'bigdot'; d.setAttribute('aria-hidden', 'true'); c.prepend(d); c.style.setProperty('--peep', P[(k0 + i) % P.length]); c._corner = CORN[(k0 + i) % 4]; });
-  const fit = () => cards.forEach(c => { const W = c.clientWidth, H = c.clientHeight, R = 1.5 * W, cr = c.getBoundingClientRect(), [sx, sy] = c._corner;
-    const pts = [...c.querySelectorAll('.ph-wrap, h3')].flatMap(e => { const r = e.getBoundingClientRect(); return [[r.left, r.top], [r.right, r.top], [r.left, r.bottom], [r.right, r.bottom]].map(([x, y]) => [x - cr.left, y - cr.top]); });
-    const kx = sx > 0 ? W : 0, ky = sy > 0 ? H : 0, L = Math.hypot(W / 2, H / 2), ux = (W / 2 - kx) / L, uy = (H / 2 - ky) / L;   // from the peeping corner toward the middle
-    let m = L * 1.2; for (; m > 0; m -= 3) { const cx = kx + ux * (m + R), cy = ky + uy * (m + R); if (pts.every(([x, y]) => Math.hypot(x - cx, y - cy) < R - 14)) break; }   // the blue's edge as far in as the photo and name allow
-    m = Math.max(0, m - 6); const cx = kx + ux * (m + R), cy = ky + uy * (m + R), dot = c.querySelector('.bigdot');
-    dot.style.width = 2 * R + 'px'; dot.style.left = cx - R + 'px'; dot.style.top = cy - R + 'px'; });
+(() => { const cards = [...document.querySelectorAll('.people .card')];
+  cards.forEach(c => { const d = document.createElement('span'); d.className = 'dotline'; d.setAttribute('aria-hidden', 'true'); c.append(d); });
+  const fit = () => cards.forEach(c => { const cr = c.getBoundingClientRect(), rs = [...c.querySelectorAll('.ph-wrap, h3')].map(e => e.getBoundingClientRect()).filter(r => r.width);
+    if (!rs.length) return; const l = Math.min(...rs.map(r => r.left)) - cr.left, rt = Math.max(...rs.map(r => r.right)) - cr.left, b = Math.max(...rs.map(r => r.bottom)) - cr.top;
+    const d = c.querySelector('.dotline'), w = Math.floor((rt - l) / 16) * 16;   /* whole dots only, none cut */ d.style.left = l + 'px'; d.style.width = w + 'px'; d.style.top = Math.min(cr.height - 24, b + 18) + 'px'; });
   fit(); addEventListener('resize', fit); document.fonts && document.fonts.ready.then(fit); setTimeout(fit, 800); })();
 </script>
 </body>
