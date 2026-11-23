@@ -703,6 +703,10 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 .ml-loop .stage{position:relative;height:100vh;height:100lvh;overflow:hidden}
 .ml-loop .stage .tilt{position:absolute;left:-4vw;top:-4vh;width:108vw;height:108%;rotate:-3.5deg}
 .ml-loop canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* once the map is all the way out: a Home pill, bottom right, back to the top of the profile */
+.ml-home{position:fixed;right:clamp(16px,3vw,36px);bottom:calc(clamp(16px,3vw,36px) + env(safe-area-inset-bottom));z-index:60;font:700 17px Inter,system-ui,sans-serif;color:#2c5494;background:#e7aa4d;border:0;border-radius:999px;padding:13px 24px;cursor:pointer;box-shadow:0 6px 18px rgba(44,84,148,.18);opacity:0;translate:0 14px;pointer-events:none;transition:opacity .35s,translate .35s}
+.ml-home.on{opacity:1;translate:0 0;pointer-events:auto}
+.ml-home:focus-visible{outline:3px solid #2c5494;outline-offset:3px}
 </style>
 <script>
 (() => {
@@ -817,6 +821,10 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
       return Math.min(ss(.1, 1, (vh - r.top) / r.height), ss(.1, 1, r.bottom / r.height)); };   /* fully arrived once the whole band is on screen: it sits at the very foot of the page */
     /* as you keep scrolling, the map zooms out from the Loop until the whole system, Linden to 95th, fits; then it stops */
     const PAD = () => { const tb = document.querySelector('.top'), hb = tb ? tb.getBoundingClientRect().bottom : 0; return (box.getBoundingClientRect().top < 0 ? -box.getBoundingClientRect().top : 0) + Math.max(0, hb) + 6; };
+    const home = document.createElement('button'); home.type = 'button'; home.className = 'ml-home'; home.textContent = 'Home'; home.tabIndex = -1; document.body.append(home);
+    home.addEventListener('click', () => scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }));
+    const showHome = () => { const on = zoomAt() > .97; if (on !== home.classList.contains('on')) { home.classList.toggle('on', on); home.tabIndex = on ? 0 : -1; } };
+    addEventListener('scroll', showHome, { passive: true });
     const zoomAt = () => { const r = grid.getBoundingClientRect(), T = parseFloat(getComputedStyle(fig).top) || 0, span = r.height - fig.offsetHeight; return span > 0 ? Math.min(1, Math.max(0, (T - r.top) / span)) : 1; };
     const frame = now => { if (!W) return; const t = reduce ? 0 : (now - t0) / 1000, p = reduce ? 1 : progress();
       const zf = Math.min(1, VW / W), e = ss(0, .92, zoomAt()), z = Math.pow(zf, e), sx0 = Math.min(Math.max(LX, VW / 2), W - VW / 2);
