@@ -3562,7 +3562,7 @@ html body .ev-cards .ev > svg.ev-lat{position:absolute !important;inset:0 !impor
 <script>
 /* open info cards: a quiet corner plan. A few dots sit on a turned grid in the top right corner, each inside its own thin octagon,
    with the octagons fading as they reach toward the words, which keep the rest of the card to themselves */
-(() => { const pills = [...document.querySelectorAll('.ab-pill')]; if (!pills.length) return; const NS = 'http://www.w3.org/2000/svg';
+(() => { let pills = [...document.querySelectorAll('.ab-pill')]; if (!pills.length) return; const NS = 'http://www.w3.org/2000/svg';
   const blob = (x, y, r, k) => { let d = ''; for (let i = 0; i <= 36; i++) { const a = i / 36 * 6.283, f = 1 + .06 * Math.sin(2 * a + k) + .04 * Math.sin(3 * a + k * 1.7); d += (i ? 'L' : 'M') + (x + Math.cos(a) * r * f).toFixed(1) + ' ' + (y + Math.sin(a) * r * f).toFixed(1); } return d + 'Z'; };
   const poly = (x, y, R, n, rot) => 'M' + [...Array(n)].map((_, i) => { const a = rot + i * 2 * Math.PI / n; return (x + Math.cos(a) * R).toFixed(1) + ' ' + (y + Math.sin(a) * R).toFixed(1); }).join('L') + 'Z';
   const tone = el => { const m = (getComputedStyle(el).backgroundColor.match(/\d+/g) || [44, 84, 148]).map(Number), [r, g, b] = m;
@@ -3761,13 +3761,17 @@ html body .ab-pill{overflow-anchor:none}
     if (!rs.length || !W) return; const top = Math.min(...rs.map(r => r.top)) - cr.top, bot = Math.max(...rs.map(r => r.bottom)) - cr.top;
     const cv = c.querySelector('.dotline'), dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; const g = cv.getContext('2d');
     const boxes = rs.map(r => [r.left - cr.left, r.top - cr.top, r.right - cr.left, r.bottom - cr.top]), k2 = W < 500 ? .75 : 1;
-    const gap = Math.min(top, H - bot), A = -Math.max(.025, Math.min(8 * Math.PI / 180, Math.atan((gap - 2 * 12 * k2 - 10) / W))), ta = Math.tan(A), st = W < 500 ? 24 : 36,   /* about 8 degrees, less where the card is short so the line still clears the photo and name */ L = W / Math.cos(A), n = Math.floor(L / st) + 2;
+    /* every line on the site leans at its own angle: about 8 degrees, never the same twice; scaled down together on short cards so the lines still clear the photo and name */
+    const ci = cards.indexOf(c), DEG = [[-8, -6], [7, 9.5], [-10, -6.5], [8.5, 5.5], [-9, -7.5], [6, 10.5]][ci % 6].map(v => v + Math.floor(ci / 6) * .3);
+    const gap = Math.min(top, H - bot), maxA = Math.max(.02, Math.atan((gap - 2 * 12 * k2 - 10) / W)), fA = Math.min(1, maxA / (Math.max(...DEG.map(Math.abs)) * Math.PI / 180));
+    const st = W < 500 ? 24 : 36, n = Math.floor(W / Math.cos(12 * Math.PI / 180) / st) + 2;
     if (!c._dl || c._dl.n !== n) c._dl = { n, a: line(n), b: line(n) };
     const y1 = top / 2, y2 = bot + (H - bot) / 2;   /* each line centred in the space above or below */
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.fillStyle = getComputedStyle(c).getPropertyValue('--dl').trim() || '#e7aa4d';
-    for (const [yc, L2] of [[y1, c._dl.a], [y2, c._dl.b]]) for (const d of L2) { const x = (d.i - (n - 1) / 2) * st * Math.cos(A) + W / 2, y = yc + (x - W / 2) * ta + d.j;
+    for (const [yc, L2, deg] of [[y1, c._dl.a, DEG[0]], [y2, c._dl.b, DEG[1]]]) { const A = deg * fA * Math.PI / 180, ta = Math.tan(A);
+      for (const d of L2) { const x = (d.i - (n - 1) / 2) * st * Math.cos(A) + W / 2, y = yc + (x - W / 2) * ta + d.j;
       if (x < -d.r || x > W + d.r) continue; if (boxes.some(b => x + d.r + 6 > b[0] && x - d.r - 6 < b[2] && y + d.r + 6 > b[1] && y - d.r - 6 < b[3])) continue;   /* never over the photo or the name */
-      g.setTransform(dpr * d.r * k2, 0, 0, dpr * d.r * k2, dpr * x, dpr * y); g.rotate(d.rot); if (d.ring) mlHole(g, d.p); else g.fill(d.p); } });
+      g.setTransform(dpr * d.r * k2, 0, 0, dpr * d.r * k2, dpr * x, dpr * y); g.rotate(d.rot); if (d.ring) mlHole(g, d.p); else g.fill(d.p); } } });
   fit(); addEventListener('resize', fit); document.fonts && document.fonts.ready.then(fit); setTimeout(fit, 800);
   cards.forEach(c => { c.addEventListener('mouseenter', () => setTimeout(fit, 30)); c.addEventListener('mouseleave', () => setTimeout(fit, 30)); }); })();
 </script>
@@ -3955,27 +3959,36 @@ html body #resources .res .r-name{letter-spacing:-.015em !important}
 /* Our Interests / Style / Invitation: a tilted line of dots from top edge to bottom edge, running into the open/close button, in the button's colour */
 html body .ab-pill summary > canvas.ab-line{position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;max-width:none !important;margin:0 !important;flex:none !important;z-index:0;pointer-events:none;display:block !important}
 .ab-pill > summary > :not(canvas),.ab-pill > p{position:relative;z-index:1}
-html body .ab-pill[open] > p{padding-right:var(--abl,90px) !important}
+html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){padding-right:var(--abl,90px) !important}
 </style>
 <script>
-(() => { const pills = [...document.querySelectorAll('.ab-pill')];
+(() => { let pills = [...document.querySelectorAll('.ab-pill')];
   const shape = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
     for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
     p.closePath(); return p; };
   pills.forEach(d => { const cv = document.createElement('canvas'); cv.className = 'ab-line'; cv.setAttribute('aria-hidden', 'true'); d.querySelector('summary').prepend(cv); d._dots = [];   /* inside the summary so it shows while the card is closed */ });
-  const draw = () => pills.forEach(d => { const cv = d.querySelector('canvas.ab-line'), pm = d.querySelector('.pm'); if (!pm) return;
-    const W = d.clientWidth, H = d.clientHeight; if (!W) return; const dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; const g = cv.getContext('2d');
-    const dr = d.getBoundingClientRect(), br = pm.getBoundingClientRect(), bx = br.left - dr.left + br.width / 2, by = br.top - dr.top + br.height / 2, bR = Math.max(br.width, br.height) / 2;
-    const A = Math.min(8 * Math.PI / 180, Math.atan(30 / H)),   /* about 8 degrees when closed; when open the drift stays small so the line stays beside the text */ sx = Math.sin(A), cy = Math.cos(A), st = W < 600 ? 26 : 32, k2 = W < 600 ? .8 : 1;   // the line leans 8 degrees from vertical and passes through the button's centre
-    const t0 = -by / cy - 20, t1 = (H - by) / cy + 20, n = Math.ceil((t1 - t0) / st) + 1;
-    while (d._dots.length < n) d._dots.push({ r: (7 + Math.random() * 2.6) * k2, p: shape(), rot: Math.random() * 6.3, j: (Math.random() - .5) * 2.4, ring: Math.random() < .12 });
-    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.fillStyle = getComputedStyle(pm).backgroundColor;
-    d.style.setProperty('--abl', Math.ceil(W - bx + 30 + 22) + 'px');   /* keeps the open text clear of the line */
-    for (let i = 0; i < n; i++) { const t = t0 + i * st, q = d._dots[i], x = bx + t * sx + q.j, y = by + t * cy; if (y < -q.r || y > H + q.r) continue;
-      if (Math.hypot(x - bx, y - by) < bR + q.r + 6) continue;   // the line runs into the button and out the other side
-      g.setTransform(dpr * q.r, 0, 0, dpr * q.r, dpr * x, dpr * y); g.rotate(q.rot); q.ring && q.r > 6 ? mlHole(g, q.p) : g.fill(q.p); } });
+  /* the line only comes out when the card is opened: dots the size of the button grow out of it, up and down, one after another */
+  const DEG = [-3, -4.5, -6];   // each card its own angle (none matches the people cards), all leaning inward so no dot is cut off at the side
+  const draw1 = (d) => { const pi = pills.indexOf(d), cv = d.querySelector('canvas.ab-line'), pm = d.querySelector('.pm'); if (!pm) return;
+    const W = d.clientWidth, H = d.clientHeight; if (!W) return; const dpr = Math.min(2, devicePixelRatio || 1);
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = W * dpr; cv.height = H * dpr; }
+    const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    if (!d.open) { d._t0 = 0; return; }
+    if (!d._t0) d._t0 = performance.now(); const el = reduce ? 1e9 : performance.now() - d._t0;
+    const dr = d.getBoundingClientRect(), br = pm.getBoundingClientRect(), bx = br.left - dr.left + br.width / 2, by = br.top - dr.top + br.height / 2, bR = Math.min(br.width, br.height) / 2;
+    const dg = DEG[pi % 3], drift = Math.abs(dg) * 5, A = Math.sign(dg) * Math.min(Math.abs(dg) * Math.PI / 180, Math.atan(drift / Math.max(1, H - by))), sx = Math.sin(A)   /* the lean stays slight on a tall open card: at most a few px of drift per degree */, cy = Math.cos(A), st = bR * 2 * 1.32;
+    const n = Math.ceil((H + 2 * bR) / cy / st) + 2, k0 = Math.ceil((by + bR) / cy / st);
+    while (d._dots.length < n + 2) d._dots.push({ f: .94 + Math.random() * .1, p: shape(), rot: Math.random() * 6.3, j: (Math.random() - .5) * 3, ring: Math.random() < .15 });
+    g.fillStyle = getComputedStyle(pm).backgroundColor; let minX = W;
+    for (let i = 0; i < n; i++) { const k = i - k0; if (k === 0) continue; const t = k * st, q = d._dots[i], r = bR * q.f, x = bx + t * sx + q.j, y = by + t * cy;
+      if (y < -r || y > H + r) continue; if (y > br.bottom - dr.top) minX = Math.min(minX, x - r);
+      const s2 = Math.max(0, Math.min(1, (el - (Math.abs(k) - 1) * 70) / 260)); if (!s2) continue; const e = 1 - Math.pow(1 - s2, 3);
+      g.setTransform(dpr * r * e, 0, 0, dpr * r * e, dpr * x, dpr * y); g.rotate(q.rot + (1 - e) * 1.5); q.ring ? mlHole(g, q.p) : g.fill(q.p); }
+    d.style.setProperty('--abl', Math.ceil(W - bx + bR * 1.1 + drift + 16) + 'px');   /* keeps the open text clear of the line */
+    if (el < n * 70 + 300) requestAnimationFrame(() => draw1(d)); };
+  const draw = () => pills.forEach(draw1), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   draw(); setTimeout(draw, 700); addEventListener('resize', draw); document.fonts && document.fonts.ready.then(draw);
-  pills.forEach(d => { new ResizeObserver(draw).observe(d); d.addEventListener('toggle', () => { let n = 0; const f = () => { draw(); if (n++ < 40) requestAnimationFrame(f); }; f(); }); }); })();
+  pills.forEach(d => { new ResizeObserver(draw).observe(d); d.addEventListener('toggle', draw); }); })();
 </script>
 </body>
 </html>
