@@ -3951,5 +3951,31 @@ html body .people .card:is(:hover,:focus-visible) h3,html body .people .card:is(
 html body .people .card h3{letter-spacing:-.015em !important}
 html body #resources .res .r-name{letter-spacing:-.015em !important}
 </style>
+<style>
+/* Our Interests / Style / Invitation: a tilted line of dots from top edge to bottom edge, running into the open/close button, in the button's colour */
+html body .ab-pill summary > canvas.ab-line{position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;max-width:none !important;margin:0 !important;flex:none !important;z-index:0;pointer-events:none;display:block !important}
+.ab-pill > summary > :not(canvas),.ab-pill > p{position:relative;z-index:1}
+html body .ab-pill[open] > p{padding-right:var(--abl,90px) !important}
+</style>
+<script>
+(() => { const pills = [...document.querySelectorAll('.ab-pill')];
+  const shape = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
+    for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
+    p.closePath(); return p; };
+  pills.forEach(d => { const cv = document.createElement('canvas'); cv.className = 'ab-line'; cv.setAttribute('aria-hidden', 'true'); d.querySelector('summary').prepend(cv); d._dots = [];   /* inside the summary so it shows while the card is closed */ });
+  const draw = () => pills.forEach(d => { const cv = d.querySelector('canvas.ab-line'), pm = d.querySelector('.pm'); if (!pm) return;
+    const W = d.clientWidth, H = d.clientHeight; if (!W) return; const dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; const g = cv.getContext('2d');
+    const dr = d.getBoundingClientRect(), br = pm.getBoundingClientRect(), bx = br.left - dr.left + br.width / 2, by = br.top - dr.top + br.height / 2, bR = Math.max(br.width, br.height) / 2;
+    const A = Math.min(8 * Math.PI / 180, Math.atan(30 / H)),   /* about 8 degrees when closed; when open the drift stays small so the line stays beside the text */ sx = Math.sin(A), cy = Math.cos(A), st = W < 600 ? 26 : 32, k2 = W < 600 ? .8 : 1;   // the line leans 8 degrees from vertical and passes through the button's centre
+    const t0 = -by / cy - 20, t1 = (H - by) / cy + 20, n = Math.ceil((t1 - t0) / st) + 1;
+    while (d._dots.length < n) d._dots.push({ r: (7 + Math.random() * 2.6) * k2, p: shape(), rot: Math.random() * 6.3, j: (Math.random() - .5) * 2.4, ring: Math.random() < .12 });
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.fillStyle = getComputedStyle(pm).backgroundColor;
+    d.style.setProperty('--abl', Math.ceil(W - bx + 30 + 22) + 'px');   /* keeps the open text clear of the line */
+    for (let i = 0; i < n; i++) { const t = t0 + i * st, q = d._dots[i], x = bx + t * sx + q.j, y = by + t * cy; if (y < -q.r || y > H + q.r) continue;
+      if (Math.hypot(x - bx, y - by) < bR + q.r + 6) continue;   // the line runs into the button and out the other side
+      g.setTransform(dpr * q.r, 0, 0, dpr * q.r, dpr * x, dpr * y); g.rotate(q.rot); q.ring && q.r > 6 ? mlHole(g, q.p) : g.fill(q.p); } });
+  draw(); setTimeout(draw, 700); addEventListener('resize', draw); document.fonts && document.fonts.ready.then(draw);
+  pills.forEach(d => { new ResizeObserver(draw).observe(d); d.addEventListener('toggle', () => { let n = 0; const f = () => { draw(); if (n++ < 40) requestAnimationFrame(f); }; f(); }); }); })();
+</script>
 </body>
 </html>
