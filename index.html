@@ -3768,5 +3768,12 @@ html body .apply:is(:hover,:focus-visible) .ap-t,html body .apply:is(:hover,:foc
 html body .apply:is(:hover,:focus-visible) .ap-kind::before{background:#e7aa4d !important}
 html body .apply:is(:hover,:focus-visible) .ap-go{background:#e7aa4d !important;color:#2c5494 !important;filter:none !important}
 </style>
+<style>
+/* resource cards: a ring of dots round the circle, in a colour that answers the card and the circle */
+.res .r-go::after{content:'';position:absolute;inset:-13%;z-index:-1;pointer-events:none;background:var(--ring,#d8708e);-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Ccircle%20cx%3D%2750%27%20cy%3D%2750%27%20r%3D%2746%27%20fill%3D%27none%27%20stroke%3D%27%23000%27%20stroke-width%3D%273.4%27%20stroke-linecap%3D%27round%27%20stroke-dasharray%3D%270%207.23%27/%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Ccircle%20cx%3D%2750%27%20cy%3D%2750%27%20r%3D%2746%27%20fill%3D%27none%27%20stroke%3D%27%23000%27%20stroke-width%3D%273.4%27%20stroke-linecap%3D%27round%27%20stroke-dasharray%3D%270%207.23%27/%3E%3C/svg%3E") center/100% 100% no-repeat;animation:rgRing 60s linear infinite}
+@keyframes rgRing{to{rotate:360deg}}
+@media (prefers-reduced-motion:reduce){.res .r-go::after{animation:none}}
+.res.bd1{--ring:#d8708e}.res.bd2{--ring:#e0773a}.res.bd3{--ring:#d8708e}.res.bd4{--ring:#e7aa4d}.res.bd5{--ring:#f2eedd}.res.bd6{--ring:#d8708e}
+</style>
 </body>
 </html>
