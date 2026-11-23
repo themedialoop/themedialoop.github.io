@@ -1710,9 +1710,9 @@ html body .pubs li > a[href]::before,html body .r-list li > a[href]::before,html
   const draw = t => { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
     const s = (t - T0) / 1000, ex = still ? 0 : ss(scrollY / Math.max(240, H * .7)), AMP = still ? 0 : (W < 700 ? 2.6 : 3.4);
     for (const d of dots) { if (!d.p) { d.p = shape(); d.fx = .25 + Math.random() * .35; d.fy = .25 + Math.random() * .35; d.rot = Math.random() * 6.3; d.sp = (Math.random() - .5) * .5; d.dl = Math.random() * .5 + Math.min(1, Math.hypot(d.x / W - .5, d.y / H - .5)) * -.3 + .3; d.up = .3 + Math.random() * .7; d.sw = (Math.random() - .5) * 60; }
-      const inn = still ? 1 : ss((s - d.dl) / .7), k = ex * (.6 + .4 * d.up);
+      const fl = (1 - d.x / W) * .95 + .12 * Math.sin(d.y / H * 4 + 1) + d.up * .04, bt = s * 1.2, inn = still ? 1 : ss(bt - .26 - fl), ki = 1 - inn, k = ex * (.6 + .4 * d.up);   /* one soft breeze from the right floats them in, as on the landing page */
       let r = d.r * (.35 + .65 * d.k) * inn * (1 + .06 * Math.sin(s * .8 + d.ph)) * (1 - .55 * k); if (r < .4) continue;
-      const x = d.x + AMP * Math.sin(s * d.fx + d.ph) + d.sw * k, y = d.y + AMP * Math.cos(s * d.fy + d.ph * 1.3) - k * H * .35 * d.up;
+      const x = d.x + AMP * Math.sin(s * d.fx + d.ph) + ki * ki * W * (.03 + .03 * d.up) - k * W * (.03 + .03 * d.up), y = d.y + AMP * Math.cos(s * d.fy + d.ph * 1.3) - ki * ki * H * .01 + k * H * .02;   /* and on scroll they drift softly off to the left and fade */
       g.setTransform(dpr * r, 0, 0, dpr * r, dpr * x, dpr * y); g.rotate(d.rot + s * d.sp * .2);
       g.fillStyle = d.b ? '#f2eedd' : '#e7aa4d'; if (d.ring && r > 3) mlHole(g, d.p); else g.fill(d.p); }
     if (!still) requestAnimationFrame(draw); };
