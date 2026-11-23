@@ -3031,7 +3031,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   // each frame the dots swell and shrink a little, in a ripple that runs out from the corner, like the net's holes
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, seen = new Set();
   const paint = (cd, time) => { if (!cd.dots) return; const g = cd.cv.getContext('2d'), dpr = cd.dpr, ox = cd.w, oy = cd.top ? 0 : cd.h, Rn = Math.hypot(cd.w, cd.h);
-    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.classList.contains('h-cream') && cd.el.matches(':hover') ? GOLD : cd.col;   /* the Apply card's dots take its old background colour when it inverts */   // cream dots turn gold on the cream hover, so they still show   // the card turns cream on hover; its dots turn gold
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cd.cv.width, cd.cv.height); g.fillStyle = cd.kind === 'ev' && cd.el.classList.contains('h-cream') && cd.el.matches(':hover') ? GOLD : cd.kind === 'ap' && cd.el.matches(':hover, :focus-visible, :active') ? (cd.col === BLUE ? GOLD : BLUE) : cd.col;   /* the Apply card's dots take its old background colour when it inverts */   // cream dots turn gold on the cream hover, so they still show   // the card turns cream on hover; its dots turn gold
     if (cd.lat && cd.el.matches(':hover, :focus-visible')) { const L = cd.lat, S = L.S, e1 = [S * L.ca, S * L.sa], e2 = [-S * L.sa, S * L.ca];
       const bc = (getComputedStyle(cd.el).backgroundColor.match(/\d+/g) || [44, 84, 148]).slice(0, 3).map(Number);
       const col = mlDeeper(bc, .1); if (!L.fc || L.fk !== col) { L.fk = col;   /* the plan only round the dots, fading out where there are none */
@@ -3046,6 +3046,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 
   const all = () => cards.forEach(cd => { build(cd); paint(cd, performance.now() / 1000); });
   if (ap) ['mouseenter', 'mouseleave'].forEach(ev => ap.addEventListener(ev, () => { const cd = cards.find(c => c.kind === 'ap'); if (cd.dots) requestAnimationFrame(() => paint(cd, performance.now() / 1000)); }));
+  if (ap) ['mouseenter', 'mouseleave', 'focus', 'blur', 'touchstart', 'touchend'].forEach(ev => ap.addEventListener(ev, () => { const cd = cards.find(c => c.kind === 'ap'); if (cd.dots) requestAnimationFrame(() => paint(cd, performance.now() / 1000)); }, { passive: true }));
   if (ap) new MutationObserver(() => { const cd = cards.find(c => c.kind === 'ap'); if (cd.dots) { cd.col = dotColour(ap); paint(cd, performance.now() / 1000); } }).observe(ap, { attributes: true, attributeFilter: ['class'] });
   let t, lastW = innerWidth; const later = () => { clearTimeout(t); t = setTimeout(all, 200); };
   all(); (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { all(); requestAnimationFrame(loop); });
