@@ -3761,5 +3761,12 @@ html body .ab-pill{overflow-anchor:none}
     for (const d of c._dl.dots) { g.setTransform(dpr * d.r, 0, 0, dpr * d.r, dpr * d.x, dpr * d.y); g.rotate(d.rot); if (d.ring) mlHole(g, d.p); else g.fill(d.p); } });
   fit(); addEventListener('resize', fit); document.fonts && document.fonts.ready.then(fit); setTimeout(fit, 800); })();
 </script>
+<style>
+/* the Apply card: gold with blue words; on hover it turns blue with gold words */
+html body .apply:is(:hover,:focus-visible){background:#2c5494 !important;color:#e7aa4d !important;box-shadow:none !important}
+html body .apply:is(:hover,:focus-visible) .ap-t,html body .apply:is(:hover,:focus-visible) .ap-kind,html body .apply:is(:hover,:focus-visible) p{color:#e7aa4d !important}
+html body .apply:is(:hover,:focus-visible) .ap-kind::before{background:#e7aa4d !important}
+html body .apply:is(:hover,:focus-visible) .ap-go{background:#e7aa4d !important;color:#2c5494 !important;filter:none !important}
+</style>
 </body>
 </html>
