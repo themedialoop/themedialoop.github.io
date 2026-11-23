@@ -3818,7 +3818,7 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
   draw(); addEventListener('resize', draw); setTimeout(draw, 600); })();
 </script>
 <style>
-.orbit-band{position:relative;height:clamp(400px,36vw,540px);width:112vw;margin:clamp(0px,1vw,16px) 0 clamp(0px,1vw,16px) calc(50% - 56vw);rotate:-3deg;pointer-events:none}   /* the same size as the river before Resources, tipped down from right to left */
+.orbit-band{position:relative;height:clamp(230px,24vw,350px);width:112vw;margin:clamp(0px,1vw,16px) 0 clamp(0px,1vw,16px) calc(50% - 56vw);rotate:-3deg;pointer-events:none}   /* the same size as the river before Resources, tipped down from right to left */
 .orbit-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 <script>
@@ -4072,60 +4072,46 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
 /* the band before Join Our Orbit: a field of dots, river 2's sizes and colours, carried on a breeze (see below). Each eddy travels right to left
    and a little downhill, sweeping the dots it passes round in a swirl; once it has gone by, they settle back into place. The eddies drift
    slowly on their own and race through as you scroll */
-(() => { const box = document.querySelector('.orbit-band'); if (!box) return; const cv = box.querySelector('canvas') || box.appendChild(document.createElement('canvas')); window.mlBreezeOn && mlBreezeOn(cv, box); const g = cv.getContext('2d');
-  const BLUE = '#2c5494', FILL = v => v < .38 ? '#e7aa4d' : v < .54 ? '#e0773a' : v < .68 ? '#d8708e' : v < .8 ? '#9b6aa6' : v < .88 ? '#2a8c8c' : BLUE;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const blob = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
-    for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
-    p.closePath(); return p; };
-  const SH = [...Array(16)].map(blob);
-  let W, H, dpr, D = [], vis = false, raf = 0, prev = 0, T = 0, TA = 0, lastY = scrollY, wind = 0, GS = [], gAcc = .7;
-  let wdir = 1; addEventListener('scroll', () => { const dy = scrollY - lastY; if (dy) wdir = dy > 0 ? 1 : -1; wind = Math.min(3, wind + Math.abs(dy) * .02); lastY = scrollY; }, { passive: true });   /* scroll down and the breeze blows them right to left; scroll up and it blows them back */
-  const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; D = [];
-    const u0 = H / 1.2 / 1.75 * .92, u = u0 * 1.22, Dd = u0 * .2,   /* a wider spread of dots, the same dot sizes */ st = Dd * .456, oy = (H - u) / 2;   /* fewer dots */   /* river 2's own spacing and dot sizes */
-    const PW = W + 40, nx = Math.round(PW / st), sx = PW / nx;   /* the lattice fills the whole wrap-around loop evenly: no seam */
-    for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let i = 0; i < nx; i++) { const x = -20 + (i + (row % 2) * .5) * sx; const out = Math.max(0, oy - y, y - oy - u), pr = .9 * Math.exp(-Math.pow(out / (H * .1), 1.25));
-      if (Math.random() > pr) continue; const big = Math.random() < .07, v = Math.random();
-      D.push({ x: x + (Math.random() - .5) * st * .2, y: y + (Math.random() - .5) * st * .2,   /* calm, like the rivers */ r: Dd * .38 * 1.25 * (big ? .55 + Math.random() * .2 : (.2 + Math.random() * .1) * (out ? .7 + .3 * pr : 1)),
-        c: big ? (v < .8 ? BLUE : FILL(v)) : (Math.random() < .5 ? BLUE : FILL(Math.random())),   /* lots of blue */ p: (Math.random() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(Math.random() * 16)], ring: big && Math.random() < .2, rot: Math.random() * 6.3, blu: Math.random() < .75, ox: 0, oy: 0, vx: 0, vy: 0, fl: Math.random() < .06, ft: -1, a: Math.random(), b: Math.random() }); } };
-  let FILLC = []; const buildFill = () => { FILLC = []; if (!W) return; const st = H / 1.75 * .92 * .2 * .3; for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) FILLC.push({ x: x + (Math.random() - .5) * st * .4, y: y + (Math.random() - .5) * st * .4, c: Math.random() < .8 ? BLUE : FILL(Math.random()), p: SH[Math.floor(Math.random() * 16)], rot: Math.random() * 6.3 }); };
-  build(); buildFill(); new ResizeObserver(() => { build(); buildFill(); }).observe(box);
-  const frame = now => { raf = 0; if (!vis || !W) return; const dt = prev ? Math.min(.05, (now - prev) / 1000) : .016; prev = now;
-    T += dt * (reduce ? 0 : .5 + wind * 1.6);   /* a gentle breeze */ wind *= Math.pow(.02, dt);
-    const R = H * .4, L = W + 4 * R, n = W < 600 ? 2 : 3, ED = [...Array(n)].map((_, i) => { const p = ((T * W * .12 + i * L / n) % L + L) % L, cx = W + 2 * R - p, cy = H * (.35 + .3 * (p / L)) + Math.sin(T * .7 + i * 2) * H * .05;   // right to left, and a little downhill
-      return [cx, cy, i % 2 ? -1 : 1]; });
-    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
-    /* the breeze: every dot floats right to left on its own little current, bobbing and swaying, faster as you scroll. Now and then one is lifted
-       right off the banner on a loop, shrinking away before it reaches the edge, and later drifts back in from the right */
-    /* the breeze (as in the demo's A): every dot floats right to left on its own little current, bobbing and swaying and turning, all but still until you scroll */
-    const wv = reduce ? 0 : Math.min(2.2, wind), act = reduce ? 0 : wv; TA += dt * (.3 + act);
-    /* calm: the whole field drifts slowly right to left together, like the rivers. Scroll and a breeze blows through: it pushes the field along
-       (right to left as you scroll down, back as you scroll up), and each dot is tossed on its own little current, settling back into place when you stop */
-    const drift = reduce ? 0 : W * .012 + W * .09 * wv * wdir;
-    const noise = (x, y, t) => Math.sin(x * 1.7 + t * .9) * Math.cos(y * 1.3 - t * .7) + .5 * Math.sin(x * 3.1 - y * 2.3 + t * 1.3);
-    for (const d of D) { if (d.sp === undefined) { d.sp = .6 + Math.random() * .8; d.ph = Math.random() * 6.3; d.by = 0; d.bx = 0; d.vx = d.sp; }
-      d.x -= drift * dt; if (d.x < -20) { d.x += W + 40; d.ft = -1; } if (d.x > W + 20) d.x -= W + 40;
-      d.bx -= W * .06 * wv * wdir * (d.sp - 1) * (1 + d.r / 10) * dt; d.bx -= d.bx * dt * .8;
-      d.by += (Math.sin(TA * 1.3 * d.sp + d.ph) * H * .14 + noise(d.x / W * 3, d.y / H * 2, TA) * H * .05) * wv * dt; d.by -= d.by * dt * .8;
-      if (!reduce) d.rot += dt * wv * 1.5 * (d.sp - .9);
-      let x = d.x + d.bx, y = d.y + d.by, sw = 1, spin = 0;
-      if (d.ft < 0 && d.fl && !reduce && wind > .15 && Math.random() < dt * .3 * Math.min(1, wind)) d.ft = 0;   /* a few get carried off, only by the gust your scrolling makes */
-      if (d.ft >= 0) { d.ft += dt; const k2 = Math.min(1, d.ft / 2.2), up = d.y < H / 2 ? -1 : 1, ph = k2 * Math.PI * 2.2 + d.a * 6.3, L = H * .06 * Math.sin(k2 * Math.PI);
-        x += -k2 * W * .12 + (Math.cos(ph) - Math.cos(d.a * 6.3)) * L; y += up * k2 * k2 * H * .55 + Math.sin(ph) * L; spin += k2 * 8 * (d.a > .5 ? 1 : -1); sw = 1 - .6 * k2;
-        if (k2 >= 1) { d.ft = -2; } }
-      if (d.ft === -2) { sw = 0; }   /* gone until it comes back round from the right */
-      sw *= Math.max(0, Math.min(1, (Math.min(y, H - y) - 2) / (d.r * 1.15)));   /* never cut by the banner's top or bottom: it shrinks away first */
-      if (sw < .05) { d.px = -9e3; d.py = -9e3; d.pr = 0; d.ps = 0; d.inW = false; continue; }
-      d.px = x; d.py = y; d.pr = d.r * sw * 1.08; d.ps = spin; d.inW = false; }   /* (deep in a whirl) */   /* (1.08: room for the organic wobble) */
-    /* no two dots ever overlap: biggest first, each smaller dot shrinks to fit the space it has left */
-    const cs = Math.max(8, H / 9), grid = new Map(), gap = 1.5, ord = D.slice().sort((a, b) => b.r - a.r);
-    for (const d of ord) { const gx = Math.floor(d.px / cs), gy = Math.floor(d.py / cs); let r = d.pr;
-      for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const cell = grid.get((gx + i) * 9973 + gy + j); if (!cell) continue;
-        for (const o of cell) { const room = Math.hypot(d.px - o.px, d.py - o.py) - o.dr - gap; if (room < r) r = room; } }
-      d.dr = r; if (r < 1) continue; const key = gx * 9973 + gy; (grid.get(key) || grid.set(key, []).get(key)).push(d);
-      const rr = r / 1.08; g.setTransform(dpr * rr, 0, 0, dpr * rr, dpr * d.px, dpr * d.py); g.rotate(d.rot + d.ps); g.fillStyle = d.inW && d.blu ? BLUE : d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
-    if (!reduce) raf = requestAnimationFrame(frame); };
-  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) { prev = 0; raf = requestAnimationFrame(frame); } }, { rootMargin: '100px' }).observe(box); })();
+(() => { const box = document.querySelector('.orbit-band'); if (!box || !window.mlBSB) return; const cv = box.querySelector('canvas') || box.appendChild(document.createElement('canvas')); window.mlBreezeOn && mlBreezeOn(cv, box); const g = cv.getContext('2d');
+  /* river 1 without its words, thinner: Netsch's BSB plan in dots (the building blue, the field gold), drifting slowly right to left
+     with river 1's crossing swell. Scroll and the wind comes: it pushes the river along and tosses each dot, then dies down within a moment */
+  const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', purple: '#9b6aa6', teal: '#2a8c8c', red: '#e0503c' };
+  const FK = ['orange', 'orange', 'purple', 'purple', 'pink', 'pink', 'teal', 'red'];
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches, R = (a, b) => a + Math.random() * (b - a), ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const SH = [...Array(12)].map(() => { const q = [R(0, 6.3), R(0, 6.3), R(0, 6.3)], p = new Path2D();
+    for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2, k = 1 + .045 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); }
+    p.closePath(); return p; });
+  let W = 0, H = 0, dpr = 1, L = 1, u = 100, rmax = 10, dots = [], vis = false, raf = 0, last = 0, clock = 0, pos = 0, wind = 0, wdir = 1, lastY = scrollY, built = 0;
+  addEventListener('scroll', () => { const dy = scrollY - lastY; lastY = scrollY; if (!dy) return; wdir = dy > 0 ? 1 : -1; wind = Math.min(2.5, wind + Math.abs(dy) * .015); }, { passive: true });
+  const build = () => { W = box.clientWidth; H = box.clientHeight; if (!W || !H) return; built = W; dpr = Math.min(2, devicePixelRatio || 1); cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    const r1 = document.querySelector('.river.lf'); u = (r1 && r1.offsetHeight ? r1.offsetHeight : innerWidth < 700 ? 540 : Math.min(580, Math.max(360, innerWidth * .4))) / 3;   /* river 1's own dot sizes */
+    const BP = 6 * u; L = Math.ceil(Math.max(W * 2.2, 1600) / BP) * BP;
+    const BQ = mlBSB({ W: L, H, u, seed: 17, periodic: true, gap: 6, edge: 4 }).dots, pOther = Math.min(1, .15 * BQ.length / Math.max(1, BQ.filter(q => !q.b).length));
+    rmax = u * .2 * .34 * 1.6; dots = BQ.map(q => ({ hx: q.x, hy: q.y, r0: q.r * .95, gi: q.x / (u * .3), gj: 2 * q.y / (u * .3), k: q.b ? 'blue' : Math.random() < pOther ? FK[Math.floor(Math.random() * FK.length)] : 'gold',
+      p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * SH.length)], ring: q.ring, ph: R(0, 6.3), fx: R(.3, .9), fy: R(.3, .9), wa: R(1, 2.2), sp: R(.5, 1.5), bx: 0, by: 0 })); };
+  const frame = now => { raf = 0; if (!vis) return; raf = requestAnimationFrame(frame); if (Math.abs(box.clientWidth - built) > 2) build(); if (!W) return;
+    const dt = last ? Math.min(.05, (now - last) / 1000) : .016; last = now; if (!still) clock += dt;
+    const wv = still ? 0 : Math.min(2, wind); wind *= Math.pow(.04, dt);
+    pos += still ? 0 : (14 + 260 * wv * wdir) * dt;   /* calm: river 1's slow drift; the wind carries it on (and back, if you scroll up) */
+    const shift = ((pos % L) + L) % L;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); const out = [];
+    for (const d of dots) { let x = ((d.hx - shift) % L + L) % L; if (x > W + 40) x -= L; if (x < -40 || x > W + 40) continue;
+      /* the wind tosses each dot: a lift and a sway of its own, settling back to its spot when the wind drops */
+      d.bx += (-wdir * wv * (d.sp - 1) * 60 + Math.sin(clock * 3 * d.sp + d.ph) * wv * 40) * dt; d.by += (Math.sin(clock * 2.6 * d.sp + d.ph * 1.7) * wv * 70 - wv * 12) * dt;
+      d.bx -= d.bx * dt * 1.4; d.by -= d.by * dt * 1.4;
+      const bx = x + (still ? 0 : d.wa * Math.sin(clock * d.fx + d.ph)) + d.bx, by = d.hy + (still ? 0 : d.wa * Math.cos(clock * d.fy + d.ph * 1.3)) + d.by;
+      const u1 = Math.sin((d.gi + d.gj / 2) * .42 - clock * 1.5), u2 = Math.sin((d.gi - d.gj / 2) * .36 + clock * 1.05);
+      const r = still ? d.r0 : d.r0 * (.62 + .5 * ss(-.55, .55, (u1 + u2) * .62));   /* river 1's crossing swell */
+      out.push({ d, x: bx, y: by, r, rot: d.ph + (still ? 0 : d.bx * .02) }); }
+    /* nothing touches, nothing is cut by the band's edge: biggest first, each smaller dot shrinks to fit */
+    out.sort((a, b) => b.r - a.r); const cell = Math.max(24, rmax * 2.6), grid = new Map(), K = (a, b) => a * 9973 + b;
+    for (const v of out) { const gx = Math.floor(v.x / cell), gy = Math.floor(v.y / cell); let r = Math.min(v.r, v.y - 3, H - 3 - v.y);
+      for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (const o of grid.get(K(gx + a, gy + b)) || []) r = Math.min(r, Math.hypot(o[0] - v.x, o[1] - v.y) - o[2] - 3);
+      if (r < .8) continue; (grid.get(K(gx, gy)) || grid.set(K(gx, gy), []).get(K(gx, gy))).push([v.x, v.y, r]);
+      g.save(); g.translate(v.x, v.y); g.scale(r, r); g.rotate(v.rot); g.fillStyle = COL[v.d.k]; if (v.d.ring && r > 6 && window.mlHole) mlHole(g, v.d.p); else g.fill(v.d.p); g.restore(); }
+    if (still) { cancelAnimationFrame(raf); raf = 0; } };
+  build(); new ResizeObserver(build).observe(box);
+  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) { last = 0; raf = requestAnimationFrame(frame); } }, { rootMargin: '100px' }).observe(box); })();
 </script>
 </body>
 </html>
