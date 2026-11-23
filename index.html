@@ -4083,9 +4083,10 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
   let wdir = 1; addEventListener('scroll', () => { const dy = scrollY - lastY; if (dy) wdir = dy > 0 ? 1 : -1; wind = Math.min(3, wind + Math.abs(dy) * .02); lastY = scrollY; }, { passive: true });   /* scroll down and the breeze blows them right to left; scroll up and it blows them back */
   const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; D = [];
     const u0 = H / 1.2 / 1.75 * .92, u = u0 * 1.22, Dd = u0 * .2,   /* a wider spread of dots, the same dot sizes */ st = Dd * .456, oy = (H - u) / 2;   /* fewer dots */   /* river 2's own spacing and dot sizes */
-    for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) { const out = Math.max(0, oy - y, y - oy - u), pr = .9 * Math.exp(-Math.pow(out / (H * .1), 1.25));
+    const PW = W + 40, nx = Math.round(PW / st), sx = PW / nx;   /* the lattice fills the whole wrap-around loop evenly: no seam */
+    for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let i = 0; i < nx; i++) { const x = -20 + (i + (row % 2) * .5) * sx; const out = Math.max(0, oy - y, y - oy - u), pr = .9 * Math.exp(-Math.pow(out / (H * .1), 1.25));
       if (Math.random() > pr) continue; const big = Math.random() < .07, v = Math.random();
-      D.push({ x: x + (Math.random() - .5) * st * .5, y: y + (Math.random() - .5) * st * .5, r: Dd * .38 * 1.25 * (big ? .55 + Math.random() * .2 : (.2 + Math.random() * .1) * (out ? .7 + .3 * pr : 1)),
+      D.push({ x: x + (Math.random() - .5) * st * .2, y: y + (Math.random() - .5) * st * .2,   /* calm, like the rivers */ r: Dd * .38 * 1.25 * (big ? .55 + Math.random() * .2 : (.2 + Math.random() * .1) * (out ? .7 + .3 * pr : 1)),
         c: big ? (v < .8 ? BLUE : FILL(v)) : (Math.random() < .5 ? BLUE : FILL(Math.random())),   /* lots of blue */ p: (Math.random() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(Math.random() * 16)], ring: big && Math.random() < .2, rot: Math.random() * 6.3, blu: Math.random() < .75, ox: 0, oy: 0, vx: 0, vy: 0, fl: Math.random() < .06, ft: -1, a: Math.random(), b: Math.random() }); } };
   let FILLC = []; const buildFill = () => { FILLC = []; if (!W) return; const st = H / 1.75 * .92 * .2 * .3; for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) FILLC.push({ x: x + (Math.random() - .5) * st * .4, y: y + (Math.random() - .5) * st * .4, c: Math.random() < .8 ? BLUE : FILL(Math.random()), p: SH[Math.floor(Math.random() * 16)], rot: Math.random() * 6.3 }); };
   build(); buildFill(); new ResizeObserver(() => { build(); buildFill(); }).observe(box);
@@ -4097,13 +4098,17 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
     /* the breeze: every dot floats right to left on its own little current, bobbing and swaying, faster as you scroll. Now and then one is lifted
        right off the banner on a loop, shrinking away before it reaches the edge, and later drifts back in from the right */
     /* the breeze (as in the demo's A): every dot floats right to left on its own little current, bobbing and swaying and turning, all but still until you scroll */
-    const wv = reduce ? 0 : Math.min(2.2, wind), act = reduce ? 0 : .04 + wv, base = W * .09 * act * (wv > .02 ? wdir : 1);   /* the breeze follows your scroll, clearly */ TA += dt * act;
+    const wv = reduce ? 0 : Math.min(2.2, wind), act = reduce ? 0 : wv; TA += dt * (.3 + act);
+    /* calm: the whole field drifts slowly right to left together, like the rivers. Scroll and a breeze blows through: it pushes the field along
+       (right to left as you scroll down, back as you scroll up), and each dot is tossed on its own little current, settling back into place when you stop */
+    const drift = reduce ? 0 : W * .012 + W * .09 * wv * wdir;
     const noise = (x, y, t) => Math.sin(x * 1.7 + t * .9) * Math.cos(y * 1.3 - t * .7) + .5 * Math.sin(x * 3.1 - y * 2.3 + t * 1.3);
-    for (const d of D) { if (d.sp === undefined) { d.sp = .6 + Math.random() * .8; d.ph = Math.random() * 6.3; d.by = 0; d.vx = d.sp; }
-      d.x -= base * d.sp * dt * (1 + d.r / 10); if (d.x < -20) { d.x += W + 40; d.ft = -1; } if (d.x > W + 20) d.x -= W + 40;
-      d.by += Math.sin(TA * 1.3 * d.sp + d.ph) * H * .06 * dt * (1 + 2 * wv) + noise(d.x / W * 3, d.y / H * 2, TA) * H * .02 * dt; d.by -= d.by * dt * .12;   /* its own little current, gently held to the band */
-      if (!reduce) d.rot += dt * (.5 + wv) * (d.sp - .9);
-      let x = d.x, y = d.y + d.by, sw = 1, spin = 0;
+    for (const d of D) { if (d.sp === undefined) { d.sp = .6 + Math.random() * .8; d.ph = Math.random() * 6.3; d.by = 0; d.bx = 0; d.vx = d.sp; }
+      d.x -= drift * dt; if (d.x < -20) { d.x += W + 40; d.ft = -1; } if (d.x > W + 20) d.x -= W + 40;
+      d.bx -= W * .06 * wv * wdir * (d.sp - 1) * (1 + d.r / 10) * dt; d.bx -= d.bx * dt * .8;
+      d.by += (Math.sin(TA * 1.3 * d.sp + d.ph) * H * .14 + noise(d.x / W * 3, d.y / H * 2, TA) * H * .05) * wv * dt; d.by -= d.by * dt * .8;
+      if (!reduce) d.rot += dt * wv * 1.5 * (d.sp - .9);
+      let x = d.x + d.bx, y = d.y + d.by, sw = 1, spin = 0;
       if (d.ft < 0 && d.fl && !reduce && wind > .15 && Math.random() < dt * .3 * Math.min(1, wind)) d.ft = 0;   /* a few get carried off, only by the gust your scrolling makes */
       if (d.ft >= 0) { d.ft += dt; const k2 = Math.min(1, d.ft / 2.2), up = d.y < H / 2 ? -1 : 1, ph = k2 * Math.PI * 2.2 + d.a * 6.3, L = H * .06 * Math.sin(k2 * Math.PI);
         x += -k2 * W * .12 + (Math.cos(ph) - Math.cos(d.a * 6.3)) * L; y += up * k2 * k2 * H * .55 + Math.sin(ph) * L; spin += k2 * 8 * (d.a > .5 ? 1 : -1); sw = 1 - .6 * k2;
