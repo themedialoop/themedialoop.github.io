@@ -4082,7 +4082,7 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
   let W, H, dpr, D = [], vis = false, raf = 0, prev = 0, T = 0, lastY = scrollY, wind = 0, GS = [], gAcc = .7;
   addEventListener('scroll', () => { wind = Math.min(3, wind + Math.abs(scrollY - lastY) * .01); lastY = scrollY; }, { passive: true });
   const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; D = [];
-    const u = H / 1.75 * .92, Dd = u * .2, st = Dd * .335, oy = (H - u) / 2;   /* about 20% fewer dots */   /* river 2's own spacing and dot sizes */
+    const u = H / 1.75 * .92, Dd = u * .2, st = Dd * .387, oy = (H - u) / 2;   /* fewer dots (another 25% down) */   /* river 2's own spacing and dot sizes */
     for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) { const out = Math.max(0, oy - y, y - oy - u), pr = .9 * Math.exp(-Math.pow(out / (H * .1), 1.25));
       if (Math.random() > pr) continue; const big = Math.random() < .07, v = Math.random();
       D.push({ x: x + (Math.random() - .5) * st * .5, y: y + (Math.random() - .5) * st * .5, r: Dd * .38 * (big ? .55 + Math.random() * .2 : (.2 + Math.random() * .1) * (out ? .7 + .3 * pr : 1)),
