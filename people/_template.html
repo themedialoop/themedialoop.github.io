@@ -717,7 +717,8 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     if (!side._dots || side._dkey !== key) { const R = (a, b) => a + Math.random() * (b - a), m = Math.min(w, h), lo = m * (mobile() ? .014 : .009), hi = m * (mobile() ? .085 : .07), AMP = 3 * dpr;
       /* the BSB field (assets/bsbfield.js), as on the landing page: the building in cream, the field in gold */
       const dts = [], blob = () => { const p = new Path2D(), q = [R(0, 6.3), R(0, 6.3), R(0, 6.3)]; for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, kq = 1 + .045 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * kq, Math.sin(a) * kq) : p.moveTo(Math.cos(a) * kq, Math.sin(a) * kq); } p.closePath(); return p; };
-      for (const q of mlBSB({ W: w, H: h, u: (mobile() ? Math.min(w * .3, 150) : Math.min(m * .3, 190)) * dpr / dpr, seed: 31, gap: 2 * dpr + AMP, edge: null }).dots)
+      const BU = (mobile() ? Math.min(r.width * .44, 180) : Math.min(r.height * .44, 240)) * dpr, BG = 7 * dpr + AMP; side._bu = [BU, BG];   /* bigger bays, more room between dots */
+      for (const q of mlBSB({ W: w, H: h, u: BU, seed: 31, gap: BG, edge: null }).dots)
         dts.push({ x: q.x, y: q.y, r: q.r, ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), rot: R(0, 6.3), sp: R(-.25, .25), gold: !q.b, ring: q.ring, st: Math.random(), p: blob() });
       { const cb = Math.max(...[sideIn.querySelector('.p-photo-wrap'), sideIn.querySelector('.p-role'), sideIn.querySelector('.p-intro h1')].filter(Boolean).map(e => e.getBoundingClientRect().bottom - r.top)) * dpr + 18 * dpr;
         for (let i = dts.length - 1; i >= 0; i--) if (dts[i].y - dts[i].r < cb) dts.splice(i, 1); }   /* dots only in the band below the photo, the name and the title */
@@ -753,14 +754,17 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(ar.width * dpr), h = Math.round(cssH * dpr), key = w + 'x' + h;
     if (spill._key !== key) { spill.width = w; spill.height = h; spill.style.width = ar.width + 'px'; spill.style.height = cssH + 'px'; spill.style.left = (ar.left + scrollX) + 'px';
       const R = (a, b) => a + Math.random() * (b - a), hem = x => (D - window.mlHem(Math.min(1, Math.max(0, x / ar.width)), D)) * dpr, dts = []; spill._hem = hem;
-      const n = Math.round(ar.width / (mob ? 9 : 11) * .25), hd = document.querySelector('.mm-top .mm-row, main .bz-h, .p-bio, main h2'),   /* about a quarter as many as before, and clear of the link cards */ stop = hd ? (hd.getBoundingClientRect().top - ar.bottom - (mob ? 24 : 36)) : depth;   /* a band of clear cream before the heading */
-      for (let t = 0; t < n * 40 && dts.length < n; t++) { const x = R(12, ar.width - 12) * dpr, f = Math.pow(Math.random(), 1.8), rr = R(mob ? 3.2 : 3.6, mob ? 7.5 : 10) * (1 - .45 * f) * dpr,
-          y = hem(x / dpr) + rr + (8 + f * (depth - 26)) * dpr;   // most stay close under the hem, a few fall further
-        if (y + rr > h - 4 * dpr || y + rr > (D + stop) * dpr || x - rr < 6 * dpr || x + rr > w - 6 * dpr) continue;
-        if (dts.some(o => Math.hypot(o.x - x, o.y - y) < o.r + rr + 7 * dpr)) continue;
-        const q = [R(0, 6.3), R(0, 6.3), R(0, 6.3)], p = new Path2D();
-        for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, kq = 1 + .045 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * kq, Math.sin(a) * kq) : p.moveTo(kq, 0); }
-        p.closePath(); dts.push({ x, y, r: rr, p, ph: R(0, 6.3), col: (u => u < .5 ? '#2c5494' : u < .7 ? '#e7aa4d' : u < .81 ? '#e0773a' : u < .9 ? '#d8708e' : u < .96 ? '#9b6aa6' : '#2a8c8c')(Math.random()), ring: rr > 5 * dpr && Math.random() < .12, rot: R(0, 6.3) }); }
+      const hd = document.querySelector('.mm-top .mm-row, main .bz-h, .p-bio, main h2'), stop = hd ? (hd.getBoundingClientRect().top - ar.bottom - (mob ? 24 : 36)) : depth;
+      /* the spill is the header's own dot field carried on past the edge: the same plan, sizes and spacing, thinning out as it falls; blue where the header is cream, gold with some other colours where it is gold */
+      const sd = document.querySelector('canvas.side-net'), BB = sd && sd._bu; if (!BB) { spill._key = null; return; }
+      const hh = Math.round(ar.height * dpr), F = mlBSB({ W: w, H: hh + (depth + 20) * dpr, u: BB[0], seed: 31, gap: BB[1], edge: null }).dots;
+      for (const q of F) { const xc = q.x / dpr, ec = ar.height - window.mlHem(Math.min(1, Math.max(0, xc / ar.width)), D), below = q.y / dpr - ec - q.r / dpr;
+        if (below < 6 || below > Math.min(depth, stop) || xc < 8 || xc > ar.width - 8) continue;
+        if (Math.random() > Math.pow(1 - below / depth, 1.6)) continue;   // thinning out as it falls
+        const qq = [R(0, 6.3), R(0, 6.3), R(0, 6.3)], p = new Path2D();
+        for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, kq = 1 + .045 * Math.sin(2 * a + qq[0]) + .03 * Math.sin(3 * a + qq[1]) + .015 * Math.sin(5 * a + qq[2]); i ? p.lineTo(Math.cos(a) * kq, Math.sin(a) * kq) : p.moveTo(kq, 0); }
+        p.closePath(); const u = Math.random();
+        dts.push({ x: q.x, y: q.y - (hh - D * dpr), r: q.r, p, ph: R(0, 6.3), col: q.b ? '#2c5494' : u < .7 ? '#e7aa4d' : u < .82 ? '#e0773a' : u < .92 ? '#d8708e' : '#9b6aa6', ring: q.ring, rot: R(0, 6.3) }); }
       spill._dots = dts; spill._key = key; }
     spill.style.top = top + 'px';
     const g = spill.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, w, h);
