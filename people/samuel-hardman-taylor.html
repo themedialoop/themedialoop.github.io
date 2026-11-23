@@ -1470,11 +1470,11 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
   let x0 = null, y0 = 0, t0 = 0;
   addEventListener('touchstart', e => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; t0 = Date.now(); }, { passive: true });
   addEventListener('touchmove', e => { if (x0 === null) return; const t = e.touches[0], dx = t.clientX - x0, dy = Math.abs(t.clientY - y0);
-    if (dx > 0 && dx > dy * 1.5 && !e.target.closest('.p-marq')) document.body.style.transform = `translateX(${Math.min(dx * .35, 60)}px)`; }, { passive: true });
+    if (dx > 0 && dx > dy * 1.5 && !e.target.closest('.p-marq, .ml-loop')) document.body.style.transform = `translateX(${Math.min(dx * .35, 60)}px)`; }, { passive: true });
   addEventListener('touchend', e => { if (x0 === null) return; const t = e.changedTouches[0], dx = t.clientX - x0, dy = Math.abs(t.clientY - y0); x0 = null;
-    if (dx > 90 && dx > dy * 1.5 && Date.now() - t0 < 800 && !e.target.closest('.p-marq')) go(); else { document.body.style.transition = 'transform .3s'; document.body.style.transform = ''; } });
+    if (dx > 90 && dx > dy * 1.5 && Date.now() - t0 < 800 && !e.target.closest('.p-marq, .ml-loop')) go(); else { document.body.style.transition = 'transform .3s'; document.body.style.transform = ''; } });
   let acc = 0, timer = 0;
-  addEventListener('wheel', e => { if (e.target.closest('.p-marq') || Math.abs(e.deltaX) < Math.abs(e.deltaY) * 1.5) return;
+  addEventListener('wheel', e => { if (e.target.closest('.p-marq, .ml-loop') || Math.abs(e.deltaX) < Math.abs(e.deltaY) * 1.5) return;
     acc += -e.deltaX; clearTimeout(timer); timer = setTimeout(() => acc = 0, 250); if (acc > 160) { acc = 0; go(); } }, { passive: true });
 })();
 </script>
