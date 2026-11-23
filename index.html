@@ -3734,7 +3734,7 @@ html body .ab-pill{overflow-anchor:none}
 /* people cards: one big blue dot, larger than the card, with another colour peeping through where it falls short */
 .people .card canvas.cnet{display:none !important}
 .people .card{background-color:var(--peep,#e7aa4d) !important;background-image:none !important}
-.people .card .bigdot{position:absolute !important;z-index:0;pointer-events:none;width:104% !important;height:auto !important;margin:0 !important;padding:0 !important;flex:none !important;aspect-ratio:1;left:var(--bx,-18%);top:var(--by,-38%);background:#2c5494;border-radius:47% 53% 44% 56% / 52% 45% 55% 48%;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.people .card .bigdot{position:absolute !important;z-index:0;pointer-events:none;width:128% !important;height:auto !important;margin:0 !important;padding:0 !important;flex:none !important;aspect-ratio:1;left:var(--bx,-18%);top:var(--by,-38%);background:#2c5494;border-radius:47% 53% 44% 56% / 52% 45% 55% 48%;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
 .people .card > h3{position:relative;z-index:1}.people .card > .ph-wrap{z-index:1}
 .people .card:hover .bigdot,.people .card:focus-visible .bigdot{transform:translate(-3%,-3%) rotate(-6deg)}
 .people .card:hover{color:#f2eedd !important}
@@ -3742,7 +3742,7 @@ html body .ab-pill{overflow-anchor:none}
 </style>
 <script>
 /* each card gets its own peeping colour and its own corner left uncovered */
-(() => { const P = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c'], POS = [['-6%', '-28%'], ['-14%', '-62%'], ['-30%', '-40%'], ['-4%', '-55%']];   /* each leaves a different corner or edge uncovered */
+(() => { const P = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c'], POS = [['-8%', '-40%'], ['-22%', '-78%'], ['-34%', '-52%'], ['-6%', '-70%']];   /* each leaves a different corner or edge uncovered */
   document.querySelectorAll('.people .card').forEach((c, i) => { const d = document.createElement('span'); d.className = 'bigdot'; d.setAttribute('aria-hidden', 'true'); c.prepend(d);
     const k = Math.floor(Math.random() * P.length); c.style.setProperty('--peep', P[(k + i) % P.length]); const [x, y] = POS[(i + k) % POS.length]; c.style.setProperty('--bx', x); c.style.setProperty('--by', y); }); })();
 </script>
