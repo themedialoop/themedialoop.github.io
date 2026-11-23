@@ -3872,12 +3872,12 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
     for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++) if (hasM(c, r)) { const x = (c + .5) * U, y = y0 + (r + .5) * U, dir = (c + r) % 2 ? -1 : 1;
       out.push(...inBay(x, y, U, dir, c, r));
       for (const [dc, dr] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) { if (hasM(c + dc, r + dr)) continue; const tx = -dr, ty = dc, ax = x + dc * U / 2 - tx * U / 2, ay = y + dr * U / 2 - ty * U / 2, p = [];
-        for (let i = 0; i <= teeth * 2; i++) { const f = i / (teeth * 2), o = i % 2 ? .45 * U / teeth : 0; p.push([ax + tx * f * U + dc * o, ay + ty * f * U + dr * o]); } out.push({ pts: p, closed: 0 }); } }
+        for (let i = 0; i <= teeth * 2; i++) { const f = i / (teeth * 2), o = i % 2 ? .3 * U / teeth : 0; p.push([ax + tx * f * U + dc * o, ay + ty * f * U + dr * o]); } out.push({ pts: p, closed: 0 }); } }
     out.PW = cols * U; return out; };
   const M2 = ['.#####.##', '###.#####'];   /* two bays deep, a few bays missing, like the real block */
   const BANDS = [
     { name: 'E1 · Turned squares', note: 'The footprint’s serrated outer wall in big blue dots; inside, one turned square per bay in smaller blue dots, turning as you scroll (neighbours the other way); colour everywhere else.',
-      b: FP(M2, (x, y, U, dir) => [{ ...dia(x, y, U * .34), fine: 1, rc: [x, y], dir }]) },
+      b: FP(M2, (x, y, U, dir) => [{ ...dia(x, y, U * .4), fine: 1, rc: [x, y], dir }]) },
   ].map(o => ({ ...o, build: o.b, PW: o.b().PW }));
   const resample = (pts, step, closed) => { const P = closed ? [...pts, pts[0]] : pts, out = [P[0]]; let carry = 0;
     for (let i = 1; i < P.length; i++) { const [ax, ay] = P[i - 1], [bx, by] = P[i], seg = Math.hypot(bx - ax, by - ay); if (!seg) continue; let t = step - carry;
@@ -3899,13 +3899,13 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
       const add = d => { dots.push(d); const q = gk(Math.floor(d.x / cs) % nI, Math.floor(d.y / cs)); (G.get(q) || G.set(q, []).get(q)).push(d); };
       const put = (x, y, sz, col, gp, line, s) => { x = ((x % P) + P) % P; const R = D * .46 * sz; if (y < R + 1 || y > H - R - 1 || clash(x, y, R, gp)) return false; add({ x, y, R, sz, col, line, s, ring: rnd() < .15, hi: Math.floor(rnd() * 3), bl: blob() }); return true; };
       const shapes = bd.build(); for (const pass of [0, 1]) shapes.forEach((sh, li) => { if (!!sh.fine !== !!pass) return;
-        const pts = resample(sh.pts.map(([x, y]) => [x * k, oy + y * k]), 1, sh.closed), sp = sh.fine ? D * .95 : D * 1.25;
+        const pts = resample(sh.pts.map(([x, y]) => [x * k, oy + y * k]), 1, sh.closed), sp = sh.fine ? D * .82 : D * 1.05;
         if (sh.solo) { const ok = put(sh.pts[0][0] * k, oy + sh.pts[0][1] * k, sh.big ? 1.9 : 1.15, '#2c5494', D * .2, li, 0); if (ok && sh.rc) { const d = dots[dots.length - 1], cx = ((sh.rc[0] * k) % P + P) % P, cy = oy + sh.rc[1] * k; d.rc = [cx, cy]; d.rr = Math.hypot(d.x - cx, d.y - cy); d.ang = Math.atan2(d.y - cy, d.x - cx); d.dir = sh.dir; d.inner = sh.inner * k; } return; }
-        for (let s = 0; s < pts.length; s += sp) { const ok = put(pts[Math.floor(s)][0], pts[Math.floor(s)][1], sh.fine ? .78 + rnd() * .12 : 1 + rnd() * .25, '#2c5494', sh.fine ? D * .3 : D * .12, li, s); if (ok && sh.rc) { const d = dots[dots.length - 1], cx = ((sh.rc[0] * k) % P + P) % P, cy = oy + sh.rc[1] * k; d.rc = [cx, cy]; d.rr = Math.hypot(d.x - cx, d.y - cy); d.ang = Math.atan2(d.y - cy, d.x - cx); d.dir = sh.dir; d.spin = sh.spin || 1; d.inner = 0; } } });
+        for (let s = 0; s < pts.length; s += sp) { const ok = put(pts[Math.floor(s)][0], pts[Math.floor(s)][1], sh.fine ? .82 + rnd() * .1 : 1 + rnd() * .2, '#2c5494', sh.fine ? D * .3 : D * .12, li, s); if (ok && sh.rc) { const d = dots[dots.length - 1], cx = ((sh.rc[0] * k) % P + P) % P, cy = oy + sh.rc[1] * k; d.rc = [cx, cy]; d.rr = Math.hypot(d.x - cx, d.y - cy); d.ang = Math.atan2(d.y - cy, d.x - cx); d.dir = sh.dir; d.spin = sh.spin || 1; d.inner = 0; } } });
       const BAYS = []; for (const d of dots) if (d.rc) { const b = BAYS.find(b => b[0] === d.rc[0] && b[1] === d.rc[1]); if (b) { b[2] = Math.max(b[2], d.rr + d.R); b[3] = Math.min(b[3], (d.inner || d.rr) - d.R * 1.5); } else BAYS.push([d.rc[0], d.rc[1], d.rr + d.R, (d.inner || d.rr) - d.R * 1.5]); }
-      const st = D * .72;   /* filler, packed in the band and sprinkling out past its edges */
+      const st = D * .66;   /* filler, packed in the band and sprinkling out past its edges */
       for (let y = st * .4, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < P; x += st) { const out = Math.max(0, oy - y, y - oy - core), pr = .88 * Math.exp(-Math.pow(out / (H * .09), 1.3));
-        const px = x + (rnd() - .5) * st * .5, py = y + (rnd() - .5) * st * .5, near = BAYS.some(b => { const q = Math.hypot(wx(px, b[0]), py - b[1]); return false; });   /* colour everywhere: small dots step aside as the stairs turn past them */   /* colour may fill the middle of a bay, but never the ring its shape sweeps */ if (!near && rnd() < pr) put(px, py, (.3 + rnd() * .12) * (out ? .75 + .25 * pr : 1), FILL[Math.floor(rnd() * FILL.length)], D * .08, -1, 0); } };
+        const px = x + (rnd() - .5) * st * .5, py = y + (rnd() - .5) * st * .5, near = BAYS.some(b => { const q = Math.hypot(wx(px, b[0]), py - b[1]); return false; });   /* colour everywhere: small dots step aside as the stairs turn past them */   /* colour may fill the middle of a bay, but never the ring its shape sweeps */ if (!near && rnd() < pr) put(px, py, (.24 + rnd() * .08) * (out ? .75 + .25 * pr : 1), FILL[Math.floor(rnd() * FILL.length)], D * .08, -1, 0); } };
     build(); new ResizeObserver(build).observe(box);
     const drawBlob = (x, y, b, r) => { const m = b.k.length; g.beginPath(); for (let i = 0; i <= m; i++) { const a = i / m * 6.283 + b.ph, qx = x + Math.cos(a) * r * b.k[i % m], qy = y + Math.sin(a) * r * b.k[i % m];
       if (!i) g.moveTo(qx, qy); else { const a0 = (i - .5) / m * 6.283 + b.ph, r0 = r * (b.k[i - 1] + b.k[i % m]) / 2 * 1.06; g.quadraticCurveTo(x + Math.cos(a0) * r0, y + Math.sin(a0) * r0, qx, qy); } } };
@@ -3929,5 +3929,11 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
 })();
 
 </script>
+<style>
+/* the ring of dots grows with the circle on hover, so the buffer between them stays */
+html body .res .r-go canvas.rg-ring{transition:scale .7s cubic-bezier(.3,1.4,.4,1)}
+html body .res:is(:hover,:focus-within) .r-go canvas.rg-ring{scale:1.09}
+@media (prefers-reduced-motion:reduce){html body .res:is(:hover,:focus-within) .r-go canvas.rg-ring{scale:none}}
+</style>
 </body>
 </html>
