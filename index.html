@@ -3778,7 +3778,7 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
 @media (prefers-reduced-motion:reduce){.res .r-go .rg-ring{animation:none}}
 </style>
 <script>
-(() => { const RING = { bd1: '#d8708e', bd2: '#e0773a', bd3: '#d8708e', bd4: '#e7aa4d', bd5: '#f2eedd', bd6: '#d8708e' };
+(() => { const RING = { bd1: '#f2eedd', bd2: '#e7aa4d', bd3: '#f2eedd', bd4: '#e7aa4d', bd5: '#f2eedd', bd6: '#f2eedd' };   /* cream or gold, whichever shows on the card */
   const shape = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
     for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
     p.closePath(); return p; };
