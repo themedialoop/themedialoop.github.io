@@ -3807,141 +3807,139 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
   draw(); addEventListener('resize', draw); setTimeout(draw, 600); })();
 </script>
 <style>
-.orbit-band{position:relative;height:clamp(200px,17vw,260px);width:112vw;margin:clamp(30px,5vw,70px) 0 clamp(10px,2vw,30px) calc(50% - 56vw);rotate:-3deg;pointer-events:none}   /* tipped down from right to left */
+.orbit-band{position:relative;height:clamp(330px,30vw,450px);width:112vw;margin:clamp(0px,1vw,16px) 0 clamp(0px,1vw,16px) calc(50% - 56vw);rotate:-3deg;pointer-events:none}   /* the same size as the river before Resources, tipped down from right to left */
 .orbit-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 <script>
-/* the footprint band before Join Our Orbit: Everything at once, simplified (E1) */
-
+/* the band before Join Our Orbit (D1c): river 2's long diagonals with a zigzag laid over them; hexagons and squares step up and down
+   the band and turn as you scroll, spurs of 8-10 dots run out from each, and the whole thing flows right to left (downhill) */
 (() => {
-  const HOLES = ['M -0.138 0.486 Q -0.120 0.483 -0.102 0.479 Q -0.084 0.475 -0.066 0.470 Q -0.049 0.465 -0.031 0.458 Q -0.014 0.452 0.003 0.445 Q 0.020 0.437 0.036 0.429 Q 0.052 0.420 0.068 0.410 Q 0.085 0.401 0.100 0.390 Q 0.116 0.381 0.131 0.369 Q 0.146 0.358 0.161 0.347 Q 0.175 0.335 0.189 0.323 Q 0.203 0.311 0.218 0.299 Q 0.232 0.286 0.245 0.273 Q 0.259 0.261 0.271 0.247 Q 0.284 0.234 0.297 0.220 Q 0.309 0.206 0.321 0.192 Q 0.333 0.178 0.344 0.163 Q 0.356 0.148 0.367 0.133 Q 0.378 0.118 0.388 0.102 Q 0.398 0.087 0.408 0.071 Q 0.418 0.055 0.427 0.039 Q 0.436 0.022 0.444 0.005 Q 0.452 -0.011 0.460 -0.029 Q 0.467 -0.046 0.473 -0.063 Q 0.479 -0.081 0.484 -0.099 Q 0.489 -0.117 0.492 -0.135 Q 0.496 -0.153 0.498 -0.171 Q 0.500 -0.189 0.500 -0.208 Q 0.500 -0.226 0.498 -0.245 Q 0.497 -0.263 0.493 -0.281 Q 0.489 -0.299 0.483 -0.316 Q 0.477 -0.333 0.469 -0.350 Q 0.461 -0.366 0.450 -0.381 Q 0.440 -0.396 0.428 -0.409 Q 0.415 -0.422 0.401 -0.433 Q 0.387 -0.445 0.371 -0.454 Q 0.355 -0.463 0.339 -0.470 Q 0.322 -0.477 0.304 -0.481 Q 0.286 -0.486 0.268 -0.488 Q 0.250 -0.490 0.231 -0.491 Q 0.213 -0.491 0.195 -0.489 Q 0.176 -0.487 0.158 -0.484 Q 0.140 -0.481 0.122 -0.475 Q 0.104 -0.471 0.087 -0.464 Q 0.069 -0.458 0.052 -0.451 Q 0.035 -0.443 0.018 -0.435 Q 0.001 -0.427 -0.015 -0.418 Q -0.032 -0.409 -0.047 -0.399 Q -0.063 -0.389 -0.079 -0.379 Q -0.094 -0.369 -0.110 -0.358 Q -0.125 -0.347 -0.140 -0.336 Q -0.155 -0.325 -0.169 -0.314 Q -0.184 -0.302 -0.198 -0.290 Q -0.213 -0.278 -0.227 -0.266 Q -0.240 -0.253 -0.254 -0.240 Q -0.267 -0.228 -0.280 -0.214 Q -0.294 -0.202 -0.306 -0.188 Q -0.320 -0.175 -0.332 -0.161 Q -0.345 -0.147 -0.357 -0.133 Q -0.369 -0.119 -0.381 -0.104 Q -0.392 -0.089 -0.403 -0.074 Q -0.414 -0.059 -0.424 -0.043 Q -0.433 -0.027 -0.442 -0.011 Q -0.451 0.005 -0.459 0.022 Q -0.466 0.039 -0.473 0.056 Q -0.479 0.074 -0.484 0.092 Q -0.489 0.109 -0.493 0.127 Q -0.496 0.145 -0.498 0.164 Q -0.500 0.183 -0.500 0.201 Q -0.500 0.220 -0.499 0.238 Q -0.497 0.256 -0.493 0.274 Q -0.490 0.292 -0.483 0.309 Q -0.477 0.326 -0.468 0.342 Q -0.460 0.357 -0.449 0.372 Q -0.438 0.387 -0.425 0.399 Q -0.412 0.413 -0.398 0.424 Q -0.383 0.435 -0.368 0.444 Q -0.352 0.453 -0.335 0.460 Q -0.318 0.468 -0.301 0.474 Q -0.283 0.479 -0.265 0.483 Q -0.247 0.486 -0.229 0.489 Q -0.211 0.491 -0.193 0.490 Q -0.174 0.490 -0.165 0.489 Q -0.156 0.489 -0.138 0.486 Z','M -0.201 0.491 Q -0.181 0.485 -0.161 0.478 Q -0.141 0.471 -0.122 0.462 Q -0.102 0.453 -0.084 0.443 Q -0.065 0.433 -0.047 0.421 Q -0.028 0.410 -0.010 0.398 Q 0.007 0.386 0.024 0.373 Q 0.041 0.360 0.058 0.347 Q 0.075 0.333 0.091 0.319 Q 0.107 0.305 0.122 0.291 Q 0.138 0.276 0.153 0.260 Q 0.167 0.244 0.181 0.228 Q 0.195 0.212 0.208 0.196 Q 0.222 0.179 0.235 0.163 Q 0.249 0.146 0.262 0.129 Q 0.275 0.112 0.287 0.094 Q 0.299 0.077 0.311 0.059 Q 0.323 0.042 0.334 0.023 Q 0.345 0.005 0.355 -0.013 Q 0.366 -0.032 0.376 -0.051 Q 0.385 -0.070 0.395 -0.089 Q 0.404 -0.108 0.413 -0.128 Q 0.422 -0.147 0.430 -0.167 Q 0.439 -0.186 0.446 -0.206 Q 0.453 -0.227 0.459 -0.247 Q 0.465 -0.267 0.469 -0.288 Q 0.473 -0.308 0.475 -0.329 Q 0.476 -0.350 0.475 -0.370 Q 0.473 -0.390 0.467 -0.409 Q 0.461 -0.428 0.451 -0.444 Q 0.440 -0.459 0.425 -0.471 Q 0.410 -0.482 0.391 -0.489 Q 0.373 -0.496 0.353 -0.498 Q 0.332 -0.500 0.312 -0.498 Q 0.291 -0.497 0.270 -0.493 Q 0.250 -0.489 0.229 -0.483 Q 0.209 -0.477 0.189 -0.469 Q 0.169 -0.462 0.149 -0.454 Q 0.130 -0.445 0.111 -0.436 Q 0.091 -0.427 0.072 -0.417 Q 0.052 -0.407 0.034 -0.396 Q 0.015 -0.385 -0.003 -0.374 Q -0.021 -0.362 -0.038 -0.350 Q -0.056 -0.338 -0.073 -0.325 Q -0.090 -0.312 -0.107 -0.299 Q -0.123 -0.285 -0.140 -0.272 Q -0.156 -0.258 -0.172 -0.244 Q -0.189 -0.230 -0.204 -0.215 Q -0.219 -0.200 -0.234 -0.184 Q -0.248 -0.169 -0.262 -0.152 Q -0.276 -0.136 -0.290 -0.119 Q -0.303 -0.102 -0.316 -0.086 Q -0.329 -0.069 -0.341 -0.051 Q -0.353 -0.034 -0.365 -0.016 Q -0.376 0.002 -0.386 0.021 Q -0.397 0.040 -0.407 0.058 Q -0.417 0.077 -0.425 0.097 Q -0.434 0.116 -0.441 0.136 Q -0.449 0.156 -0.455 0.176 Q -0.461 0.196 -0.466 0.217 Q -0.471 0.237 -0.474 0.257 Q -0.476 0.278 -0.476 0.298 Q -0.475 0.319 -0.471 0.339 Q -0.467 0.359 -0.459 0.378 Q -0.451 0.397 -0.440 0.414 Q -0.428 0.431 -0.413 0.445 Q -0.398 0.459 -0.381 0.469 Q -0.363 0.480 -0.344 0.487 Q -0.325 0.494 -0.305 0.497 Q -0.284 0.500 -0.263 0.499 Q -0.243 0.499 -0.232 0.497 Q -0.222 0.496 -0.201 0.491 Z','M -0.169 0.475 Q -0.150 0.472 -0.132 0.467 Q -0.113 0.462 -0.096 0.456 Q -0.077 0.451 -0.060 0.444 Q -0.042 0.437 -0.024 0.430 Q -0.006 0.422 0.011 0.413 Q 0.028 0.404 0.045 0.395 Q 0.061 0.386 0.078 0.376 Q 0.094 0.366 0.111 0.355 Q 0.127 0.345 0.142 0.334 Q 0.158 0.323 0.173 0.311 Q 0.188 0.299 0.202 0.287 Q 0.217 0.274 0.231 0.261 Q 0.245 0.248 0.258 0.235 Q 0.273 0.221 0.286 0.208 Q 0.299 0.194 0.312 0.180 Q 0.325 0.166 0.338 0.152 Q 0.350 0.137 0.362 0.122 Q 0.374 0.107 0.386 0.092 Q 0.397 0.077 0.407 0.061 Q 0.418 0.045 0.428 0.028 Q 0.437 0.011 0.446 -0.006 Q 0.454 -0.023 0.461 -0.041 Q 0.469 -0.059 0.475 -0.077 Q 0.481 -0.095 0.486 -0.113 Q 0.491 -0.132 0.494 -0.150 Q 0.498 -0.169 0.499 -0.188 Q 0.500 -0.207 0.500 -0.225 Q 0.499 -0.244 0.495 -0.262 Q 0.492 -0.281 0.486 -0.299 Q 0.481 -0.317 0.473 -0.334 Q 0.466 -0.351 0.455 -0.367 Q 0.445 -0.383 0.432 -0.396 Q 0.419 -0.410 0.405 -0.422 Q 0.390 -0.434 0.374 -0.443 Q 0.358 -0.452 0.340 -0.459 Q 0.323 -0.467 0.305 -0.471 Q 0.287 -0.476 0.268 -0.479 Q 0.249 -0.482 0.230 -0.483 Q 0.211 -0.483 0.193 -0.482 Q 0.174 -0.481 0.155 -0.478 Q 0.136 -0.475 0.118 -0.470 Q 0.099 -0.466 0.082 -0.459 Q 0.064 -0.453 0.047 -0.446 Q 0.029 -0.438 0.012 -0.430 Q -0.005 -0.421 -0.022 -0.412 Q -0.038 -0.403 -0.054 -0.393 Q -0.071 -0.383 -0.087 -0.372 Q -0.103 -0.361 -0.118 -0.350 Q -0.134 -0.339 -0.149 -0.327 Q -0.163 -0.315 -0.178 -0.302 Q -0.193 -0.289 -0.207 -0.276 Q -0.220 -0.262 -0.234 -0.249 Q -0.248 -0.235 -0.261 -0.221 Q -0.275 -0.208 -0.288 -0.193 Q -0.301 -0.179 -0.314 -0.165 Q -0.327 -0.150 -0.339 -0.135 Q -0.351 -0.121 -0.363 -0.105 Q -0.374 -0.090 -0.386 -0.075 Q -0.397 -0.059 -0.407 -0.043 Q -0.417 -0.027 -0.427 -0.010 Q -0.436 0.007 -0.445 0.024 Q -0.453 0.041 -0.461 0.058 Q -0.468 0.076 -0.474 0.094 Q -0.481 0.112 -0.485 0.130 Q -0.490 0.148 -0.494 0.166 Q -0.497 0.185 -0.499 0.203 Q -0.500 0.222 -0.499 0.240 Q -0.498 0.258 -0.495 0.276 Q -0.491 0.294 -0.485 0.312 Q -0.480 0.329 -0.472 0.346 Q -0.464 0.363 -0.453 0.378 Q -0.443 0.394 -0.430 0.407 Q -0.417 0.420 -0.402 0.432 Q -0.387 0.443 -0.371 0.452 Q -0.354 0.460 -0.336 0.467 Q -0.318 0.472 -0.300 0.476 Q -0.281 0.480 -0.262 0.482 Q -0.244 0.483 -0.225 0.482 Q -0.206 0.481 -0.197 0.480 Q -0.187 0.479 -0.169 0.475 Z'].map(d => new Path2D(d));   /* the counters of the wordmark's two o's and its d */
-  const R2 = Math.SQRT1_2;
-  /* ---- shapes, in a 100 x 100 plan; each returns a closed or open polyline ---- */
-  const rot = (p, cx, cy, a) => { const c = Math.cos(a), s = Math.sin(a); return p.map(([x, y]) => [cx + (x - cx) * c - (y - cy) * s, cy + (x - cx) * s + (y - cy) * c]); };
-  const sq = (cx, cy, h, a = 0) => ({ pts: rot([[cx - h, cy - h], [cx + h, cy - h], [cx + h, cy + h], [cx - h, cy + h]], cx, cy, a), closed: 1 });
-  const dia = (cx, cy, h) => sq(cx, cy, h, Math.PI / 4);
-  const oct = (cx, cy, h) => { const t = h * .4142, p = [[cx + h, cy - t], [cx + h, cy + t], [cx + t, cy + h], [cx - t, cy + h], [cx - h, cy + t], [cx - h, cy - t], [cx - t, cy - h], [cx + t, cy - h]]; return { pts: p, closed: 1 }; };
-  const step = (cx, cy, h, n, a = 0) => {   /* a square whose sides step in and out at 45°: Netsch's sawtooth edge */
-    const p = [], e = 2 * h / n, side = (x0, y0, dx, dy, nx, ny) => { for (let i = 0; i < n; i++) { const x = x0 + dx * e * i, y = y0 + dy * e * i; p.push([x, y], [x + dx * e / 2 + nx * e / 2, y + dy * e / 2 + ny * e / 2]); } };
-    side(cx - h, cy - h, 1, 0, 0, -1); side(cx + h, cy - h, 0, 1, 1, 0); side(cx + h, cy + h, -1, 0, 0, 1); side(cx - h, cy + h, 0, -1, -1, 0);
-    return { pts: rot(p, cx, cy, a), closed: 1 }; };
-  const ln = (...p) => ({ pts: p, closed: 0 });
-  const hex = (cx, cy, h, a = 0) => ({ pts: rot([0, 1, 2, 3, 4, 5].map(i => [cx + h * Math.cos(i * Math.PI / 3), cy + h * Math.sin(i * Math.PI / 3)]), cx, cy, a), closed: 1 });
-  const zig = (x, y0, y1, n, d) => { const p = [], e = (y1 - y0) / n; for (let i = 0; i <= n; i++) p.push([x + (i % 2 ? d : 0), y0 + e * i]); return { pts: p, closed: 0 }; };   /* the triangular, saw-toothed outer wall */
+const HOLE = new Path2D('M -0.42 0.05 C -0.40 -0.22 -0.18 -0.43 0.08 -0.41 C 0.32 -0.39 0.46 -0.17 0.43 0.07 C 0.40 0.30 0.18 0.45 -0.06 0.43 C -0.28 0.41 -0.44 0.27 -0.42 0.05 Z');
+const BLUE = '#2c5494', CREAM = '#f2eedd';
+const FILL = v => v < .4 ? '#e7aa4d' : v < .56 ? '#e0773a' : v < .7 ? '#d8708e' : v < .82 ? '#9b6aa6' : v < .9 ? '#2a8c8c' : BLUE;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const PIECES = [
-    { name: 'The seed', note: 'The rotated square the whole building grows from.', build: () => [
-      sq(50, 50, 34), dia(50, 50, 34), sq(50, 50, 17), dia(50, 50, 12), ln([16, 50], [84, 50]), ln([50, 16], [50, 84])] },
-    { name: 'Ground floor', note: 'Lecture-hall pods and the cafeteria strung on a long spine, the edge stepping in and out.', build: () => [
-      step(50, 52, 40, 8), ln([14, 52], [86, 52]), dia(28, 52, 12), dia(72, 52, 12), oct(50, 52, 10), sq(28, 52, 5), sq(72, 52, 5), ln([50, 18], [50, 86])] },
-    { name: 'Second floor', note: 'A ring of rooms round the open stair wells, corridors cutting across at 45°.', build: () => [
-      oct(50, 50, 38), oct(50, 50, 26), ln([24, 24], [76, 76]), ln([76, 24], [24, 76]), dia(50, 50, 9), sq(26, 50, 4), sq(74, 50, 4)] },
-    { name: 'Third floor', note: 'The three office towers rising out of the base, each a rotated square, joined by short bridges.', build: () => [
-      dia(24, 60, 16), dia(50, 36, 16), dia(76, 60, 16), sq(24, 60, 6), sq(50, 36, 6), sq(76, 60, 6), ln([35, 49], [39, 47]), ln([61, 47], [65, 49]), ln([24, 77], [24, 90]), ln([76, 77], [76, 90])] },
-    { name: 'Fourth floor', note: 'Just the tops of the towers: nested squares turning inside one another.', build: () => [
-      step(26, 62, 13, 3, Math.PI / 4), sq(26, 62, 6), step(74, 62, 13, 3, Math.PI / 4), sq(74, 62, 6), step(50, 30, 13, 3, Math.PI / 4), dia(50, 30, 6)] },
-    { name: 'The stairs', note: 'The big sculptural stair: squares nested and turning as they climb.', build: () => [
-      sq(50, 50, 38), sq(50, 50, 30, .2), sq(50, 50, 22, .4), sq(50, 50, 14, .6), sq(50, 50, 7, .8)] },
-    { name: 'All four floors', note: 'The floors laid over one another, a little out of register.', wide: 1, build: () => {
-      const f = (fn, dx, dy, s, c) => fn().map(sh => ({ ...sh, c, pts: sh.pts.map(([x, y]) => [50 + (x - 50) * s + dx, 50 + (y - 50) * s + dy]) }));
-      const W0 = [zig(-58, 4, 96, 6, 13), hex(-28, 27, 14), hex(-28, 27, 7, Math.PI / 6), hex(-28, 73, 14), hex(-28, 73, 7, Math.PI / 6), ln([-44, 50], [-30, 41], [-16, 50], [-30, 59], [-44, 50])].map(sh => ({ ...sh, fine: 1 }));   /* the west end: double saw-tooth wall, nested hexagons, triangles, drawn in finer dots */
-      return [...W0, ...f(PIECES[1].build, -60, 0, .9, '#2c5494'), ...f(PIECES[2].build, -20, 0, .9, '#2a8c8c'), ...f(PIECES[3].build, 20, 0, .9, '#e0503c'), ...f(PIECES[4].build, 60, 0, .9, '#9b6aa6')]; } },
-  ];
-
-
-  const F = (...sh) => sh.map(x => ({ ...x, fine: 1 }));
-  /* the footprint field (Everything at once): 6 x 3 bays, corners missing, repeating */
-  const MASK = ['.####.', '######', '.##.##'], has = (c, r) => r >= 0 && r < 3 && MASK[r][((c % 6) + 6) % 6] === '#';
-  const footprint = (U, y0, c0, c1, teeth) => { const out = [], cells = [];
-    for (let c = c0; c < c1; c++) for (let r = 0; r < 3; r++) if (has(c, r)) { const x = (c + .5) * U, y = y0 + (r + .5) * U; cells.push([x, y]);
-      for (const [dc, dr] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) { if (has(c + dc, r + dr)) continue; const tx = -dr, ty = dc, ax = x + dc * U / 2 - tx * U / 2, ay = y + dr * U / 2 - ty * U / 2, p = [];
-        for (let i = 0; i <= teeth * 2; i++) { const f = i / (teeth * 2), o = i % 2 ? .5 * U / teeth : 0; p.push([ax + tx * f * U + dc * o, ay + ty * f * U + dr * o]); } out.push({ pts: p, closed: 0 }); } }
-    return { out, cells }; };
-  /* all four floors, as one repeat 230 wide, 100 tall */
-  const floors = (withWest) => { const f = (fn, dx, s) => fn().map(sh => ({ ...sh, pts: sh.pts.map(([x, y]) => [50 + (x - 50) * s + dx, 50 + (y - 50) * s]) }));
-    const W0 = F(zig(-58, 4, 96, 6, 13), hex(-28, 27, 14), hex(-28, 27, 7, Math.PI / 6), hex(-28, 73, 14), hex(-28, 73, 7, Math.PI / 6), ln([-44, 50], [-30, 41], [-16, 50], [-30, 59], [-44, 50]));
-    return [...(withWest ? W0 : []), ...f(PIECES[1].build, -60 + 0, .9), ...f(PIECES[2].build, -20, .9), ...f(PIECES[3].build, 20, .9), ...f(PIECES[4].build, 60, .9)].map(sh => ({ ...sh, pts: sh.pts.map(([x, y]) => [x + 70, y]) })); };
-  const tr = (shs, f) => shs.map(sh => ({ ...sh, pts: sh.pts.map(f) }));
-  const FL = [1, 2, 3, 4].map(k => PIECES[k].build());   /* ground, second, third and fourth floors, each in a 100 x 100 tile */
-  /* Everything at once, skinny: the footprint's serrated wall stays still; in every bay a turned square and an octagon turn as you scroll (neighbours the other way) */
-  const EV = (rows, mask, teeth) => () => { const U = 100 / (rows + .35), y0 = (100 - rows * U) / 2, hasM = (c, r) => r >= 0 && r < rows && mask[r][((c % 6) + 6) % 6] === '#', out = [];
-    for (let c = 0; c < 6; c++) for (let r = 0; r < rows; r++) if (hasM(c, r)) { const x = (c + .5) * U, y = y0 + (r + .5) * U, dir = (c + r) % 2 ? -1 : 1;
-      out.push({ ...dia(x, y, U * .31), fine: 1, rc: [x, y], dir }, { ...oct(x, y, U * .16), fine: 1, rc: [x, y], dir });
-      for (const [dc, dr] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) { if (hasM(c + dc, r + dr)) continue; const tx = -dr, ty = dc, ax = x + dc * U / 2 - tx * U / 2, ay = y + dr * U / 2 - ty * U / 2, p = [];
-        for (let i = 0; i <= teeth * 2; i++) { const f = i / (teeth * 2), o = i % 2 ? .5 * U / teeth : 0; p.push([ax + tx * f * U + dc * o, ay + ty * f * U + dr * o]); } out.push({ pts: p, closed: 0 }); } }
-    out.PW = 6 * U; return out; };
-  /* the full footprint, made readable at this size: one shape per bay instead of two, fewer, larger dots, and the bays filled with colour */
-  const EVA = (mode) => () => { const rows = 3, mask = ['.####.', '######', '.##.##'], U = 100 / (rows + .35), y0 = (100 - rows * U) / 2, hasM = (c, r) => r >= 0 && r < rows && mask[r][((c % 6) + 6) % 6] === '#', out = [];
-    for (let c = 0; c < 6; c++) for (let r = 0; r < rows; r++) if (hasM(c, r)) { const x = (c + .5) * U, y = y0 + (r + .5) * U, dir = (c + r) % 2 ? -1 : 1;
-      if (mode === 'sq') out.push({ ...dia(x, y, U * .3), fine: 1, rc: [x, y], dir, inner: U * .3 });
-      if (mode === 'corners') for (let q = 0; q < 4; q++) { const a = q * Math.PI / 2; out.push({ pts: [[x + Math.cos(a) * U * .32, y + Math.sin(a) * U * .32]], closed: 0, rc: [x, y], dir, inner: U * .22, solo: 1 }); }
-      if (mode === 'dot') out.push({ pts: [[x, y]], closed: 0, solo: 1, big: 1 });
-      for (const [dc, dr] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) { if (hasM(c + dc, r + dr)) continue; const tx = -dr, ty = dc, ax = x + dc * U / 2 - tx * U / 2, ay = y + dr * U / 2 - ty * U / 2;
-        out.push({ pts: [[ax, ay], [ax + tx * U, ay + ty * U]], closed: 0 }); } }
-    out.PW = 6 * U; return out; };
-  /* Everything at once, simplified: the footprint repeats; only its OUTER serrated wall is drawn (no inside walls),
-     and each bay holds one blue shape that turns as you scroll; colour fills everything else */
-  const FP = (mask, inBay, teeth = 2) => () => { const rows = mask.length, U = 100 / (rows + .3), y0 = (100 - rows * U) / 2, cols = mask[0].length,
-      hasM = (c, r) => r >= 0 && r < rows && mask[r][((c % cols) + cols) % cols] === '#', out = [];
-    for (let c = 0; c < cols; c++) for (let r = 0; r < rows; r++) if (hasM(c, r)) { const x = (c + .5) * U, y = y0 + (r + .5) * U, dir = (c + r) % 2 ? -1 : 1;
-      out.push(...inBay(x, y, U, dir, c, r));
-      for (const [dc, dr] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) { if (hasM(c + dc, r + dr)) continue; const tx = -dr, ty = dc, ax = x + dc * U / 2 - tx * U / 2, ay = y + dr * U / 2 - ty * U / 2, p = [];
-        for (let i = 0; i <= teeth * 2; i++) { const f = i / (teeth * 2), o = i % 2 ? .3 * U / teeth : 0; p.push([ax + tx * f * U + dc * o, ay + ty * f * U + dr * o]); } out.push({ pts: p, closed: 0 }); } }
-    out.PW = cols * U; return out; };
-  const M2 = ['.#####.##', '###.#####'];   /* two bays deep, a few bays missing, like the real block */
-  const BANDS = [
-    { name: 'E1 · Turned squares', note: 'The footprint’s serrated outer wall in big blue dots; inside, one turned square per bay in smaller blue dots, turning as you scroll (neighbours the other way); colour everywhere else.',
-      b: FP(['#######'], (x, y, U, dir) => [{ ...sq(x, y, U * .3), fine: 1, rc: [x, y], dir }], 3) },   /* one row: a big square turning in each bay, the serrated wall above and below */
-  ].map(o => ({ ...o, build: o.b, PW: o.b().PW }));
-  const resample = (pts, step, closed) => { const P = closed ? [...pts, pts[0]] : pts, out = [P[0]]; let carry = 0;
-    for (let i = 1; i < P.length; i++) { const [ax, ay] = P[i - 1], [bx, by] = P[i], seg = Math.hypot(bx - ax, by - ay); if (!seg) continue; let t = step - carry;
+function orbitRiver(box) {
+  const kind = box.dataset.o, cv = box.querySelector('canvas'), g = cv.getContext('2d');
+  let W, H, D, P, u, oy, dots = [], movers = [], paths = [], dpr, seed;
+  const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const blob = () => { const k = []; for (let i = 0; i < 9; i++) k.push(1 + (rnd() - .5) * .26); return { k, ph: rnd() * 6.3 }; };
+  const resample = (pts, step) => { const out = [pts[0]]; let carry = 0;
+    for (let i = 1; i < pts.length; i++) { const [ax, ay] = pts[i - 1], [bx, by] = pts[i], seg = Math.hypot(bx - ax, by - ay); let t = step - carry;
       while (t <= seg) { const f = t / seg; out.push([ax + (bx - ax) * f, ay + (by - ay) * f]); t += step; } carry = seg - (t - step); }
-    if (closed) out.pop(); return out; };
-  const FILL = ['#e7aa4d', '#e7aa4d', '#e0773a', '#e0773a', '#d8708e', '#d8708e', '#9b6aa6', '#2a8c8c'];   /* the colour, no blue: the blue is the building */
-  const list = document.querySelector('.orbit-band'); if (!list) return;
-  BANDS.forEach((bd, n) => {
-    const box = list; box.innerHTML = '<canvas></canvas>'; const sec = box;
-    const _b = 0, cv = box.querySelector('canvas'), g = cv.getContext('2d');
-    let W, H, D, P, dots = [], dpr, seed;
-    const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
-    const blob = () => { const k = []; for (let i = 0; i < 9; i++) k.push(1 + (rnd() - .5) * .26); return { k, ph: rnd() * 6.3 }; };
-    const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; seed = 7 + n * 31; dots = [];
-      const core = H * .66, k = core / 100, oy = (H - core) / 2; P = bd.PW * k; D = core / (W < 700 ? 13 : 15);
-      const wx = (a, b) => { const d = Math.abs(a - b) % P; return Math.min(d, P - d); };
-      const cs = D * 1.2, G = new Map(), nI = Math.ceil(P / cs) + 1, gk = (i, j) => i * 4096 + j + 64;
-      const clash = (x, y, R, gp) => { const gi = Math.floor(x / cs), gj = Math.floor(y / cs); for (let a = -2; a <= 2; a++) for (let b = -2; b <= 2; b++) { const L = G.get(gk(((gi + a) % nI + nI) % nI, gj + b)); if (L) for (const o of L) if (wx(o.x, x) ** 2 + (o.y - y) ** 2 < (R + o.R + gp) ** 2) return true; } return false; };
-      const add = d => { dots.push(d); const q = gk(Math.floor(d.x / cs) % nI, Math.floor(d.y / cs)); (G.get(q) || G.set(q, []).get(q)).push(d); };
-      const put = (x, y, sz, col, gp, line, s) => { x = ((x % P) + P) % P; const R = D * .46 * sz; if (y < R + 1 || y > H - R - 1 || clash(x, y, R, gp)) return false; add({ x, y, R, sz, col, line, s, ring: rnd() < .15, hi: Math.floor(rnd() * 3), bl: blob() }); return true; };
-      const shapes = bd.build(); for (const pass of [0, 1]) shapes.forEach((sh, li) => { if (!!sh.fine !== !!pass) return;
-        const pts = resample(sh.pts.map(([x, y]) => [x * k, oy + y * k]), 1, sh.closed), sp = sh.fine ? D * 1.15 : D * .62;
-        if (sh.solo) { const ok = put(sh.pts[0][0] * k, oy + sh.pts[0][1] * k, sh.big ? 1.9 : 1.15, '#2c5494', D * .2, li, 0); if (ok && sh.rc) { const d = dots[dots.length - 1], cx = ((sh.rc[0] * k) % P + P) % P, cy = oy + sh.rc[1] * k; d.rc = [cx, cy]; d.rr = Math.hypot(d.x - cx, d.y - cy); d.ang = Math.atan2(d.y - cy, d.x - cx); d.dir = sh.dir; d.inner = sh.inner * k; } return; }
-        for (let s = 0; s < pts.length; s += sp) { const ok = put(pts[Math.floor(s)][0], pts[Math.floor(s)][1], sh.fine ? 1.15 + rnd() * .15 : .5 + rnd() * .08, '#2c5494', sh.fine ? D * .3 : D * .12, li, s); if (ok && sh.rc) { const d = dots[dots.length - 1], cx = ((sh.rc[0] * k) % P + P) % P, cy = oy + sh.rc[1] * k; d.rc = [cx, cy]; d.rr = Math.hypot(d.x - cx, d.y - cy); d.ang = Math.atan2(d.y - cy, d.x - cx); d.dir = sh.dir; d.spin = sh.spin || 1; d.inner = 0; } } });
-      const BAYS = []; for (const d of dots) if (d.rc) { const b = BAYS.find(b => b[0] === d.rc[0] && b[1] === d.rc[1]); if (b) { b[2] = Math.max(b[2], d.rr + d.R); b[3] = Math.min(b[3], (d.inner || d.rr) - d.R * 1.5); } else BAYS.push([d.rc[0], d.rc[1], d.rr + d.R, (d.inner || d.rr) - d.R * 1.5]); }
-      const st = D * .66;   /* filler, packed in the band and sprinkling out past its edges */
-      for (let y = st * .4, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < P; x += st) { const out = Math.max(0, oy - y, y - oy - core), pr = .88 * Math.exp(-Math.pow(out / (H * .09), 1.3));
-        const px = x + (rnd() - .5) * st * .5, py = y + (rnd() - .5) * st * .5, near = BAYS.some(b => { const q = Math.hypot(wx(px, b[0]), py - b[1]); return false; });   /* colour everywhere: small dots step aside as the stairs turn past them */   /* colour may fill the middle of a bay, but never the ring its shape sweeps */ if (!near && rnd() < pr) put(px, py, (.24 + rnd() * .08) * (out ? .75 + .25 * pr : 1), FILL[Math.floor(rnd() * FILL.length)], D * .08, -1, 0); } };
-    build(); new ResizeObserver(build).observe(box);
-    const drawBlob = (x, y, b, r) => { const m = b.k.length; g.beginPath(); for (let i = 0; i <= m; i++) { const a = i / m * 6.283 + b.ph, qx = x + Math.cos(a) * r * b.k[i % m], qy = y + Math.sin(a) * r * b.k[i % m];
-      if (!i) g.moveTo(qx, qy); else { const a0 = (i - .5) / m * 6.283 + b.ph, r0 = r * (b.k[i - 1] + b.k[i % m]) / 2 * 1.06; g.quadraticCurveTo(x + Math.cos(a0) * r0, y + Math.sin(a0) * r0, qx, qy); } } };
-    let vis = false; new IntersectionObserver(e => { const was = vis; vis = e[0].isIntersecting; if (vis && !was) requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box);
-    const t0 = performance.now();
-    const frame = now => { if (!W) return; const t = (now - t0) / 1000, shift = -((((t * D * .55 + scrollY * .6) % P) + P) % P);   /* flowing to the left, downhill */ const spin = t * .5 + scrollY * .006;   /* the squares keep turning, faster as you scroll */
-      g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-      const cs2 = D * 1.5, MG = new Map();   /* where every turning stair dot is right now, on a grid */
-      for (const d of dots) if (d.rc) { const a = d.ang + d.dir * (d.spin || 1) * spin, x = ((d.rc[0] + Math.cos(a) * d.rr) % P + P) % P, y = d.rc[1] + Math.sin(a) * d.rr, q = Math.floor(x / cs2) * 4096 + Math.floor(y / cs2); (MG.get(q) || MG.set(q, []).get(q)).push([x, y, D * .38 * d.sz]); }
-      const nI2 = Math.ceil(P / cs2);
-      const room = d => { const gi = Math.floor(d.x / cs2), gj = Math.floor(d.y / cs2), r = D * .38 * d.sz; let f = 1;
-        for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) { const L = MG.get((((gi + a) % nI2) + nI2) % nI2 * 4096 + gj + b); if (L) for (const [hx, hy, hr] of L) { let dx = Math.abs(d.x - hx) % P; dx = Math.min(dx, P - dx); const dd = Math.hypot(dx, d.y - hy); if (dd < hr + r + D * .08) f = Math.min(f, Math.max(0, (dd - hr - D * .08) / r)); } }
-        return f; };
-      for (let kk = -1; kk * P < W + P; kk++) { const ox = kk * P + shift;
-        for (const d of dots) { let x = d.x + ox, y = d.y; if (d.rc) { const a = d.ang + d.dir * (d.spin || 1) * spin; x = d.rc[0] + Math.cos(a) * d.rr + ox; y = d.rc[1] + Math.sin(a) * d.rr; }   /* the squares and octagons turn with your scroll */
-          if (x < -D || x > W + D) continue; const sh2 = d.rc || d.line >= 0 ? 1 : room(d); if (sh2 < .15) continue; const sw = sh2 * (d.line >= 0 ? 1 + .18 * Math.sin(scrollY * .02 - d.s / (D * 3) - d.line + t * .6) : 1), r = D * .38 * d.sz * sw; g.fillStyle = d.col; drawBlob(x, y, d.bl, r); g.fill();
-          if (d.ring && r > 3) { g.save(); g.translate(x, y); g.rotate(.12 * Math.sin(t * .45 + d.hi * 2)); g.scale(r * 1.15, r * 1.15); g.fillStyle = '#f2eedd'; g.fill(HOLES[d.hi]); g.restore(); } } }
-      if (vis) requestAnimationFrame(frame); };
-    requestAnimationFrame(frame);
-  });
-})();
+    return out; };
+  const wx = (a, b) => { const d = Math.abs(a - b) % P; return Math.min(d, P - d); };
+  const clash = (x, y, R, gp) => dots.some(o => wx(o.x, x) ** 2 + (o.y - y) ** 2 < (R + o.R + gp) ** 2);
+  const put = (x, y, sz, extra, gp) => { x = ((x % P) + P) % P; const R = D * .46 * sz; if (y < R + 2 || y > H - R - 2 || clash(x, y, R, gp)) return;
+    dots.push({ x, y, sz, R, ring: rnd() < .15, bl: blob(), col: BLUE, ...extra }); };
+  /* a shape of big dots that turns about its centre: m sides, ps dots per side, stored as angle + radius so it can turn */
+  const shape = (cx, cy, m, hr, ps, dir, rot0, sz = .62) => { for (let s = 0; s < m; s++) for (let j = 0; j < ps; j++) {
+      const a0 = rot0 + s / m * 2 * Math.PI, a1 = rot0 + (s + 1) / m * 2 * Math.PI, f = j / ps;
+      const x = Math.cos(a0) * (1 - f) + Math.cos(a1) * f, y = Math.sin(a0) * (1 - f) + Math.sin(a1) * f;
+      put(cx + x * hr, cy + y * hr, sz + rnd() * .14, { hc: [cx, cy], ang: Math.atan2(y, x), rr: Math.hypot(x, y) * hr, dir }, D * .08); } };
+  const corridor = (L, clear) => { for (const [x, y] of resample(L, D * .42)) { if (clear.some(([cx, cy, r]) => Math.hypot(x - cx, y - cy) < r)) continue; put(x, y, .34 + rnd() * .06, {}, D * .05); } };
 
+  const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; seed = 11;
+    u = H / 1.75 * .92; oy = (H - u) / 2; const N = 8, cy = oy + u / 2; P = N * u; D = u * .2; dots = []; paths = [];
+    const clear = [];
+    if (kind === 'ref') { const hr = u * .36;
+      for (let c = 0; c < N; c++) { const cx = (c + .5) * u; for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2, kk = k % 2 ? Math.cos(Math.PI / 6) : 1; put(cx + Math.cos(a) * hr * kk, cy + Math.sin(a) * hr * kk, .62 + rnd() * .14, { hc: [cx, cy], ang: a, rr: hr * kk, dir: c % 2 ? -1 : 1 }, D * .08); } clear.push([cx, cy, hr * 1.22]); }
+      for (let c = 0; c < N; c++) { corridor([[c * u, oy], [(c + 1) * u, oy + u]], clear); corridor([[(c + 1) * u, oy], [c * u, oy + u]], clear); } }
+    const X = (lat) => { /* river 2's corridors: corner to corner in every bay; with lat, a second set offset by half a bay */
+      for (let c = 0; c < N; c++) { corridor([[c * u, oy], [(c + 1) * u, oy + u]], clear); corridor([[(c + 1) * u, oy], [c * u, oy + u]], clear);
+        if (lat) { corridor([[(c + .5) * u, oy], [(c + 1.5) * u, oy + u]], clear); corridor([[(c + 1.5) * u, oy], [(c + .5) * u, oy + u]], clear); } } };
+    const hexR = (cx, cyy, hr, dir, col, sz = .62) => { for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2, kk = k % 2 ? Math.cos(Math.PI / 6) : 1; put(cx + Math.cos(a) * hr * kk, cyy + Math.sin(a) * hr * kk, sz + rnd() * .14, { hc: [cx, cyy], ang: a, rr: hr * kk, dir, col }, D * .08); } };
+    if (kind === 'sq') { const hr = u * .4; for (let c = 0; c < N; c++) { const cx = (c + .5) * u; shape(cx, cy, 4, hr, 3, c % 2 ? -1 : 1, c % 2 ? 0 : Math.PI / 4); clear.push([cx, cy, hr * 1.12]); } X(); }
+    if (kind === 'two') { for (let c = 0; c < N; c++) { const cx = (c + .5) * u, hr = u * (c % 2 ? .25 : .4); hexR(cx, cy, hr, c % 2 ? -1 : 1, BLUE, c % 2 ? .5 : .66); clear.push([cx, cy, hr * 1.22]); } X(); }
+    if (kind === 'lat') { const hr = u * .2; for (let c = 0; c < N * 2; c++) { const cx = (c + 1) * u / 2, yy = c % 2 ? oy + u * .25 : cy; if (c % 2) { hexR(cx, oy + u * .25, hr, -1, BLUE, .5); hexR(cx, oy + u * .75, hr, -1, BLUE, .5); clear.push([cx, oy + u * .25, hr * 1.25], [cx, oy + u * .75, hr * 1.25]); } else { hexR(cx - u / 2 + u / 2, cy, hr * 1.25, 1, BLUE, .55); clear.push([cx, cy, hr * 1.5]); } } X(true); }
+    if (kind === 'hxsq') { const hr = u * .37; for (let c = 0; c < N; c++) { const cx = (c + .5) * u, d = c % 2 ? -1 : 1; if (c % 2) shape(cx, cy, 4, hr * 1.02, 3, d, Math.PI / 4); else hexR(cx, cy, hr, d, BLUE); clear.push([cx, cy, hr * 1.2]); } X(); }
+    if (kind === 'gold') { const hr = u * .36; for (let c = 0; c < N; c++) { const cx = (c + .5) * u; hexR(cx, cy, hr, c % 2 ? -1 : 1, '#e7aa4d'); clear.push([cx, cy, hr * 1.22]); } X(); dots.forEach(o => { if (!o.hc) o.col = '#e7aa4d'; }); }
+    const spur = (ax, ay, tx, ty, r0) => { const dx = tx - ax, dy = ty - ay, L = Math.hypot(dx, dy), st = D * .42, n = 8 + Math.floor(rnd() * 3);   /* a spur of 8 to 10 dots */
+      for (let k = 0; k < n; k++) { const t = r0 + st * (k + .5); put(ax + dx / L * t, ay + dy / L * t, .34 + rnd() * .06, {}, D * .02); } };
+    if (kind.startsWith('d1')) { const hr = u * .3, cys = []; for (let c = 0; c < N; c++) { const cx = (c + .5) * u, yy = cy + (c % 2 ? -1 : 1) * u * .16, d = c % 2 ? -1 : 1; cys.push([cx, yy]);
+        if (c % 2) shape(cx, yy, 4, hr * 1.02, 3, d, Math.PI / 4); else hexR(cx, yy, hr, d, BLUE); clear.push([cx, yy, hr * 1.2]); }
+      for (let c = 0; c < N; c++) { const [ax, ay] = cys[c], [bx, by] = cys[(c + 1) % N], bx2 = c + 1 === N ? bx + P : bx;
+        corridor([[ax, ay], [bx2, by]], clear); for (const sx of [-1, 1]) spur(ax, ay, ax + sx * u * .5, c % 2 ? oy + u : oy, hr * 1.25); }
+      const ex = kind.slice(2);
+      if (ex === 'a' || ex === 'd') for (const [y, sg] of [[oy, 1], [oy + u, -1]]) {   /* the edge corridors wander: a lazy wave, dots that swell and shrink, the odd gap like a doorway */
+        const pts = [], M = 400; for (let k = 0; k <= M; k++) { const x = k / M * P; pts.push([x, y + sg * (u * .07 * Math.sin(x / P * Math.PI * 2 * 3 + (sg > 0 ? 0 : 1.7)) + u * .03 * Math.sin(x / P * Math.PI * 2 * 7 + 2))]); }
+        let k = 0; for (const [x, yy] of resample(pts, D * .44)) { k++; if (clear.some(([cx, cy2, r]) => Math.hypot(x - cx, yy - cy2) < r)) continue;
+          if ((k % 23) < 2) continue;   // a doorway now and then
+          const big = k % 11 === 0; put(x, yy, big ? .55 : .26 + .14 * (.5 + .5 * Math.sin(k * .9)) + rnd() * .05, big ? { ring: rnd() < .5 } : {}, D * .03); } }
+      if (ex === 'b' || ex === 'd') for (const off of [-1, 1]) for (let c = 0; c < N; c++) { const [ax, ay] = cys[c], [bx, by] = cys[(c + 1) % N], bx2 = c + 1 === N ? bx + P : bx; corridor([[ax, ay + off * u * .3], [bx2, by + off * u * .3]], clear); }
+      if (ex === 'c') for (let c = 0; c < N; c++) { corridor([[c * u, oy], [(c + 1) * u, oy + u]], clear); corridor([[(c + 1) * u, oy], [c * u, oy + u]], clear); } }
+    if (kind === 'd2') { const hr = u * .37; for (let c = 0; c < N; c++) { const cx = (c + .5) * u, d = c % 2 ? -1 : 1; if (c % 2) shape(cx, cy, 4, hr * 1.02, 3, d, Math.PI / 4); else hexR(cx, cy, hr, d, BLUE); clear.push([cx, cy, hr * 1.2]); } X();
+      dots.forEach((o, k) => { if (o.hc && o.dir === -1) o.col = '#e0773a'; }); }
+    if (kind === 'd3') { const hr = u * .35; for (let c = 0; c < N; c++) { const cx = (c + .5) * u, d = c % 2 ? -1 : 1; if (c % 2) shape(cx, cy, 4, hr * 1.02, 3, d, Math.PI / 4); else hexR(cx, cy, hr, d, BLUE); put(cx, cy, .75, { ring: true }, D * .1); clear.push([cx, cy, hr * 1.2]); }
+      const off = D * .34; for (let c = 0; c < N; c++) for (const [a, b] of [[[c * u, oy], [(c + 1) * u, oy + u]], [[(c + 1) * u, oy], [c * u, oy + u]]]) { const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), nx = -dy / L * off, ny = dx / L * off;
+        corridor([[a[0] + nx, a[1] + ny], [b[0] + nx, b[1] + ny]], clear); corridor([[a[0] - nx, a[1] - ny], [b[0] - nx, b[1] - ny]], clear); } }
+    if (kind === 'd4') { for (let c = 0; c < N; c++) { const cx = (c + .5) * u, d = c % 2 ? -1 : 1; if (c % 2) { const hr = u * .19; hexR(cx, cy, hr, d, BLUE, .5); clear.push([cx, cy, hr * 1.3]); } else { const hr = u * .5; shape(cx, cy, 4, hr, 4, d, Math.PI / 4, .64); clear.push([cx, cy, hr * 1.05]); } } X(); }
+    const zig = (amp, hr, spurs, ph = 0, onlyHex = null, rowsDir = 1, extra = []) => { const pts = [];
+      for (let c = 0; c < N; c++) { const cx = (c + .5) * u + ph * u * .5, up = (c + (ph ? 1 : 0)) % 2, yy = cy + (up ? -1 : 1) * u * amp, d = (c % 2 ? -1 : 1) * rowsDir; pts.push([cx, yy]);
+        const sq = onlyHex === null ? c % 2 : !onlyHex; if (sq) shape(cx, yy, 4, hr * 1.02, 3, d, Math.PI / 4); else hexR(cx, yy, hr, d, BLUE); clear.push([cx, yy, hr * 1.2]); }
+      for (let c = 0; c < N; c++) { const [ax, ay] = pts[c], [bx, by] = pts[(c + 1) % N]; extra.push([[ax, ay], [c + 1 === N ? bx + P : bx, by]]);
+        if (spurs) { corridor([[ax, ay], [ax - u * .5, (c % 2) ? oy + u : oy]], clear); corridor([[ax, ay], [ax + u * .5, (c % 2) ? oy + u : oy]], clear); } }
+      return extra; };
+    if (kind === 'z1') { for (const L of zig(.3, u * .22, true)) corridor(L, clear); }
+    if (kind === 'z2') { for (const L of zig(.22, u * .3, false)) corridor(L, clear); }
+    if (kind === 'z3') { const a = zig(.28, u * .2, false, 0, true, 1), b = zig(.28, u * .2, false, 1, false, -1); for (const L of [...a, ...b]) corridor(L, clear); }
+    if (kind === 'z4') { const hr = u * .2, pts = []; for (let c = 0; c < N; c++) { const cx = (c + .5) * u, lv = [0, 1, 2, 1][c % 4], yy = oy + u * (.18 + lv * .32), d = c % 2 ? -1 : 1; pts.push([cx, yy]);
+        if (c % 2) shape(cx, yy, 4, hr * 1.02, 3, d, Math.PI / 4); else hexR(cx, yy, hr, d, BLUE); clear.push([cx, yy, hr * 1.25]); }
+      for (let c = 0; c < N; c++) { const [ax, ay] = pts[c], [bx0, by] = pts[(c + 1) % N], bx = c + 1 === N ? bx0 + P : bx0; corridor([[ax, ay], [ax + u * .35, ay], [bx - u * .15, by], [bx, by]], clear); } }
+    if (kind === 'z5') { for (const L of zig(.26, u * .24, false)) corridor(L, clear); corridor([[0, cy], [P, cy]], clear); }
+    if (kind === 'court') { const hr = u * .33;
+      for (let c = 0; c < N; c++) { const cx = (c + .5) * u; shape(cx, cy, 4, hr, 3, c % 2 ? -1 : 1, Math.PI / 4); clear.push([cx, cy, hr * 1.15]); }
+      for (const y of [oy, oy + u]) corridor([[0, y], [P, y]], []);   /* the long corridors */
+      for (let c = 0; c <= N; c++) corridor([[c * u, oy], [c * u, oy + u]], []); }   /* the walls between rooms */
+    if (kind === 'nest') { const hr = u * .44;
+      for (let c = 0; c < N; c++) { const cx = (c + .5) * u, d = c % 2 ? -1 : 1; shape(cx, cy, 4, hr, 3, d, 0, .58); shape(cx, cy, 4, hr * .5, 2, -d, Math.PI / 4, .55); clear.push([cx, cy, hr * 1.1]); }
+      for (let c = 0; c < N; c++) corridor([[c * u, oy], [(c + 1) * u, oy + u]], clear); }
+    if (kind === 'alt') { const hr = u * .32;
+      for (let c = 0; c < N; c++) { const cx = (c + .5) * u, d = c % 2 ? -1 : 1;
+        if (c % 2) shape(cx, cy, 4, hr * 1.05, 3, d, Math.PI / 4); else shape(cx, cy, 6, hr, 2, d, 0);
+        clear.push([cx, cy, hr * 1.2]); }
+      corridor([[0, cy], [P, cy]], clear);
+      for (let c = 0; c < N; c++) { const x0 = c * u; corridor([[x0, oy], [x0 + u / 2, cy]], clear); corridor([[x0 + u / 2, cy], [x0 + u, oy + u]], clear); } }
+    if (kind === 'ramp') { const hr = u * .2;
+      for (let c = 0; c < N * 2; c++) { const x0 = c * u / 2; corridor([[x0, oy + u], [x0 + u * .5, oy]], clear.length ? clear : []); }
+      dots = dots.filter(() => true);
+      for (let c = 0; c < N * 2; c++) { const cx = (c + .5) * u / 2 + u * .125, up = c % 2; const yy = cy + (up ? -1 : 1) * u * .02;
+        // clear the corridor dots inside the triangle
+        dots = dots.filter(o => wx(o.x, cx) ** 2 + (o.y - yy) ** 2 > (hr * 1.25) ** 2);
+        shape(cx, yy, 3, hr, 2, up ? -1 : 1, up ? -Math.PI / 2 : Math.PI / 2, .5); } }
+    if (kind === 'walk') {
+      for (let c = 0; c < N; c++) { const cx = (c + .5) * u, ring = [];
+        corridor([[c * u, oy], [(c + 1) * u, oy + u]], [[cx, cy, D * .8]]); corridor([[(c + 1) * u, oy], [c * u, oy + u]], [[cx, cy, D * .8]]);
+        put(cx, cy, .7, { ring: true }, D * .1); }
+      /* two long zigzag paths the walkers follow */
+      for (const ph of [0, 1]) { const pts = []; for (let c = 0; c <= N; c++) pts.push([c * u, (c + ph) % 2 ? oy + u : oy]); paths.push(pts); }
+      movers = []; for (let p = 0; p < 2; p++) for (let k = 0; k < N; k++) movers.push({ p, s: (k + p * .5) / N, sz: .58 + rnd() * .1, bl: blob(), ring: rnd() < .2 }); }
+    const st = D * .36;   /* every gap filled with small dots in the other colours; past the band's edge they thin into a sprinkle */
+    for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < P; x += st) { const out = Math.max(0, oy - y, y - oy - u), pr = .9 * Math.exp(-Math.pow(out / (H * .1), 1.25));
+      if (rnd() < pr) put(x + (rnd() - .5) * st * .5, y + (rnd() - .5) * st * .5, (.2 + rnd() * .1) * (out ? .7 + .3 * pr : 1), { fl: 1, col: kind === 'd2' ? (v => v < .5 ? '#e7aa4d' : v < .8 ? BLUE : v < .9 ? '#d8708e' : '#2a8c8c')(rnd()) : kind === 'gold' ? (v => v < .55 ? BLUE : v < .7 ? '#e0773a' : v < .82 ? '#d8708e' : v < .92 ? '#9b6aa6' : '#2a8c8c')(rnd()) : FILL(rnd()) }, D * .07); }
+  };
+  const along = (pts, f) => { const segs = pts.length - 1, t = ((f % 1) + 1) % 1 * segs, i = Math.floor(t), r = t - i, a = pts[i], b = pts[i + 1]; return [a[0] + (b[0] - a[0]) * r, a[1] + (b[1] - a[1]) * r]; };
+  const drawBlob = (x, y, b, r) => { const m = b.k.length; g.beginPath();
+    for (let i = 0; i <= m; i++) { const a = i / m * 6.283 + b.ph, qx = x + Math.cos(a) * r * b.k[i % m], qy = y + Math.sin(a) * r * b.k[i % m];
+      if (!i) g.moveTo(qx, qy); else { const a0 = (i - .5) / m * 6.283 + b.ph, r0 = r * (b.k[i - 1] + b.k[i % m]) / 2 * 1.06; g.quadraticCurveTo(x + Math.cos(a0) * r0, y + Math.sin(a0) * r0, qx, qy); } } };
+  const one = (x, y, d, r) => { g.fillStyle = d.col || BLUE; drawBlob(x, y, d.bl, r); g.fill(); if (d.ring) { g.save(); g.translate(x, y); g.rotate(Math.sin(x * .01) * .12); g.scale(r * 1.15, r * 1.15); g.fillStyle = CREAM; g.fill(HOLE); g.restore(); } };
+  build(); new ResizeObserver(build).observe(box);
+  let vis = false, raf = 0; const t0 = performance.now();
+  const frame = now => { raf = 0; if (!W || !vis) return; const t = reduce ? 0 : (now - t0) / 1000, sc = reduce ? 0 : scrollY;
+    const dirx = kind === 'ref' ? 1 : -1, shift = dirx * ((((t * D * .35 + sc * .55) % P) + P) % P);   /* runs with your scroll; this river flows right to left, downhill */
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    const ang = sc * .004, MV = [];   /* where every moving dot is right now (in pattern space) */
+    for (const d of dots) if (d.hc) { const a = d.ang + d.dir * ang; MV.push([d.hc[0] + Math.cos(a) * d.rr, d.hc[1] + Math.sin(a) * d.rr, D * .38 * d.sz, d]); }
+    for (const m of movers) { const [x, y] = along(paths[m.p], m.s + sc * .00018 + t * .004); MV.push([x, y, D * .38 * m.sz, m]); }
+    const room = d => { let f = 1; for (const [hx, hy, hr2] of MV) { const dx = wx(d.x, ((hx % P) + P) % P); if (dx > hr2 + D) continue; const dd = Math.hypot(dx, d.y - hy), r = D * .38 * d.sz; if (dd < hr2 + r + D * .1) f = Math.min(f, Math.max(0, (dd - hr2 - D * .1) / r)); } return f; };
+    for (let k = -2; k * P < W + P; k++) { const ox = k * P + shift;
+      for (const d of dots) { if (d.hc) continue; const x = d.x + ox; if (x < -D || x > W + D) continue; const sh = d.fl || !d.hc ? room(d) : 1; if (sh < .15) continue; one(x, d.y, d, D * .38 * d.sz * sh); }
+      for (const [x, y, r, d] of MV) { const X = x + ox; if (X < -D * 2 || X > W + D * 2) continue; one(X, y, d, r); } }
+    if (!reduce) raf = requestAnimationFrame(frame); };
+  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box);
+}
+const box = document.querySelector('.orbit-band'); if (!box) return; box.dataset.o = 'd1c'; if (!box.querySelector('canvas')) box.append(document.createElement('canvas')); orbitRiver(box);
+})();
 </script>
 <style>
 /* the ring of dots grows with the circle on hover, so the buffer between them stays */
