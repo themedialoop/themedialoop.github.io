@@ -3659,9 +3659,7 @@ html body .ab-pill{overflow-anchor:none}
 </script>
 <style>
 /* the BSB banner after the publications: full width, a little wider than the screen so its ends never show, tipped slightly downward */
-.bsb-band{position:relative;z-index:0;height:clamp(420px,50vw,760px);width:112vw;margin:clamp(30px,5vw,80px) 0 calc(-1 * clamp(150px,20vw,320px)) calc(50% - 56vw);rotate:3deg;pointer-events:none}
-@media (max-width:700px){.bsb-band{height:460px;margin-bottom:-150px}}
-#resources{position:relative;z-index:1}   /* the band bleeds under the top of Resources; the cards sit over it */
+.bsb-band{position:relative;z-index:0;height:clamp(96px,8vw,124px);width:112vw;margin:clamp(40px,6vw,90px) 0 clamp(40px,6vw,90px) calc(50% - 56vw);rotate:3deg;pointer-events:none}   /* a thin band, about an inch: a visual break between Publications and Resources */
 .bsb-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 <script>
@@ -3673,10 +3671,25 @@ html body .ab-pill{overflow-anchor:none}
   let W, H, D, P, dots = [], dpr, seed;
   const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
   const blob = () => { const k = []; for (let i = 0; i < 9; i++) k.push(1 + (rnd() - .5) * .26); return { k, ph: rnd() * 6.3 }; };
+  /* "long diagonals": corridors run corner to corner the whole length of the band, crossing in an X in every bay;
+     a hexagon of big dots sits on each crossing, and the hexagons turn as you scroll (neighbours the opposite way) */
+  const resample = (pts, step) => { const out = [pts[0]]; let carry = 0;
+    for (let i = 1; i < pts.length; i++) { const [ax, ay] = pts[i - 1], [bx, by] = pts[i], seg = Math.hypot(bx - ax, by - ay); let t = step - carry;
+      while (t <= seg) { const f = t / seg; out.push([ax + (bx - ax) * f, ay + (by - ay) * f]); t += step; } carry = seg - (t - step); }
+    return out; };
   const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; seed = 11;
-    const F = mlBSB({ W: 1, H, u: Math.min(H * .9 / 3, innerWidth < 700 ? 140 : 200), seed: 41, periodic: true, gap: H * .012, edge: H * .03 }); D = F.D; P = F.W;   /* bigger and more spaced out */
-    dots = F.dots.filter(q => { const ef = Math.min(q.y, H - q.y) / (H * .16); return ef >= 1 || rnd() < ef * ef; })   /* the band thins out at its top and bottom rather than ending on a straight line */
-      .map(q => ({ ...q, col: q.b ? '#2c5494' : '#e7aa4d', Pp: q.li < 0 ? 1e9 : D * 1.22 * 9, w: q.b ? 1 : 0, hi: Math.floor(rnd() * 3), bl: blob() })); };
+    const u = H * .92, oy = (H - u) / 2, N = 4, hr = u * .36; P = N * u; D = u * .2; dots = [];
+    const wx = (a, b) => { const d = Math.abs(a - b) % P; return Math.min(d, P - d); };
+    const clash = (x, y, R, gp) => dots.some(o => wx(o.x, x) ** 2 + (o.y - y) ** 2 < (R + o.R + gp) ** 2);
+    const put = (x, y, sz, extra, gp) => { x = ((x % P) + P) % P; const R = D * .46 * sz; if (y < R + 2 || y > H - R - 2 || clash(x, y, R, gp)) return;
+      dots.push({ x, y, sz, R, s: 0, li: 0, Pp: 1e9, w: 0, ring: rnd() < .15, hi: Math.floor(rnd() * 3), bl: blob(), col: '#2c5494', ...extra }); };
+    for (let c = 0; c < N; c++) { const cx = (c + .5) * u, cy = oy + u / 2, dir = c % 2 ? -1 : 1, n = 7;   /* the hexagons: big blue dots on six corners and between */
+      for (let k = 0; k < 6 * 2; k++) { const a = k / 12 * Math.PI * 2, kk = k % 2 ? Math.cos(Math.PI / 6) : 1; put(cx + Math.cos(a) * hr * kk, cy + Math.sin(a) * hr * kk, .95 + rnd() * .3, { hc: [cx, cy], ang: a, rr: hr * kk, dir }, D * .08); } }
+    for (let c = 0; c < N; c++) for (const L of [[[c * u, oy], [(c + 1) * u, oy + u]], [[(c + 1) * u, oy], [c * u, oy + u]]])   /* the corridors, in fine dots, stopping at each hexagon */
+      for (const [x, y] of resample(L, D * .6)) { const cx = (c + .5) * u, cy = oy + u / 2; if (Math.hypot(x - cx, y - cy) < hr * 1.22) continue; put(x, y, .5 + rnd() * .08, {}, D * .06); }
+    const st = D * .62;   /* a light scatter of small gold dots, kept clear of the hexagons so they read */
+    for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < P; x += st) if (rnd() < .45 && Math.hypot(x - (Math.floor(x / u) + .5) * u, y - (oy + u / 2)) > hr * 1.3) put(x + (rnd() - .5) * st * .5, y + (rnd() - .5) * st * .5, .42 + rnd() * .14, { col: '#e7aa4d' }, D * .1);
+  };
   build(); new ResizeObserver(build).observe(box);
   const drawBlob = (x, y, b, r) => { const m = b.k.length; g.beginPath();
     for (let i = 0; i <= m; i++) { const a = i / m * 6.283 + b.ph, qx = x + Math.cos(a) * r * b.k[i % m], qy = y + Math.sin(a) * r * b.k[i % m];
@@ -3686,8 +3699,9 @@ html body .ab-pill{overflow-anchor:none}
   const frame = now => { raf = 0; if (!W || !vis) return; const t = reduce ? 0 : (now - t0) / 1000, shift = reduce ? 0 : (((t * D * .35 + scrollY * .55) % P) + P) % P;   /* it runs with your scroll, and drifts a little on its own */
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     for (let k = -1; k * P < W + P; k++) { const ox = k * P + shift;
-      for (const d of dots) { const x = d.x + ox; if (x < -D || x > W + D) continue; const r = D * (.3 + .16 * swell(d, t) * d.w) * d.sz; g.fillStyle = d.col; drawBlob(x, d.y, d.bl, r); g.fill();
-        if (d.ring) { g.save(); g.translate(x, d.y); g.rotate(mlHoleTurn(d.hi * 2.1 + d.s * .01)); g.scale(r * 1.15, r * 1.15); g.fillStyle = CREAM; g.fill(HOLES[d.hi]); g.restore(); } } }
+      for (const d of dots) { let x = d.x + ox, y = d.y; if (d.hc) { const a = d.ang + d.dir * (reduce ? 0 : scrollY * .004); x = d.hc[0] + Math.cos(a) * d.rr + ox; y = d.hc[1] + Math.sin(a) * d.rr; }   /* the hexagons turn with your scroll */
+        if (x < -D || x > W + D) continue; const r = D * .38 * d.sz; g.fillStyle = d.col; drawBlob(x, y, d.bl, r); g.fill();
+        if (d.ring) { g.save(); g.translate(x, y); g.rotate(mlHoleTurn(d.hi * 2.1 + d.s * .01)); g.scale(r * 1.15, r * 1.15); g.fillStyle = CREAM; g.fill(HOLES[d.hi]); g.restore(); } } }
     if (!reduce) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box);
 })();
@@ -3708,7 +3722,6 @@ html body .ab-pill{overflow-anchor:none}
 <style>
 /* the dot river keeps its own proportions and is simply drawn larger, so it fills about 80% of the screen's height */
 .river.lf{scale:var(--rvs,1);margin-block:var(--rvm,0px)}
-.bsb-band{height:80vh !important;height:80svh !important}
 </style>
 <script>
 (() => { const fit = () => document.querySelectorAll('.river.lf').forEach(el => { el.style.removeProperty('--rvs'); el.style.removeProperty('--rvm');
