@@ -3293,11 +3293,11 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       { const cg = Math.hypot(d.x - W / 2, d.y - (H - Math.max(28, 18) - 42)) - d.r - AMP * 2; m *= 1 - (1 - k) * (1 - ss(54, 78, cg)); }   /* on the landing, nothing sits behind the gold ^ dot */
       if (m < .02) continue;
       let px = d.x + AMP * Math.sin(t * d.fx + d.ph), py = d.y + AMP * Math.cos(t * d.fy + d.ph * 1.3), spin = 0;   // each wanders on its own small loop
-      if (!reduce && born < 1) { const ki = 1 - ss(.8 + dly(d), 1.6 + dly(d), bt); if (ki > 0) { const B = mlBlow(ki, d.z, d.ph / 6.3, W, H); px -= B[0] * .4; py -= B[1] * .4; spin -= B[2] * .4; } }   /* on arrival the dots are blown in on a light breeze from the right */
+      if (!reduce && born < 1) { const ki = 1 - ss(.8 + dly(d), 1.6 + dly(d), bt); if (ki > 0) { const e2 = ki * ki * (3 - 2 * ki); px += e2 * W * (.03 + .03 * d.z); py -= e2 * H * (.006 + .01 * d.z); } }   /* on arrival they drift in from the right and ease to a stop: no loops, no spin */   /* on arrival the dots are blown in on a light breeze from the right */
       let blowL = 1; if (!reduce && k > 0 && k < 1) {   /* leaving the blue landing, a breeze blows through: dots with no place on the home page are blown away
          off to the left and downhill, looping and tumbling as they shrink; the rest are caught up in the gust and land in their new places */
-        if (maskHome(d.x, d.y, t) < .35) { const B = mlBlow(k, d.z, d.ph / 6.3, W, H); px += B[0] * .4; py += B[1] * .4; spin += B[2] * .4; blowL = B[3]; }
-        else { const B = mlBlow(k * .5, d.z, d.ph / 6.3, W, H), b = Math.sin(Math.PI * k); px += B[0] * b * .2; py += B[1] * b * .2; spin += B[2] * b * .4; } }
+        if (maskHome(d.x, d.y, t) < .35) { const e2 = k * k * (3 - 2 * k); px -= e2 * W * (.03 + .03 * d.z); py += e2 * H * (.006 + .01 * d.z); blowL = 1 - e2; }   /* those leaving drift softly left and fade */
+        else { } }
       let blowS = 1; if (sq > 0) {   /* as you scroll down from the home page, a breeze blows the dots away: right-hand dots first, each lifted, looped and tumbled off to the left and downhill */
         const kk = Math.max(0, Math.min(1, sq * 1.7 - (1 - d.x / W) * .55 - d.z * .15)), B = mlBlow(kk, d.z, d.ph / 6.3, W, H); px += B[0]; py += B[1]; spin = B[2]; blowS = B[3]; }
       let c = 1; for (const b of boxes) { const g = Math.max(b.left - pr.left - px, px - (b.right - pr.left), b.top - pr.top - py, py - (b.bottom - pr.top), 0); if (g < pad + d.r) c *= ss(0, pad + d.r, g); }   // never over the words, wherever it dances
