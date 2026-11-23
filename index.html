@@ -3818,7 +3818,7 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
   draw(); addEventListener('resize', draw); setTimeout(draw, 600); })();
 </script>
 <style>
-.orbit-band{position:relative;height:clamp(330px,30vw,450px);width:112vw;margin:clamp(30px,9vw,130px) 0 clamp(30px,9vw,130px) calc(50% - 56vw);rotate:-11deg;pointer-events:none}   /* the same size as the river before Resources, tipped down from right to left */
+.orbit-band{position:relative;height:clamp(330px,30vw,450px);width:112vw;margin:clamp(0px,1vw,16px) 0 clamp(0px,1vw,16px) calc(50% - 56vw);rotate:-3deg;pointer-events:none}   /* the same size as the river before Resources, tipped down from right to left */
 .orbit-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 <script>
@@ -4069,7 +4069,7 @@ html body .about-grid .ab-pill h3{letter-spacing:-.045em !important}
 html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !important}
 </style>
 <script>
-/* the band before Join Our Orbit: a field of dots, river 2's sizes and colours, rolling like wind over water (see below). Each eddy travels right to left
+/* the band before Join Our Orbit: a field of dots, river 2's sizes and colours, that gusts blow through (see below). Each eddy travels right to left
    and a little downhill, sweeping the dots it passes round in a swirl; once it has gone by, they settle back into place. The eddies drift
    slowly on their own and race through as you scroll */
 (() => { const box = document.querySelector('.orbit-band'); if (!box) return; const cv = box.querySelector('canvas') || box.appendChild(document.createElement('canvas')); window.mlBreezeOn && mlBreezeOn(cv, box); const g = cv.getContext('2d');
@@ -4079,14 +4079,14 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
     for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
     p.closePath(); return p; };
   const SH = [...Array(16)].map(blob);
-  let W, H, dpr, D = [], vis = false, raf = 0, prev = 0, T = 0, lastY = scrollY, wind = 0;
+  let W, H, dpr, D = [], vis = false, raf = 0, prev = 0, T = 0, lastY = scrollY, wind = 0, GS = [], gAcc = .7;
   addEventListener('scroll', () => { wind = Math.min(3, wind + Math.abs(scrollY - lastY) * .01); lastY = scrollY; }, { passive: true });
   const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; D = [];
-    const u = H / 1.75 * .92, Dd = u * .2, st = Dd * .36, oy = (H - u) / 2;   /* river 2's own spacing and dot sizes */
+    const u = H / 1.75 * .92, Dd = u * .2, st = Dd * .33, oy = (H - u) / 2;   /* a touch denser */   /* river 2's own spacing and dot sizes */
     for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) { const out = Math.max(0, oy - y, y - oy - u), pr = .9 * Math.exp(-Math.pow(out / (H * .1), 1.25));
       if (Math.random() > pr) continue; const big = Math.random() < .07, v = Math.random();
       D.push({ x: x + (Math.random() - .5) * st * .5, y: y + (Math.random() - .5) * st * .5, r: Dd * .38 * (big ? .55 + Math.random() * .2 : (.2 + Math.random() * .1) * (out ? .7 + .3 * pr : 1)),
-        c: big ? (v < .8 ? BLUE : FILL(v)) : (Math.random() < .5 ? BLUE : FILL(Math.random())),   /* lots of blue */ p: (Math.random() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(Math.random() * 16)], ring: big && Math.random() < .2, rot: Math.random() * 6.3, blu: Math.random() < .75 }); } };
+        c: big ? (v < .8 ? BLUE : FILL(v)) : (Math.random() < .5 ? BLUE : FILL(Math.random())),   /* lots of blue */ p: (Math.random() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(Math.random() * 16)], ring: big && Math.random() < .2, rot: Math.random() * 6.3, blu: Math.random() < .75, ox: 0, oy: 0, vx: 0, vy: 0, fl: Math.random() < .035, ft: -1, a: Math.random(), b: Math.random() }); } };
   let FILLC = []; const buildFill = () => { FILLC = []; if (!W) return; const st = H / 1.75 * .92 * .2 * .3; for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) FILLC.push({ x: x + (Math.random() - .5) * st * .4, y: y + (Math.random() - .5) * st * .4, c: Math.random() < .8 ? BLUE : FILL(Math.random()), p: SH[Math.floor(Math.random() * 16)], rot: Math.random() * 6.3 }); };
   build(); buildFill(); new ResizeObserver(() => { build(); buildFill(); }).observe(box);
   const frame = now => { raf = 0; if (!vis || !W) return; const dt = prev ? Math.min(.05, (now - prev) / 1000) : .016; prev = now;
@@ -4094,10 +4094,18 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
     const R = H * .4, L = W + 4 * R, n = W < 600 ? 2 : 3, ED = [...Array(n)].map((_, i) => { const p = ((T * W * .12 + i * L / n) % L + L) % L, cx = W + 2 * R - p, cy = H * (.35 + .3 * (p / L)) + Math.sin(T * .7 + i * 2) * H * .05;   // right to left, and a little downhill
       return [cx, cy, i % 2 ? -1 : 1]; });
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
-    for (const d of D) { let x = d.x, y = d.y, sw = 1, spin = 0;
-      /* rolling waves: the field rolls like wind over water. Every dot traces a small loop in step with its neighbours, so curling waves run down the band, right to left */
-      const env = .55 + .45 * Math.sin(d.x / W * 4 + T * .6), th = d.x / (H * .55) + T * 2.6, Rl = H * .055 * env * (.8 + .4 * ((d.rot / 6.3) % 1));
-      x += Math.cos(th) * Rl; y += Math.sin(th) * Rl; spin = th * .15;
+    /* gusts: the field mostly rests; a gust rolls through right to left (one now and then on its own, more as you scroll), lifting and swirling the dots it
+       passes before they spring back. A very few dots get carried right away on a little loop and come back later */
+    if (!reduce) { gAcc += dt * .16 + Math.min(1.5, wind) * dt * 2.4; if (gAcc > 1) { gAcc = 0; GS.push({ x: W + W * .2, s: .55 + Math.min(1, wind) * .6 + Math.random() * .25 }); } }
+    for (const q of GS) q.x -= dt * W * (.42 + .25 * q.s); while (GS.length && GS[0].x < -W * .3) GS.shift();
+    const GW = W * .13, K = H * 9;
+    for (const d of D) { let x = d.x, y = d.y, sw = 1, spin = 0, e = 0;
+      for (const q of GS) { const u2 = (d.x - q.x) / GW; if (u2 > -3 && u2 < 3) e = Math.max(e, Math.exp(-u2 * u2) * q.s); }
+      if (d.ft < 0) { const lift = Math.sin(d.a * 6.3 + d.x * .01); d.vx += (-e * K * (.8 + .6 * d.b) - d.ox * 26 - d.vx * 7) * dt; d.vy += (-e * K * (.35 + .5 * lift) - d.oy * 26 - d.vy * 7) * dt;   /* pushed, then springing home */
+        d.ox += d.vx * dt; d.oy += d.vy * dt; x += d.ox; y += d.oy; spin = d.ox * .02; sw = 1 + .1 * Math.min(1, e);
+        if (d.fl && e > .55) d.ft = 0; }
+      if (d.ft >= 0) { d.ft += dt; const k2 = Math.min(1, d.ft / 1.8), B = mlBlow(k2, d.a, d.b, W * 2.2, H * 2.2); x += B[0]; y += B[1]; spin = B[2]; sw = B[3] * (k2 >= 1 ? Math.min(1, Math.max(0, (d.ft - 3.2) / .8)) : 1);   /* flies off on a loop, then fades back in at home */
+        if (k2 >= 1) { x = d.x; y = d.y; spin = 0; if (d.ft > 4) { d.ft = -1; d.ox = d.oy = d.vx = d.vy = 0; } } if (sw < .05) { d.px = -9e3; d.py = -9e3; d.pr = 0; d.ps = 0; d.inW = false; continue; } }
       d.px = x; d.py = y; d.pr = d.r * sw * 1.08; d.ps = spin; d.inW = false; }   /* (deep in a whirl) */   /* (1.08: room for the organic wobble) */
     /* no two dots ever overlap: biggest first, each smaller dot shrinks to fit the space it has left */
     const cs = Math.max(8, H / 9), grid = new Map(), gap = 1.5, ord = D.slice().sort((a, b) => b.r - a.r);
