@@ -703,7 +703,14 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 .ml-loop .stage{position:relative;height:clamp(270px,32vw,450px);overflow:visible}
 @media (max-width:600px){.ml-loop .stage{height:340px}}
 .ml-loop .stage .tilt{position:absolute;left:2vw;top:0;width:96vw;height:100%;rotate:-3.5deg}
+/* the whole map, north to south, runs left to right: swipe or scroll sideways along it */
+.ml-loop .scroll{position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;cursor:grab;touch-action:pan-x pan-y}
+.ml-loop .scroll::-webkit-scrollbar{display:none}
+.ml-loop .scroll.drag{cursor:grabbing}
+.ml-loop .long{position:relative;height:100%}
 .ml-loop canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ml-loop .hint{position:absolute;bottom:-6px;left:50%;translate:-50% 0;font:600 13px Inter,system-ui,sans-serif;color:#2c5494;opacity:.7;letter-spacing:.02em;pointer-events:none;transition:opacity .6s}
+.ml-loop .hint.gone{opacity:0}
 </style>
 <script>
 (() => {
@@ -726,32 +733,41 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 
   const grid = document.getElementById('mlLoop');
   OPTIONS.forEach((o, n) => {
-    const fig = document.createElement('figure'); fig.innerHTML = `<div class="stage"><div class="tilt"><canvas></canvas></div></div>`; grid.append(fig);
-    const cv = fig.querySelector('canvas'), g = cv.getContext('2d'), box = cv.parentElement, stage = fig.querySelector('.stage');
+    const fig = document.createElement('figure'); fig.innerHTML = `<div class="stage"><div class="tilt"><div class="scroll"><div class="long"><canvas></canvas></div></div></div><div class="hint">\u2190 north \u00b7 south \u2192</div></div>`; grid.append(fig);
+    const cv = fig.querySelector('canvas'), g = cv.getContext('2d'), box = fig.querySelector('.tilt'), stage = fig.querySelector('.stage'), sc = fig.querySelector('.scroll'), long = fig.querySelector('.long'), hint = fig.querySelector('.hint');
+    { let dn = null; sc.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; dn = { x: e.clientX, l: sc.scrollLeft }; sc.classList.add('drag'); sc.setPointerCapture(e.pointerId); });   /* drag it with a mouse too */
+      sc.addEventListener('pointermove', e => { if (dn) sc.scrollLeft = dn.l - (e.clientX - dn.x); });
+      const up = () => { dn = null; sc.classList.remove('drag'); }; sc.addEventListener('pointerup', up); sc.addEventListener('pointercancel', up);
+      sc.addEventListener('scroll', () => hint.classList.add('gone'), { once: true }); }
     let seed, W, H, D, SP, dots = [], dpr, LX = 0, LY = 0;
     const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
     const blob = () => { const k = []; for (let i = 0; i < 9; i++) k.push(1 + (rnd() - .5) * (.24 + (o.lump || 0))); return { k, ph: rnd() * 6.3 }; };
     const build = () => {
-      dpr = Math.min(2, devicePixelRatio || 1); const W0 = box.clientWidth, H0 = box.clientHeight; if (!W0) return; cv.width = W0 * dpr; cv.height = H0 * dpr;
-      W = H0; H = W0; D = Math.min(H / 30, W / 23) * (W0 < 600 ? .68 : 1);   /* on phones the map is drawn smaller, so more of the lines darting off it show */ SP = D * 1.3 * (o.sp || 1); seed = 5 + n * 7; dots = [];
-      const G = D * 1.4, CX = W * .56, CY = H * .5, A = 2.6 * D, B = 2.4 * D, off = D * 2, rk = k => ({ hx: A + k * G, hy: B + k * G });
+      dpr = Math.min(2, devicePixelRatio || 1); const W0 = box.clientWidth, H0 = box.clientHeight; if (!W0) return;
+      W = H0; D = W / 23 * (W0 < 600 ? .68 : 1);   /* on phones the map is drawn smaller */
+      const MI = D * 3, MY = D * 5, CY = D * 3 + 13.4 * MY; H = Math.max(W0, CY + 11.4 * MY + D * 3);   /* Linden in the north to 95th in the south; north–south drawn longer than east–west, so there is a long way to scroll */
+      long.style.width = H + 'px'; cv.width = Math.round(H * dpr); cv.height = Math.round(W * dpr);
+      requestAnimationFrame(() => { if (!sc.dataset.set) { sc.scrollLeft = CY - W0 / 2; sc.dataset.set = 1; } });   /* it opens on the Loop */ SP = D * 1.3 * (o.sp || 1); seed = 5 + n * 7; dots = [];
+      const G = D * 1.4, CX = W * .56, A = 2.6 * D, B = 2.4 * D, off = D * 2, M = (e, n) => [CX + e * MI, CY - n * MY], rk = k => ({ hx: A + k * G, hy: B + k * G });
       const ring = k => { const { hx, hy } = rk(k), r = D * (.5 + k * .25), pts = [], arc = (cx, cy, a0) => { for (let i = 0; i <= 12; i++) { const a = a0 + i / 12 * Math.PI / 2; pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); } };
         arc(CX + hx - r, CY - hy + r, -Math.PI / 2); arc(CX + hx - r, CY + hy - r, 0); arc(CX - hx + r, CY + hy - r, Math.PI / 2); arc(CX - hx + r, CY - hy + r, Math.PI);
         return { pts: resample(pts, 1, true), hx, hy }; };
       const O = rk(4), top = CY - O.hy, bot = CY + O.hy, left = CX - O.hx;
-      /* the real routes, north up, the lake to the east (the whole map is turned afterwards to fill the band) */
+      /* the real routes, north up, the lake to the east, from end to end (the whole map is turned afterwards, north to the left).
+         M(east, north) is a point that many miles from the Loop. Lines that run west leave the band; the rest stop at their terminals. */
       const LOOP = [
-        { k: 0, col: OCHRE, leg: R => { const x = CX + D * 2, yb = CY + R.hy + D * 3.2; return [[x, CY + R.hy], [x, yb], [x - (H + off - yb), H + off]]; } },                    /* Orange: south out of the Loop, then away south-west to Midway */
-        { k: 1, col: PURPLE, leg: R => { const y = CY - R.hy, xt = CX - O.hx - D * 4.5; return [[CX - R.hx * .3, y], [xt, y], [xt - (H + off - y) * .55, H + off]]; } },          /* Pink: west along Lake, then south-west to 54th/Cermak */
-        { k: 2, col: PINK, leg: R => { const y = CY - R.hy; return [[CX - R.hx * .3, y], [-off, y]]; },                                                                          /* Green: west along Lake to Harlem */
-                           leg2: R => { const x = CX + D * 4.3; return [[x, CY + R.hy], [x, H + off]]; } },                                                                       /*   and south out of the Loop to Ashland and Cottage Grove */
-        { k: 3, col: GOLD, leg: R => { const x = CX - D * 3.6; return [[x, CY - R.hy], [x, -off]]; } },                                                                          /* Purple: straight north to Evanston */
-        { k: 4, col: SKY, leg: R => { const x = CX - D * 5.4, yb = CY - R.hy - D * 9; return [[x, CY - R.hy], [x, yb], [x - (yb + off) * .18, -off]]; } },                  /* Brown: north, then away north-west to Kimball */
+        { k: 0, col: OCHRE, end: 1, leg: R => { const x = CX + D * 2; return [[x, CY + R.hy], [x, CY + R.hy + D * 3], M(-1.4, -2.3), M(-3.1, -4.1), M(-3.6, -5)]; } },                     /* Orange: south, then south-west to Midway */
+        { k: 1, col: PURPLE, leg: R => { const y = CY - R.hy, xt = CX - O.hx - D * 4.5; return [[CX - R.hx * .3, y], [xt, y], M(-2.2, -.6), M(-2.5, -1.6), [-off, CY + 1.7 * MY]]; } },   /* Pink: west along Lake, south-west, then west to 54th/Cermak */
+        { k: 2, col: PINK, leg: R => { const y = CY - R.hy; return [[CX - R.hx * .3, y], [-off, y]]; },                                                                        /* Green: west along Lake to Harlem */
+                           leg2: R => { const x = CX + D * 4.3; return [[x, CY + R.hy], M(.5, -2.5), M(.55, -5.6), M(.5, -6.4)]; },                                              /*   south through Bronzeville to Garfield */
+                           leg3: () => [M(.5, -6.4), M(1.1, -6.5), M(1.8, -6.6)], leg4: () => [M(.5, -6.4), M(-.6, -6.5), M(-1.6, -6.6)], end: 1 },                            /*   then east to Cottage Grove and west to Ashland/63rd */
+        { k: 3, col: GOLD, end: 1, leg: R => { const x = CX - D * 3.6; return [[x, CY - R.hy], M(.5, 2.4), M(1, 4.5), M(1.15, 7), M(.8, 9.6), M(.2, 11.6), M(-.2, 13.2)]; } },       /* Purple: north beside the Red to Howard, on through Evanston to Linden */
+        { k: 4, col: SKY, end: 1, leg: R => { const x = CX - D * 5.4; return [[x, CY - R.hy], M(-1.1, 2), M(-1.1, 4.4), M(-1.7, 5.4), M(-2.7, 6.3), M(-3.7, 6.8)]; } },                 /* Brown: north, then north-west to Kimball */
       ];
       const xr = CX + D * .2, xb = CX - D * 1.7, yo = CY - O.hy - D * 1.6, yw = CY + O.hy + D * 1.6;
       const THRU = [
-        { col: BLUE, pts: [[xr, -off], [xr, H + off]] },                                                                                                                           /* Red: north to south, under State St */
-        { col: ORANGE, pts: [[xb - D * 2.2 - (yo - D * 6 + off) * .16, -off], [xb - D * 2.2, yo - D * 6], [xb, yo - D * 2], [xb, yw], [-off, yw]] },                                                                                        /* Blue: in from O'Hare, under Dearborn, out west to Forest Park */
+        { col: BLUE, end: 1, pts: [M(-.3, 9.6), M(-.1, 7.6), M(-.45, 5), M(-.35, 2.6), [xr, CY - 1.2 * MY], [xr, CY + 1.2 * MY], M(-.3, -3), M(-.3, -8), M(-.35, -11.2)] },   /* Red: Howard to 95th, under State St and down the Dan Ryan */
+        { col: ORANGE, pts: [M(-6.5, 8.5), M(-3.6, 6), M(-2, 3.6), [xb - D * 2.2, yo - D * 6], [xb, yo - D * 2], [xb, yw], M(-2.5, -1.1), [-off, yw + .3 * MY]] },   /* Blue: in from O'Hare, through the Loop under Dearborn, out west to Forest Park */
       ];
       const OTHER = new Proxy({}, { get: () => [GOLD, BLUE] });
       const sizeAt = (x, y) => { let s = 1 + (rnd() - .5) * 2 * (o.vary || 0); if (o.taper) { const dd = Math.hypot(x - CX, y - CY) / (Math.hypot(W, H) * .5); s *= Math.max(.25, 1.25 - dd * 1.5); } return Math.max(.3, s); };
@@ -762,13 +778,15 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
         const roll = rnd(), kind = roll < (o.ring || 0) ? 'ring' : roll < (o.ring || 0) + (o.inner || 0) ? 'inner' : '';
         dots.push({ x, y, s, P, li, col: ALLBLUE ? BLUE : col, sz, R, kind, hi: Math.floor(rnd() * 3), ring: inLoop, ic: OTHER[col][Math.floor(rnd() * 2)], b: blob(), b2: blob() }); };
       let inLoop = 0; const lines = [];   /* every line's dots, kept to sprinkle halos and doubles round later */
+      const ends = []; THRU.forEach(L => { if (L.end) ends.push(L.pts[0], L.pts[L.pts.length - 1]); }); LOOP.forEach(L => { if (!L.end) return; const R = ring(L.k); for (const f of (L.leg3 ? [L.leg3, L.leg4] : [L.leg])) { const p = f(R); ends.push(p[p.length - 1]); } });
+      for (const q of ends) { const n0 = dots.length; put(q, 0, 1e9, 30, BLUE, 1.7); if (dots.length > n0) dots[n0].kind = 'ring'; }   /* each terminal: a bigger open circle */
       THRU.forEach((L, i) => { const P = resample(chaikin(L.pts, 2), 1, false); lines.push({ P, col: L.col, li: 10 + i, s0: 0 }); for (let s = 0; s < P.length; s += SP) put(P[Math.floor(s)], s, SP * 9, 10 + i, L.col); });
       LOOP.forEach((L, li) => { const R = ring(L.k), first = L.leg(R), ji = nearest(R.pts, first[0]);
         const around = []; for (let i = 0; i < R.pts.length; i++) around.push(R.pts[(ji + i) % R.pts.length]);
         const cnt = Math.round(around.length / SP), st = around.length / cnt;
         inLoop = 1; for (let i = 0; i < cnt; i++) put(around[Math.floor(i * st)], SP * 8 + i * st, st * 9, li, L.col); inLoop = 0;
         lines.push({ P: around, col: L.col, li, s0: SP * 8 });
-        for (const f of [L.leg, L.leg2, L.leg3]) { if (!f) continue; const leg = resample(chaikin(f(R), 2).reverse(), 1, false);
+        for (const f of [L.leg, L.leg2, L.leg3, L.leg4]) { if (!f) continue; const leg = resample(chaikin(f(R), 2).reverse(), 1, false);
           for (let s = leg.length - SP, j = 0; s >= 0; s -= SP, j++) put(leg[Math.floor(s)], SP * 8 - j * SP, SP * 9, li, L.col);
           lines.push({ P: leg, col: L.col, li, s0: SP * 8 - leg.length }); } });
       if (o.dbl) lines.forEach(L => { for (let s = SP / 2; s < L.P.length - 2; s += SP) { const a = L.P[Math.floor(s)], b = L.P[Math.min(L.P.length - 1, Math.floor(s) + 2)], l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
