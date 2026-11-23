@@ -4080,18 +4080,18 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
   const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; D = [];
     const u = H / 1.75 * .92, Dd = u * .2, st = Dd * .36, oy = (H - u) / 2;   /* river 2's own spacing and dot sizes */
     for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) { const out = Math.max(0, oy - y, y - oy - u), pr = .9 * Math.exp(-Math.pow(out / (H * .1), 1.25));
-      if (Math.random() > pr) continue; const big = Math.random() < .06, v = Math.random();
+      if (Math.random() > pr) continue; const big = Math.random() < .07, v = Math.random();
       D.push({ x: x + (Math.random() - .5) * st * .5, y: y + (Math.random() - .5) * st * .5, r: Dd * .38 * (big ? .55 + Math.random() * .2 : (.2 + Math.random() * .1) * (out ? .7 + .3 * pr : 1)),
-        c: big ? (v < .6 ? BLUE : FILL(v)) : FILL(Math.random()), p: (Math.random() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(Math.random() * 16)], ring: big && Math.random() < .2, rot: Math.random() * 6.3 }); } };
+        c: big ? (v < .8 ? BLUE : FILL(v)) : (Math.random() < .5 ? BLUE : FILL(Math.random())),   /* lots of blue */ p: (Math.random() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(Math.random() * 16)], ring: big && Math.random() < .2, rot: Math.random() * 6.3 }); } };
   build(); new ResizeObserver(build).observe(box);
   const frame = now => { raf = 0; if (!vis || !W) return; const dt = prev ? Math.min(.05, (now - prev) / 1000) : .016; prev = now;
-    T += dt * (reduce ? 0 : .22 + wind * 1.3);   /* a gentle breeze */ wind *= Math.pow(.15, dt);
+    T += dt * (reduce ? 0 : .14 + wind * .8);   /* a gentle breeze */ wind *= Math.pow(.15, dt);
     const R = H * .42, L = W + 4 * R, n = W < 600 ? 2 : 3, ED = [...Array(n)].map((_, i) => { const p = ((T * W * .12 + i * L / n) % L + L) % L, cx = W + 2 * R - p, cy = H * (.35 + .3 * (p / L)) + Math.sin(T * .7 + i * 2) * H * .05;   // right to left, and a little downhill
       return [cx, cy, i % 2 ? -1 : 1]; });
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
     for (const d of D) { let x = d.x, y = d.y, sw = 1, spin = 0;
-      for (const [cx, cy, sg] of ED) { const dx = x - cx, dy = y - cy, q = (dx * dx + dy * dy) / (R * R); if (q > 4) continue; const f = Math.exp(-q * 2), th = sg * f * Math.PI * .8, c = Math.cos(th), s2 = Math.sin(th), pull = 1 - .1 * f;
-        x = cx + (dx * c - dy * s2) * pull; y = cy + (dx * s2 + dy * c) * pull; sw *= 1 + .1 * f; spin += th; }   /* swept round the swirl, pulled in a little and swelling as it whooshes by */
+      for (const [cx, cy, sg] of ED) { const dx = x - cx, dy = y - cy, q = (dx * dx + dy * dy) / (R * R); if (q > 4) continue; const f = Math.exp(-q * 2), th = sg * f * Math.PI * .45, c = Math.cos(th), s2 = Math.sin(th), pull = 1 - .1 * f;
+        x = cx + (dx * c - dy * s2) * pull; y = cy + (dx * s2 + dy * c) * pull; sw *= 1 + .05 * f; spin += th; }   /* swept round the swirl, pulled in a little and swelling as it whooshes by */
       d.px = x; d.py = y; d.pr = d.r * sw * 1.08; d.ps = spin; }   /* (1.08: room for the organic wobble) */
     /* no two dots ever overlap: biggest first, each smaller dot shrinks to fit the space it has left */
     const cs = Math.max(8, H / 9), grid = new Map(), gap = 1.5, ord = D.slice().sort((a, b) => b.r - a.r);
