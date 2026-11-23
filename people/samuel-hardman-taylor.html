@@ -604,7 +604,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 @media (max-width:760px){.ph-d{min-height:0;padding-bottom:150px}.ph-d .ph-grid{flex-direction:column;align-items:flex-start}.ph-d .ph-photo{width:56%}}
 html body .top:not(.lift){background:none !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
 .top:not(.lift) .menu-btn{color:#f2eedd !important}.top:not(.lift) .mark{filter:brightness(0) invert(94%) sepia(9%) saturate(390%) hue-rotate(10deg) !important}
-.mm-top{padding-top:clamp(44px,5vw,72px) !important}
+.mm-top{padding-top:clamp(24px,3vw,40px) !important}
 </style></head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -1698,11 +1698,29 @@ html body .pubs li > a[href]::before,html body .r-list li > a[href]::before,html
         let k = Math.max(0, Math.min(1, (e - .92) / .45));
         if (mob) { const tl = Math.hypot(q.x / (W * .72), q.y / (boxes[3][3] + 70)); k *= Math.max(0, Math.min(1, (tl - 1) / .35)); }   /* on phones the top left, by the menu and "All people", stays clear */
         return { ...q, k: inBox ? 0 : k * k * (3 - 2 * k), ph: Math.random() * 6.3 }; }).filter(q => q.k > .05); };
-  const draw = t => { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-    for (const d of dots) { const r = d.r * (.35 + .65 * d.k) * (1 + (still ? 0 : .06 * Math.sin(t / 1000 * .8 + d.ph))), x = d.x + (still ? 0 : 2.5 * Math.sin(t / 1000 * .5 + d.ph)), y = d.y + (still ? 0 : 2.5 * Math.cos(t / 1000 * .43 + d.ph));
-      const p = new Path2D(); p.arc(x, y, r, 0, 6.283); g.fillStyle = d.b ? '#f2eedd' : '#e7aa4d'; d.ring && r > 3 ? mlHole(g, p) : g.fill(p); }
+  /* each dot: an organic shape around its own centre (so the logo hole sits inside it), wandering and breathing like the landing page;
+     on arrival they swell in from the edges, and as you scroll down they drift up and away */
+  const shape = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
+    for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .045 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
+    p.closePath(); return p; };
+  const T0 = performance.now(), ss = v => { v = Math.min(1, Math.max(0, v)); return v * v * (3 - 2 * v); };
+  const draw = t => { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    const s = (t - T0) / 1000, ex = still ? 0 : ss(scrollY / Math.max(240, H * .7)), AMP = still ? 0 : (W < 700 ? 2.6 : 3.4);
+    for (const d of dots) { if (!d.p) { d.p = shape(); d.fx = .25 + Math.random() * .35; d.fy = .25 + Math.random() * .35; d.rot = Math.random() * 6.3; d.sp = (Math.random() - .5) * .5; d.dl = Math.random() * .5 + Math.min(1, Math.hypot(d.x / W - .5, d.y / H - .5)) * -.3 + .3; d.up = .3 + Math.random() * .7; d.sw = (Math.random() - .5) * 60; }
+      const inn = still ? 1 : ss((s - d.dl) / .7), k = ex * (.6 + .4 * d.up);
+      let r = d.r * (.35 + .65 * d.k) * inn * (1 + .06 * Math.sin(s * .8 + d.ph)) * (1 - .55 * k); if (r < .4) continue;
+      const x = d.x + AMP * Math.sin(s * d.fx + d.ph) + d.sw * k, y = d.y + AMP * Math.cos(s * d.fy + d.ph * 1.3) - k * H * .35 * d.up;
+      g.setTransform(dpr * r, 0, 0, dpr * r, dpr * x, dpr * y); g.rotate(d.rot + s * d.sp * .2);
+      g.fillStyle = d.b ? '#f2eedd' : '#e7aa4d'; if (d.ring && r > 3) mlHole(g, d.p); else g.fill(d.p); }
     if (!still) requestAnimationFrame(draw); };
   build(); addEventListener('resize', build); document.fonts && document.fonts.ready.then(build); requestAnimationFrame(draw); })();
 </script>
+<style>.mm-top{border-bottom:0 !important;margin-bottom:0}.mm-top + section,.mm-top ~ section:first-of-type{border-top:0 !important}.mm-top::after,.mm-top::before{display:none !important}</style>
+<style>
+html body main section.mm.mm-top{padding-top:clamp(28px,3.5vw,48px) !important;padding-bottom:clamp(8px,1.5vw,20px) !important;margin-top:0 !important}
+html body main.person:has(> .mm-top){padding-top:0 !important}
+/* the name in Inter Light, spaced so no two letters touch */
+html body .ph-d h1{font-weight:300 !important;letter-spacing:-.015em !important;line-height:.98 !important}
+</style>
 </body>
 </html>
