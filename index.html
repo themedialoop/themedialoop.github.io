@@ -3892,10 +3892,10 @@ function orbitRiver(box) {
         if (c % 2) shape(cx, yy, 4, hr * 1.02, 3, d, Math.PI / 4); else hexR(cx, yy, hr, d, BLUE); clear.push([cx, yy, hr * 1.25]); }
       for (let c = 0; c < N; c++) { const [ax, ay] = pts[c], [bx0, by] = pts[(c + 1) % N], bx = c + 1 === N ? bx0 + P : bx0; corridor([[ax, ay], [ax + u * .35, ay], [bx - u * .15, by], [bx, by]], clear); } }
     if (kind === 'z5') { for (const L of zig(.26, u * .24, false)) corridor(L, clear); corridor([[0, cy], [P, cy]], clear); }
-    if (kind === 'oct') { const ho = u * .47, hh = u * .25; OCT = 1;   /* an octagon with a hexagon inside, turning opposite ways; river 2's diagonals run straight through both in bold dotted lines, an X in every bay */
-      for (let c = 0; c < N; c++) { const cx = (c + .5) * u, d = c % 2 ? -1 : 1; shape(cx, cy, 8, ho, 5, d, Math.PI / 8, .3); shape(cx, cy, 6, hh, 3, -d, 0, .3); }
+    if (kind === 'oct') { const ho = u * .38, hh = u * .19; OCT = 1;   /* calmer: an octagon with a hexagon inside, spaced apart, turning opposite ways; the X lines only cross in the gaps between them */
+      for (let c = 0; c < N; c++) { const cx = (c + .5) * u, d = c % 2 ? -1 : 1; shape(cx, cy, 8, ho, 3, d, Math.PI / 8, .36); shape(cx, cy, 6, hh, 2, -d, 0, .32); }
       for (let c = 0; c < N; c++) for (const L of [[[c * u, oy], [(c + 1) * u, oy + u]], [[(c + 1) * u, oy], [c * u, oy + u]]])
-        for (const [x, y] of resample(L, D * .36)) { if (Math.hypot(x - (c + .5) * u, y - cy) < hh * .95) continue; put(x, y, .32 + rnd() * .04, {}, 0); } }   /* the X runs up to the hexagon; its middle is left to the colourful dots */
+        for (const [x, y] of resample(L, D * .42)) { if (Math.hypot(x - (c + .5) * u, y - cy) < ho * 1.2) continue; put(x, y, .3 + rnd() * .04, {}, 0); } }
     if (kind === 'court') { const hr = u * .33;
       for (let c = 0; c < N; c++) { const cx = (c + .5) * u; shape(cx, cy, 4, hr, 3, c % 2 ? -1 : 1, Math.PI / 4); clear.push([cx, cy, hr * 1.15]); }
       for (const y of [oy, oy + u]) corridor([[0, y], [P, y]], []);   /* the long corridors */
@@ -3925,7 +3925,7 @@ function orbitRiver(box) {
       movers = []; for (let p = 0; p < 2; p++) for (let k = 0; k < N; k++) movers.push({ p, s: (k + p * .5) / N, sz: .58 + rnd() * .1, bl: blob(), ring: rnd() < .2 }); }
     const st = D * .36;   /* every gap filled with small dots in the other colours; past the band's edge they thin into a sprinkle */
     for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < P; x += st) { const out = Math.max(0, oy - y, y - oy - u), pr = .9 * Math.exp(-Math.pow(out / (H * .1), 1.25));
-      if (kind === 'oct' && !out && rnd() < .4 && Math.hypot(x - (Math.floor(x / u) + .5) * u, y - (oy + u / 2)) > u * .22) continue;   /* a lighter field, so the X lines and the shapes read */
+      if (kind === 'oct' && !out && rnd() < .55 && Math.hypot(x - (Math.floor(x / u) + .5) * u, y - (oy + u / 2)) > u * .22) continue;   /* a lighter field, so the X lines and the shapes read */
       if (rnd() < pr) put(x + (rnd() - .5) * st * .5, y + (rnd() - .5) * st * .5, (.2 + rnd() * .1) * (out ? .7 + .3 * pr : 1) * (kind === 'oct' ? .72 : 1), { fl: 1, col: kind === 'd2' ? (v => v < .5 ? '#e7aa4d' : v < .8 ? BLUE : v < .9 ? '#d8708e' : '#2a8c8c')(rnd()) : kind === 'gold' ? (v => v < .55 ? BLUE : v < .7 ? '#e0773a' : v < .82 ? '#d8708e' : v < .92 ? '#9b6aa6' : '#2a8c8c')(rnd()) : FILL(rnd()) }, D * .07); }
   };
   const along = (pts, f) => { const segs = pts.length - 1, t = ((f % 1) + 1) % 1 * segs, i = Math.floor(t), r = t - i, a = pts[i], b = pts[i + 1]; return [a[0] + (b[0] - a[0]) * r, a[1] + (b[1] - a[1]) * r]; };
@@ -3981,7 +3981,7 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
     p.closePath(); return p; };
   pills.forEach(d => { const cv = document.createElement('canvas'); cv.className = 'ab-line'; cv.setAttribute('aria-hidden', 'true'); d.querySelector('summary').prepend(cv); d._dots = [];   /* inside the summary so it shows while the card is closed */ });
   /* the line only comes out when the card is opened: dots the size of the button grow out of it, up and down, one after another */
-  const DEG = [7.6, 8.7, 9.8];   // at least a full degree apart   // all lean out to the right as they go down, each a touch more than the last   // the first leans left to right, the second right to left, the third right to left and steeper; each card its own angle (none matches the people cards), all leaning inward so no dot is cut off at the side
+  const DEG = [7.6, 10.6, 13.6];   // 3 degrees apart, so the difference shows   // at least a full degree apart   // all lean out to the right as they go down, each a touch more than the last   // the first leans left to right, the second right to left, the third right to left and steeper; each card its own angle (none matches the people cards), all leaning inward so no dot is cut off at the side
   const draw1 = (d) => { const pi = pills.indexOf(d), cv = d.querySelector('canvas.ab-line'), pm = d.querySelector('.pm'); if (!pm) return;
     const W = d.clientWidth, H = d.clientHeight; if (!W) return; const dpr = Math.min(2, devicePixelRatio || 1);
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = W * dpr; cv.height = H * dpr; }
