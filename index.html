@@ -3685,12 +3685,12 @@ html body .ab-pill{overflow-anchor:none}
     const put = (x, y, sz, extra, gp) => { x = ((x % P) + P) % P; const R = D * .46 * sz; if (y < R + 2 || y > H - R - 2 || clash(x, y, R, gp)) return;
       dots.push({ x, y, sz, R, s: 0, li: 0, Pp: 1e9, w: 0, ring: rnd() < .15, hi: Math.floor(rnd() * 3), bl: blob(), col: '#2c5494', ...extra }); };
     for (let c = 0; c < N; c++) { const cx = (c + .5) * u, cy = oy + u / 2, dir = c % 2 ? -1 : 1, n = 7;   /* the hexagons: big blue dots on six corners and between */
-      const hcol = ['#2c5494', '#2c5494', '#e0773a', '#2c5494', '#9b6aa6', '#2c5494', '#d8708e', '#2c5494'][c % 8];   /* most hexagons blue, a few in the other colours */
+      const hcol = '#2c5494';   /* every hexagon blue */
       for (let k = 0; k < 6 * 2; k++) { const a = k / 12 * Math.PI * 2, kk = k % 2 ? Math.cos(Math.PI / 6) : 1; put(cx + Math.cos(a) * hr * kk, cy + Math.sin(a) * hr * kk, .62 + rnd() * .14, { hc: [cx, cy], ang: a, rr: hr * kk, dir, col: hcol }, D * .08); } }
     for (let c = 0; c < N; c++) for (const L of [[[c * u, oy], [(c + 1) * u, oy + u]], [[(c + 1) * u, oy], [c * u, oy + u]]])   /* the corridors, in fine dots, stopping at each hexagon */
       for (const [x, y] of resample(L, D * .42)) { const cx = (c + .5) * u, cy = oy + u / 2; if (Math.hypot(x - cx, y - cy) < hr * 1.22) continue; put(x, y, .34 + rnd() * .06, {}, D * .05); }
-    const st = D * .5;   /* a light scatter of small gold dots, kept clear of the hexagons so they read */
-    for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < P; x += st) if (rnd() < .45 && Math.hypot(x - (Math.floor(x / u) + .5) * u, y - (oy + u / 2)) > hr * 1.3) put(x + (rnd() - .5) * st * .5, y + (rnd() - .5) * st * .5, .3 + rnd() * .1, { col: (v => v < .62 ? '#e7aa4d' : v < .76 ? '#e0773a' : v < .87 ? '#d8708e' : v < .95 ? '#9b6aa6' : '#2a8c8c')(rnd()) }, D * .1);
+    const st = D * .36;   /* filling every gap */
+    for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < P; x += st) if (rnd() < .9) put(x + (rnd() - .5) * st * .5, y + (rnd() - .5) * st * .5, .2 + rnd() * .1, { col: (v => v < .4 ? '#e7aa4d' : v < .56 ? '#e0773a' : v < .7 ? '#d8708e' : v < .82 ? '#9b6aa6' : v < .9 ? '#2a8c8c' : '#2c5494')(rnd()) }, D * .07);   /* the gaps filled with small dots in the other colours, a few blue */
   };
   build(); new ResizeObserver(build).observe(box);
   const drawBlob = (x, y, b, r) => { const m = b.k.length; g.beginPath();
