@@ -3661,7 +3661,7 @@ html body .ab-pill{overflow-anchor:none}
 <style>
 /* the BSB banner after the publications: full width, a little wider than the screen so its ends never show, tipped slightly downward */
 .bsb-band{position:relative;z-index:0;height:clamp(190px,17vw,260px);width:112vw;margin:clamp(40px,6vw,90px) 0 clamp(40px,6vw,90px) calc(50% - 56vw);rotate:3deg;pointer-events:none}   /* a thin band, about an inch: a visual break between Publications and Resources */
-.bsb-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block;-webkit-mask:linear-gradient(transparent,#000 7%,#000 93%,transparent);mask:linear-gradient(transparent,#000 7%,#000 93%,transparent)}
+.bsb-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 <script>
 /* the banner's dots: assets/bsbfield.js, repeating left to right; the building blue, the field gold; a slow swell runs along the lines */
@@ -3682,11 +3682,7 @@ html body .ab-pill{overflow-anchor:none}
     const u = H * .92, oy = (H - u) / 2, N = 8, hr = u * .36; P = N * u; D = u * .2; dots = [];
     const wx = (a, b) => { const d = Math.abs(a - b) % P; return Math.min(d, P - d); };
     const clash = (x, y, R, gp) => dots.some(o => wx(o.x, x) ** 2 + (o.y - y) ** 2 < (R + o.R + gp) ** 2);
-    const HR = D * .46 * .76;   /* the biggest hexagon dot */
-    const swept = (x, y, R) => { if (!extraHex) for (let c = -1; c <= N; c++) { const d = Math.hypot(wx(x, (c + .5) * u), y - (oy + u / 2)); if (d > hr * .866 - HR - R - D * .12 && d < hr + HR + R + D * .12) return true; } return false; };   /* the ring each hexagon sweeps as it turns stays clear, so nothing ever overlaps */
-    let extraHex = false;
-    const put = (x, y, sz, extra, gp) => { x = ((x % P) + P) % P; const R = D * .46 * sz; extraHex = !!(extra && extra.hc); if (y < R + 2 || y > H - R - 2 || clash(x, y, R, gp) || swept(x, y, R)) return;
-      const ef = Math.min(y, H - y) / (H * .22); if (ef < 1 && !extraHex) { if (rnd() > ef) return; sz *= .55 + .45 * ef; }   /* the band thins and shrinks toward its top and bottom, fading into the cream */
+    const put = (x, y, sz, extra, gp) => { x = ((x % P) + P) % P; const R = D * .46 * sz; if (y < R + 2 || y > H - R - 2 || clash(x, y, R, gp)) return;
       dots.push({ x, y, sz, R, s: 0, li: 0, Pp: 1e9, w: 0, ring: rnd() < .15, hi: Math.floor(rnd() * 3), bl: blob(), col: '#2c5494', ...extra }); };
     for (let c = 0; c < N; c++) { const cx = (c + .5) * u, cy = oy + u / 2, dir = c % 2 ? -1 : 1, n = 7;   /* the hexagons: big blue dots on six corners and between */
       const hcol = '#2c5494';   /* every hexagon blue */
@@ -3738,17 +3734,26 @@ html body .ab-pill{overflow-anchor:none}
 /* people cards: plain blue, with a little line of gold dots under the photo and the name */
 .people .card canvas.cnet{display:none !important}
 .people .card{background-color:#2c5494 !important;background-image:none !important}
-.people .card .dotline{position:absolute;z-index:1;pointer-events:none;height:10px;background:radial-gradient(circle at center,#e7aa4d 0 3.4px,transparent 3.9px) left center/16px 10px repeat-x;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.people .card .dotline{position:absolute;z-index:1;pointer-events:none;height:16px;display:block;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
 .people .card > h3{position:relative;z-index:1}
 .people .card:hover .dotline,.people .card:focus-visible .dotline{transform:translateX(6px)}
 @media (prefers-reduced-motion:reduce){.people .card .dotline{transition:none}}
 </style>
 <script>
 (() => { const cards = [...document.querySelectorAll('.people .card')];
-  cards.forEach(c => { const d = document.createElement('span'); d.className = 'dotline'; d.setAttribute('aria-hidden', 'true'); c.append(d); });
+  /* the line is drawn like the site's other dots: organic gold dots, a little uneven in size, with an open circle or two */
+  cards.forEach(c => { const d = document.createElement('canvas'); d.className = 'dotline'; d.setAttribute('aria-hidden', 'true'); c.append(d); });
+  const shape = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
+    for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
+    p.closePath(); return p; };
   const fit = () => cards.forEach(c => { const cr = c.getBoundingClientRect(), rs = [...c.querySelectorAll('.ph-wrap, h3')].map(e => e.getBoundingClientRect()).filter(r => r.width);
     if (!rs.length) return; const l = Math.min(...rs.map(r => r.left)) - cr.left, rt = Math.max(...rs.map(r => r.right)) - cr.left, b = Math.max(...rs.map(r => r.bottom)) - cr.top;
-    const d = c.querySelector('.dotline'), w = Math.floor((rt - l) / 16) * 16;   /* whole dots only, none cut */ d.style.left = l + 'px'; d.style.width = w + 'px'; d.style.top = Math.min(cr.height - 24, b + 18) + 'px'; });
+    const cv = c.querySelector('.dotline'), w = rt - l, h = 16, dpr = Math.min(2, devicePixelRatio || 1); cv.style.left = l + 'px'; cv.style.width = w + 'px'; cv.style.top = Math.min(cr.height - 26, b + 16) + 'px';
+    cv.width = w * dpr; cv.height = h * dpr; const g = cv.getContext('2d');
+    if (!c._dl || c._dl.w !== Math.round(w)) { const st = 17, n = Math.floor((w - 12) / st) + 1, pad = (w - (n - 1) * st) / 2, rings = new Set([2 + Math.floor(Math.random() * Math.max(1, n - 4))]); if (n > 14 && Math.random() < .6) rings.add(n - 3 - Math.floor(Math.random() * 3));
+      c._dl = { w: Math.round(w), dots: [...Array(n)].map((_, i) => ({ x: pad + i * st, y: h / 2 + (Math.random() - .5) * 2, r: rings.has(i) ? 6.2 : 3.2 + Math.random() * 1.3, ring: rings.has(i), p: shape(), rot: Math.random() * 6.3 })) }; }
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.fillStyle = '#e7aa4d';
+    for (const d of c._dl.dots) { g.setTransform(dpr * d.r, 0, 0, dpr * d.r, dpr * d.x, dpr * d.y); g.rotate(d.rot); if (d.ring) mlHole(g, d.p); else g.fill(d.p); } });
   fit(); addEventListener('resize', fit); document.fonts && document.fonts.ready.then(fit); setTimeout(fit, 800); })();
 </script>
 </body>
