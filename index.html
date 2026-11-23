@@ -4028,18 +4028,13 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
       else c.style.minHeight = Math.ceil(base + need) + 'px'; } });
   fit(); addEventListener('resize', fit); addEventListener('load', fit); document.fonts && document.fonts.ready.then(fit); setTimeout(fit, 700); setTimeout(fit, 2000); })();
 </script>
-<style>
-/* big section titles in Figtree Black */
-html body h2.bz-h,html body h2.ev-h,html body h2.bz-h *,html body h2.ev-h *{font-family:Figtree,Inter,system-ui,sans-serif !important;font-weight:900 !important}
-html body h2.bz-h,html body h2.ev-h{letter-spacing:-.025em !important}
-</style>
 <style>html body h2.bz-h .tilt-sub{font-family:Inter,system-ui,sans-serif !important;font-weight:200 !important;letter-spacing:-.01em !important}   /* the line under Keep Scrolling in thin Inter */</style>
 <style>
-/* Figtree only goes to Black (900); a hairline of the same colour round each letter makes the titles heavier still */
-html body h2.bz-h,html body h2.ev-h,html body .about-grid .ab-pill h3{-webkit-text-stroke:0;letter-spacing:-.005em !important}
-html body h2.bz-h .tilt-sub{-webkit-text-stroke:0}
-html body .about-grid .ab-pill h3{font-family:Figtree,Inter,system-ui,sans-serif !important;font-weight:900 !important}
+/* back to Inter Black for every title */
+html body h2.bz-h,html body h2.ev-h,html body h2.bz-h *,html body h2.ev-h *,html body .about-grid .ab-pill h3{font-family:Inter,system-ui,sans-serif !important;font-weight:900 !important;-webkit-text-stroke:0 !important}
+html body h2.bz-h,html body h2.ev-h{letter-spacing:-.04em !important}
+html body .about-grid .ab-pill h3{letter-spacing:-.045em !important}
+html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !important}
 </style>
-<style>html body .about-grid .ab-pill h3{-webkit-text-stroke:0 !important;letter-spacing:-.02em !important}   /* the Our cards: plain Figtree Black, no extra hairline */</style>
 </body>
 </html>
