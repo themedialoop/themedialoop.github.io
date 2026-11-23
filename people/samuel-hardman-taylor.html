@@ -589,6 +589,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 </style>
 <style>.person > section:first-of-type{padding-top:clamp(150px,20vw,260px) !important}   /* room for the spill of dots, then clear cream before the first heading */</style>
 <script src="../assets/mlhole.js?v=2"></script>
+<script src="../assets/mlidot.js?v=1"></script>
 <script src="../assets/bsbfield.js?v=3"></script>
 <style>
 /* the profile header: the landing page's field, clearing softly round the photo, the name and the title */
@@ -1021,7 +1022,7 @@ html body .top:not(.lift){background:none !important;backdrop-filter:none !impor
       const dts = [], blob = () => { const p = new Path2D(), q = [R(0, 6.3), R(0, 6.3), R(0, 6.3)]; for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, kq = 1 + .045 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * kq, Math.sin(a) * kq) : p.moveTo(Math.cos(a) * kq, Math.sin(a) * kq); } p.closePath(); return p; };
       const BU = (mobile() ? Math.min(r.width * .44, 180) : Math.min(r.height * .44, 240)) * dpr, BG = 7 * dpr + AMP; side._bu = [BU, BG];   /* bigger bays, more room between dots */
       for (const q of mlBSB({ W: w, H: h, u: BU, seed: 31, gap: BG, edge: null }).dots)
-        dts.push({ x: q.x, y: q.y, r: q.r, ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), rot: R(0, 6.3), sp: R(-.25, .25), gold: !q.b, ring: q.ring, st: Math.random(), p: blob() });
+        dts.push({ x: q.x, y: q.y, r: q.r, ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), rot: R(0, 6.3), sp: R(-.25, .25), gold: !q.b, ring: q.ring, st: Math.random(), p: (Math.random() < .07 && window.mlIDot) ? mlIDot : blob() });
       { const cb = Math.max(...[sideIn.querySelector('.p-photo-wrap'), sideIn.querySelector('.p-role'), sideIn.querySelector('.p-intro h1')].filter(Boolean).map(e => e.getBoundingClientRect().bottom - r.top)) * dpr + 18 * dpr;
         for (let i = dts.length - 1; i >= 0; i--) if (dts[i].y - dts[i].r < cb) dts.splice(i, 1); }   /* dots only in the band below the photo, the name and the title */
       side._dots = dts; side._dkey = key; side._amp = AMP; }
@@ -1344,7 +1345,7 @@ html body .top:not(.lift){background:none !important;backdrop-filter:none !impor
     const BQ = mlBSB({ W: L, H, u: H / 3, seed: 41, periodic: true, gap: 3, edge: 4 }).dots, pOther = Math.min(1, .15 * BQ.length / Math.max(1, BQ.filter(q => !q.b).length));
     for (const q of BQ)
       dots.push({ gi: q.x / S, gj: 2 * q.y / S, sq: null, hx: Math.max(0, Math.min(L - .01, q.x)), hy: q.y, r0: q.r * .95,
-        k: q.b ? 'blue' : Math.random() < pOther ? FK[Math.floor(Math.random() * FK.length)] : 'gold', p: SH[Math.floor(Math.random() * SH.length)], ph: R(0, 6.3), fx: R(.3, .9), fy: R(.3, .9), wa: R(1, 2.2), wb: 0, fz: R(.15, .35), ring: q.ring, ox: 0, oy: 0, pop: 0, hit: -9, k0: null, st: Math.random() });
+        k: q.b ? 'blue' : Math.random() < pOther ? FK[Math.floor(Math.random() * FK.length)] : 'gold', p: ((window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * SH.length)]), ph: R(0, 6.3), fx: R(.3, .9), fy: R(.3, .9), wa: R(1, 2.2), wb: 0, fz: R(.15, .35), ring: q.ring, ox: 0, oy: 0, pop: 0, hit: -9, k0: null, st: Math.random() });
     dots.sort((a, b) => a.hx - b.hx);
   };
 
@@ -1626,7 +1627,7 @@ html body .top:not(.lift){background:none !important;backdrop-filter:none !impor
     /* the BSB field (assets/bsbfield.js): the building in blue, the field in gold; nothing cut by an edge */
     const FC = ['#e7aa4d'];   /* blue and gold only */ D = [];
     for (const q of mlBSB({ W, H, u: Math.max(90, Math.min(H * .5, 150)), seed: 23, gap: 1 + AMP, edge: 3 + AMP }).dots)
-      D.push({ x: q.x, y: q.y, r: q.r, c: q.b ? '#2c5494' : FC[Math.floor(rnd() * FC.length)], s: SH[Math.floor(rnd() * SH.length)], rot: rnd() * 6.3, ring: q.ring, ph: rnd() * 6.3, sp: .35 + rnd() * .4 }); };
+      D.push({ x: q.x, y: q.y, r: q.r, c: q.b ? '#2c5494' : FC[Math.floor(rnd() * FC.length)], s: (rnd() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(rnd() * SH.length)], rot: rnd() * 6.3, ring: q.ring, ph: rnd() * 6.3, sp: .35 + rnd() * .4 }); };
   const draw = t => { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     for (const d of D) { const k = reduce ? 1 : .88 + .12 * Math.sin(t * 1.1 - (d.x + d.y) * .011), r = d.r * k, cq = Math.cos(d.rot) * r * dpr, sq = Math.sin(d.rot) * r * dpr;
       const fx = reduce ? 0 : AMP * .6 * Math.sin(t * d.sp * .7 + d.ph * 2), fy = reduce ? 0 : AMP * Math.sin(t * d.sp + d.ph);   /* floating */
