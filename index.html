@@ -4099,7 +4099,12 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
     const flow = reduce ? 0 : dt * W * (.012 + .05 * Math.min(2, wind));
     for (const d of D) { if (d.vx === 0 && d.vy === 0 && d.ox === 0) { d.vx = .7 + .6 * d.b; d.vy = 1; }
       d.x -= flow * d.vx; if (d.x < -20) { d.x += W + 40; d.ft = -1; }
-      let x = d.x, y = d.y + Math.sin(T * 1.6 * d.vx + d.a * 6.3) * H * .012 + Math.sin(d.x / W * 5 + T * .8) * H * .018, sw = 1, spin = Math.sin(T * d.vx + d.b * 6.3) * .6;
+      /* a big cylinder lying along the band, turning gently: each dot rides round it, rising over the front and sinking behind, bigger in front, smaller behind.
+         It turns slowly on its own, waiting; scrolling spins it on */
+      if (d.th === undefined) d.th = Math.random() * 6.283;
+      d.th -= dt * (reduce ? 0 : .12 + .9 * Math.min(2, wind));
+      const cz = Math.cos(d.th + d.y / H * 3), depth = .78 + .22 * cz;
+      let x = d.x + cz * H * .02, y = d.y + Math.sin(d.th + d.y / H * 3) * H * .07, sw = depth,   /* every dot rides its own slice of the turning drum, so the field stays even */ spin = Math.sin(T * d.vx + d.b * 6.3) * .6;
       if (d.ft < 0 && d.fl && !reduce && wind > .15 && Math.random() < dt * .3 * Math.min(1, wind)) d.ft = 0;   /* a few get carried off, only by the gust your scrolling makes */
       if (d.ft >= 0) { d.ft += dt; const k2 = Math.min(1, d.ft / 2.2), up = d.y < H / 2 ? -1 : 1, ph = k2 * Math.PI * 2.2 + d.a * 6.3, L = H * .06 * Math.sin(k2 * Math.PI);
         x += -k2 * W * .12 + (Math.cos(ph) - Math.cos(d.a * 6.3)) * L; y += up * k2 * k2 * H * .55 + Math.sin(ph) * L; spin += k2 * 8 * (d.a > .5 ? 1 : -1); sw = 1 - .6 * k2;
