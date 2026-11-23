@@ -3817,8 +3817,8 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
 .orbit-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 <script>
-/* the band before Join Our Orbit: river 2's long diagonals; on every crossing an octagon with a hexagon inside, the two turning opposite ways
-   as you scroll, and the whole thing flows right to left (downhill) */
+/* the band before Join Our Orbit: BSB's diagonal corridors as a fine lattice with a big dot at every crossing; big dots walk the corridors as you scroll,
+   and the whole thing flows right to left (downhill) */
 (() => {
 const HOLE = new Path2D('M -0.42 0.05 C -0.40 -0.22 -0.18 -0.43 0.08 -0.41 C 0.32 -0.39 0.46 -0.17 0.43 0.07 C 0.40 0.30 0.18 0.45 -0.06 0.43 C -0.28 0.41 -0.44 0.27 -0.42 0.05 Z');
 const BLUE = '#2c5494', CREAM = '#f2eedd';
@@ -3893,17 +3893,24 @@ function orbitRiver(box) {
         if (c % 2) shape(cx, yy, 4, hr * 1.02, 3, d, Math.PI / 4); else hexR(cx, yy, hr, d, BLUE); clear.push([cx, yy, hr * 1.25]); }
       for (let c = 0; c < N; c++) { const [ax, ay] = pts[c], [bx0, by] = pts[(c + 1) % N], bx = c + 1 === N ? bx0 + P : bx0; corridor([[ax, ay], [ax + u * .35, ay], [bx - u * .15, by], [bx, by]], clear); } }
     if (kind === 'z5') { for (const L of zig(.26, u * .24, false)) corridor(L, clear); corridor([[0, cy], [P, cy]], clear); }
-    if (kind === 'bsb') { /* river 2's own dots and spacing, drawn as the BSB plan: in every bay a big hexagon with a small turned hexagon inside, the X of corridors
+    if (kind === 'lattice') { /* only the corridors: a fine lattice of 45-degree diagonals across the band, big dots at every crossing, and people (big dots) walking the corridors as you scroll */
+      const s2 = u / 2; for (let k = -2; k < N * 2 + 2; k++) { corridor([[k * s2, oy], [k * s2 + u, oy + u]], []); corridor([[k * s2 + u, oy], [k * s2, oy + u]], []); }
+      for (let k = 0; k < N * 2; k++) for (const yy of [oy + u * .25, oy + u * .75]) put((k + (yy > cy ? .5 : 0)) * s2 + s2 * .5, yy, .66, {}, 0);
+      for (const ph of [0, 1, 2, 3]) { const pts = []; for (let c = 0; c <= N * 2; c++) pts.push([c * s2 + ph * s2 * .25, (c + ph) % 2 ? oy + u : oy]); paths.push(pts); }
+      movers = []; for (let p = 0; p < 4; p++) for (let k = 0; k < N; k++) movers.push({ p, s: (k + p * .25) / N, sz: .6 + rnd() * .1, bl: blob(), ring: rnd() < .2, col: BLUE }); }
+    if (kind.startsWith('bsb')) { /* river 2's own dots and spacing, drawn as the BSB plan: in every bay a big hexagon with a small turned hexagon inside, the X of corridors
          corner to corner, and the 45-degree sawtooth wall along both edges. Scrolling drives it: the small hexagons swell out and back, and a wave runs along the corridors */
       const hr = u * .36, hi = u * .15;
-      for (let c = 0; c < N; c++) { const cx = (c + .5) * u;
-        for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2, kk = k % 2 ? Math.cos(Math.PI / 6) : 1; put(cx + Math.cos(a) * hr * kk, cy + Math.sin(a) * hr * kk, .62 + rnd() * .14, { hc: [cx, cy], ang: a, rr: hr * kk, dir: 0 }, D * .08); }
-        for (let k = 0; k < 6; k++) { const a = Math.PI / 6 + k / 6 * Math.PI * 2; put(cx + Math.cos(a) * hi, cy + Math.sin(a) * hi, .5 + rnd() * .1, { hc: [cx, cy], ang: a, rr: hi, dir: 0, inner: c }, D * .06); }
-        clear.push([cx, cy, hr * 1.22]); }
-      X();
+      const E = kind === 'bsbE', hr2 = E ? u * .3 : hr, hi2 = E ? u * .13 : hi, CY = c => E ? cy + (c % 2 ? -1 : 1) * u * .17 : cy;
+      for (let c = 0; c < N; c++) { const cx = (c + .5) * u, yy = CY(c);
+        for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2, kk = k % 2 ? Math.cos(Math.PI / 6) : 1; put(cx + Math.cos(a) * hr2 * kk, yy + Math.sin(a) * hr2 * kk, .62 + rnd() * .14, { hc: [cx, yy], ang: a, rr: hr2 * kk, dir: 0, outer: c }, D * .08); }
+        for (let k = 0; k < 6; k++) { const a = Math.PI / 6 + k / 6 * Math.PI * 2; put(cx + Math.cos(a) * hi2, yy + Math.sin(a) * hi2, .5 + rnd() * .1, { hc: [cx, yy], ang: a, rr: hi2, dir: 0, inner: c }, D * .06); }
+        clear.push([cx, yy, hr2 * 1.22]); }
+      if (E) { for (let c = 0; c < N; c++) { const ax = (c + .5) * u, ay = CY(c), bx = (c + 1.5) * u, by = CY(c + 1); corridor([[ax, ay], [bx, by]], clear);
+          corridor([[ax, ay], [ax - u * .5, c % 2 ? oy : oy + u]], clear); corridor([[ax, ay], [ax + u * .5, c % 2 ? oy : oy + u]], clear); } } else X();
       for (const [y0, sg] of [[oy, -1], [oy + u, 1]]) { const pts = []; for (let k = 0; k <= N * 4; k++) pts.push([k * u / 4, y0 + (k % 2 ? sg * u * .11 : 0)]);
-        for (const [x, y] of resample(pts, D * .42)) put(x, y, .34 + rnd() * .06, {}, D * .05); }
-      dots.forEach(o => { if (!o.hc && !o.fl) o.cw = 1; }); }
+        for (const [x, y] of resample(pts, D * .42)) put(x, y, .34 + rnd() * .06, { wb: y0, wo: y - y0 }, D * .05); }
+      dots.forEach(o => { if (!o.hc && !o.fl) { o.cw = 1; const c0 = Math.floor(o.x / u), cxx = (c0 + .5) * u; o.bay = c0; o.ct = Math.max(0, Math.min(1, (Math.hypot(o.x - cxx, o.y - cy) - hr * 1.2) / (u * .71 - hr * 1.2))); } if (o.fl) o.bay = Math.floor(o.x / u); }); }
     if (kind === 'oct') { const ho = u * .38, hh = u * .19; OCT = 1;   /* calmer: an octagon with a hexagon inside, spaced apart, turning opposite ways; the X lines only cross in the gaps between them */
       for (let c = 0; c < N; c++) { const cx = (c + .5) * u, d = c % 2 ? -1 : 1; shape(cx, cy, 8, ho, 3, d, Math.PI / 8, .36); shape(cx, cy, 6, hh, 2, -d, 0, .32); }
       for (let c = 0; c < N; c++) for (const L of [[[c * u, oy], [(c + 1) * u, oy + u]], [[(c + 1) * u, oy], [c * u, oy + u]]])
@@ -3953,16 +3960,20 @@ function orbitRiver(box) {
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     const ang = kind === 'bsb' ? 0 : sc * .004, MV = [];   /* the BSB shapes hold still; the life is in the swell and your pointer */   /* where every moving dot is right now (in pattern space) */
     for (const d of dots) if (d.sp) { const [ax, ay, an, tt, ph] = d.sp, a2 = an + Math.sin(ph + sc * .012) * .1;   /* the spurs sway only as you scroll */ MV.push([ax + Math.cos(a2) * tt, ay + Math.sin(a2) * tt, D * .38 * d.sz, d]); }
-    for (const d of dots) if (d.hc) { const a = d.ang + d.dir * ang, rr = d.rr * (d.inner !== undefined ? 1 + .9 * Math.max(0, Math.sin(sc * .006 - d.inner * .9)) : 1); MV.push([d.hc[0] + Math.cos(a) * rr, d.hc[1] + Math.sin(a) * rr, D * .38 * d.sz, d]); }
-    for (const m of movers) { const [x, y] = along(paths[m.p], m.s + sc * .00018 + t * .004); MV.push([x, y, D * .38 * m.sz, m]); }
+    for (const d of dots) if (d.hc) { const a = d.ang + d.dir * ang, sw0 = Math.max(0, Math.sin(sc * .006 - (d.inner !== undefined ? d.inner : d.outer || 0) * .9)), rr = d.rr * (d.inner !== undefined ? 1 + (kind === 'bsbD' || kind === 'bsbC' ? 0 : .9) * sw0 : kind === 'bsbB' && d.outer !== undefined ? 1 - .14 * sw0 : 1); MV.push([d.hc[0] + Math.cos(a) * rr, d.hc[1] + Math.sin(a) * rr, D * .38 * d.sz, d]); }
+    for (const m of movers) { const [x, y] = along(paths[m.p], m.s + sc * .00018 + (kind === 'lattice' ? 0 : t * .004)); MV.push([x, y, D * .38 * m.sz, m]); }
     const room = d => { let f = 1; for (const [hx, hy, hr2] of MV) { const dx = wx(d.x, ((hx % P) + P) % P); if (dx > hr2 + D) continue; const dd = Math.hypot(dx, d.y - hy), r = D * .38 * d.sz; if (dd < hr2 + r + D * .1) f = Math.min(f, Math.max(0, (dd - hr2 - D * .1) / r)); } return f; };
     for (let k = -2; k * P < W + P; k++) { const ox = k * P + shift;
-      for (const d of dots) { if (d.hc || d.sp) continue; const x = d.x + ox; if (x < -D || x > W + D) continue; const sh = d.fl || !d.hc ? room(d) : 1; if (sh < .15) continue; const sw = d.cw ? 1 + .7 * Math.max(0, Math.sin(d.x / (D * 5) - sc * .012)) ** 6 : d.wl ? 1 + .45 * Math.max(0, Math.sin(d.s / (D * 3) + sc * .02)) ** 4 : 1; const [qx, qy, qr] = part(x, d.y, D * .38 * d.sz * sh * sw); one(qx, qy, d, qr); }
+      for (const d of dots) { if (d.hc || d.sp) continue; const x = d.x + ox; if (x < -D || x > W + D) continue; const sh = d.fl || !d.hc ? room(d) : 1; if (sh < .15) continue; let sw = d.cw && kind !== 'bsbD' ? 1 + .7 * Math.max(0, Math.sin(d.x / (D * 5) - sc * .012)) ** 6 : d.wl ? 1 + .45 * Math.max(0, Math.sin(d.s / (D * 3) + sc * .02)) ** 4 : 1, yy = d.y;
+        if (kind === 'bsbB' && d.wb !== undefined) yy = d.wb + d.wo * (1 + .9 * Math.sin(sc * .008 + d.x / u * 1.6));   /* the sawtooth teeth open and close as you scroll */
+        if (kind === 'bsbD' && d.ct !== undefined && d.wb === undefined) { const p = (Math.sin(sc * .005 - d.bay * .8) + 1) / 2 * 1.3; sw *= Math.max(0, Math.min(1, (p - d.ct) * 4)); if (sw < .15) continue; }   /* the corridors draw themselves out from each hexagon and back */
+        let col0 = d.col; if (kind === 'bsbC' && d.fl && Math.abs(d.y - cy) < u * .5) { const on = Math.max(0, Math.sin(sc * .005 - d.bay * .9)) ** 3; if (on > .5) d.col = BLUE; sw *= 1 + .5 * on; }   /* a bay at a time fills with blue as you scroll */
+        const [qx, qy, qr] = part(x, yy, D * .38 * d.sz * sh * sw); one(qx, qy, d, qr); d.col = col0; }
       for (const [x, y, r, d] of MV) { const X = x + ox; if (X < -D * 2 || X > W + D * 2) continue; const [qx, qy, qr] = part(X, y, r); one(qx, qy, d, qr); } }
     if (!reduce) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box);
 }
-const box = document.querySelector('.orbit-band'); if (!box) return; box.dataset.o = 'bsb'; if (!box.querySelector('canvas')) box.append(document.createElement('canvas')); orbitRiver(box);
+const box = document.querySelector('.orbit-band'); if (!box) return; box.dataset.o = 'lattice'; if (!box.querySelector('canvas')) box.append(document.createElement('canvas')); orbitRiver(box);
 })();
 </script>
 <style>
