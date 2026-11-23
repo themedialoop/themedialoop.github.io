@@ -3730,12 +3730,12 @@ html body .ab-pill{overflow-anchor:none}
 }
 </style>
 <style>
-/* the dot river keeps its own proportions and is simply drawn larger, so it fills about 80% of the screen's height */
+/* the dot river keeps its own proportions and is simply drawn larger, so it fills about two thirds of the screen's height */
 .river.lf{scale:var(--rvs,1);margin-block:var(--rvm,0px)}
 </style>
 <script>
 (() => { const fit = () => document.querySelectorAll('.river.lf').forEach(el => { el.style.removeProperty('--rvs'); el.style.removeProperty('--rvm');
-    const h = el.offsetHeight, k = Math.max(1, innerHeight * .8 / (h || 1)); el.style.setProperty('--rvs', k.toFixed(3)); el.style.setProperty('--rvm', ((k - 1) * h / 2).toFixed(1) + 'px'); });
+    const h = el.offsetHeight, k = Math.max(1, innerHeight * .66 / (h || 1));   /* a little skinnier, so the arrows at its foot stay on screen */ el.style.setProperty('--rvs', k.toFixed(3)); el.style.setProperty('--rvm', ((k - 1) * h / 2).toFixed(1) + 'px'); });
   fit(); addEventListener('resize', fit); })();
 </script>
 <style>
