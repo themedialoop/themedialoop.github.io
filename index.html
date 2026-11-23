@@ -4064,51 +4064,36 @@ html body .about-grid .ab-pill h3{letter-spacing:-.045em !important}
 html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !important}
 </style>
 <script>
-/* the band before Join Our Orbit: a breeze of dots (Eddies). Dots of every size, with small ones filling the gaps and a medialoop wordmark or two caught up among them,
-   blown right to left and curled round in slow swirls while you scroll; when you stop, the wind dies and they settle within a moment */
-(() => { const BLUE = '#2c5494', COLS = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c'];
+/* the band before Join Our Orbit: a calm field of dots, river 2's sizes and colours, that eddies whoosh through. Each eddy travels right to left
+   and a little downhill, sweeping the dots it passes round in a swirl; once it has gone by, they settle back into place. The eddies drift
+   slowly on their own and race through as you scroll */
+(() => { const box = document.querySelector('.orbit-band'); if (!box) return; const cv = box.querySelector('canvas') || box.appendChild(document.createElement('canvas')), g = cv.getContext('2d');
+  const BLUE = '#2c5494', FILL = v => v < .38 ? '#e7aa4d' : v < .54 ? '#e0773a' : v < .68 ? '#d8708e' : v < .8 ? '#9b6aa6' : v < .88 ? '#2a8c8c' : BLUE;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const blob = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
-    for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .07 * Math.sin(2 * a + q[0]) + .05 * Math.sin(3 * a + q[1]) + .03 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
+    for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
     p.closePath(); return p; };
   const SH = [...Array(16)].map(blob);
-  const dot = (g, dpr, x, y, r, c, k, ring, rot) => { g.setTransform(dpr * r, 0, 0, dpr * r, dpr * x, dpr * y); g.rotate(rot); g.fillStyle = c; const p = k === -1 && window.mlIDot ? mlIDot : SH[((k % 16) + 16) % 16]; if (ring && window.mlHole) mlHole(g, p); else g.fill(p); };
-  const noise = (x, y, t) => Math.sin(x * 1.7 + t * .9) * Math.cos(y * 1.3 - t * .7) + .5 * Math.sin(x * 3.1 - y * 2.3 + t * 1.3);   // a smooth wind field
-  const WM = new Image(); WM.src = 'assets/medialoop-wordmark-nodot.svg';
-  let lastY = scrollY, wind = 0; addEventListener('scroll', () => { wind = Math.min(1.6, wind + Math.abs(scrollY - lastY) * .012); lastY = scrollY; }, { passive: true });
-  [document.querySelector('.orbit-band')].filter(Boolean).forEach(box => { const V = 'E', cv = box.querySelector('canvas') || box.appendChild(document.createElement('canvas')), g = cv.getContext('2d'); let W, H, dpr, P = [], vis = false, raf = 0, prev = performance.now(), T = 0;
-    const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr;
-      const st = Math.max(10, H / 20),   /* dots in proportion to river 2's */ n = Math.round(W * H / (st * st * (V === 'D' ? 9 : V === 'C' ? 7 : V === 'E' ? 5 : 11)));
-      P = [...Array(n)].map((_, i) => { const r = Math.random(); return { x: Math.random() * W, y: Math.random() * H, hx: 0, hy: 0, u: Math.random(), v: Math.random(), r: st * (r < .6 ? .18 + Math.random() * .12 : r < .92 ? .32 + Math.random() * .14 : .5 + Math.random() * .2),
-        c: V === 'D' ? (Math.random() < .85 ? BLUE : COLS[Math.floor(Math.random() * 5)]) : (Math.random() < .45 ? BLUE : COLS[Math.floor(Math.random() * 5)]), k: Math.random() < .06 ? -1 : i, ring: Math.random() < .13, rot: Math.random() * 6.3, ph: Math.random() * 6.3, sp: .6 + Math.random() * .8, vx: 0, vy: 0 }; });
-      if (V === 'E') for (let i = 0, m = Math.round(W * H / (st * st * 2.2)); i < m; i++) P.push({ x: Math.random() * W, y: Math.random() * H, u: Math.random(), v: Math.random(), r: st * (.11 + Math.random() * .1), c: Math.random() < .5 ? BLUE : COLS[Math.floor(Math.random() * 5)], k: i, ring: false, rot: Math.random() * 6.3, ph: Math.random() * 6.3, sp: .5 + Math.random() * .9, vx: 0, vy: 0, small: 1 });   /* small dots fill the gaps, riding the same wind */
-      for (let i = 0; i < (W < 600 ? 1 : 2); i++) P.push({ x: W * (i ? .78 : .3), y: H * (i ? .38 : .6), u: Math.random(), v: Math.random(), r: st * 2.1, c: BLUE, k: 0, ring: false, rot: 0, ph: Math.random() * 6.3, sp: .45, vx: 0, vy: 0, logo: 1 });   /* a medialoop wordmark or two, carried on the same wind */
-      P.forEach(p => { p.hx = p.x; p.hy = p.y; }); };
-    build(); new ResizeObserver(build).observe(box);
-    const frame = now => { raf = 0; if (!vis || !W) return; const dt = Math.min(.05, (now - prev) / 1000); prev = now; if (reduce) { draw(); return; }
-      const wv = wind, act = Math.min(1.8, .16 + wv);   /* a gentle flow at rest, like the other rivers; scrolling whips it up */ T += dt * act; const base = W * .05 * act;   /* the breeze only blows while you scroll, and dies down within a moment when you stop */   // the breeze, picking up as you scroll
-      for (const p of P) {
-        if (V === 'A') { p.x -= base * p.sp * dt * (1 + p.r / 10); p.y += Math.sin(T * 1.3 * p.sp + p.ph) * H * .06 * dt * (1 + wv) + noise(p.x / W * 3, p.y / H * 2, T) * H * .02 * dt; p.rot += dt * (.5 + wv) * (p.sp - .9); }
-        if (V === 'B') { const gust = Math.max(0, Math.sin((p.x / W) * 4 - T * 2.2)) ** 3 * wv; p.vx += (-gust * W * .25 + (p.hx - p.x) * .8) * dt; p.vy += (Math.sin(p.ph + T * 3) * gust * H * .5 + (p.hy - p.y) * .8) * dt; p.vx *= .93; p.vy *= .93; p.x += p.vx * dt * 3; p.y += p.vy * dt * 3; p.rot += p.vx * dt * .02;
-          p.hx -= W * .01 * dt; if (p.hx < -20) { p.hx += W + 40; p.x += W + 40; } }
-        if (V === 'C') { p.u -= dt * .035 * p.sp * (1 + wv * 1.5); if (p.u < 0) p.u += 1; const x = p.u * (W + 80) - 40, mid = H / 2 + Math.sin(p.u * 7 + T * .8) * H * .22, tw = Math.sin(p.u * 11 - T * 1.4) * H * .14;
-          p.x = x + Math.sin(T + p.ph) * 4; p.y = mid + (p.v - .5) * tw * 2; p.rot += dt * .4; }
-        if (V === 'D') { const cx = W * (.5 + .38 * Math.sin(T * .23)), cy = H * (.5 + .25 * Math.sin(T * .41 + 1)), ang = T * .5 + noise(p.u, p.v, T * .5), rr = (.1 + .34 * p.u) * W * (.7 + .3 * Math.sin(T * .7 + p.v * 3)), sq = .3 + .12 * Math.sin(T * .3);
-          const tx = cx + Math.cos(ang + p.v * 6.28) * rr, ty = cy + Math.sin(ang + p.v * 6.28) * rr * sq; p.x += (tx - p.x) * dt * (1.2 + wv * .3); p.y += (ty - p.y) * dt * (1.2 + wv * .3); p.rot += dt * .3; }
-        if (V === 'E') { let vx = -base * p.sp, vy = base * .1; for (const [ex, ey, s] of (W < 600 ? [[.3, .5, 1], [.8, .5, -1]] : [[.2, .5, 1], [.5, .48, -1], [.8, .52, 1]])) { const L = W * 1.2, dx = p.x - ((ex * W - T * W * .03) % L + L) % L + W * .1, dy = p.y - ey * H, d = Math.hypot(dx, dy) + 1, f = Math.exp(-((d / (H * .46)) ** 2)) * act;   /* big, dramatic whirls that loop dots right round */
-            vx += -dy / d * f * H * 1.5 * s; vy += dx / d * f * H * 1.5 * s; } p.x += vx * dt; p.y += vy * dt + (H / 2 - p.y) * dt * .05 * act;
-            { const e = Math.max(0, Math.min(1, (W * .22 - p.x) / (W * .22))); if (e > 0) {   /* near the left edge a gust catches it: it speeds up, tumbles, shrinks and is blown off the page, downhill */
-              p.x -= e * e * W * .9 * dt * act; p.y += e * e * H * (.25 + .5 * (p.ph % 1)) * dt * act * (p.ph > 1.6 ? 1 : -.35); p.rot += e * (p.logo ? 3 : 9) * dt * act; } p.ex = e; }
-            if (p.logo) p.rot += (Math.max(-.5, Math.min(.5, Math.atan2(vy, -vx || -1) * .6)) - p.rot) * Math.min(1, dt * 3); else p.rot += dt * (vy / 60); }   /* the logo turns with the wind, like a dot, but never far enough to be unreadable */
-        if (p.x < -30) { p.x += W + 60; p.hx = p.x; } if (p.x > W + 30 && V !== 'B') p.x -= W + 60; if (V !== 'C' && V !== 'D') { if (p.y < -20) p.y += H + 40; if (p.y > H + 20) p.y -= H + 40; } if (p.small && V === 'E' && Math.random() < dt * .25 * act) { p.x = Math.random() * W; p.y = Math.random() * H; } }
-      wind *= Math.pow(.02, dt); draw(); raf = requestAnimationFrame(frame); };
-    const draw = () => { g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
-      const LG = P.filter(q => q.logo).map(q => [q.x, q.y, q.r * 4278 / 1185 / 2 * (1 - .75 * (q.ex || 0) ** 1.5) + 3, q.r / 2 + 3]);
-      for (const p of P) { if (!p.logo) { let sh = 1; for (const [lx, ly, hw, hh] of LG) { const ex = Math.abs(p.x - lx) / hw, ey = Math.abs(p.y - ly) / hh; if (ex < 1.15 && ey < 1.3) sh = Math.min(sh, Math.max(0, Math.max(ex - .95, (ey - 1) * .7) * 5)); }   /* dots shrink out of the way of the logos */
-          sh *= (1 - .75 * (p.ex || 0) ** 1.5) * Math.max(0, Math.min(1, Math.min(p.y, H - p.y) / (H * .14)));   /* the band's top and bottom edges thin out softly instead of cutting off */ if (sh > .1) dot(g, dpr, p.x, p.y, p.r * sh, p.c, p.k, p.ring, p.rot); continue; } if (!WM.complete || !WM.naturalWidth) continue;
-        const wh = p.r * (1 - .75 * (p.ex || 0) ** 1.5), ww = wh * 4278 / 1185; g.setTransform(dpr, 0, 0, dpr, dpr * p.x, dpr * p.y); g.rotate(p.rot); g.drawImage(WM, -ww / 2, -wh / 2, ww, wh);
-        g.translate(-ww / 2 + ww * (.47751 + .03637 / 2), -wh / 2 + wh * (.24869 + .11527 / 2)); g.scale(wh * .085, wh * .085); g.fillStyle = '#e7aa4d'; g.fill(window.mlIDot || SH[0]); g.setTransform(1, 0, 0, 1, 0, 0); } };
-    new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) { prev = performance.now(); raf = requestAnimationFrame(frame); } }, { rootMargin: '100px' }).observe(box); }); })();
+  let W, H, dpr, D = [], vis = false, raf = 0, prev = 0, T = 0, lastY = scrollY, wind = 0;
+  addEventListener('scroll', () => { wind = Math.min(3, wind + Math.abs(scrollY - lastY) * .01); lastY = scrollY; }, { passive: true });
+  const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; D = [];
+    const u = H / 1.75 * .92, Dd = u * .2, st = Dd * .36, oy = (H - u) / 2;   /* river 2's own spacing and dot sizes */
+    for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) { const out = Math.max(0, oy - y, y - oy - u), pr = .9 * Math.exp(-Math.pow(out / (H * .1), 1.25));
+      if (Math.random() > pr) continue; const big = Math.random() < .06, v = Math.random();
+      D.push({ x: x + (Math.random() - .5) * st * .5, y: y + (Math.random() - .5) * st * .5, r: Dd * .38 * (big ? .55 + Math.random() * .2 : (.2 + Math.random() * .1) * (out ? .7 + .3 * pr : 1)),
+        c: big ? (v < .6 ? BLUE : FILL(v)) : FILL(Math.random()), p: (Math.random() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(Math.random() * 16)], ring: big && Math.random() < .2, rot: Math.random() * 6.3 }); } };
+  build(); new ResizeObserver(build).observe(box);
+  const frame = now => { raf = 0; if (!vis || !W) return; const dt = prev ? Math.min(.05, (now - prev) / 1000) : .016; prev = now;
+    T += dt * (reduce ? 0 : .35 + wind * 2.2); wind *= Math.pow(.15, dt);
+    const R = H * .42, L = W + 4 * R, n = W < 600 ? 2 : 3, ED = [...Array(n)].map((_, i) => { const p = ((T * W * .12 + i * L / n) % L + L) % L, cx = W + 2 * R - p, cy = H * (.4 + .2 * (p / L)) + Math.sin(T * .7 + i * 2) * H * .05;   // right to left, and a little downhill
+      return [cx, cy, i % 2 ? -1 : 1]; });
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    for (const d of D) { let x = d.x, y = d.y, sw = 1, spin = 0;
+      for (const [cx, cy, sg] of ED) { const dx = x - cx, dy = y - cy, q = (dx * dx + dy * dy) / (R * R); if (q > 4) continue; const f = Math.exp(-q * 2), th = sg * f * Math.PI * 1.25, c = Math.cos(th), s2 = Math.sin(th), pull = 1 - .1 * f;
+        x = cx + (dx * c - dy * s2) * pull; y = cy + (dx * s2 + dy * c) * pull; sw *= 1 + .18 * f; spin += th; }   /* swept round the swirl, pulled in a little and swelling as it whooshes by */
+      const r = d.r * sw; g.setTransform(dpr * r, 0, 0, dpr * r, dpr * x, dpr * y); g.rotate(d.rot + spin); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
+    if (!reduce) raf = requestAnimationFrame(frame); };
+  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) { prev = 0; raf = requestAnimationFrame(frame); } }, { rootMargin: '100px' }).observe(box); })();
 </script>
 </body>
 </html>
