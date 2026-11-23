@@ -20,11 +20,10 @@ window.mlHoleSVG = (k, size, x, y) => {   /* the same, as an SVG path for a dot 
 
 /* mlBlow(k, a, b, W, H): a dot caught by the breeze and blown off the page, right to left and downhill. k runs 0 (at rest) to 1 (gone);
    a and b (0-1) are the dot's own randomness. Returns [dx, dy, spin, scale]: it accelerates away, loops and flutters, tumbles and shrinks */
-window.mlBlow = (k, a, b, W, H) => { if (k <= 0) return [0, 0, 0, 1]; k = Math.min(1, k);
-  const g = Math.pow(k, 1.7), arc = k * (1 - k) * 4, ph = k * Math.PI * 2 * (1 + b * 1.5) + a * 6.3, R = H * (.05 + .1 * b) * arc;
-  return [-g * W * (.95 + .6 * a) + (Math.cos(ph) - Math.cos(a * 6.3)) * R,
-          g * H * (.12 + .28 * b) + Math.sin(ph) * R + Math.sin(k * 9 + a * 6.3) * arc * H * .03,
-          k * (a > .5 ? 1 : -1) * (5 + 9 * b), 1 - .75 * Math.pow(k, 1.3)]; };
+window.mlBlow = (k, a, b, W, H) => { if (k <= 0) return [0, 0, 0, 1]; k = Math.min(1, k);   /* subtle: a short drift on the breeze, a little loop, and the dot shrinks away */
+  const g = Math.pow(k, 1.5), arc = k * (1 - k) * 4, ph = k * Math.PI * 2 * (1 + b) + a * 6.3, R = H * (.02 + .035 * b) * arc;
+  return [-g * W * (.14 + .12 * a) + (Math.cos(ph) - Math.cos(a * 6.3)) * R, g * H * (.05 + .08 * b) + Math.sin(ph) * R,
+          k * (a > .5 ? 1 : -1) * (1 + 2 * b), 1 - .92 * Math.pow(k, 1.15)]; };
 
 /* the breeze that brings every dot field in and takes it away again. mlBreezeAt(host, x, y, W, H): as the host scrolls up into view from the
    bottom, its dots are blown in from the right, looping down into place; as it leaves off the top, they're blown away to the left and downhill.
@@ -33,11 +32,12 @@ window.mlBlow = (k, a, b, W, H) => { if (k <= 0) return [0, 0, 0, 1]; k = Math.m
   const prog = host => { const now = performance.now(), c = K.get(host); if (c && now - c.t < 12) return c.k;
     const r = host.getBoundingClientRect(), vh = innerHeight, k = [cl((r.top - vh * .62) / (vh * .38)), cl((vh * .38 - r.bottom) / (vh * .38))]; K.set(host, { t: now, k }); return k; };
   const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.mlBreezeAt = (host, x, y, W, H) => { if (still()) return null; const [ki, ko] = prog(host); if (!ki && !ko) return null;
+  const OPT = new WeakMap(); window.mlBreezeAt = (host, x, y, W, H) => { if (still()) return null; const o = OPT.get(host) || {}, dir = o.dir || 1, amt = o.amt == null ? 1 : o.amt; const [ki, ko] = prog(host); if (!ki && !ko) return null;
     const a = .5 + .5 * Math.sin(x * .0137 + y * .0213 + 1.3), b = .5 + .5 * Math.sin(x * .0171 - y * .0119 + 4.1), u = cl(x / Math.max(1, W));
-    if (ko > 0) { const B = mlBlow(cl(ko * 1.6 - (1 - u) * .5 - a * .1), a, b, W, H); return B; }
-    const B = mlBlow(cl(ki * 1.6 - u * .5 - a * .1), a, b, W, H); return [-B[0], -B[1], -B[2], B[3]]; };
-  window.mlBreezeOn = (canvas, host) => { const g = canvas.getContext('2d'); if (g._breeze) return; g._breeze = 1; const f0 = g.fill.bind(g);
+    const sc = B => [B[0] * dir * amt, B[1] * amt, B[2] * amt, 1 - (1 - B[3]) * Math.min(1, amt * 1.5)];
+    if (ko > 0) return sc(mlBlow(cl(ko * 1.6 - (1 - u) * .5 - a * .1), a, b, W, H));
+    const B = sc(mlBlow(cl(ki * 1.6 - u * .5 - a * .1), a, b, W, H)); return [-B[0], -B[1], -B[2], B[3]]; };
+  window.mlBreezeOn = (canvas, host, opt) => { if (opt) OPT.set(host, opt); const g = canvas.getContext('2d'); if (g._breeze) return; g._breeze = 1; const f0 = g.fill.bind(g);
     g.fill = function (p, rule) { if (!(p instanceof Path2D)) return rule ? f0(p, rule) : p ? f0(p) : f0();
       const m = g.getTransform(); if ((m.e === 0 && m.f === 0) || Math.hypot(m.a, m.b) > 400) return rule ? f0(p, rule) : f0(p);
       const dpr = canvas.width / Math.max(1, canvas.clientWidth), B = mlBreezeAt(host, m.e / dpr, m.f / dpr, canvas.clientWidth, canvas.clientHeight); if (!B) return rule ? f0(p, rule) : f0(p);
