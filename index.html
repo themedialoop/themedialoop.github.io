@@ -899,6 +899,9 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   </section>
 </div>
 
+<!-- the stairs band: Netsch's sculptural stair as a pattern, before Join Our Orbit -->
+<div class="stair-band" aria-hidden="true"><canvas></canvas></div>
+
 <footer class="wrap" id="contact" data-net="0.14 0.42 0.33" data-net-m="0.12 0.4 0.36">
   <h2 class="bz-h sec-h ct-h"><span class="bz-a">Join</span> <span class="bz-b">Our Orbit</span></h2>
   <p class="contact">There is something rather magical about finding another person who thinks like you. <span class="t4">Please take a moment to connect.</span></p>
@@ -3788,6 +3791,52 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
       R.dots = [...Array(n)].map((_, i) => ({ a: i / n * Math.PI * 2 + (Math.random() - .5) * .03, r: rings.has(i) ? 13 : 7.4 + Math.random() * 2.8, ring: rings.has(i), p: shape(), rot: Math.random() * 6.3, dr: (Math.random() - .5) * 2.5 })); }
     g.fillStyle = R.col; for (const d of R.dots) { const rr = rad + d.dr; g.setTransform(dpr * d.r, 0, 0, dpr * d.r, dpr * (S / 2 + Math.cos(d.a) * rr), dpr * (S / 2 + Math.sin(d.a) * rr)); g.rotate(d.rot); if (d.ring) mlHole(g, d.p); else g.fill(d.p); } });
   draw(); addEventListener('resize', draw); setTimeout(draw, 600); })();
+</script>
+<style>
+/* the stairs band before Join Our Orbit: skinny, tipped down from right to left */
+.stair-band{position:relative;height:clamp(200px,17vw,260px);width:112vw;margin:clamp(30px,5vw,70px) 0 clamp(10px,2vw,30px) calc(50% - 56vw);rotate:-3deg;pointer-events:none}
+.stair-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+</style>
+<script>
+/* nested squares, each turned a little more than the last; as you scroll every square turns (the inner ones faster) and
+   neighbouring stairs wind opposite ways. Colour fills every gap, and those small dots step aside as a stair dot passes. */
+(() => { const box = document.querySelector('.stair-band'); if (!box) return; const cv = box.querySelector('canvas'), g = cv.getContext('2d'), still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const FILL = ['#e7aa4d', '#e7aa4d', '#e0773a', '#e0773a', '#d8708e', '#d8708e', '#9b6aa6', '#2a8c8c'];
+  let W, H, D, P, dots = [], dpr, seed; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const blob = () => { const k = []; for (let i = 0; i < 9; i++) k.push(1 + (rnd() - .5) * .26); return { k, ph: rnd() * 6.3 }; };
+  const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; seed = 13; dots = [];
+    const core = H * .66, k = core / 100, oy = (H - core) / 2, T = 108; P = 2 * T * k; D = core / (W < 700 ? 13 : 15);
+    const wx = (a, b) => { const d = Math.abs(a - b) % P; return Math.min(d, P - d); };
+    const clash = (x, y, R, gp) => dots.some(o => !o.rc && wx(o.x, x) ** 2 + (o.y - y) ** 2 < (R + o.R + gp) ** 2);
+    for (let c = 0; c < 2; c++) { const cx = (c * T + T / 2) * k, cy = oy + 50 * k, dir = c % 2 ? -1 : 1;
+      [44, 34, 24, 14].forEach((h, q) => { const a0 = q * .2 * dir, n = Math.max(8, Math.round(8 * h * k / (q ? D * .62 : D * 1.2)));
+        for (let i = 0; i < n; i++) { const t = i / n * 4, side = Math.floor(t), f = t - side, c4 = [[-1, -1], [1, -1], [1, 1], [-1, 1]], A = c4[side], B = c4[(side + 1) % 4];
+          const lx = (A[0] + (B[0] - A[0]) * f) * h * k, ly = (A[1] + (B[1] - A[1]) * f) * h * k, x = cx + lx * Math.cos(a0) - ly * Math.sin(a0), y = cy + lx * Math.sin(a0) + ly * Math.cos(a0);
+          const sz = q ? .62 + rnd() * .1 : .92 + rnd() * .3; dots.push({ x, y, R: D * .46 * sz, sz, col: '#2c5494', rc: [cx, cy], rr: Math.hypot(x - cx, y - cy), ang: Math.atan2(y - cy, x - cx), dir, spin: 1 + q * .5, ring: rnd() < .15, hi: Math.floor(rnd() * 3), bl: blob() }); } }); }
+    const st = D * .62;
+    for (let y = st * .4, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < P; x += st) { const out = Math.max(0, oy - y, y - oy - core), pr = .88 * Math.exp(-Math.pow(out / (H * .09), 1.3));
+      const px = ((x + (rnd() - .5) * st * .5) % P + P) % P, py = y + (rnd() - .5) * st * .5, sz = (.42 + rnd() * .16) * (out ? .75 + .25 * pr : 1), R = D * .46 * sz;
+      if (rnd() < pr && py > R && py < H - R && !clash(px, py, R, D * .08)) dots.push({ x: px, y: py, R, sz, col: FILL[Math.floor(rnd() * FILL.length)], ring: rnd() < .15, hi: Math.floor(rnd() * 3), bl: blob() }); } };
+  build(); new ResizeObserver(build).observe(box);
+  const drawBlob = (x, y, b, r) => { const m = b.k.length; g.beginPath(); for (let i = 0; i <= m; i++) { const a = i / m * 6.283 + b.ph, qx = x + Math.cos(a) * r * b.k[i % m], qy = y + Math.sin(a) * r * b.k[i % m];
+    if (!i) g.moveTo(qx, qy); else { const a0 = (i - .5) / m * 6.283 + b.ph, r0 = r * (b.k[i - 1] + b.k[i % m]) / 2 * 1.06; g.quadraticCurveTo(x + Math.cos(a0) * r0, y + Math.sin(a0) * r0, qx, qy); } } };
+  const shape = () => { const p = new Path2D(); p.arc(0, 0, 1, 0, 6.283); return p; };
+  let vis = false, raf = 0; const t0 = performance.now();
+  const frame = now => { raf = 0; if (!W || !vis) return; const t = (now - t0) / 1000, sy = still ? 0 : scrollY, shift = still ? 0 : (((t * D * .3 + sy * .5) % P) + P) % P;
+    const cs = D * 1.5, nI = Math.ceil(P / cs), MG = new Map();
+    for (const d of dots) if (d.rc) { const a = d.ang + d.dir * d.spin * sy * .004; d.cx = ((d.rc[0] + Math.cos(a) * d.rr) % P + P) % P; d.cy = d.rc[1] + Math.sin(a) * d.rr; const q = Math.floor(d.cx / cs) * 4096 + Math.floor(d.cy / cs); (MG.get(q) || MG.set(q, []).get(q)).push(d); }
+    const room = d => { const gi = Math.floor(d.x / cs), gj = Math.floor(d.y / cs), r = D * .38 * d.sz; let f = 1;
+      for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) { const L = MG.get((((gi + a) % nI) + nI) % nI * 4096 + gj + b); if (L) for (const o of L) { let dx = Math.abs(d.x - o.cx) % P; dx = Math.min(dx, P - dx); const dd = Math.hypot(dx, d.y - o.cy), hr = D * .38 * o.sz; if (dd < hr + r + D * .08) f = Math.min(f, Math.max(0, (dd - hr - D * .08) / r)); } }
+      return f; };
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    for (let kk = -1; kk * P < W + P; kk++) { const ox = kk * P + shift;
+      for (const d of dots) { const x0 = d.rc ? d.cx : d.x, x = x0 + ox, y = d.rc ? d.cy : d.y; if (x < -D || x > W + D) continue; const f = d.rc ? 1 : room(d); if (f < .15) continue;
+        const r = D * .38 * d.sz * f; g.fillStyle = d.col;
+        if (d.ring && r > 3) { if (!d.p) { d.p = new Path2D(); const m = d.bl.k.length; for (let i = 0; i <= m; i++) { const a = i / m * 6.283 + d.bl.ph, kk = d.bl.k[i % m]; i ? d.p.lineTo(Math.cos(a) * kk, Math.sin(a) * kk) : d.p.moveTo(Math.cos(a) * kk, Math.sin(a) * kk); } d.p.closePath(); }
+          g.save(); g.translate(x, y); g.scale(r, r); mlHole(g, d.p); g.restore(); } else { drawBlob(x, y, d.bl, r); g.fill(); } } }
+    if (!still) raf = requestAnimationFrame(frame); };
+  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box);
+})();
 </script>
 </body>
 </html>
