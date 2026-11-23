@@ -3978,10 +3978,10 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
     const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
     if (!d.open) { d._t0 = 0; return; }
     if (!d._t0) d._t0 = performance.now(); const el = reduce ? 1e9 : performance.now() - d._t0;
-    const dr = d.getBoundingClientRect(), br = pm.getBoundingClientRect(), bx = br.left - dr.left + br.width / 2, by = br.top - dr.top + br.height / 2, bR = Math.min(br.width, br.height) / 2;
-    const sm = W < 600 ? .58 : W < 900 ? .78 : 1,   /* smaller dots on narrow screens */ dg = DEG[pi % 3], drift = Math.abs(dg) * 5, A = Math.sign(dg) * Math.min(Math.abs(dg) * Math.PI / 180, Math.atan(drift / Math.max(1, H - by))), sx = Math.sin(A)   /* the lean stays slight on a tall open card: at most a few px of drift per degree */, cy = Math.cos(A), st = bR * sm * 2 * 1.32;
+    const dr = d.getBoundingClientRect(), br = pm.getBoundingClientRect(), bx = br.left - dr.left + br.width / 2, by = br.top - dr.top + br.height / 2, bR = Math.min(pm.offsetWidth, pm.offsetHeight) / 2;   /* the button's own size, not its turned bounding box */
+    const sm = .9,   /* about the button's diameter (the organic wobble adds the rest) */ dg = DEG[pi % 3], drift = Math.abs(dg) * 5, A = Math.sign(dg) * Math.min(Math.abs(dg) * Math.PI / 180, Math.atan(drift / Math.max(1, H - by))), sx = Math.sin(A)   /* the lean stays slight on a tall open card: at most a few px of drift per degree */, cy = Math.cos(A), st = bR * sm * 2 * 1.32;
     const n = Math.ceil((H + 2 * bR) / cy / st) + 2, k0 = Math.ceil((by + bR) / cy / st);
-    while (d._dots.length < n + 2) d._dots.push({ f: .94 + Math.random() * .1, p: shape(), rot: Math.random() * 6.3, j: (Math.random() - .5) * 3, ring: Math.random() < .15 });
+    while (d._dots.length < n + 2) d._dots.push({ f: .96 + Math.random() * .06, p: shape(), rot: Math.random() * 6.3, j: (Math.random() - .5) * 3, ring: Math.random() < .15 });
     g.fillStyle = getComputedStyle(pm).backgroundColor; let minX = W;
     for (let i = 0; i < n; i++) { const k = i - k0; if (k === 0) continue; const t = k * st, q = d._dots[i], r = bR * q.f * sm, x = bx + t * sx + q.j, y = by + t * cy;
       if (y < -r || y > H + r) continue; if (y > br.bottom - dr.top) minX = Math.min(minX, x - r);
