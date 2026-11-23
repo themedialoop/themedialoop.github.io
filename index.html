@@ -3769,11 +3769,25 @@ html body .apply:is(:hover,:focus-visible) .ap-kind::before{background:#e7aa4d !
 html body .apply:is(:hover,:focus-visible) .ap-go{background:#e7aa4d !important;color:#2c5494 !important;filter:none !important}
 </style>
 <style>
-/* resource cards: a ring of dots round the circle, in a colour that answers the card and the circle */
-.res .r-go::after{content:'';position:absolute;inset:-13%;z-index:-1;pointer-events:none;background:var(--ring,#d8708e);-webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Ccircle%20cx%3D%2750%27%20cy%3D%2750%27%20r%3D%2746%27%20fill%3D%27none%27%20stroke%3D%27%23000%27%20stroke-width%3D%273.4%27%20stroke-linecap%3D%27round%27%20stroke-dasharray%3D%270%207.23%27/%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20100%20100%27%3E%3Ccircle%20cx%3D%2750%27%20cy%3D%2750%27%20r%3D%2746%27%20fill%3D%27none%27%20stroke%3D%27%23000%27%20stroke-width%3D%273.4%27%20stroke-linecap%3D%27round%27%20stroke-dasharray%3D%270%207.23%27/%3E%3C/svg%3E") center/100% 100% no-repeat;animation:rgRing 60s linear infinite}
+/* resource cards: a ring of dots round the circle, drawn like the people cards' dot line (organic dots, a little uneven, an open circle or two), in a colour that answers the card */
+html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;inset:-16%;width:132%;height:132%;z-index:-1;pointer-events:none;animation:rgRing 70s linear infinite}
 @keyframes rgRing{to{rotate:360deg}}
-@media (prefers-reduced-motion:reduce){.res .r-go::after{animation:none}}
-.res.bd1{--ring:#d8708e}.res.bd2{--ring:#e0773a}.res.bd3{--ring:#d8708e}.res.bd4{--ring:#e7aa4d}.res.bd5{--ring:#f2eedd}.res.bd6{--ring:#d8708e}
+@media (prefers-reduced-motion:reduce){.res .r-go .rg-ring{animation:none}}
 </style>
+<script>
+(() => { const RING = { bd1: '#d8708e', bd2: '#e0773a', bd3: '#d8708e', bd4: '#e7aa4d', bd5: '#f2eedd', bd6: '#d8708e' };
+  const shape = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
+    for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
+    p.closePath(); return p; };
+  const cards = [...document.querySelectorAll('#resources .res')];
+  cards.forEach(c => { const go = c.querySelector('.r-go'); if (!go) return; const cv = document.createElement('canvas'); cv.className = 'rg-ring'; cv.setAttribute('aria-hidden', 'true'); go.append(cv);
+    c._ring = { cv, col: RING[[...c.classList].find(k => RING[k])] || '#d8708e' }; });
+  const draw = () => cards.forEach(c => { const R = c._ring; if (!R) return; const S = R.cv.clientWidth; if (!S) return; const dpr = Math.min(2, devicePixelRatio || 1);
+    R.cv.width = S * dpr; R.cv.height = S * dpr; const g = R.cv.getContext('2d'), rad = S / 2 / 1.32 * 1.13, st = S < 260 ? 30 : 36, n = Math.max(8, Math.round(2 * Math.PI * rad / st));
+    if (!R.dots || R.dots.length !== n) { const rings = new Set([Math.floor(Math.random() * n)]); if (n > 18) rings.add((Math.floor(Math.random() * n) + Math.floor(n / 2)) % n);
+      R.dots = [...Array(n)].map((_, i) => ({ a: i / n * Math.PI * 2 + (Math.random() - .5) * .03, r: rings.has(i) ? 13 : 7.4 + Math.random() * 2.8, ring: rings.has(i), p: shape(), rot: Math.random() * 6.3, dr: (Math.random() - .5) * 2.5 })); }
+    g.fillStyle = R.col; for (const d of R.dots) { const rr = rad + d.dr; g.setTransform(dpr * d.r, 0, 0, dpr * d.r, dpr * (S / 2 + Math.cos(d.a) * rr), dpr * (S / 2 + Math.sin(d.a) * rr)); g.rotate(d.rot); if (d.ring) mlHole(g, d.p); else g.fill(d.p); } });
+  draw(); addEventListener('resize', draw); setTimeout(draw, 600); })();
+</script>
 </body>
 </html>
