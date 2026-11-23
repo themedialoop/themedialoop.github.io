@@ -3949,7 +3949,7 @@ function orbitRiver(box) {
     if (!reduce) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box);
 }
-const box = document.querySelector('.orbit-band'); if (!box) return; box.dataset.o = 'oct'; if (!box.querySelector('canvas')) box.append(document.createElement('canvas')); orbitRiver(box);
+const box = document.querySelector('.orbit-band'); if (!box) return; box.dataset.o = 'd1a'; if (!box.querySelector('canvas')) box.append(document.createElement('canvas')); orbitRiver(box);
 })();
 </script>
 <style>
