@@ -3616,7 +3616,7 @@ html body .about-grid .ab-pill[open] h3{font-size:clamp(56px,7.4vw,120px);letter
 html body .about-grid .ab-pill[open] > p{font-size:clamp(19px,1.75vw,26px);line-height:1.42;max-width:34em;letter-spacing:-.01em}
 html body .about-grid .ab-pill[open] > p:first-of-type{margin-top:-6px}
 html body .ab-pill .pm{transition:width .5s cubic-bezier(.25,.8,.3,1),height .5s cubic-bezier(.25,.8,.3,1),rotate .5s cubic-bezier(.25,.8,.3,1),scale .3s}
-html body .ab-pill[open] .pm{width:clamp(46px,3.9vw,56px) !important;height:clamp(44px,3.7vw,53px) !important}   /* the close dot a touch smaller than the open one */
+html body .ab-pill[open] .pm{width:clamp(38px,3.2vw,46px) !important;height:clamp(36px,3vw,44px) !important}   /* the close dot a touch smaller than the open one */
 html body .about-grid .ab-pill > summary .pm{align-self:flex-start;margin-top:calc(clamp(44px,5.4vw,80px) * .95 - clamp(51px,4.4vw,63px) / 2)}   /* and its place: level with the closed title, open or shut */
 html body .ab-pill .pm::before{transition:width .45s,height .45s}
 html body .ab-pill[open] .pm::before{width:40%;height:40%}
@@ -3628,7 +3628,7 @@ document.querySelectorAll('.ab-pill summary h3').forEach(h => { const m = h.text
 </script>
 <style>
 html body .ab-pill summary h3 .ab-w{display:block;text-transform:capitalize}   /* two lines, open or shut */
-html body .ab-pill .pm{width:clamp(54px,4.6vw,66px);height:clamp(51px,4.4vw,63px)}
+html body .ab-pill .pm{width:clamp(42px,3.6vw,52px);height:clamp(40px,3.4vw,50px)}
 html body .about-grid .ab-pill .pm::before{width:54% !important;height:54% !important;background-size:contain !important}
 html body .about-grid .ab-pill h3{line-height:.95;font-size:clamp(44px,5.4vw,80px);letter-spacing:-.045em}
 </style>
@@ -4028,5 +4028,10 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
       else c.style.minHeight = Math.ceil(base + need) + 'px'; } });
   fit(); addEventListener('resize', fit); addEventListener('load', fit); document.fonts && document.fonts.ready.then(fit); setTimeout(fit, 700); setTimeout(fit, 2000); })();
 </script>
+<style>
+/* big section titles in Figtree Black */
+html body h2.bz-h,html body h2.ev-h,html body h2.bz-h *,html body h2.ev-h *{font-family:Figtree,Inter,system-ui,sans-serif !important;font-weight:900 !important}
+html body h2.bz-h,html body h2.ev-h{letter-spacing:-.025em !important}
+</style>
 </body>
 </html>
