@@ -816,10 +816,11 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
     const progress = () => { const r = stage.getBoundingClientRect(), vh = innerHeight;   /* 0 off screen, 1 once it is well in view; back down as it leaves */
       return Math.min(ss(.1, 1, (vh - r.top) / r.height), ss(.1, 1, r.bottom / r.height)); };   /* fully arrived once the whole band is on screen: it sits at the very foot of the page */
     /* as you keep scrolling, the map zooms out from the Loop until the whole system, Linden to 95th, fits; then it stops */
+    const PAD = () => { const tb = document.querySelector('.top'), hb = tb ? tb.getBoundingClientRect().bottom : 0; return (box.getBoundingClientRect().top < 0 ? -box.getBoundingClientRect().top : 0) + Math.max(0, hb) + 6; };
     const zoomAt = () => { const r = grid.getBoundingClientRect(), T = parseFloat(getComputedStyle(fig).top) || 0, span = r.height - fig.offsetHeight; return span > 0 ? Math.min(1, Math.max(0, (T - r.top) / span)) : 1; };
     const frame = now => { if (!W) return; const t = reduce ? 0 : (now - t0) / 1000, p = reduce ? 1 : progress();
       const zf = Math.min(1, VW / W), e = ss(0, .92, zoomAt()), z = Math.pow(zf, e), sx0 = Math.min(Math.max(LX, VW / 2), W - VW / 2);
-      const sy0 = Math.min(Math.max(LY + VH * .12, VH / 2), H - VH / 2), fx = Math.min(Math.max(sx0 + (W / 2 - sx0) * e, VW / 2 / z), W - VW / 2 / z), fy = VH / 2 / z,   /* the map's top edge stays pinned to the top of the screen; it zooms out from there */ gr = Math.pow(z, -.25);   /* dots shrink a little more slowly than the map, so they stay legible (and still never touch) */
+      const sy0 = Math.min(Math.max(LY + VH * .12, VH / 2), H - VH / 2), fx = Math.min(Math.max(sx0 + (W / 2 - sx0) * e, VW / 2 / z), W - VW / 2 / z), fy = (VH / 2 - PAD()) / z,   /* the map's top edge stays pinned just under the page header (never beneath its frosted bar); it zooms out from there */ gr = Math.pow(z, -.25);   /* dots shrink a little more slowly than the map, so they stay legible (and still never touch) */
       g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.setTransform(dpr * z, 0, 0, dpr * z, dpr * (VW / 2 - fx * z), dpr * (VH / 2 - fy * z));
       const xl = fx - VW / 2 / z - D, xr2 = fx + VW / 2 / z + D, yt = fy - VH / 2 / z - D, yb = fy + VH / 2 / z + D;
       if (o.mode === 'turn') { const e = ss(0, 1, p); g.translate(LX, LY); g.rotate((1 - e) * -Math.PI / 2); g.scale(.55 + .45 * e, .55 + .45 * e); g.translate(-LX, -LY); }
