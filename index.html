@@ -3977,7 +3977,7 @@ function orbitRiver(box) {
     if (!reduce) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box);
 }
-const box = document.querySelector('.orbit-band'); if (!box) return; box.dataset.o = 'lattice'; if (!box.querySelector('canvas')) box.append(document.createElement('canvas')); orbitRiver(box);
+/* (the dot-river engine stays above for reference; this band now shows the dotted wordmark below) */
 })();
 </script>
 <style>
@@ -4064,5 +4064,35 @@ html body h2.bz-h,html body h2.ev-h{letter-spacing:-.04em !important}
 html body .about-grid .ab-pill h3{letter-spacing:-.045em !important}
 html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !important}
 </style>
+<script>
+/* the band before Join Our Orbit: the medialoop wordmark drawn in blue dots (its i-dot in gold), floating right to left across the screen.
+   It drifts on its own and runs faster as you scroll; every dot bobs gently, a little out of step with its neighbours */
+(() => { const box = document.querySelector('.orbit-band'); if (!box) return; const cv = box.querySelector('canvas') || box.appendChild(document.createElement('canvas')), g = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, BLUE = '#2c5494', GOLD = '#e7aa4d';
+  const blob = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
+    for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .07 * Math.sin(2 * a + q[0]) + .05 * Math.sin(3 * a + q[1]) + .03 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
+    p.closePath(); return p; };
+  const load = src => new Promise(r => { const im = new Image(); im.onload = () => r(im); im.onerror = () => r(null); im.src = src; });
+  let W, H, dpr, dots = [], WM = 0, vis = false, raf = 0, imgs = null; const t0 = performance.now();
+  const sample = (im, w, h, step, test) => { const c = document.createElement('canvas'); c.width = Math.ceil(w); c.height = Math.ceil(h); const x = c.getContext('2d'); x.drawImage(im, 0, 0, w, h);
+    const d = x.getImageData(0, 0, c.width, c.height).data, out = [];
+    for (let y = step / 2, row = 0; y < h; y += step * .87, row++) for (let xx = (row % 2) * step / 2; xx < w; xx += step) { const i = ((y | 0) * c.width + (xx | 0)) * 4 + 3; if (d[i] > 110) out.push([xx, y]); }
+    return out; };
+  const build = () => { if (!imgs) return; dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr;
+    const wh = Math.min(H * .8, W * (W < 600 ? 2.2 : 1.15) * 1185 / 4278), ww = wh * 4278 / 1185, step = Math.max(4.5, wh / (W < 600 ? 22 : 30)), top = (H - wh) / 2; WM = ww + Math.max(W * .35, wh);
+    dots = sample(imgs[0], ww, wh, step).map(([x, y]) => ({ x, y: y + top, r: step * (.3 + Math.random() * .12), c: BLUE, ring: Math.random() < .14, p: (Math.random() < .07 && window.mlIDot) ? mlIDot : blob(), rot: Math.random() * 6.3, ph: Math.random() * 6.3 }));
+    if (imgs[1]) { const bx = ww * .47751, by = top + wh * .24869, bw = ww * .03637, bh = wh * .11527, st2 = Math.max(4, step * .55);   // the gold i-dot, in smaller gold dots
+      dots.push({ x: bx + bw / 2, y: by + bh / 2, r: Math.sqrt(bw * bh / Math.PI) * 1.05, c: GOLD, ring: false, p: window.mlIDot || blob(), rot: 0, ph: 0, big: 1 }); } };   /* the i-dot: one gold dot in the logo's own shape */
+  Promise.all([load('assets/medialoop-wordmark-nodot.svg'), load('assets/idot.svg')]).then(r => { if (!r[0]) return; imgs = r; build(); if (vis && !raf) raf = requestAnimationFrame(frame); });
+  new ResizeObserver(build).observe(box);
+  const frame = now => { raf = 0; if (!W || !vis || !dots.length) return; const t = reduce ? 0 : (now - t0) / 1000, sc = reduce ? 0 : scrollY;
+    const off = W - ((((t * 28 + sc * .6) % (WM)) + WM) % WM);   /* floats right to left on its own, and faster as you scroll */
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    for (const k of [-1, 0, 1]) { const ox = off + k * WM; if (ox > W || ox + WM < 0) continue;
+      for (const d of dots) { const x = ox + d.x + Math.cos(t * .7 + d.ph) * d.r * .25, y = d.y + Math.sin(t * .9 + d.ph + sc * .004) * (d.big ? 3 : d.r * .4); if (x < -20 || x > W + 20) continue;
+        g.setTransform(dpr * d.r, 0, 0, dpr * d.r, dpr * x, dpr * y); g.rotate(d.rot); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); } }
+    if (!reduce) raf = requestAnimationFrame(frame); };
+  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box); })();
+</script>
 </body>
 </html>
