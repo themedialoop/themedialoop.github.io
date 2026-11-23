@@ -4086,8 +4086,8 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
     for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) { const out = Math.max(0, oy - y, y - oy - u), pr = .9 * Math.exp(-Math.pow(out / (H * .1), 1.25));
       if (Math.random() > pr) continue; const big = Math.random() < .07, v = Math.random();
       D.push({ x: x + (Math.random() - .5) * st * .5, y: y + (Math.random() - .5) * st * .5, r: Dd * .38 * (big ? .55 + Math.random() * .2 : (.2 + Math.random() * .1) * (out ? .7 + .3 * pr : 1)),
-        c: big ? (v < .8 ? BLUE : FILL(v)) : (Math.random() < .5 ? BLUE : FILL(Math.random())),   /* lots of blue */ p: (Math.random() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(Math.random() * 16)], ring: big && Math.random() < .2, rot: Math.random() * 6.3 }); } };
-  let FILLC = []; const buildFill = () => { FILLC = []; if (!W) return; const st = H / 1.75 * .92 * .2 * .3; for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) FILLC.push({ x: x + (Math.random() - .5) * st * .4, y: y + (Math.random() - .5) * st * .4, c: Math.random() < .5 ? BLUE : FILL(Math.random()), p: SH[Math.floor(Math.random() * 16)], rot: Math.random() * 6.3 }); };
+        c: big ? (v < .8 ? BLUE : FILL(v)) : (Math.random() < .5 ? BLUE : FILL(Math.random())),   /* lots of blue */ p: (Math.random() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(Math.random() * 16)], ring: big && Math.random() < .2, rot: Math.random() * 6.3, blu: Math.random() < .75 }); } };
+  let FILLC = []; const buildFill = () => { FILLC = []; if (!W) return; const st = H / 1.75 * .92 * .2 * .3; for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) FILLC.push({ x: x + (Math.random() - .5) * st * .4, y: y + (Math.random() - .5) * st * .4, c: Math.random() < .8 ? BLUE : FILL(Math.random()), p: SH[Math.floor(Math.random() * 16)], rot: Math.random() * 6.3 }); };
   build(); buildFill(); new ResizeObserver(() => { build(); buildFill(); }).observe(box);
   const frame = now => { raf = 0; if (!vis || !W) return; const dt = prev ? Math.min(.05, (now - prev) / 1000) : .016; prev = now;
     T += dt * (reduce ? 0 : .18 + wind * 1.05);   /* a gentle breeze */ wind *= Math.pow(.15, dt);
@@ -4097,21 +4097,22 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
     for (const d of D) { let x = d.x, y = d.y, sw = 1, spin = 0;
       for (const [cx, cy, sg] of ED) { const dx = x - cx, dy = y - cy, q = (dx * dx + dy * dy) / (R * R); if (q > 4) continue; const f = Math.exp(-q * 2.2), th = sg * f * Math.PI * 2.2, c = Math.cos(th), s2 = Math.sin(th), pull = 1 - .12 * f;   /* a whirlwind: dots near its heart spin right round, the outer ones just sway */
         x = cx + (dx * c - dy * s2) * pull; y = cy + (dx * s2 + dy * c) * pull; sw *= 1 + .08 * f; spin += th; }   /* swept round the swirl, pulled in a little and swelling as it whooshes by */
-      d.px = x; d.py = y; d.pr = d.r * sw * 1.08; d.ps = spin; }   /* (1.08: room for the organic wobble) */
+      d.px = x; d.py = y; d.pr = d.r * sw * 1.08; d.ps = spin; d.inW = sw > 1.035; }   /* (deep in a whirl) */   /* (1.08: room for the organic wobble) */
     /* no two dots ever overlap: biggest first, each smaller dot shrinks to fit the space it has left */
     const cs = Math.max(8, H / 9), grid = new Map(), gap = 1.5, ord = D.slice().sort((a, b) => b.r - a.r);
     for (const d of ord) { const gx = Math.floor(d.px / cs), gy = Math.floor(d.py / cs); let r = d.pr;
       for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const cell = grid.get((gx + i) * 9973 + gy + j); if (!cell) continue;
         for (const o of cell) { const room = Math.hypot(d.px - o.px, d.py - o.py) - o.dr - gap; if (room < r) r = room; } }
       d.dr = r; if (r < 1) continue; const key = gx * 9973 + gy; (grid.get(key) || grid.set(key, []).get(key)).push(d);
-      const rr = r / 1.08; g.setTransform(dpr * rr, 0, 0, dpr * rr, dpr * d.px, dpr * d.py); g.rotate(d.rot + d.ps); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
+      const rr = r / 1.08; g.setTransform(dpr * rr, 0, 0, dpr * rr, dpr * d.px, dpr * d.py); g.rotate(d.rot + d.ps); g.fillStyle = d.inW && d.blu ? BLUE : d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
     /* the whirl leaves gaps: small dots fill the negative space it opens up, only where there is room, so nothing touches */
-    const maxR = H / 1.75 * .92 * .2 * .38 * .26;
-    for (const q of FILLC) { let near = 0; for (const [cx, cy] of ED) { const dx = q.x - cx, dy = q.y - cy; near = Math.max(near, Math.exp(-(dx * dx + dy * dy) / (R * R) * 2.2)); } if (near < .12) continue;
-      const gx = Math.floor(q.x / cs), gy = Math.floor(q.y / cs); let r = maxR * Math.min(1, near * 2);
-      for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const cell = grid.get((gx + i) * 9973 + gy + j); if (!cell) continue; for (const o of cell) { const room = Math.hypot(q.x - o.px, q.y - o.py) - o.dr - gap; if (room < r) r = room; } }
-      if (r < maxR * .45) continue; q.px = q.x; q.py = q.y; q.dr = r; const key = gx * 9973 + gy; (grid.get(key) || grid.set(key, []).get(key)).push(q);
-      g.setTransform(dpr * r / 1.08, 0, 0, dpr * r / 1.08, dpr * q.x, dpr * q.y); g.rotate(q.rot); g.fillStyle = q.c; g.fill(q.p); }
+    const maxR = H / 1.75 * .92 * .2 * .38 * .17;   /* smaller than the field's smallest dots */
+    for (const q of FILLC) { let near = 0, qx = q.x, qy = q.y, qs = 0; for (const [cx, cy, sg] of ED) { const dx = q.x - cx, dy = q.y - cy, f = Math.exp(-(dx * dx + dy * dy) / (R * R) * 2.2); near = Math.max(near, f);
+        const th = sg * f * Math.PI * .5, c = Math.cos(th), s2 = Math.sin(th); qx = cx + dx * c - dy * s2; qy = cy + dx * s2 + dy * c; qs += th; }   /* they ride the whirl too, a gentler turn, so they go with the wind */ if (near < .12) continue;
+      const gx = Math.floor(qx / cs), gy = Math.floor(qy / cs); let r = maxR * Math.min(1, near * 2);
+      for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const cell = grid.get((gx + i) * 9973 + gy + j); if (!cell) continue; for (const o of cell) { const room = Math.hypot(qx - o.px, qy - o.py) - o.dr - gap; if (room < r) r = room; } }
+      if (r < maxR * .4) continue; q.px = qx; q.py = qy; q.dr = r; const key = gx * 9973 + gy; (grid.get(key) || grid.set(key, []).get(key)).push(q);
+      g.setTransform(dpr * r / 1.08, 0, 0, dpr * r / 1.08, dpr * qx, dpr * qy); g.rotate(q.rot + qs); g.fillStyle = q.c; g.fill(q.p); }
     if (!reduce) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) { prev = 0; raf = requestAnimationFrame(frame); } }, { rootMargin: '100px' }).observe(box); })();
 </script>
