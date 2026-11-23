@@ -3659,7 +3659,7 @@ html body .ab-pill{overflow-anchor:none}
 </script>
 <style>
 /* the BSB banner after the publications: full width, a little wider than the screen so its ends never show, tipped slightly downward */
-.bsb-band{position:relative;z-index:0;height:clamp(96px,8vw,124px);width:112vw;margin:clamp(40px,6vw,90px) 0 clamp(40px,6vw,90px) calc(50% - 56vw);rotate:3deg;pointer-events:none}   /* a thin band, about an inch: a visual break between Publications and Resources */
+.bsb-band{position:relative;z-index:0;height:clamp(190px,17vw,260px);width:112vw;margin:clamp(40px,6vw,90px) 0 clamp(40px,6vw,90px) calc(50% - 56vw);rotate:3deg;pointer-events:none}   /* a thin band, about an inch: a visual break between Publications and Resources */
 .bsb-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 <script>
@@ -3678,17 +3678,18 @@ html body .ab-pill{overflow-anchor:none}
       while (t <= seg) { const f = t / seg; out.push([ax + (bx - ax) * f, ay + (by - ay) * f]); t += step; } carry = seg - (t - step); }
     return out; };
   const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = box.clientWidth; H = box.clientHeight; if (!W) return; cv.width = W * dpr; cv.height = H * dpr; seed = 11;
-    const u = H * .92, oy = (H - u) / 2, N = 4, hr = u * .36; P = N * u; D = u * .2; dots = [];
+    const u = H * .92, oy = (H - u) / 2, N = 8, hr = u * .36; P = N * u; D = u * .2; dots = [];
     const wx = (a, b) => { const d = Math.abs(a - b) % P; return Math.min(d, P - d); };
     const clash = (x, y, R, gp) => dots.some(o => wx(o.x, x) ** 2 + (o.y - y) ** 2 < (R + o.R + gp) ** 2);
     const put = (x, y, sz, extra, gp) => { x = ((x % P) + P) % P; const R = D * .46 * sz; if (y < R + 2 || y > H - R - 2 || clash(x, y, R, gp)) return;
       dots.push({ x, y, sz, R, s: 0, li: 0, Pp: 1e9, w: 0, ring: rnd() < .15, hi: Math.floor(rnd() * 3), bl: blob(), col: '#2c5494', ...extra }); };
     for (let c = 0; c < N; c++) { const cx = (c + .5) * u, cy = oy + u / 2, dir = c % 2 ? -1 : 1, n = 7;   /* the hexagons: big blue dots on six corners and between */
-      for (let k = 0; k < 6 * 2; k++) { const a = k / 12 * Math.PI * 2, kk = k % 2 ? Math.cos(Math.PI / 6) : 1; put(cx + Math.cos(a) * hr * kk, cy + Math.sin(a) * hr * kk, .95 + rnd() * .3, { hc: [cx, cy], ang: a, rr: hr * kk, dir }, D * .08); } }
+      const hcol = ['#2c5494', '#2c5494', '#e0773a', '#2c5494', '#9b6aa6', '#2c5494', '#d8708e', '#2c5494'][c % 8];   /* most hexagons blue, a few in the other colours */
+      for (let k = 0; k < 6 * 2; k++) { const a = k / 12 * Math.PI * 2, kk = k % 2 ? Math.cos(Math.PI / 6) : 1; put(cx + Math.cos(a) * hr * kk, cy + Math.sin(a) * hr * kk, .62 + rnd() * .14, { hc: [cx, cy], ang: a, rr: hr * kk, dir, col: hcol }, D * .08); } }
     for (let c = 0; c < N; c++) for (const L of [[[c * u, oy], [(c + 1) * u, oy + u]], [[(c + 1) * u, oy], [c * u, oy + u]]])   /* the corridors, in fine dots, stopping at each hexagon */
-      for (const [x, y] of resample(L, D * .6)) { const cx = (c + .5) * u, cy = oy + u / 2; if (Math.hypot(x - cx, y - cy) < hr * 1.22) continue; put(x, y, .5 + rnd() * .08, {}, D * .06); }
-    const st = D * .62;   /* a light scatter of small gold dots, kept clear of the hexagons so they read */
-    for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < P; x += st) if (rnd() < .45 && Math.hypot(x - (Math.floor(x / u) + .5) * u, y - (oy + u / 2)) > hr * 1.3) put(x + (rnd() - .5) * st * .5, y + (rnd() - .5) * st * .5, .42 + rnd() * .14, { col: '#e7aa4d' }, D * .1);
+      for (const [x, y] of resample(L, D * .42)) { const cx = (c + .5) * u, cy = oy + u / 2; if (Math.hypot(x - cx, y - cy) < hr * 1.22) continue; put(x, y, .34 + rnd() * .06, {}, D * .05); }
+    const st = D * .5;   /* a light scatter of small gold dots, kept clear of the hexagons so they read */
+    for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < P; x += st) if (rnd() < .45 && Math.hypot(x - (Math.floor(x / u) + .5) * u, y - (oy + u / 2)) > hr * 1.3) put(x + (rnd() - .5) * st * .5, y + (rnd() - .5) * st * .5, .3 + rnd() * .1, { col: (v => v < .62 ? '#e7aa4d' : v < .76 ? '#e0773a' : v < .87 ? '#d8708e' : v < .95 ? '#9b6aa6' : '#2a8c8c')(rnd()) }, D * .1);
   };
   build(); new ResizeObserver(build).observe(box);
   const drawBlob = (x, y, b, r) => { const m = b.k.length; g.beginPath();
