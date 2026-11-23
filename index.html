@@ -3739,7 +3739,7 @@ html body .ab-pill{overflow-anchor:none}
 /* people cards: plain blue, with a little line of gold dots under the photo and the name */
 .people .card canvas.cnet{display:none !important}
 .people .card{background-color:#2c5494 !important;background-image:none !important}
-.people .card .dotline{position:absolute;z-index:1;pointer-events:none;height:26px;display:block;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.people .card .dotline{position:absolute;z-index:1;pointer-events:none;height:36px;display:block;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
 .people .card > h3{position:relative;z-index:1}
 .people .card:hover .dotline,.people .card:focus-visible .dotline{transform:translateX(6px)}
 @media (prefers-reduced-motion:reduce){.people .card .dotline{transition:none}}
@@ -3753,10 +3753,10 @@ html body .ab-pill{overflow-anchor:none}
     p.closePath(); return p; };
   const fit = () => cards.forEach(c => { const cr = c.getBoundingClientRect(), rs = [...c.querySelectorAll('.ph-wrap, h3')].map(e => e.getBoundingClientRect()).filter(r => r.width);
     if (!rs.length) return; const l = Math.min(...rs.map(r => r.left)) - cr.left, rt = Math.max(...rs.map(r => r.right)) - cr.left, b = Math.max(...rs.map(r => r.bottom)) - cr.top;
-    const cv = c.querySelector('.dotline'), w = cr.width, h = 26, dpr = Math.min(2, devicePixelRatio || 1); cv.style.left = '0px'; cv.style.width = w + 'px'; cv.style.top = Math.round(b + (cr.height - b) * .5 - h / 2) + 'px';   /* edge to edge, halfway between the photo and the card's bottom */
+    const cv = c.querySelector('.dotline'), w = cr.width, h = 36, dpr = Math.min(2, devicePixelRatio || 1); cv.style.left = '0px'; cv.style.width = w + 'px'; cv.style.top = Math.round(b + (cr.height - b) * .5 - h / 2) + 'px';   /* edge to edge, halfway between the photo and the card's bottom */
     cv.width = w * dpr; cv.height = h * dpr; const g = cv.getContext('2d');
-    if (!c._dl || c._dl.w !== Math.round(w)) { const st = w < 500 ? 22 : 26, n = Math.floor((w - 16) / st) + 1, pad = (w - (n - 1) * st) / 2, rings = new Set([2 + Math.floor(Math.random() * Math.max(1, n - 4))]); if (n > 14 && Math.random() < .6) rings.add(n - 3 - Math.floor(Math.random() * 3));
-      c._dl = { w: Math.round(w), dots: [...Array(n)].map((_, i) => ({ x: pad + i * st, y: h / 2 + (Math.random() - .5) * 2.5, r: rings.has(i) ? 9.5 : 5 + Math.random() * 2.2, ring: rings.has(i), p: shape(), rot: Math.random() * 6.3 })) }; }
+    if (!c._dl || c._dl.w !== Math.round(w)) { const st = w < 500 ? 30 : 36, n = Math.floor((w - 16) / st) + 1, pad = (w - (n - 1) * st) / 2, rings = new Set([2 + Math.floor(Math.random() * Math.max(1, n - 4))]); if (n > 14 && Math.random() < .6) rings.add(n - 3 - Math.floor(Math.random() * 3));
+      c._dl = { w: Math.round(w), dots: [...Array(n)].map((_, i) => ({ x: pad + i * st, y: h / 2 + (Math.random() - .5) * 2.5, r: rings.has(i) ? 13 : 7.4 + Math.random() * 2.8, ring: rings.has(i), p: shape(), rot: Math.random() * 6.3 })) }; }
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.fillStyle = '#e7aa4d';
     for (const d of c._dl.dots) { g.setTransform(dpr * d.r, 0, 0, dpr * d.r, dpr * d.x, dpr * d.y); g.rotate(d.rot); if (d.ring) mlHole(g, d.p); else g.fill(d.p); } });
   fit(); addEventListener('resize', fit); document.fonts && document.fonts.ready.then(fit); setTimeout(fit, 800); })();
