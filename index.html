@@ -3975,7 +3975,7 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
     p.closePath(); return p; };
   pills.forEach(d => { const cv = document.createElement('canvas'); cv.className = 'ab-line'; cv.setAttribute('aria-hidden', 'true'); d.querySelector('summary').prepend(cv); d._dots = [];   /* inside the summary so it shows while the card is closed */ });
   /* the line only comes out when the card is opened: dots the size of the button grow out of it, up and down, one after another */
-  const DEG = [1.2, -1.5, -2.5];   // the first leans left to right, the second right to left, the third right to left and steeper; each card its own angle (none matches the people cards), all leaning inward so no dot is cut off at the side
+  const DEG = [1.2, -1.5, 2.5];   // the first leans left to right, the second right to left, the third right to left and steeper; each card its own angle (none matches the people cards), all leaning inward so no dot is cut off at the side
   const draw1 = (d) => { const pi = pills.indexOf(d), cv = d.querySelector('canvas.ab-line'), pm = d.querySelector('.pm'); if (!pm) return;
     const W = d.clientWidth, H = d.clientHeight; if (!W) return; const dpr = Math.min(2, devicePixelRatio || 1);
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = W * dpr; cv.height = H * dpr; }
