@@ -791,7 +791,7 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
 @media (min-width:601px){html body .bz-h.tilt-h{font-size:clamp(96px,11vw,190px) !important}}
 html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-weight:300;letter-spacing:0;line-height:1.2;color:#2c5494;margin-top:.45em;white-space:normal}
 @media (max-width:600px){html body .bz-h.tilt-h{font-size:17vw !important}}   /* (its rows are longer: smaller on phones so each stays on one line) */</style>
-<script src="assets/mlhole.js?v=1"></script>
+<script src="assets/mlhole.js?v=2"></script>
 <script src="assets/bsbfield.js?v=3"></script>
 </head>
 <body>
@@ -3687,7 +3687,7 @@ html body .ab-pill{overflow-anchor:none}
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     for (let k = -1; k * P < W + P; k++) { const ox = k * P + shift;
       for (const d of dots) { const x = d.x + ox; if (x < -D || x > W + D) continue; const r = D * (.3 + .16 * swell(d, t) * d.w) * d.sz; g.fillStyle = d.col; drawBlob(x, d.y, d.bl, r); g.fill();
-        if (d.ring) { g.save(); g.translate(x, d.y); g.scale(r * 1.15, r * 1.15); g.fillStyle = CREAM; g.fill(HOLES[d.hi]); g.restore(); } } }
+        if (d.ring) { g.save(); g.translate(x, d.y); g.rotate(mlHoleTurn(d.hi * 2.1 + d.s * .01)); g.scale(r * 1.15, r * 1.15); g.fillStyle = CREAM; g.fill(HOLES[d.hi]); g.restore(); } } }
     if (!reduce) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box);
 })();
@@ -3695,6 +3695,15 @@ html body .ab-pill{overflow-anchor:none}
 <style>
 /* resource cards: no hexagon lines, still or moving */
 .res::after,.res::before{display:none !important}
+</style>
+<style>
+/* open circles drawn in CSS/SVG rock ever so slightly too */
+@keyframes mlHoleRock{0%,100%{rotate:-6deg}50%{rotate:6deg}}
+@media (prefers-reduced-motion:no-preference){
+  .river .rd:not(.sm) .rb.ring::before{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,mlHoleRock 13s ease-in-out infinite}
+  .river .rd.pp .rb.ring::before{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,rvPop var(--pd,11s) ease-in-out var(--pdd,0s) infinite,mlHoleRock 13s ease-in-out infinite}
+  .ev-lat .ring{transform-box:fill-box;transform-origin:center;animation:mlHoleRock 15s ease-in-out infinite}
+}
 </style>
 </body>
 </html>

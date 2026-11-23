@@ -587,7 +587,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 .p-river .river.lf{position:relative;width:112%;margin-left:-6%;rotate:-3.5deg;overflow:visible}
 </style>
 <style>.person > section:first-of-type{padding-top:clamp(150px,20vw,260px) !important}   /* room for the spill of dots, then clear cream before the first heading */</style>
-<script src="../assets/mlhole.js?v=1"></script>
+<script src="../assets/mlhole.js?v=2"></script>
 <script src="../assets/bsbfield.js?v=3"></script>
 </head>
 <body>
@@ -842,7 +842,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
         else if (o.mode === 'sink') k = .22 + .78 * ss(0, 1, (p * 1.5 - d.rr * .5) / .45);
         if (k <= .01) continue;
         const r = D * (.3 + .16 * swell(d, t)) * d.sz * k * gr; if (r * z < 2.2) { const P = SMALL[d.col] || (SMALL[d.col] = new Path2D()); P.moveTo(x + r, y); P.arc(x, y, r, 0, 6.283); continue; }   /* tiny dots: plain circles, filled together */
-        drawBlob(x, y, d.b, r, d.col); if (d.kind === 'ring') { const h = HOLES[d.hi], k = r * 1.1 / h.s; g.save(); g.translate(x, y); g.scale(k, k); g.translate(-h.cx, -h.cy); g.fillStyle = CREAM; g.fill(h.p); g.restore(); } }
+        drawBlob(x, y, d.b, r, d.col); if (d.kind === 'ring') { const h = HOLES[d.hi], k = r * 1.1 / h.s; g.save(); g.translate(x, y); g.rotate(mlHoleTurn(d.rr * 6.283)); g.scale(k, k); g.translate(-h.cx, -h.cy); g.fillStyle = CREAM; g.fill(h.p); g.restore(); } }
       for (const c in SMALL) { g.fillStyle = c; g.fill(SMALL[c]); }
       if (vis && !reduce) requestAnimationFrame(frame); };
     requestAnimationFrame(frame);
@@ -1637,5 +1637,14 @@ html body .pubs li > a[href]::before,html body .r-list li > a[href]::before,html
     a.style.setProperty('--te', (mx - ar.left - bl).toFixed(0) + 'px'); });
   place(); addEventListener('load', place); document.fonts && document.fonts.ready.then(place); let tm; addEventListener('resize', () => { clearTimeout(tm); tm = setTimeout(place, 150); }); })();
 </script>
+<style>
+/* open circles drawn in CSS/SVG rock ever so slightly too */
+@keyframes mlHoleRock{0%,100%{rotate:-6deg}50%{rotate:6deg}}
+@media (prefers-reduced-motion:no-preference){
+  .river .rd:not(.sm) .rb.ring::before{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,mlHoleRock 13s ease-in-out infinite}
+  .river .rd.pp .rb.ring::before{animation:rvGrow var(--gd,4s) ease-in-out var(--bd,0s) infinite alternate,rvPop var(--pd,11s) ease-in-out var(--pdd,0s) infinite,mlHoleRock 13s ease-in-out infinite}
+  .ev-lat .ring{transform-box:fill-box;transform-origin:center;animation:mlHoleRock 15s ease-in-out infinite}
+}
+</style>
 </body>
 </html>
