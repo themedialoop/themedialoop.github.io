@@ -3293,13 +3293,14 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       { const cg = Math.hypot(d.x - W / 2, d.y - (H - Math.max(28, 18) - 42)) - d.r - AMP * 2; m *= 1 - (1 - k) * (1 - ss(54, 78, cg)); }   /* on the landing, nothing sits behind the gold ^ dot */
       if (m < .02) continue;
       let px = d.x + AMP * Math.sin(t * d.fx + d.ph), py = d.y + AMP * Math.cos(t * d.fy + d.ph * 1.3), spin = 0;   // each wanders on its own small loop
-      if (!reduce && k > 0 && k < 1) { let vx = d.x - hx, vy = d.y - hy; const L = Math.hypot(vx, vy) || 1; vx /= L; vy /= L;   // the hand-over: each dot scatters outward,
-        const b = Math.sin(Math.PI * k), far = b * (H * .18 + d.z * H * .3), sway = Math.sin(k * 9 + d.ph * 3) * b * (10 + d.r * .5);   // swaying and spinning, then settles into its new place
-        px += vx * far - vy * sway; py += vy * far + vx * sway; spin += b * (d.sp > 0 ? 1 : -1) * (2 + d.z * 3); }
+      let blowL = 1; if (!reduce && k > 0 && k < 1) {   /* leaving the blue landing, a breeze blows through: dots with no place on the home page are blown away
+         off to the left and downhill, looping and tumbling as they shrink; the rest are caught up in the gust and land in their new places */
+        if (maskHome(d.x, d.y, t) < .35) { const B = mlBlow(k, d.z, d.ph / 6.3, W, H); px += B[0]; py += B[1]; spin += B[2]; blowL = B[3]; }
+        else { const B = mlBlow(k * .5, d.z, d.ph / 6.3, W, H), b = Math.sin(Math.PI * k); px += B[0] * b * .5; py += B[1] * b * .5; spin += B[2] * b; } }
       let blowS = 1; if (sq > 0) {   /* as you scroll down from the home page, a breeze blows the dots away: right-hand dots first, each lifted, looped and tumbled off to the left and downhill */
         const kk = Math.max(0, Math.min(1, sq * 1.7 - (1 - d.x / W) * .55 - d.z * .15)), B = mlBlow(kk, d.z, d.ph / 6.3, W, H); px += B[0]; py += B[1]; spin = B[2]; blowS = B[3]; }
       let c = 1; for (const b of boxes) { const g = Math.max(b.left - pr.left - px, px - (b.right - pr.left), b.top - pr.top - py, py - (b.bottom - pr.top), 0); if (g < pad + d.r) c *= ss(0, pad + d.r, g); }   // never over the words, wherever it dances
-      let s = d.r * m * c * blowS * (reduce ? .97 : .82 + .18 * mlRipple(d.x, d.y, t)); s = Math.min(s, (H - 3 - py) / 1.1); if (s < .4) continue;   /* a ripple of breath across the field; a dot near the bottom shrinks rather than being cut by the edge */
+      let s = d.r * (k > 0 && k < 1 && maskHome(d.x, d.y, t) < .35 ? Math.max(m, lerp(maskLanding(d.x, d.y, t), 0, k)) : m) * blowL * c * blowS * (reduce ? .97 : .82 + .18 * mlRipple(d.x, d.y, t)); s = Math.min(s, (H - 3 - py) / 1.1); if (s < .4) continue;   /* a ripple of breath across the field; a dot near the bottom shrinks rather than being cut by the edge */
       if (flyS > .02) { if (d.ghS) SM.push([px, py, s, d.ghS, spin]); } else if (d.ghost && fly > .02) GH.push([px, py, s, d.ghost, spin]);
       ctx.setTransform(s * DPR, 0, 0, s * DPR, px * DPR, py * DPR); ctx.rotate(d.rot + t * d.sp + spin);
       const col = mix(d.c0, d.c1, ce);
@@ -3382,7 +3383,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
       let c = 1; for (const b of reg.boxes) { const g = Math.max(b.left - d.x, d.x - b.right, b.top - d.y, d.y - b.bottom, 0), pp = b.wide ? pad * 3.5 : pad; if (g < pp + d.r) { c *= ss(0, pp + d.r, g); if (c < .02) break; } }   // headings and text get a wide berth
       if (reg.kind === 'res') { const lb = document.querySelector('#resources .res-stack .res') || document.querySelector('#resources .sec-h'); if (lb) { const q = lb.getBoundingClientRect(); m *= ss(q.top - 10, q.top + 70, d.y); if (m < .02) continue; } }   // no dots above or beside the heading or its description: the field starts at the first card
       if (reg.kind === 'res' && d.thin) { const st = reg.boxes.find(b => !b.wide); if (!st || d.y < st.top) continue; }   // and the space around them is lighter
-      let s = d.r * m * c * blowS * (reduce ? .97 : .82 + .18 * mlRipple(d.x, d.y, t));
+      let s = d.r * (k > 0 && k < 1 && maskHome(d.x, d.y, t) < .35 ? Math.max(m, lerp(maskLanding(d.x, d.y, t), 0, k)) : m) * blowL * c * blowS * (reduce ? .97 : .82 + .18 * mlRipple(d.x, d.y, t));
       let px = d.x + AMP * Math.sin(t * d.fx + d.ph), py = d.y + AMP * Math.cos(t * d.fy + d.ph * 1.3), spin = 0;
       if (ex > 0) { const k = Math.max(0, Math.min(1, ex * 1.35 - d.st * .35));   // the dance: each dot sways one way, then the other, spins, and sails off the side
         if (d.r < Math.min(W, H) * .02) s *= 1 - k;   // the small ones simply shrink away
