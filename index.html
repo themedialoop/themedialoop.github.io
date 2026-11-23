@@ -4092,7 +4092,14 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
     for (const d of D) { let x = d.x, y = d.y, sw = 1, spin = 0;
       for (const [cx, cy, sg] of ED) { const dx = x - cx, dy = y - cy, q = (dx * dx + dy * dy) / (R * R); if (q > 4) continue; const f = Math.exp(-q * 2), th = sg * f * Math.PI * 1.25, c = Math.cos(th), s2 = Math.sin(th), pull = 1 - .1 * f;
         x = cx + (dx * c - dy * s2) * pull; y = cy + (dx * s2 + dy * c) * pull; sw *= 1 + .18 * f; spin += th; }   /* swept round the swirl, pulled in a little and swelling as it whooshes by */
-      const r = d.r * sw; g.setTransform(dpr * r, 0, 0, dpr * r, dpr * x, dpr * y); g.rotate(d.rot + spin); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
+      d.px = x; d.py = y; d.pr = d.r * sw * 1.08; d.ps = spin; }   /* (1.08: room for the organic wobble) */
+    /* no two dots ever overlap: biggest first, each smaller dot shrinks to fit the space it has left */
+    const cs = Math.max(8, H / 9), grid = new Map(), gap = 1.5, ord = D.slice().sort((a, b) => b.r - a.r);
+    for (const d of ord) { const gx = Math.floor(d.px / cs), gy = Math.floor(d.py / cs); let r = d.pr;
+      for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const cell = grid.get((gx + i) * 9973 + gy + j); if (!cell) continue;
+        for (const o of cell) { const room = Math.hypot(d.px - o.px, d.py - o.py) - o.dr - gap; if (room < r) r = room; } }
+      d.dr = r; if (r < 1) continue; const key = gx * 9973 + gy; (grid.get(key) || grid.set(key, []).get(key)).push(d);
+      const rr = r / 1.08; g.setTransform(dpr * rr, 0, 0, dpr * rr, dpr * d.px, dpr * d.py); g.rotate(d.rot + d.ps); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
     if (!reduce) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) { prev = 0; raf = requestAnimationFrame(frame); } }, { rootMargin: '100px' }).observe(box); })();
 </script>
