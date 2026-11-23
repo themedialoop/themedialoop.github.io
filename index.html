@@ -3661,7 +3661,7 @@ html body .ab-pill{overflow-anchor:none}
 <style>
 /* the BSB banner after the publications: full width, a little wider than the screen so its ends never show, tipped slightly downward */
 .bsb-band{position:relative;z-index:0;height:clamp(190px,17vw,260px);width:112vw;margin:clamp(40px,6vw,90px) 0 clamp(40px,6vw,90px) calc(50% - 56vw);rotate:3deg;pointer-events:none}   /* a thin band, about an inch: a visual break between Publications and Resources */
-.bsb-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.bsb-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block;-webkit-mask:linear-gradient(transparent,#000 7%,#000 93%,transparent);mask:linear-gradient(transparent,#000 7%,#000 93%,transparent)}
 </style>
 <script>
 /* the banner's dots: assets/bsbfield.js, repeating left to right; the building blue, the field gold; a slow swell runs along the lines */
@@ -3682,7 +3682,11 @@ html body .ab-pill{overflow-anchor:none}
     const u = H * .92, oy = (H - u) / 2, N = 8, hr = u * .36; P = N * u; D = u * .2; dots = [];
     const wx = (a, b) => { const d = Math.abs(a - b) % P; return Math.min(d, P - d); };
     const clash = (x, y, R, gp) => dots.some(o => wx(o.x, x) ** 2 + (o.y - y) ** 2 < (R + o.R + gp) ** 2);
-    const put = (x, y, sz, extra, gp) => { x = ((x % P) + P) % P; const R = D * .46 * sz; if (y < R + 2 || y > H - R - 2 || clash(x, y, R, gp)) return;
+    const HR = D * .46 * .76;   /* the biggest hexagon dot */
+    const swept = (x, y, R) => { if (!extraHex) for (let c = -1; c <= N; c++) { const d = Math.hypot(wx(x, (c + .5) * u), y - (oy + u / 2)); if (d > hr * .866 - HR - R - D * .12 && d < hr + HR + R + D * .12) return true; } return false; };   /* the ring each hexagon sweeps as it turns stays clear, so nothing ever overlaps */
+    let extraHex = false;
+    const put = (x, y, sz, extra, gp) => { x = ((x % P) + P) % P; const R = D * .46 * sz; extraHex = !!(extra && extra.hc); if (y < R + 2 || y > H - R - 2 || clash(x, y, R, gp) || swept(x, y, R)) return;
+      const ef = Math.min(y, H - y) / (H * .22); if (ef < 1 && !extraHex) { if (rnd() > ef) return; sz *= .55 + .45 * ef; }   /* the band thins and shrinks toward its top and bottom, fading into the cream */
       dots.push({ x, y, sz, R, s: 0, li: 0, Pp: 1e9, w: 0, ring: rnd() < .15, hi: Math.floor(rnd() * 3), bl: blob(), col: '#2c5494', ...extra }); };
     for (let c = 0; c < N; c++) { const cx = (c + .5) * u, cy = oy + u / 2, dir = c % 2 ? -1 : 1, n = 7;   /* the hexagons: big blue dots on six corners and between */
       const hcol = '#2c5494';   /* every hexagon blue */
