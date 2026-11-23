@@ -792,7 +792,7 @@ html body .bz-h.tilt-h{rotate:-3deg !important;transform-origin:0 100%}
 @media (min-width:601px){html body .bz-h.tilt-h{font-size:clamp(96px,11vw,190px) !important}}
 html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-weight:300;letter-spacing:0;line-height:1.2;color:#2c5494;margin-top:.45em;white-space:normal}
 @media (max-width:600px){html body .bz-h.tilt-h{font-size:17vw !important}}   /* (its rows are longer: smaller on phones so each stays on one line) */</style>
-<script src="assets/mlhole.js?v=3"></script>
+<script src="assets/mlhole.js?v=4"></script>
 <script src="assets/mlidot.js?v=1"></script>
 <script src="assets/bsbfield.js?v=3"></script>
 </head>
@@ -2325,7 +2325,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   ];
   const ALL = ROWS.flat(), RES = ALL.filter(w => w[0] !== '*'), FUN = ALL.filter(w => w[0] === '*').map(w => w.slice(1));
   const river = document.createElement('div'); river.className = 'river lf'; river.setAttribute('aria-hidden', 'true'); box.append(river);
-  const cv = document.createElement('canvas'); river.append(cv); const g = cv.getContext('2d'), mc = document.createElement('canvas').getContext('2d');
+  const cv = document.createElement('canvas'); river.append(cv); window.mlBreezeOn && mlBreezeOn(cv, river); const g = cv.getContext('2d'), mc = document.createElement('canvas').getContext('2d');
   const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', purple: '#9b6aa6', cream: '#f2eedd', teal: '#2a8c8c', red: '#e0503c' };
   const PAL = ['blue', 'gold', 'orange', 'pink', 'purple'];
   const MIX = [['blue', .7], ['gold', .21], ['orange', .03], ['pink', .03], ['purple', .03]];   // blue and gold lead; the rest are sprinkles
@@ -3025,7 +3025,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
       dots.push({ x, y, r, R, rot: rnd() * 6.283, p: dotShape(rnd), ph: rnd() * 6.283, ring: r > 4 && rnd() < .18 }); }   // about one in six is an open circle
     const dpr = Math.min(2, devicePixelRatio || 1);
     cd.w = w; cd.h = h; cd.dpr = dpr; cd.dots = dots; cd.col = cd.kind === 'ev' ? EV_DOT : dotColour(cd.el);
-    cd.cv.width = Math.round(w * dpr); cd.cv.height = Math.round(h * dpr); cd.box.classList.add('on');
+    cd.cv.width = Math.round(w * dpr); cd.cv.height = Math.round(h * dpr); cd.box.classList.add('on'); window.mlSwayOn && mlSwayOn(cd.cv);
   };
 
   // each frame the dots swell and shrink a little, in a ripple that runs out from the corner, like the net's holes
@@ -3333,7 +3333,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
   const secs = [{ el: document.getElementById('contact'), kind: 'ct' }].filter(q => q.el);   /* (no longer behind the resource cards) */
   if (!secs.length) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const C = document.createElement('canvas'); C.id = 'pageDots'; C.setAttribute('aria-hidden', 'true');
+  const C = document.createElement('canvas'); C.id = 'pageDots'; C.setAttribute('aria-hidden', 'true'); window.mlBreezeOn && mlBreezeOn(C, secs[0].el);
   C.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block';
   const net = document.getElementById('net'); (net ? net.after(C) : document.body.prepend(C));
   const ctx = C.getContext('2d');
@@ -3671,7 +3671,7 @@ html body .ab-pill{overflow-anchor:none}
 <script>
 /* the banner's dots: assets/bsbfield.js, repeating left to right; the building blue, the field gold; a slow swell runs along the lines */
 (() => {
-  const box = document.querySelector('.bsb-band'); if (!box) return; const cv = box.querySelector('canvas'), g = cv.getContext('2d');
+  const box = document.querySelector('.bsb-band'); if (!box) return; const cv = box.querySelector('canvas'), g = cv.getContext('2d'); window.mlBreezeOn && mlBreezeOn(cv, box);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, CREAM = '#f2eedd';
   const HOLES = ['M -0.138 0.486 Q -0.120 0.483 -0.102 0.479 Q -0.084 0.475 -0.066 0.470 Q -0.049 0.465 -0.031 0.458 Q -0.014 0.452 0.003 0.445 Q 0.020 0.437 0.036 0.429 Q 0.052 0.420 0.068 0.410 Q 0.085 0.401 0.100 0.390 Q 0.116 0.381 0.131 0.369 Q 0.146 0.358 0.161 0.347 Q 0.175 0.335 0.189 0.323 Q 0.203 0.311 0.218 0.299 Q 0.232 0.286 0.245 0.273 Q 0.259 0.261 0.271 0.247 Q 0.284 0.234 0.297 0.220 Q 0.309 0.206 0.321 0.192 Q 0.333 0.178 0.344 0.163 Q 0.356 0.148 0.367 0.133 Q 0.378 0.118 0.388 0.102 Q 0.398 0.087 0.408 0.071 Q 0.418 0.055 0.427 0.039 Q 0.436 0.022 0.444 0.005 Q 0.452 -0.011 0.460 -0.029 Q 0.467 -0.046 0.473 -0.063 Q 0.479 -0.081 0.484 -0.099 Q 0.489 -0.117 0.492 -0.135 Q 0.496 -0.153 0.498 -0.171 Q 0.500 -0.189 0.500 -0.208 Q 0.500 -0.226 0.498 -0.245 Q 0.497 -0.263 0.493 -0.281 Q 0.489 -0.299 0.483 -0.316 Q 0.477 -0.333 0.469 -0.350 Q 0.461 -0.366 0.450 -0.381 Q 0.440 -0.396 0.428 -0.409 Q 0.415 -0.422 0.401 -0.433 Q 0.387 -0.445 0.371 -0.454 Q 0.355 -0.463 0.339 -0.470 Q 0.322 -0.477 0.304 -0.481 Q 0.286 -0.486 0.268 -0.488 Q 0.250 -0.490 0.231 -0.491 Q 0.213 -0.491 0.195 -0.489 Q 0.176 -0.487 0.158 -0.484 Q 0.140 -0.481 0.122 -0.475 Q 0.104 -0.471 0.087 -0.464 Q 0.069 -0.458 0.052 -0.451 Q 0.035 -0.443 0.018 -0.435 Q 0.001 -0.427 -0.015 -0.418 Q -0.032 -0.409 -0.047 -0.399 Q -0.063 -0.389 -0.079 -0.379 Q -0.094 -0.369 -0.110 -0.358 Q -0.125 -0.347 -0.140 -0.336 Q -0.155 -0.325 -0.169 -0.314 Q -0.184 -0.302 -0.198 -0.290 Q -0.213 -0.278 -0.227 -0.266 Q -0.240 -0.253 -0.254 -0.240 Q -0.267 -0.228 -0.280 -0.214 Q -0.294 -0.202 -0.306 -0.188 Q -0.320 -0.175 -0.332 -0.161 Q -0.345 -0.147 -0.357 -0.133 Q -0.369 -0.119 -0.381 -0.104 Q -0.392 -0.089 -0.403 -0.074 Q -0.414 -0.059 -0.424 -0.043 Q -0.433 -0.027 -0.442 -0.011 Q -0.451 0.005 -0.459 0.022 Q -0.466 0.039 -0.473 0.056 Q -0.479 0.074 -0.484 0.092 Q -0.489 0.109 -0.493 0.127 Q -0.496 0.145 -0.498 0.164 Q -0.500 0.183 -0.500 0.201 Q -0.500 0.220 -0.499 0.238 Q -0.497 0.256 -0.493 0.274 Q -0.490 0.292 -0.483 0.309 Q -0.477 0.326 -0.468 0.342 Q -0.460 0.357 -0.449 0.372 Q -0.438 0.387 -0.425 0.399 Q -0.412 0.413 -0.398 0.424 Q -0.383 0.435 -0.368 0.444 Q -0.352 0.453 -0.335 0.460 Q -0.318 0.468 -0.301 0.474 Q -0.283 0.479 -0.265 0.483 Q -0.247 0.486 -0.229 0.489 Q -0.211 0.491 -0.193 0.490 Q -0.174 0.490 -0.165 0.489 Q -0.156 0.489 -0.138 0.486 Z','M -0.201 0.491 Q -0.181 0.485 -0.161 0.478 Q -0.141 0.471 -0.122 0.462 Q -0.102 0.453 -0.084 0.443 Q -0.065 0.433 -0.047 0.421 Q -0.028 0.410 -0.010 0.398 Q 0.007 0.386 0.024 0.373 Q 0.041 0.360 0.058 0.347 Q 0.075 0.333 0.091 0.319 Q 0.107 0.305 0.122 0.291 Q 0.138 0.276 0.153 0.260 Q 0.167 0.244 0.181 0.228 Q 0.195 0.212 0.208 0.196 Q 0.222 0.179 0.235 0.163 Q 0.249 0.146 0.262 0.129 Q 0.275 0.112 0.287 0.094 Q 0.299 0.077 0.311 0.059 Q 0.323 0.042 0.334 0.023 Q 0.345 0.005 0.355 -0.013 Q 0.366 -0.032 0.376 -0.051 Q 0.385 -0.070 0.395 -0.089 Q 0.404 -0.108 0.413 -0.128 Q 0.422 -0.147 0.430 -0.167 Q 0.439 -0.186 0.446 -0.206 Q 0.453 -0.227 0.459 -0.247 Q 0.465 -0.267 0.469 -0.288 Q 0.473 -0.308 0.475 -0.329 Q 0.476 -0.350 0.475 -0.370 Q 0.473 -0.390 0.467 -0.409 Q 0.461 -0.428 0.451 -0.444 Q 0.440 -0.459 0.425 -0.471 Q 0.410 -0.482 0.391 -0.489 Q 0.373 -0.496 0.353 -0.498 Q 0.332 -0.500 0.312 -0.498 Q 0.291 -0.497 0.270 -0.493 Q 0.250 -0.489 0.229 -0.483 Q 0.209 -0.477 0.189 -0.469 Q 0.169 -0.462 0.149 -0.454 Q 0.130 -0.445 0.111 -0.436 Q 0.091 -0.427 0.072 -0.417 Q 0.052 -0.407 0.034 -0.396 Q 0.015 -0.385 -0.003 -0.374 Q -0.021 -0.362 -0.038 -0.350 Q -0.056 -0.338 -0.073 -0.325 Q -0.090 -0.312 -0.107 -0.299 Q -0.123 -0.285 -0.140 -0.272 Q -0.156 -0.258 -0.172 -0.244 Q -0.189 -0.230 -0.204 -0.215 Q -0.219 -0.200 -0.234 -0.184 Q -0.248 -0.169 -0.262 -0.152 Q -0.276 -0.136 -0.290 -0.119 Q -0.303 -0.102 -0.316 -0.086 Q -0.329 -0.069 -0.341 -0.051 Q -0.353 -0.034 -0.365 -0.016 Q -0.376 0.002 -0.386 0.021 Q -0.397 0.040 -0.407 0.058 Q -0.417 0.077 -0.425 0.097 Q -0.434 0.116 -0.441 0.136 Q -0.449 0.156 -0.455 0.176 Q -0.461 0.196 -0.466 0.217 Q -0.471 0.237 -0.474 0.257 Q -0.476 0.278 -0.476 0.298 Q -0.475 0.319 -0.471 0.339 Q -0.467 0.359 -0.459 0.378 Q -0.451 0.397 -0.440 0.414 Q -0.428 0.431 -0.413 0.445 Q -0.398 0.459 -0.381 0.469 Q -0.363 0.480 -0.344 0.487 Q -0.325 0.494 -0.305 0.497 Q -0.284 0.500 -0.263 0.499 Q -0.243 0.499 -0.232 0.497 Q -0.222 0.496 -0.201 0.491 Z','M -0.169 0.475 Q -0.150 0.472 -0.132 0.467 Q -0.113 0.462 -0.096 0.456 Q -0.077 0.451 -0.060 0.444 Q -0.042 0.437 -0.024 0.430 Q -0.006 0.422 0.011 0.413 Q 0.028 0.404 0.045 0.395 Q 0.061 0.386 0.078 0.376 Q 0.094 0.366 0.111 0.355 Q 0.127 0.345 0.142 0.334 Q 0.158 0.323 0.173 0.311 Q 0.188 0.299 0.202 0.287 Q 0.217 0.274 0.231 0.261 Q 0.245 0.248 0.258 0.235 Q 0.273 0.221 0.286 0.208 Q 0.299 0.194 0.312 0.180 Q 0.325 0.166 0.338 0.152 Q 0.350 0.137 0.362 0.122 Q 0.374 0.107 0.386 0.092 Q 0.397 0.077 0.407 0.061 Q 0.418 0.045 0.428 0.028 Q 0.437 0.011 0.446 -0.006 Q 0.454 -0.023 0.461 -0.041 Q 0.469 -0.059 0.475 -0.077 Q 0.481 -0.095 0.486 -0.113 Q 0.491 -0.132 0.494 -0.150 Q 0.498 -0.169 0.499 -0.188 Q 0.500 -0.207 0.500 -0.225 Q 0.499 -0.244 0.495 -0.262 Q 0.492 -0.281 0.486 -0.299 Q 0.481 -0.317 0.473 -0.334 Q 0.466 -0.351 0.455 -0.367 Q 0.445 -0.383 0.432 -0.396 Q 0.419 -0.410 0.405 -0.422 Q 0.390 -0.434 0.374 -0.443 Q 0.358 -0.452 0.340 -0.459 Q 0.323 -0.467 0.305 -0.471 Q 0.287 -0.476 0.268 -0.479 Q 0.249 -0.482 0.230 -0.483 Q 0.211 -0.483 0.193 -0.482 Q 0.174 -0.481 0.155 -0.478 Q 0.136 -0.475 0.118 -0.470 Q 0.099 -0.466 0.082 -0.459 Q 0.064 -0.453 0.047 -0.446 Q 0.029 -0.438 0.012 -0.430 Q -0.005 -0.421 -0.022 -0.412 Q -0.038 -0.403 -0.054 -0.393 Q -0.071 -0.383 -0.087 -0.372 Q -0.103 -0.361 -0.118 -0.350 Q -0.134 -0.339 -0.149 -0.327 Q -0.163 -0.315 -0.178 -0.302 Q -0.193 -0.289 -0.207 -0.276 Q -0.220 -0.262 -0.234 -0.249 Q -0.248 -0.235 -0.261 -0.221 Q -0.275 -0.208 -0.288 -0.193 Q -0.301 -0.179 -0.314 -0.165 Q -0.327 -0.150 -0.339 -0.135 Q -0.351 -0.121 -0.363 -0.105 Q -0.374 -0.090 -0.386 -0.075 Q -0.397 -0.059 -0.407 -0.043 Q -0.417 -0.027 -0.427 -0.010 Q -0.436 0.007 -0.445 0.024 Q -0.453 0.041 -0.461 0.058 Q -0.468 0.076 -0.474 0.094 Q -0.481 0.112 -0.485 0.130 Q -0.490 0.148 -0.494 0.166 Q -0.497 0.185 -0.499 0.203 Q -0.500 0.222 -0.499 0.240 Q -0.498 0.258 -0.495 0.276 Q -0.491 0.294 -0.485 0.312 Q -0.480 0.329 -0.472 0.346 Q -0.464 0.363 -0.453 0.378 Q -0.443 0.394 -0.430 0.407 Q -0.417 0.420 -0.402 0.432 Q -0.387 0.443 -0.371 0.452 Q -0.354 0.460 -0.336 0.467 Q -0.318 0.472 -0.300 0.476 Q -0.281 0.480 -0.262 0.482 Q -0.244 0.483 -0.225 0.482 Q -0.206 0.481 -0.197 0.480 Q -0.187 0.479 -0.169 0.475 Z'].map(d => new Path2D(d));
   let W, H, D, P, dots = [], dpr, seed, HX = null;
@@ -3712,7 +3712,10 @@ html body .ab-pill{overflow-anchor:none}
       for (const [hx, hy, hr2] of L) { const dd = Math.hypot(d.x - hx, d.y - hy), r = D * .38 * d.sz; if (dd < hr2 + r + D * .1) f = Math.min(f, Math.max(0, (dd - hr2 - D * .1) / r)); } return f; };
     for (let k = -1; k * P < W + P; k++) { const ox = k * P + shift;
       for (const d of dots) { let x = d.x + ox, y = d.y; if (x < -D || x > W + D) continue; const sh = d.hc ? 1 : room(d); if (sh < .15) continue; if (d.hc) { const a = d.ang + d.dir * (reduce ? 0 : scrollY * .004); x = d.hc[0] + Math.cos(a) * d.rr + ox; y = d.hc[1] + Math.sin(a) * d.rr; }   /* the hexagons turn with your scroll */
-        const r = D * .38 * d.sz * sh; g.fillStyle = d.col; if (d.bl.id && window.mlIDot) { g.save(); g.translate(x, y); g.rotate(d.bl.ph); g.scale(r, r); g.fill(mlIDot); g.restore(); } else { drawBlob(x, y, d.bl, r); g.fill(); }
+        const r = D * .38 * d.sz * sh; g.fillStyle = d.col; if (d.bl.id && window.mlIDot) { g.save(); g.translate(x, y); g.rotate(d.bl.ph); g.scale(r, r); g.fill(mlIDot); g.restore(); } else { if (!d.bl.P) { const b = d.bl, m = b.k.length, P = new Path2D();   /* the blob as a unit path, so it can be carried on the breeze */
+            for (let i = 0; i <= m; i++) { const an = i / m * 6.283 + b.ph, qx = Math.cos(an) * b.k[i % m], qy = Math.sin(an) * b.k[i % m];
+              if (!i) P.moveTo(qx, qy); else { const a0 = (i - .5) / m * 6.283 + b.ph, r0 = (b.k[i - 1] + b.k[i % m]) / 2 * 1.06; P.quadraticCurveTo(Math.cos(a0) * r0, Math.sin(a0) * r0, qx, qy); } } d.bl.P = P; }
+          g.save(); g.translate(x, y); g.scale(r, r); g.fill(d.bl.P); g.restore(); }
         if (d.ring) { g.save(); g.translate(x, y); g.rotate(mlHoleTurn(d.hi * 2.1 + d.s * .01)); g.scale(r * 1.15, r * 1.15); g.fillStyle = CREAM; g.fill(HOLES[d.hi]); g.restore(); } } }
     if (!reduce) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(frame); }, { rootMargin: '100px' }).observe(box);
@@ -3753,7 +3756,7 @@ html body .ab-pill{overflow-anchor:none}
 (() => { const cards = [...document.querySelectorAll('.people .card')];
   /* two lines of dots, one above and one below the photo and name, each tipped about 8 degrees and running edge to edge;
      drawn like the site's other dots (organic, a little uneven, an open circle or two) */
-  cards.forEach(c => { const d = document.createElement('canvas'); d.className = 'dotline'; d.setAttribute('aria-hidden', 'true'); c.append(d); });
+  cards.forEach(c => { const d = document.createElement('canvas'); d.className = 'dotline'; d.setAttribute('aria-hidden', 'true'); c.append(d); window.mlSwayOn && mlSwayOn(d); });
   const shape = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
     for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
     p.closePath(); return p; };
@@ -3804,7 +3807,7 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
     for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
     p.closePath(); return p; };
   const cards = [...document.querySelectorAll('#resources .res')];
-  cards.forEach(c => { const go = c.querySelector('.r-go'); if (!go) return; const cv = document.createElement('canvas'); cv.className = 'rg-ring'; cv.setAttribute('aria-hidden', 'true'); go.append(cv);
+  cards.forEach(c => { const go = c.querySelector('.r-go'); if (!go) return; const cv = document.createElement('canvas'); cv.className = 'rg-ring'; cv.setAttribute('aria-hidden', 'true'); go.append(cv); window.mlSwayOn && mlSwayOn(cv);
     c._ring = { cv, col: RING[[...c.classList].find(k => RING[k])] || '#d8708e' }; });
   const draw = () => cards.forEach(c => { const R = c._ring; if (!R) return; const S = R.cv.clientWidth; if (!S) return; const dpr = Math.min(2, devicePixelRatio || 1);
     R.cv.width = S * dpr; R.cv.height = S * dpr; const g = R.cv.getContext('2d'), rad = S / 2 / 1.5 * 1.09 + 22,   /* the circle (with its wobble and swell) plus the biggest dot plus a clear buffer */ st = S < 260 ? 30 : 36, n = Math.max(8, Math.round(2 * Math.PI * rad / st));
@@ -4007,7 +4010,7 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
   const shape = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
     for (let i = 0; i <= 36; i++) { const a = i / 36 * Math.PI * 2, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(k, 0); }
     p.closePath(); return p; };
-  pills.forEach(d => { const cv = document.createElement('canvas'); cv.className = 'ab-line'; cv.setAttribute('aria-hidden', 'true'); d.querySelector('summary').prepend(cv); d._dots = [];   /* inside the summary so it shows while the card is closed */ });
+  pills.forEach(d => { const cv = document.createElement('canvas'); cv.className = 'ab-line'; cv.setAttribute('aria-hidden', 'true'); window.mlSwayOn && mlSwayOn(cv); d.querySelector('summary').prepend(cv); d._dots = [];   /* inside the summary so it shows while the card is closed */ });
   /* the line only comes out when the card is opened: dots the size of the button grow out of it, up and down, one after another */
   const DEG = [7.6, 10.6, 13.6];   // 3 degrees apart, so the difference shows   // at least a full degree apart   // all lean out to the right as they go down, each a touch more than the last   // the first leans left to right, the second right to left, the third right to left and steeper; each card its own angle (none matches the people cards), all leaning inward so no dot is cut off at the side
   const draw1 = (d) => { const pi = pills.indexOf(d), cv = d.querySelector('canvas.ab-line'), pm = d.querySelector('.pm'); if (!pm) return;
@@ -4068,7 +4071,7 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
 /* the band before Join Our Orbit: a calm field of dots, river 2's sizes and colours, that eddies whoosh through. Each eddy travels right to left
    and a little downhill, sweeping the dots it passes round in a swirl; once it has gone by, they settle back into place. The eddies drift
    slowly on their own and race through as you scroll */
-(() => { const box = document.querySelector('.orbit-band'); if (!box) return; const cv = box.querySelector('canvas') || box.appendChild(document.createElement('canvas')), g = cv.getContext('2d');
+(() => { const box = document.querySelector('.orbit-band'); if (!box) return; const cv = box.querySelector('canvas') || box.appendChild(document.createElement('canvas')); window.mlBreezeOn && mlBreezeOn(cv, box); const g = cv.getContext('2d');
   const BLUE = '#2c5494', FILL = v => v < .38 ? '#e7aa4d' : v < .54 ? '#e0773a' : v < .68 ? '#d8708e' : v < .8 ? '#9b6aa6' : v < .88 ? '#2a8c8c' : BLUE;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const blob = () => { const p = new Path2D(), q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3];
@@ -4083,14 +4086,15 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
       if (Math.random() > pr) continue; const big = Math.random() < .07, v = Math.random();
       D.push({ x: x + (Math.random() - .5) * st * .5, y: y + (Math.random() - .5) * st * .5, r: Dd * .38 * (big ? .55 + Math.random() * .2 : (.2 + Math.random() * .1) * (out ? .7 + .3 * pr : 1)),
         c: big ? (v < .8 ? BLUE : FILL(v)) : (Math.random() < .5 ? BLUE : FILL(Math.random())),   /* lots of blue */ p: (Math.random() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(Math.random() * 16)], ring: big && Math.random() < .2, rot: Math.random() * 6.3 }); } };
-  build(); new ResizeObserver(build).observe(box);
+  let FILLC = []; const buildFill = () => { FILLC = []; if (!W) return; const st = H / 1.75 * .92 * .2 * .3; for (let y = st * .5, row = 0; y < H; y += st * .87, row++) for (let x = (row % 2) * st * .5; x < W; x += st) FILLC.push({ x: x + (Math.random() - .5) * st * .4, y: y + (Math.random() - .5) * st * .4, c: Math.random() < .5 ? BLUE : FILL(Math.random()), p: SH[Math.floor(Math.random() * 16)], rot: Math.random() * 6.3 }); };
+  build(); buildFill(); new ResizeObserver(() => { build(); buildFill(); }).observe(box);
   const frame = now => { raf = 0; if (!vis || !W) return; const dt = prev ? Math.min(.05, (now - prev) / 1000) : .016; prev = now;
     T += dt * (reduce ? 0 : .18 + wind * 1.05);   /* a gentle breeze */ wind *= Math.pow(.15, dt);
-    const R = H * .42, L = W + 4 * R, n = W < 600 ? 2 : 3, ED = [...Array(n)].map((_, i) => { const p = ((T * W * .12 + i * L / n) % L + L) % L, cx = W + 2 * R - p, cy = H * (.35 + .3 * (p / L)) + Math.sin(T * .7 + i * 2) * H * .05;   // right to left, and a little downhill
+    const R = H * .4, L = W + 4 * R, n = W < 600 ? 2 : 3, ED = [...Array(n)].map((_, i) => { const p = ((T * W * .12 + i * L / n) % L + L) % L, cx = W + 2 * R - p, cy = H * (.35 + .3 * (p / L)) + Math.sin(T * .7 + i * 2) * H * .05;   // right to left, and a little downhill
       return [cx, cy, i % 2 ? -1 : 1]; });
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
     for (const d of D) { let x = d.x, y = d.y, sw = 1, spin = 0;
-      for (const [cx, cy, sg] of ED) { const dx = x - cx, dy = y - cy, q = (dx * dx + dy * dy) / (R * R); if (q > 4) continue; const f = Math.exp(-q * 2), th = sg * f * Math.PI * .65, c = Math.cos(th), s2 = Math.sin(th), pull = 1 - .1 * f;
+      for (const [cx, cy, sg] of ED) { const dx = x - cx, dy = y - cy, q = (dx * dx + dy * dy) / (R * R); if (q > 4) continue; const f = Math.exp(-q * 2.2), th = sg * f * Math.PI * 2.2, c = Math.cos(th), s2 = Math.sin(th), pull = 1 - .12 * f;   /* a whirlwind: dots near its heart spin right round, the outer ones just sway */
         x = cx + (dx * c - dy * s2) * pull; y = cy + (dx * s2 + dy * c) * pull; sw *= 1 + .08 * f; spin += th; }   /* swept round the swirl, pulled in a little and swelling as it whooshes by */
       d.px = x; d.py = y; d.pr = d.r * sw * 1.08; d.ps = spin; }   /* (1.08: room for the organic wobble) */
     /* no two dots ever overlap: biggest first, each smaller dot shrinks to fit the space it has left */
@@ -4100,6 +4104,13 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
         for (const o of cell) { const room = Math.hypot(d.px - o.px, d.py - o.py) - o.dr - gap; if (room < r) r = room; } }
       d.dr = r; if (r < 1) continue; const key = gx * 9973 + gy; (grid.get(key) || grid.set(key, []).get(key)).push(d);
       const rr = r / 1.08; g.setTransform(dpr * rr, 0, 0, dpr * rr, dpr * d.px, dpr * d.py); g.rotate(d.rot + d.ps); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
+    /* the whirl leaves gaps: small dots fill the negative space it opens up, only where there is room, so nothing touches */
+    const maxR = H / 1.75 * .92 * .2 * .38 * .26;
+    for (const q of FILLC) { let near = 0; for (const [cx, cy] of ED) { const dx = q.x - cx, dy = q.y - cy; near = Math.max(near, Math.exp(-(dx * dx + dy * dy) / (R * R) * 2.2)); } if (near < .12) continue;
+      const gx = Math.floor(q.x / cs), gy = Math.floor(q.y / cs); let r = maxR * Math.min(1, near * 2);
+      for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const cell = grid.get((gx + i) * 9973 + gy + j); if (!cell) continue; for (const o of cell) { const room = Math.hypot(q.x - o.px, q.y - o.py) - o.dr - gap; if (room < r) r = room; } }
+      if (r < maxR * .45) continue; q.px = q.x; q.py = q.y; q.dr = r; const key = gx * 9973 + gy; (grid.get(key) || grid.set(key, []).get(key)).push(q);
+      g.setTransform(dpr * r / 1.08, 0, 0, dpr * r / 1.08, dpr * q.x, dpr * q.y); g.rotate(q.rot); g.fillStyle = q.c; g.fill(q.p); }
     if (!reduce) raf = requestAnimationFrame(frame); };
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) { prev = 0; raf = requestAnimationFrame(frame); } }, { rootMargin: '100px' }).observe(box); })();
 </script>

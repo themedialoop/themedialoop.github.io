@@ -1344,7 +1344,7 @@ html.st-on body .top.solid:not(.open),html body .top.over-side:not(.open){backgr
 html body .top nav a:is(:hover,:focus-visible,.tapped){background:var(--nh) !important;color:var(--nt) !important}
 html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--nt) !important;transform:none !important}
 </style>
-<script src="assets/mlhole.js?v=3"></script>
+<script src="assets/mlhole.js?v=4"></script>
 <script src="assets/mlidot.js?v=1"></script>
 <script src="assets/bsbfield.js?v=3"></script>
 </head>
@@ -1842,7 +1842,7 @@ html body .pubs li > a[href]::before,html body .r-list li > a[href]::before,html
 /* a light scatter of dots floating along the bottom of the page, on the same turned Netsch grid as the rest of the site.
    Each drifts a little on its own; room for the drift is left, so they never touch and never run off the edge */
 (() => {
-  const box = document.querySelector('.drift'); if (!box) return; const cv = box.querySelector('canvas'), g = cv.getContext('2d');
+  const box = document.querySelector('.drift'); if (!box) return; const cv = box.querySelector('canvas'); window.mlBreezeOn && mlBreezeOn(cv, box); const g = cv.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const COLS = [['#2c5494', .6], ['#e7aa4d', .4]];   /* blue and gold only */
   let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;

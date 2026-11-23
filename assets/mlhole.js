@@ -25,3 +25,32 @@ window.mlBlow = (k, a, b, W, H) => { if (k <= 0) return [0, 0, 0, 1]; k = Math.m
   return [-g * W * (.95 + .6 * a) + (Math.cos(ph) - Math.cos(a * 6.3)) * R,
           g * H * (.12 + .28 * b) + Math.sin(ph) * R + Math.sin(k * 9 + a * 6.3) * arc * H * .03,
           k * (a > .5 ? 1 : -1) * (5 + 9 * b), 1 - .75 * Math.pow(k, 1.3)]; };
+
+/* the breeze that brings every dot field in and takes it away again. mlBreezeAt(host, x, y, W, H): as the host scrolls up into view from the
+   bottom, its dots are blown in from the right, looping down into place; as it leaves off the top, they're blown away to the left and downhill.
+   Returns null when at rest, else [dx, dy, spin, scale]. mlBreezeOn(canvas, host) applies it to every dot a canvas draws */
+(() => { const K = new WeakMap(), cl = v => v < 0 ? 0 : v > 1 ? 1 : v;
+  const prog = host => { const now = performance.now(), c = K.get(host); if (c && now - c.t < 12) return c.k;
+    const r = host.getBoundingClientRect(), vh = innerHeight, k = [cl((r.top - vh * .62) / (vh * .38)), cl((vh * .38 - r.bottom) / (vh * .38))]; K.set(host, { t: now, k }); return k; };
+  const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.mlBreezeAt = (host, x, y, W, H) => { if (still()) return null; const [ki, ko] = prog(host); if (!ki && !ko) return null;
+    const a = .5 + .5 * Math.sin(x * .0137 + y * .0213 + 1.3), b = .5 + .5 * Math.sin(x * .0171 - y * .0119 + 4.1), u = cl(x / Math.max(1, W));
+    if (ko > 0) { const B = mlBlow(cl(ko * 1.6 - (1 - u) * .5 - a * .1), a, b, W, H); return B; }
+    const B = mlBlow(cl(ki * 1.6 - u * .5 - a * .1), a, b, W, H); return [-B[0], -B[1], -B[2], B[3]]; };
+  window.mlBreezeOn = (canvas, host) => { const g = canvas.getContext('2d'); if (g._breeze) return; g._breeze = 1; const f0 = g.fill.bind(g);
+    g.fill = function (p, rule) { if (!(p instanceof Path2D)) return rule ? f0(p, rule) : p ? f0(p) : f0();
+      const m = g.getTransform(); if ((m.e === 0 && m.f === 0) || Math.hypot(m.a, m.b) > 400) return rule ? f0(p, rule) : f0(p);
+      const dpr = canvas.width / Math.max(1, canvas.clientWidth), B = mlBreezeAt(host, m.e / dpr, m.f / dpr, canvas.clientWidth, canvas.clientHeight); if (!B) return rule ? f0(p, rule) : f0(p);
+      if (B[3] < .03) return; const c = Math.cos(B[2]) * B[3], s = Math.sin(B[2]) * B[3];
+      g.setTransform(c * m.a - s * m.b, s * m.a + c * m.b, c * m.c - s * m.d, s * m.c + c * m.d, m.e + B[0] * dpr, m.f + B[1] * dpr); rule ? f0(p, rule) : f0(p); g.setTransform(m); };
+    const t0 = g.fillText.bind(g); g.fillText = function (tx, x, y, mw) { const m = g.getTransform(); if (m.e === 0 && m.f === 0) return t0(tx, x, y, mw);   /* words ride with their bubbles */
+      const dpr = canvas.width / Math.max(1, canvas.clientWidth), B = mlBreezeAt(host, m.e / dpr, m.f / dpr, canvas.clientWidth, canvas.clientHeight); if (!B) return t0(tx, x, y, mw); if (B[3] < .03) return;
+      const c = Math.cos(B[2]) * B[3], s = Math.sin(B[2]) * B[3]; g.setTransform(c * m.a - s * m.b, s * m.a + c * m.b, c * m.c - s * m.d, s * m.c + c * m.d, m.e + B[0] * dpr, m.f + B[1] * dpr); t0(tx, x, y, mw); g.setTransform(m); }; };
+  /* card dots don't leave: they just sway a little in the wind, each a touch out of step with its neighbours */
+  window.mlSwayOn = (canvas, amp = 1.6) => { const g = canvas.getContext('2d'); if (g._sway) return; g._sway = 1; const f0 = g.fill.bind(g);
+    g.fill = function (p, rule) { if (!(p instanceof Path2D) || still()) return rule ? f0(p, rule) : p ? f0(p) : f0();
+      const m = g.getTransform(); if ((m.e === 0 && m.f === 0) || Math.hypot(m.a, m.b) > 400) return rule ? f0(p, rule) : f0(p);
+      const dpr = canvas.width / Math.max(1, canvas.clientWidth), t = performance.now() / 1000, x = m.e / dpr, y = m.f / dpr, w = Math.sin(t * 1.1 + x * .021 + y * .013), A = amp * dpr;
+      const sp = .12 * Math.sin(t * .9 + x * .017 - y * .02), c = Math.cos(sp), s = Math.sin(sp);
+      g.setTransform(c * m.a - s * m.b, s * m.a + c * m.b, c * m.c - s * m.d, s * m.c + c * m.d, m.e - A * (.6 + .4 * w), m.f + A * .45 * Math.sin(t * .8 + x * .017)); rule ? f0(p, rule) : f0(p); g.setTransform(m); }; };
+})();

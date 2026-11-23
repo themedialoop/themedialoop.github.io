@@ -459,7 +459,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 .sea{position:relative;height:clamp(260px,38vh,440px);margin-top:clamp(10px,3vw,40px)}
 .sea canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
-<script src="assets/mlhole.js?v=3"></script>
+<script src="assets/mlhole.js?v=4"></script>
 <script src="assets/mlidot.js?v=1"></script>
 <script src="assets/bsbfield.js?v=3"></script>
 </head>
@@ -875,7 +875,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 /* a sea of bubbles along the bottom, laid out on Netsch's turned grid: big bubbles on the grid's corners, smaller ones in its
    middles, all breathing in a slow diagonal swell. They grow from nothing at the top edge, never touch, and never run off the edge */
 (() => {
-  const box = document.querySelector('.sea'); if (!box) return; const cv = box.querySelector('canvas'), g = cv.getContext('2d');
+  const box = document.querySelector('.sea'); if (!box) return; const cv = box.querySelector('canvas'); window.mlBreezeOn && mlBreezeOn(cv, box); const g = cv.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const COLS = [['#2c5494', .62], ['#e7aa4d', .24], ['#e0773a', .05], ['#d8708e', .05], ['#9b6aa6', .04]];
   let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
