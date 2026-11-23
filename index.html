@@ -3939,7 +3939,7 @@ function orbitRiver(box) {
     const dirx = kind === 'ref' ? 1 : -1, shift = dirx * ((((t * D * .35 + sc * .55) % P) + P) % P);   /* runs with your scroll; this river flows right to left, downhill */
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     const ang = sc * .004, MV = [];   /* where every moving dot is right now (in pattern space) */
-    for (const d of dots) if (d.sp) { const [ax, ay, an, tt, ph] = d.sp, a2 = an + Math.sin(t * 1.1 + ph + sc * .006) * .09; MV.push([ax + Math.cos(a2) * tt, ay + Math.sin(a2) * tt, D * .38 * d.sz, d]); }
+    for (const d of dots) if (d.sp) { const [ax, ay, an, tt, ph] = d.sp, a2 = an + Math.sin(ph + sc * .012) * .1;   /* the spurs sway only as you scroll */ MV.push([ax + Math.cos(a2) * tt, ay + Math.sin(a2) * tt, D * .38 * d.sz, d]); }
     for (const d of dots) if (d.hc) { const a = d.ang + d.dir * ang; MV.push([d.hc[0] + Math.cos(a) * d.rr, d.hc[1] + Math.sin(a) * d.rr, D * .38 * d.sz, d]); }
     for (const m of movers) { const [x, y] = along(paths[m.p], m.s + sc * .00018 + t * .004); MV.push([x, y, D * .38 * m.sz, m]); }
     const room = d => { let f = 1; for (const [hx, hy, hr2] of MV) { const dx = wx(d.x, ((hx % P) + P) % P); if (dx > hr2 + D) continue; const dd = Math.hypot(dx, d.y - hy), r = D * .38 * d.sz; if (dd < hr2 + r + D * .1) f = Math.min(f, Math.max(0, (dd - hr2 - D * .1) / r)); } return f; };
