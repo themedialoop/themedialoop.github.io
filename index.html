@@ -3814,7 +3814,7 @@ html body .res .r-go canvas.rg-ring{display:block !important;position:absolute;i
   draw(); addEventListener('resize', draw); setTimeout(draw, 600); })();
 </script>
 <style>
-.orbit-band{position:relative;height:clamp(330px,30vw,450px);width:112vw;margin:clamp(0px,1vw,16px) 0 clamp(0px,1vw,16px) calc(50% - 56vw);rotate:-3deg;pointer-events:none}   /* the same size as the river before Resources, tipped down from right to left */
+.orbit-band{position:relative;height:clamp(330px,30vw,450px);width:112vw;margin:clamp(0px,1vw,16px) 0 clamp(0px,1vw,16px) calc(50% - 56vw);rotate:-6deg;pointer-events:none}   /* the same size as the river before Resources, tipped down from right to left */
 .orbit-band canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 </style>
 <script>
@@ -4085,13 +4085,13 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
         c: big ? (v < .6 ? BLUE : FILL(v)) : FILL(Math.random()), p: (Math.random() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(Math.random() * 16)], ring: big && Math.random() < .2, rot: Math.random() * 6.3 }); } };
   build(); new ResizeObserver(build).observe(box);
   const frame = now => { raf = 0; if (!vis || !W) return; const dt = prev ? Math.min(.05, (now - prev) / 1000) : .016; prev = now;
-    T += dt * (reduce ? 0 : .35 + wind * 2.2); wind *= Math.pow(.15, dt);
-    const R = H * .42, L = W + 4 * R, n = W < 600 ? 2 : 3, ED = [...Array(n)].map((_, i) => { const p = ((T * W * .12 + i * L / n) % L + L) % L, cx = W + 2 * R - p, cy = H * (.4 + .2 * (p / L)) + Math.sin(T * .7 + i * 2) * H * .05;   // right to left, and a little downhill
+    T += dt * (reduce ? 0 : .22 + wind * 1.3);   /* a gentle breeze */ wind *= Math.pow(.15, dt);
+    const R = H * .42, L = W + 4 * R, n = W < 600 ? 2 : 3, ED = [...Array(n)].map((_, i) => { const p = ((T * W * .12 + i * L / n) % L + L) % L, cx = W + 2 * R - p, cy = H * (.35 + .3 * (p / L)) + Math.sin(T * .7 + i * 2) * H * .05;   // right to left, and a little downhill
       return [cx, cy, i % 2 ? -1 : 1]; });
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
     for (const d of D) { let x = d.x, y = d.y, sw = 1, spin = 0;
-      for (const [cx, cy, sg] of ED) { const dx = x - cx, dy = y - cy, q = (dx * dx + dy * dy) / (R * R); if (q > 4) continue; const f = Math.exp(-q * 2), th = sg * f * Math.PI * 1.25, c = Math.cos(th), s2 = Math.sin(th), pull = 1 - .1 * f;
-        x = cx + (dx * c - dy * s2) * pull; y = cy + (dx * s2 + dy * c) * pull; sw *= 1 + .18 * f; spin += th; }   /* swept round the swirl, pulled in a little and swelling as it whooshes by */
+      for (const [cx, cy, sg] of ED) { const dx = x - cx, dy = y - cy, q = (dx * dx + dy * dy) / (R * R); if (q > 4) continue; const f = Math.exp(-q * 2), th = sg * f * Math.PI * .8, c = Math.cos(th), s2 = Math.sin(th), pull = 1 - .1 * f;
+        x = cx + (dx * c - dy * s2) * pull; y = cy + (dx * s2 + dy * c) * pull; sw *= 1 + .1 * f; spin += th; }   /* swept round the swirl, pulled in a little and swelling as it whooshes by */
       d.px = x; d.py = y; d.pr = d.r * sw * 1.08; d.ps = spin; }   /* (1.08: room for the organic wobble) */
     /* no two dots ever overlap: biggest first, each smaller dot shrinks to fit the space it has left */
     const cs = Math.max(8, H / 9), grid = new Map(), gap = 1.5, ord = D.slice().sort((a, b) => b.r - a.r);
