@@ -716,7 +716,7 @@ html body .top:not(.lift){background:none !important;backdrop-filter:none !impor
 <div class="ml-loop" id="mlLoop" aria-hidden="true"></div>
 <style>
 /* the Loop, in dots, at the foot of the page */
-.ml-loop{overflow:clip;height:400vh;position:relative}   /* room to scroll: the map fills the screen and holds still while it zooms out */
+.ml-loop{overflow:clip;height:320vh;position:relative}   /* room to scroll: the map fills the screen and holds still while it zooms out */
 .ml-loop figure{margin:0;padding:0;position:sticky;top:0}
 .ml-loop .stage{position:relative;height:100vh;height:100lvh;overflow:hidden}
 .ml-loop .stage .tilt{position:absolute;left:-4vw;top:-4vh;width:108vw;height:108%;rotate:-3.5deg}
@@ -724,7 +724,10 @@ html body .top:not(.lift){background:none !important;backdrop-filter:none !impor
 /* once the map is all the way out: a Home pill, bottom right, back to the top of the profile */
 .ml-home{position:fixed;left:50%;right:auto;margin-left:-44px;bottom:calc(clamp(28px,8vh,90px) + env(safe-area-inset-bottom));z-index:60;font:700 17px Inter,system-ui,sans-serif;color:#2c5494;background:#e7aa4d;border:0;border-radius:999px;padding:13px 24px;cursor:pointer;box-shadow:0 6px 18px rgba(44,84,148,.18);opacity:0;translate:0 14px;pointer-events:none;transition:opacity .35s,translate .35s}
 .ml-home.on{opacity:1;translate:0 0;pointer-events:auto}
-.ml-home{font-size:19px !important;padding:15px 28px !important;transition:opacity .6s,translate .6s cubic-bezier(.2,.8,.2,1) !important;translate:0 30px}
+.ml-home{left:auto !important;margin:0 !important;right:calc(clamp(16px,3vw,36px) + env(safe-area-inset-right)) !important;bottom:calc(clamp(16px,3vw,36px) + env(safe-area-inset-bottom)) !important;width:clamp(96px,11vw,132px);height:clamp(96px,11vw,132px);padding:0 !important;display:flex;align-items:center;justify-content:center;background:#2c5494 !important;color:#f2eedd !important;font:900 clamp(18px,1.9vw,23px)/1 Inter,system-ui,sans-serif !important;letter-spacing:-.03em;border-radius:52% 48% 50% 50% / 49% 52% 48% 51% !important;box-shadow:none !important;transition:opacity .5s,scale .55s cubic-bezier(.3,1.4,.5,1) !important;translate:0 0 !important;scale:.4;transform-origin:center}
+.ml-home.on{scale:1}   /* a big blue dot in the corner, cream letters; it swells into place */
+.ml-home:hover{scale:1.06}
+.ml-home:focus-visible{outline-color:#e7aa4d !important}
 .ml-home:focus-visible{outline:3px solid #2c5494;outline-offset:3px}
 </style>
 <script>
@@ -842,17 +845,17 @@ html body .top:not(.lift){background:none !important;backdrop-filter:none !impor
     const PAD = () => { const tb = document.querySelector('.top'), hb = tb ? tb.getBoundingClientRect().bottom : 0; return (box.getBoundingClientRect().top < 0 ? -box.getBoundingClientRect().top : 0) + Math.max(0, hb) + 6; };
     const home = document.createElement('button'); home.type = 'button'; home.className = 'ml-home'; home.textContent = 'Home'; home.tabIndex = -1; document.body.append(home);
     home.addEventListener('click', () => scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }));
-    const showHome = () => { const on = blowAt() > .8;   /* the Home button rises once the map has blown away */ if (on !== home.classList.contains('on')) { home.classList.toggle('on', on); home.tabIndex = on ? 0 : -1; } };
+    const showHome = () => { const on = zoomAt() > .97;   /* the Home button appears once the whole map is in view */ if (on !== home.classList.contains('on')) { home.classList.toggle('on', on); home.tabIndex = on ? 0 : -1; } };
     addEventListener('scroll', showHome, { passive: true });
     const rawAt = () => { const r = grid.getBoundingClientRect(), T = parseFloat(getComputedStyle(fig).top) || 0, span = r.height - fig.offsetHeight; return span > 0 ? Math.min(1, Math.max(0, (T - r.top) / span)) : 1; };
-    const zoomAt = () => Math.min(1, rawAt() / .72), blowAt = () => Math.min(1, Math.max(0, (rawAt() - .76) / .2));   /* zoom out fully, hold a moment, then the breeze takes the map away */
+    const zoomAt = rawAt;
     const frame = now => { if (!W) return; const t = reduce ? 0 : (now - t0) / 1000, p = reduce ? 1 : progress();
       const zf = Math.min(1, VW / W), e = ss(0, .92, zoomAt()), z = Math.pow(zf, e), sx0 = Math.min(Math.max(LX, VW / 2), W - VW / 2);
       const sy0 = Math.min(Math.max(LY + VH * .12, VH / 2), H - VH / 2), fx = Math.min(Math.max(sx0 + (W / 2 - sx0) * e, VW / 2 / z), W - VW / 2 / z), fy = (VH / 2 - PAD()) / z,   /* the map's top edge stays pinned just under the page header (never beneath its frosted bar); it zooms out from there */ gr = Math.pow(z, -.25);   /* dots shrink a little more slowly than the map, so they stay legible (and still never touch) */
       g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.setTransform(dpr * z, 0, 0, dpr * z, dpr * (VW / 2 - fx * z), dpr * (VH / 2 - fy * z));
       const xl = fx - VW / 2 / z - D, xr2 = fx + VW / 2 / z + D, yt = fy - VH / 2 / z - D, yb = fy + VH / 2 / z + D;
       if (o.mode === 'turn') { const e = ss(0, 1, p); g.translate(LX, LY); g.rotate((1 - e) * -Math.PI / 2); g.scale(.55 + .45 * e, .55 + .45 * e); g.translate(-LX, -LY); }
-      const SMALL = {}, BK = reduce ? (blowAt() > .5 ? 1 : 0) : blowAt();
+      const SMALL = {};
       for (const d of dots) { let k = 1, x = d.x, y = d.y; if (x < xl || x > xr2 || y < yt || y > yb) continue;
         if (o.mode === 'grow') k = ss(0, 1, (p * 1.35 - d.dl) / .35);
         else if (o.mode === 'arrive') k = ss(0, 1, (p * 1.35 - (1 - d.dl)) / .35);
@@ -860,7 +863,6 @@ html body .top:not(.lift){background:none !important;backdrop-filter:none !impor
         else if (o.mode === 'pop') k = back((p * 1.6 - d.rr * .6) / .35);
         else if (o.mode === 'turn') k = ss(0, 1, (p * 1.3 - d.rr * .3) / .5);
         else if (o.mode === 'sink') k = .22 + .78 * ss(0, 1, (p * 1.5 - d.rr * .5) / .45);
-        if (BK > 0) { const kk = Math.min(1, BK * 1.6 - (1 - (x - xl) / Math.max(1, xr2 - xl)) * .5 - d.rr * .1); if (kk > 0) { const B = mlBlow(kk, d.rr, (d.sz * 7) % 1, VW / z, VH / z); x += B[0]; y += B[1]; k *= B[3]; } }   /* blown away, right-hand dots first, gently left and downhill */
         if (k <= .01) continue;
         const r = D * (.3 + .16 * swell(d, t)) * d.sz * k * gr; if (r * z < 2.2) { const P = SMALL[d.col] || (SMALL[d.col] = new Path2D()); P.moveTo(x + r, y); P.arc(x, y, r, 0, 6.283); continue; }   /* tiny dots: plain circles, filled together */
         drawBlob(x, y, d.b, r, d.col); if (d.kind === 'ring') { const h = HOLES[d.hi], k = r * 1.1 / h.s; g.save(); g.translate(x, y); g.rotate(mlHoleTurn(d.rr * 6.283)); g.scale(k, k); g.translate(-h.cx, -h.cy); g.fillStyle = CREAM; g.fill(h.p); g.restore(); } }
