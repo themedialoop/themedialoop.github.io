@@ -4089,7 +4089,8 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
     const r1 = document.querySelector('.river.lf'); u = (r1 && r1.offsetHeight ? r1.offsetHeight : innerWidth < 700 ? 540 : Math.min(580, Math.max(360, innerWidth * .4))) / 3;   /* river 1's own dot sizes */
     const BP = 6 * u; L = Math.ceil(Math.max(W * 2.2, 1600) / BP) * BP;
     const BQ = mlBSB({ W: L, H, u, seed: 17, periodic: true, gap: 6, edge: 4 }).dots, pOther = Math.min(1, .15 * BQ.length / Math.max(1, BQ.filter(q => !q.b).length));
-    rmax = u * .2 * .34 * 1.6; dots = BQ.map(q => ({ hx: q.x, hy: q.y, r0: q.r * .95, gi: q.x / (u * .3), gj: 2 * q.y / (u * .3), b: q.b, k: MASS[Math.floor(Math.random() * MASS.length)],   /* at first, every dot is part of one colourful mass */
+    const mx = {}; for (const q of BQ) if (q.b) mx[q.li] = Math.max(mx[q.li] || 0, q.s || 0);
+    rmax = u * .2 * .34 * 1.6; dots = BQ.map(q => ({ ls: q.b ? (mx[q.li] ? (q.s || 0) / mx[q.li] : Math.random()) : 0, lo: Math.random(), hx: q.x, hy: q.y, r0: q.r * .95, gi: q.x / (u * .3), gj: 2 * q.y / (u * .3), b: q.b, k: MASS[Math.floor(Math.random() * MASS.length)],   /* at first, every dot is part of one colourful mass */
       p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * SH.length)], ring: q.ring, ph: R(0, 6.3), fx: R(.3, .9), fy: R(.3, .9), wa: R(1, 2.2), sp: R(.5, 1.5), bx: 0, by: 0 })); };
   const frame = now => { raf = 0; if (!vis) return; raf = requestAnimationFrame(frame); if (Math.abs(box.clientWidth - built) > 2) build(); if (!W) return;
     const dt = last ? Math.min(.05, (now - last) / 1000) : .016; last = now; if (!still) clock += dt;
@@ -4105,14 +4106,17 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
       const u1 = Math.sin((d.gi + d.gj / 2) * .42 - clock * 1.5), u2 = Math.sin((d.gi - d.gj / 2) * .36 + clock * 1.05);
       const r = still ? d.r0 : d.r0 * (.62 + .5 * ss(-.55, .55, (u1 + u2) * .62));   /* river 1's crossing swell */
       const t = ss(0, 1, (rev * 1.3 - (1 - Math.max(0, Math.min(1, bx / W)))) / .3);   /* right-hand side first */
-      if (d.th === undefined) d.th = R(.3, .7); const on = d.b && t > d.th, pop = on ? 1 + .35 * Math.max(0, 1 - (t - d.th) / .12) : 1;   /* each building dot flips to blue on its own, with a little pop: no muddy in-between colours */
-      out.push({ d, x: bx, y: by, r: d.b ? r * (1 + .12 * t) * pop : r * (1 - .22 * t), c: on ? COL.blue : COL[d.k], rot: d.ph + (still ? 0 : d.bx * .02) }); }
+      /* drawn in: the plan is traced in blue, each corridor and hexagon filling in along its own length, while the colour fades back
+         and the plan settles still and true, so the floor plan reads */
+      const tt = ss(0, 1, (rev * 1.25 - d.ls * .8 - d.lo * .1) / .15), fade = ss(.2, 1, rev); let rr = r, a = 1, c = COL[d.k];
+      if (d.b) { rr = d.r0 * (rr / d.r0 + (1 - rr / d.r0) * fade); if (tt > .5) { c = COL.blue; rr *= 1 + .3 * Math.max(0, 1 - (tt - .5) * 4); } } else { rr *= 1 - .55 * fade; a = 1 - .6 * fade; }
+      out.push({ d, x: bx, y: by, r: rr, c, a, rot: d.ph }); }
     /* nothing touches, nothing is cut by the band's edge: biggest first, each smaller dot shrinks to fit */
     out.sort((a, b) => b.r - a.r); const cell = Math.max(24, rmax * 2.6), grid = new Map(), K = (a, b) => a * 9973 + b;
     for (const v of out) { const gx = Math.floor(v.x / cell), gy = Math.floor(v.y / cell); let r = Math.min(v.r, v.y - 3, H - 3 - v.y);
       for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (const o of grid.get(K(gx + a, gy + b)) || []) r = Math.min(r, Math.hypot(o[0] - v.x, o[1] - v.y) - o[2] - 3);
       if (r < .8) continue; (grid.get(K(gx, gy)) || grid.set(K(gx, gy), []).get(K(gx, gy))).push([v.x, v.y, r]);
-      g.save(); g.translate(v.x, v.y); g.scale(r, r); g.rotate(v.rot); g.fillStyle = v.c; if (v.d.ring && r > 6 && window.mlHole) mlHole(g, v.d.p); else g.fill(v.d.p); g.restore(); }
+      g.save(); g.globalAlpha = v.a; g.translate(v.x, v.y); g.scale(r, r); g.rotate(v.rot); g.fillStyle = v.c; if (v.d.ring && r > 6 && window.mlHole && v.c !== COL.blue) mlHole(g, v.d.p); else g.fill(v.d.p); g.restore(); }
     if (still) { cancelAnimationFrame(raf); raf = 0; } };
   build(); new ResizeObserver(build).observe(box);
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) { last = 0; raf = requestAnimationFrame(frame); } }, { rootMargin: '100px' }).observe(box); })();
