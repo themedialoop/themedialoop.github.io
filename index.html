@@ -4076,7 +4076,9 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
   /* river 1 without its words, thinner: Netsch's BSB plan in dots (the building blue, the field gold), drifting slowly right to left
      with river 1's crossing swell. Scroll and the wind comes: it pushes the river along and tosses each dot, then dies down within a moment */
   const COL = { blue: '#2c5494', gold: '#e7aa4d', orange: '#e0773a', pink: '#d8708e', purple: '#9b6aa6', teal: '#2a8c8c', red: '#e0503c' };
-  const FK = ['orange', 'orange', 'purple', 'purple', 'pink', 'pink', 'teal', 'red'];
+  const FK = ['orange', 'orange', 'purple', 'purple', 'pink', 'pink', 'teal', 'red'], MASS = ['gold', 'gold', 'gold', 'orange', 'orange', 'pink', 'pink', 'purple', 'purple', 'teal', 'red'];
+  const RGB = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), mix = (a, b, t) => { const A = RGB(a), B = RGB(b); return 'rgb(' + A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(',') + ')'; };
+  /* as you scroll the band up the screen, Netsch's BSB floor plan surfaces in blue out of the mass, sweeping in from the right */
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches, R = (a, b) => a + Math.random() * (b - a), ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
   const SH = [...Array(12)].map(() => { const q = [R(0, 6.3), R(0, 6.3), R(0, 6.3)], p = new Path2D();
     for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2, k = 1 + .045 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); }
@@ -4087,13 +4089,13 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
     const r1 = document.querySelector('.river.lf'); u = (r1 && r1.offsetHeight ? r1.offsetHeight : innerWidth < 700 ? 540 : Math.min(580, Math.max(360, innerWidth * .4))) / 3;   /* river 1's own dot sizes */
     const BP = 6 * u; L = Math.ceil(Math.max(W * 2.2, 1600) / BP) * BP;
     const BQ = mlBSB({ W: L, H, u, seed: 17, periodic: true, gap: 6, edge: 4 }).dots, pOther = Math.min(1, .15 * BQ.length / Math.max(1, BQ.filter(q => !q.b).length));
-    rmax = u * .2 * .34 * 1.6; dots = BQ.map(q => ({ hx: q.x, hy: q.y, r0: q.r * .95, gi: q.x / (u * .3), gj: 2 * q.y / (u * .3), k: q.b ? 'blue' : Math.random() < pOther ? FK[Math.floor(Math.random() * FK.length)] : 'gold',
+    rmax = u * .2 * .34 * 1.6; dots = BQ.map(q => ({ hx: q.x, hy: q.y, r0: q.r * .95, gi: q.x / (u * .3), gj: 2 * q.y / (u * .3), b: q.b, k: MASS[Math.floor(Math.random() * MASS.length)],   /* at first, every dot is part of one colourful mass */
       p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * SH.length)], ring: q.ring, ph: R(0, 6.3), fx: R(.3, .9), fy: R(.3, .9), wa: R(1, 2.2), sp: R(.5, 1.5), bx: 0, by: 0 })); };
   const frame = now => { raf = 0; if (!vis) return; raf = requestAnimationFrame(frame); if (Math.abs(box.clientWidth - built) > 2) build(); if (!W) return;
     const dt = last ? Math.min(.05, (now - last) / 1000) : .016; last = now; if (!still) clock += dt;
     const wv = still ? 0 : Math.min(2, wind); wind *= Math.pow(.04, dt);
     pos += still ? 0 : (14 + 260 * wv * wdir) * dt;   /* calm: river 1's slow drift; the wind carries it on (and back, if you scroll up) */
-    const shift = ((pos % L) + L) % L;
+    const shift = ((pos % L) + L) % L, bc = box.getBoundingClientRect(), rev = still ? 1 : Math.min(1, Math.max(0, (innerHeight - (bc.top + bc.height / 2)) / (innerHeight * .55)));
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); const out = [];
     for (const d of dots) { let x = ((d.hx - shift) % L + L) % L; if (x > W + 40) x -= L; if (x < -40 || x > W + 40) continue;
       /* the wind tosses each dot: a lift and a sway of its own, settling back to its spot when the wind drops */
@@ -4102,13 +4104,15 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
       const bx = x + (still ? 0 : d.wa * Math.sin(clock * d.fx + d.ph)) + d.bx, by = d.hy + (still ? 0 : d.wa * Math.cos(clock * d.fy + d.ph * 1.3)) + d.by;
       const u1 = Math.sin((d.gi + d.gj / 2) * .42 - clock * 1.5), u2 = Math.sin((d.gi - d.gj / 2) * .36 + clock * 1.05);
       const r = still ? d.r0 : d.r0 * (.62 + .5 * ss(-.55, .55, (u1 + u2) * .62));   /* river 1's crossing swell */
-      out.push({ d, x: bx, y: by, r, rot: d.ph + (still ? 0 : d.bx * .02) }); }
+      const t = ss(0, 1, rev * 1.7 - (1 - Math.max(0, Math.min(1, bx / W))) * .7);   /* right-hand side first */
+      if (d.th === undefined) d.th = R(.1, .9); const on = d.b && t > d.th, pop = on ? 1 + .35 * Math.max(0, 1 - (t - d.th) / .12) : 1;   /* each building dot flips to blue on its own, with a little pop: no muddy in-between colours */
+      out.push({ d, x: bx, y: by, r: d.b ? r * (1 + .12 * t) * pop : r * (1 - .22 * t), c: on ? COL.blue : COL[d.k], rot: d.ph + (still ? 0 : d.bx * .02) }); }
     /* nothing touches, nothing is cut by the band's edge: biggest first, each smaller dot shrinks to fit */
     out.sort((a, b) => b.r - a.r); const cell = Math.max(24, rmax * 2.6), grid = new Map(), K = (a, b) => a * 9973 + b;
     for (const v of out) { const gx = Math.floor(v.x / cell), gy = Math.floor(v.y / cell); let r = Math.min(v.r, v.y - 3, H - 3 - v.y);
       for (let a = -1; a <= 1; a++) for (let b = -1; b <= 1; b++) for (const o of grid.get(K(gx + a, gy + b)) || []) r = Math.min(r, Math.hypot(o[0] - v.x, o[1] - v.y) - o[2] - 3);
       if (r < .8) continue; (grid.get(K(gx, gy)) || grid.set(K(gx, gy), []).get(K(gx, gy))).push([v.x, v.y, r]);
-      g.save(); g.translate(v.x, v.y); g.scale(r, r); g.rotate(v.rot); g.fillStyle = COL[v.d.k]; if (v.d.ring && r > 6 && window.mlHole) mlHole(g, v.d.p); else g.fill(v.d.p); g.restore(); }
+      g.save(); g.translate(v.x, v.y); g.scale(r, r); g.rotate(v.rot); g.fillStyle = v.c; if (v.d.ring && r > 6 && window.mlHole) mlHole(g, v.d.p); else g.fill(v.d.p); g.restore(); }
     if (still) { cancelAnimationFrame(raf); raf = 0; } };
   build(); new ResizeObserver(build).observe(box);
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) { last = 0; raf = requestAnimationFrame(frame); } }, { rootMargin: '100px' }).observe(box); })();
