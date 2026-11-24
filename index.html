@@ -4297,28 +4297,19 @@ html body .res:is(:hover,:focus-visible) .r-go:not(#_){transform:translateX(4px)
 html body .apply canvas{display:none !important}
 </style>
 <style>
-/* behind the Apply card: a few big pale blobs in soft tints of the palette, like watercolour spots, breathing very slowly */
-.ap-blobs{position:absolute;z-index:0;pointer-events:none}.ap-blobs canvas{width:100%;height:100%;display:block}
+/* behind the Apply card: big bold stripes in the palette's other colours (no gold, the card's own), sliding very slowly */
+.ap-stripes{position:absolute;z-index:0;pointer-events:none;overflow:hidden}
+.ap-stripes i{position:absolute;inset:-60% -10%;rotate:-28deg;background:repeating-linear-gradient(90deg,#2c5494 0 var(--s),#f2eedd var(--s) calc(var(--s) * 1.7),#e0773a calc(var(--s) * 1.7) calc(var(--s) * 2.7),#f2eedd calc(var(--s) * 2.7) calc(var(--s) * 3.4),#d8708e calc(var(--s) * 3.4) calc(var(--s) * 4.4),#f2eedd calc(var(--s) * 4.4) calc(var(--s) * 5.1),#9b6aa6 calc(var(--s) * 5.1) calc(var(--s) * 6.1),#f2eedd calc(var(--s) * 6.1) calc(var(--s) * 6.8),#2a8c8c calc(var(--s) * 6.8) calc(var(--s) * 7.8),#f2eedd calc(var(--s) * 7.8) calc(var(--s) * 8.5));--s:clamp(34px,4vw,56px);animation:apStripe 40s linear infinite}
+@keyframes apStripe{to{background-position-x:calc(var(--s) * 8.5)}}
+@media (prefers-reduced-motion:reduce){.ap-stripes i{animation:none}}
 html body .apply{position:relative;z-index:1}
 </style>
 <script>
 (() => { const a = document.querySelector('.apply'); if (!a) return; const host = a.parentElement; if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
-  const band = document.createElement('div'); band.className = 'ap-blobs'; band.setAttribute('aria-hidden', 'true'); const cv = document.createElement('canvas'); band.append(cv); a.before(band); const g = cv.getContext('2d');
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const tint = (h, k) => { const n = parseInt(h.slice(1), 16), f = v => Math.round(v + (242 - v) * k); return `rgb(${f(n >> 16)},${f(n >> 8 & 255)},${f(n & 255)})`; };
-  const COL = ['#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c', '#e7aa4d'].map(c => tint(c, .62));
-  const SH = [...Array(8)].map(() => { const q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3], p = new Path2D(); for (let i = 0; i <= 48; i++) { const t = i / 48 * 6.283, k = 1 + .09 * Math.sin(2 * t + q[0]) + .05 * Math.sin(3 * t + q[1]) + .025 * Math.sin(5 * t + q[2]); i ? p.lineTo(Math.cos(t) * k, Math.sin(t) * k) : p.moveTo(Math.cos(t) * k, Math.sin(t) * k); } p.closePath(); return p; });
-  let W = 0, H = 0, dpr = 1, D = [], vis = false, raf = 0, bw = 0;
-  const build = () => { const pad = innerWidth < 700 ? 60 : 110, vw = document.documentElement.clientWidth, hl = host.getBoundingClientRect().left, at = a.offsetTop;
-    band.style.left = -hl + 'px'; band.style.width = vw + 'px'; band.style.top = (at - pad) + 'px'; band.style.height = (a.offsetHeight + pad * 2) + 'px';
-    W = band.offsetWidth; H = band.offsetHeight; dpr = Math.min(2, devicePixelRatio || 1); if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
-    if (W === bw && D.length) return; bw = W; D = []; const n = innerWidth < 700 ? 5 : 8;
-    for (let t = 0; t < 600 && D.length < n; t++) { const r = (innerWidth < 700 ? 40 : 60) + Math.random() * (innerWidth < 700 ? 50 : 90), x = Math.random() * W, y = Math.random() * H;
-      if (Math.min(y, H - y) < r * .9 || D.some(o => Math.hypot(o.x - x, o.y - y) < o.r + r + 10)) continue; D.push({ x, y, r, c: COL[D.length % 5], p: SH[D.length % 8], rot: Math.random() * 6.3, ph: Math.random() * 6.3 }); } };
-  const draw = now => { raf = 0; build(); const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
-    for (const d of D) { const r = d.r * (.96 + .04 * Math.sin(t * .3 + d.ph)); g.setTransform(dpr * r, 0, 0, dpr * r, dpr * d.x, dpr * d.y); g.rotate(d.rot + t * .01); g.fillStyle = d.c; g.fill(d.p); }
-    if (vis && !reduce) raf = requestAnimationFrame(draw); };
-  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(draw); }, { rootMargin: '100px' }).observe(band); })();
+  const band = document.createElement('div'); band.className = 'ap-stripes'; band.setAttribute('aria-hidden', 'true'); band.innerHTML = '<i></i>'; a.before(band);
+  const fit = () => { const pad = innerWidth < 700 ? 40 : 70, vw = document.documentElement.clientWidth, hl = host.getBoundingClientRect().left;
+    band.style.left = -hl + 'px'; band.style.width = vw + 'px'; band.style.top = (a.offsetTop - pad) + 'px'; band.style.height = (a.offsetHeight + pad * 2) + 'px'; };
+  fit(); addEventListener('resize', fit); addEventListener('load', fit); new ResizeObserver(fit).observe(a); })();
 </script>
 <style>
 /* the Our cards: all blue, cream words, a gold open/close dot, no dots inside. Behind them, quiet confetti in orange, gold and purple */
