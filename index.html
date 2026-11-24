@@ -3359,7 +3359,7 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
        on the cream: the building blue, the field gold */
     const m = Math.min(W, H), u = mob ? W * .3 : m * .19, FIELD = ['#e7aa4d']; LS = u; PLAN = []; NODE = new Map();
     mlBSB({ W, H, u, seed: 17, gap: 2 + AMP, edge: null }).dots.forEach((q, n) => dots.push({ x: q.x, y: q.y, r: q.r, s: ((window.mlIsIDot && mlIsIDot()) ? mlIDot : shapes[n % 8]), rot: R(0, 6.3), ph: R(0, 6.3), fx: R(.25, .6), fy: R(.25, .6), sp: R(-.25, .25), z: Math.random(),
-      few: Math.random() < .85, ring: q.ring, big: q.b && !q.fine, c0: q.b ? '#f2eedd' : '#e7aa4d', c1: q.b ? '#2c5494' : FIELD[Math.floor(Math.random() * FIELD.length)] }));
+      few: Math.random() < .85, ring: q.ring, big: q.b && !q.fine, c0: q.b ? '#f2eedd' : '#e7aa4d', c1: Math.random() < .2 ? ['#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c', '#e0503c'][Math.floor(Math.random() * 5)] : q.b ? '#2c5494' : FIELD[Math.floor(Math.random() * FIELD.length)] }));   /* on the cream page, one dot in five takes another colour from the palette */
     { const bigs = dots.filter(d => d.big).sort(() => Math.random() - .5).slice(0, mob ? 5 : 8); bigs.forEach((d, i) => d.ghost = [8, 6, 4, 8, 6, 4, 8, 6, 4, 2][i % 10]); dots.forEach(d => { d.ghS = d.big ? mlMarkType(.3) : 0; });   /* the scroll fly-out on the cream gets its own, fuller set */   /* octagons, squares and grid lines */ }   /* a few big dots carry a thin octagon or square while they fly: the blueprint showing through */
   };
   const wob = (a, t) => 1 + .09 * Math.sin(3 * a + 1.3 + t * .2) + .06 * Math.sin(5 * a + .4 - t * .15) + .03 * Math.sin(8 * a + 2);
