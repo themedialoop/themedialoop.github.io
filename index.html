@@ -4530,7 +4530,7 @@ html body .about-grid .ab-pill > summary:not(#_){align-items:center !important} 
   const band = document.createElement('div'); band.className = 'ab-stripes'; band.setAttribute('aria-hidden', 'true'); grid.prepend(band);
   const fit = () => { const X = el => { let x = 0; for (let e = el; e; e = e.offsetParent) x += e.offsetLeft; return x; };   /* page position, unaffected by any fly-in motion */ const vw = document.documentElement.clientWidth, gl = X(grid), gh = grid.offsetHeight, VH = Math.max(innerHeight, document.documentElement.clientHeight);
     /* the stripes fill a whole screen, like a page of their own, with the cards in the middle; opening a card uses up the room before the page grows */
-    const pad = Math.max(innerWidth < 700 ? 40 : 70, (VH - gh) / 2); grid.style.setProperty('margin-block', pad + 'px', 'important');
+    const pad = Math.max(innerWidth < 700 ? 40 : 70, (VH - gh) / 2), room = innerWidth < 700 ? 70 : 130; grid.style.setProperty('margin-top', pad + room + 'px', 'important'); grid.style.setProperty('margin-bottom', pad + 'px', 'important');   /* clear cream before the stripes */
     band.style.left = -gl + 'px'; band.style.width = vw + 'px'; band.style.top = -pad + 'px'; band.style.height = (gh + pad * 2) + 'px'; draw(vw, gh + pad * 2); };
   let lastW = 0, lastH = 0, P = [], bw = 0, bh = 0; const NS = 'http://www.w3.org/2000/svg', C = ['#e7aa4d', '#e0773a', '#d8708e', '#e7aa4d', '#9b6aa6'], A = 3, E = 2.5;
   const draw = (W, H) => { if (Math.abs(W - lastW) < 2 && Math.abs(H - lastH) < 2) return; lastW = W; lastH = H; bw = W; bh = H; const u = x => x / W * 6.283 * (W / 900 + .6);
