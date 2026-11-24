@@ -4315,41 +4315,30 @@ html body .apply{position:relative;z-index:1}
   fit(); addEventListener('resize', fit); addEventListener('load', fit); new ResizeObserver(fit).observe(a); })();
 </script>
 <style>
-/* the Our cards: all blue, cream words, a gold open/close dot, no dots inside. Behind them, quiet confetti in orange, gold and purple */
+/* the Our cards: all blue, cream words, a gold open/close dot, no dots inside. Behind them, fat vertical stripes in the palette (no blue),
+   standing still; the band grows and shrinks with the cards as they open and close */
 html body .ab-pill canvas,html body .ab-pill summary > canvas.ab-line{display:none !important}
 html body .ab-pill .ab-fl{display:none !important}
 html body .about-grid .ab-pill.ab-pill:is(.ab-b2,.ab-b3,.ab-b4){background:#2c5494 !important;color:#f2eedd !important}
 html body .about-grid .ab-pill.ab-pill:is(.ab-b2,.ab-b3,.ab-b4) :is(h3,p){color:#f2eedd !important}
 html body .ab-pill.ab-pill .pm{background:#e7aa4d !important}
-.ab-conf{position:absolute;z-index:0;pointer-events:none}
+.ab-stripes{position:absolute;z-index:0;pointer-events:none;transition:height .5s cubic-bezier(.25,.8,.3,1)}
+.ab-stripes{--s:clamp(60px,7vw,110px);background:repeating-linear-gradient(90deg,#e7aa4d 0 var(--s),#e0773a var(--s) calc(var(--s) * 2),#d8708e calc(var(--s) * 2) calc(var(--s) * 3),#9b6aa6 calc(var(--s) * 3) calc(var(--s) * 4),#2a8c8c calc(var(--s) * 4) calc(var(--s) * 5),#e0503c calc(var(--s) * 5) calc(var(--s) * 6))}
 html body .about-grid .ab-pill h3,html body .about-grid .ab-pill[open] h3{white-space:nowrap !important;font-size:clamp(26px,min(7.2vw,5.4vw + 6px),68px) !important}
 html body .about-grid .ab-pill h3 br{display:none}   /* each title on one line */
 html body .about-grid .ab-pill h3 .ab-w{display:inline !important}
 html body .about-grid .ab-pill > summary .pm:not(#_){align-self:center !important;margin-top:0 !important;margin-bottom:0 !important}
 html body .about-grid .ab-pill > summary:not(#_){align-items:center !important}   /* the open/close dot sits level with the one-line title */
-.ab-conf canvas{width:100%;height:100%;display:block}
 .about-grid.ab-pills{position:relative}
 .about-grid .ab-pill{position:relative;z-index:1}
 </style>
 <script>
 (() => { const grid = document.querySelector('.about-grid.ab-pills'); if (!grid) return;
-  const band = document.createElement('div'); band.className = 'ab-conf'; band.setAttribute('aria-hidden', 'true'); const cv = document.createElement('canvas'); band.append(cv); grid.prepend(band); const g = cv.getContext('2d');
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, COL = ['#e0773a', '#e7aa4d', '#9b6aa6'];
-  const SH = [...Array(12)].map(() => { const q = [Math.random() * 6.3, Math.random() * 6.3], p = new Path2D(); for (let i = 0; i <= 32; i++) { const a = i / 32 * 6.283, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); } p.closePath(); return p; });
-  let W = 0, H = 0, dpr = 1, D = [], vis = false, raf = 0;
-  const build = () => { const pad = innerWidth < 700 ? 50 : 90; band.style.top = -pad + 'px'; band.style.height = (grid.offsetHeight + pad * 2) + 'px';
-    const vw = document.documentElement.clientWidth, gl = grid.getBoundingClientRect().left; band.style.left = -gl + 'px'; band.style.width = vw + 'px';   /* edge to edge of the screen */
-    const w = band.offsetWidth, h = band.offsetHeight; if (!w) return; const grow = h > H + 30 || w !== W; W = w; H = h; dpr = Math.min(2, devicePixelRatio || 1);
-    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
-    D = D.filter(d => d.y < H - d.r - 4);   /* a card closing: the dots below simply aren't needed */
-    if (grow || D.length < W * H / 11000) for (let t = 0; t < 1500 && D.length < W * H / 9000; t++) { const x = Math.random() * W, y = Math.random() * H, r = 5 + Math.random() * 9;
-      if (Math.min(y, H - y) < r + 4 || D.some(o => Math.hypot(o.x - x, o.y - y) < o.r + r + 26)) continue;
-      D.push({ x, y, r, c: COL[Math.floor(Math.random() * 3)], p: SH[Math.floor(Math.random() * 12)], ph: Math.random() * 6.3, ring: Math.random() < .2, rot: Math.random() * 6.3, born: performance.now() }); } };
-  const draw = now => { raf = 0; build(); const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
-    for (const d of D) { const age = reduce ? 1 : Math.min(1, (now - d.born) / 700), r = d.r * (reduce ? 1 : .92 + .08 * Math.sin(t * .6 + d.ph)) * age * age * (3 - 2 * age);   /* new dots (a card opening) swell in gently */
-      g.setTransform(dpr * r, 0, 0, dpr * r, dpr * d.x, dpr * d.y); g.rotate(d.rot); if (d.ring) { g.lineWidth = .42; g.strokeStyle = d.c; g.stroke(d.p); } else { g.fillStyle = d.c; g.fill(d.p); } }
-    if (vis) raf = requestAnimationFrame(draw); };
-  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(draw); }, { rootMargin: '100px' }).observe(band); })();
+  const band = document.createElement('div'); band.className = 'ab-stripes'; band.setAttribute('aria-hidden', 'true'); grid.prepend(band);
+  const fit = () => { const pad = innerWidth < 700 ? 40 : 70, vw = document.documentElement.clientWidth, gl = grid.getBoundingClientRect().left;
+    band.style.left = -gl + 'px'; band.style.width = vw + 'px'; band.style.top = -pad + 'px'; band.style.height = (grid.offsetHeight + pad * 2) + 'px'; };
+  fit(); addEventListener('resize', fit); addEventListener('load', fit); new ResizeObserver(fit).observe(grid);
+  grid.querySelectorAll('.ab-pill').forEach(d => new MutationObserver(() => requestAnimationFrame(fit)).observe(d, { attributes: true, attributeFilter: ['open', 'class', 'style'] })); })();
 </script>
 <style>
 /* resource cards on wider screens: the name on the left, the description and its pill on the right, so the card is full side to side */
