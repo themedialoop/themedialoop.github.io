@@ -795,7 +795,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 @media (max-width:600px){html body .bz-h.tilt-h{font-size:17vw !important}}   /* (its rows are longer: smaller on phones so each stays on one line) */</style>
 <script src="assets/mlhole.js?v=5"></script>
 <script src="assets/mlidot.js?v=1"></script>
-<script src="assets/bsbfield.js?v=3"></script>
+<script src="assets/bsbfield.js?v=4"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -4151,12 +4151,9 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
     const more = sec.querySelector('.more'); if (more) { more.style.removeProperty('margin-top'); const g1 = Y(more) - (Y(host) + host.offsetHeight), need = pad + 30; if (g1 < need) more.style.setProperty('margin-top', (parseFloat(getComputedStyle(more).marginTop) || 0) + need - g1 + 'px', 'important'); }   /* Alumni & Peers below the dots, with room */
     W = band.offsetWidth; H = band.offsetHeight; if (W === bw && Math.abs(H - bh) < 30 && D.length) return;   /* (layout above is re-checked every time) */ bw = W; bh = H;
     dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; D = [];
-    const S = Math.max(60, W / 9); FM = S; FW = W + 2 * FM; const pdx = (a, b) => { const d = Math.abs(a - b) % FW; return Math.min(d, FW - d); };   /* distances wrap round, so the loop has no seam */ 
-    const mk = (x, y, r) => ({ x, y, r, c: pick(), p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * 14)], ring: Math.random() < .15, rot: Math.random() * 6.3, ph: Math.random() * 6.3 });
-    const clear = (x, y, r) => Math.min(y, H - y) >= r * 1.15 && !D.some(o => Math.hypot(pdx(o.x, x), o.y - y) < o.r * 1.15 + r * 1.15 + 14);
-    /* balanced: every dot in the top half has a partner in the bottom half (mirrored, its own colour and shape), so the cards sit squarely in the middle */
-    for (let t = 0; t < 2200; t++) { const x = Math.random() * FW, y = Math.random() * H / 2, r = S * (.25 + Math.random() * .45), x2 = ((W - x + (Math.random() - .5) * S * .3) % FW + FW) % FW, y2 = H - y;
-      if (!clear(x, y, r) || !clear(x2, y2, r)) continue; if (Math.hypot(pdx(x, x2), y - y2) < r * 2.4 + 14) continue; D.push(mk(x, y, r)); D.push(mk(x2, y2, r)); } };
+    /* the field follows Netsch's BSB plan (big hexagon dots, finer lines, a softer field round them), at a big, whimsical scale */
+    const u = Math.max(260, W * .5), F = window.mlBSBDots ? mlBSBDots({ W: W + u, H, u, seed: 5, periodic: true, keep: .42 }) : { dots: [], W: W + u }; FW = F.W; FM = (FW - W) / 2;
+    D = F.dots.map(q => ({ x: q.x, y: q.y, r: q.r, c: q.c, ring: q.ring && q.r > 10, p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * 14)], rot: Math.random() * 6.3, ph: Math.random() * 6.3 })); };
   const draw = now => { raf = 0; const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
     const M = FM, span = FW;   /* a very soft breeze: the dots float slowly to the right, bobbing a touch, and wrap round */
     for (const d of D) { const r = d.r * (reduce ? 1 : .94 + .06 * Math.sin(t * .7 + d.x / W * 4 + d.ph * .4));
@@ -4264,6 +4261,9 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
     W = band.offsetWidth; H = band.offsetHeight; VH = Math.min(cv.clientHeight || innerHeight, H); dpr = Math.min(1.5, devicePixelRatio || 1);   /* draw at the canvas's real size, so nothing is stretched or cut */
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(VH * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(VH * dpr); }
     if (W === bw && Math.abs(H - bh) < 30 && D.length) return; bw = W; bh = H; D = [];
+    if (window.mlBSBDots) { const u = innerWidth < 700 ? 130 : 170, F = mlBSBDots({ W, H, u, seed: 21, keep: .5, gap: 4, edge: 6 });   /* the BSB plan in small dots: hexagons, lines and field */
+      D = F.dots.map(q => ({ x: q.x, y: q.y, r: q.r, c: q.c, p: SH[Math.floor(Math.random() * 14)], ring: q.ring && q.r > 6, rot: Math.random() * 6.3, sp: (Math.random() < .5 ? -1 : 1) * (6.283 / (24 + Math.random() * 24)) }));
+      D.sort((a, b) => a.y - b.y); return; }
     const S = innerWidth < 700 ? 15 : 20, cell = S * 2, grid = new Map(), K = (a, b) => a * 9973 + b;
     for (let t = 0, n = W * H / (S * S) * 6; t < n; t++) { const x = Math.random() * W, y = Math.random() * H, r = S * (.16 + Math.random() * .2); if (Math.min(y, H - y) < r * 1.6 + 4) continue;   /* whole dots only at the top and the end */
       const gx = Math.floor(x / cell), gy = Math.floor(y / cell); let ok = true;

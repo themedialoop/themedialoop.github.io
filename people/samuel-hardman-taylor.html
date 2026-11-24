@@ -590,7 +590,7 @@ html body .bz-h,html body .bz-h.sec-h{letter-spacing:-.018em !important}
 <style>.person > section:first-of-type{padding-top:clamp(150px,20vw,260px) !important}   /* room for the spill of dots, then clear cream before the first heading */</style>
 <script src="../assets/mlhole.js?v=5"></script>
 <script src="../assets/mlidot.js?v=1"></script>
-<script src="../assets/bsbfield.js?v=3"></script>
+<script src="../assets/bsbfield.js?v=4"></script>
 <style>
 /* the profile header: the landing page's field, clearing softly round the photo, the name and the title */
 .side-spill{display:none !important}
@@ -1818,10 +1818,9 @@ html body .ph-d .ph-in{position:relative;z-index:1;box-sizing:border-box;max-wid
   const build = () => { W = sec.clientWidth; H = sec.clientHeight; if (!W || (W === bw && Math.abs(H - bh) < 40 && D.length)) return; bw = W; bh = H;
     dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; D = []; const S = Math.max(60, W / 9);
     const TOP = (document.querySelector('.top')?.offsetHeight || 80) + 24;   /* nothing under the logo and menu */
-    FM = S; FW = W + 2 * FM; const pdx = (a, b) => { const d = Math.abs(a - b) % FW; return Math.min(d, FW - d); };   /* the loop has no seam */
-    for (let t = 0; t < 2400; t++) { const x = Math.random() * FW, y = Math.random() * H, r = S * (.25 + Math.random() * .45); if (y - r * 1.1 < TOP || H - y < r * 1.1) continue;
-      if (D.some(o => Math.hypot(pdx(o.x, x), o.y - y) < o.r * 1.15 + r * 1.15 + 14)) continue;
-      D.push({ x, y, r, c: pick(), p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * 14)], ring: Math.random() < .15, rot: Math.random() * 6.3, ph: Math.random() * 6.3 }); } };
+    /* the field follows Netsch's BSB plan (big hexagon dots, finer lines, a softer field round them), at a big, whimsical scale; nothing under the logo and menu */
+    const u = Math.max(260, W * .5), F = window.mlBSBDots ? mlBSBDots({ W: W + u, H, u, seed: 9, periodic: true, keep: .42 }) : { dots: [], W: W + u }; FW = F.W; FM = (FW - W) / 2;
+    D = F.dots.filter(q => q.y - q.r * 1.1 > TOP).map(q => ({ x: q.x, y: q.y, r: q.r, c: q.c, ring: q.ring && q.r > 10, p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * 14)], rot: Math.random() * 6.3, ph: Math.random() * 6.3 })); };
   const draw = now => { raf = 0; const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
     const M = FM, span = FW;   /* a very soft breeze: the dots float slowly to the right, bobbing a touch, and wrap round */
     for (const d of D) { const r = d.r * (reduce ? 1 : .94 + .06 * Math.sin(t * .7 + d.x / W * 4 + d.ph * .4));

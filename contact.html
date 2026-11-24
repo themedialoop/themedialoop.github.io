@@ -462,7 +462,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 </style>
 <script src="assets/mlhole.js?v=5"></script>
 <script src="assets/mlidot.js?v=1"></script>
-<script src="assets/bsbfield.js?v=3"></script>
+<script src="assets/bsbfield.js?v=4"></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -483,6 +483,8 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   const build = () => { dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; D = [];
     const V = 'E';   /* big bubbles */
     const mk = (x, y, r) => ({ x, y, r, c: pick(), p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * SH.length)], ring: Math.random() < .15, rot: Math.random() * 6.3, ph: Math.random() * 6.3, z: .3 + Math.random() * .7 });
+    if (V === 'E' && window.mlBSBDots) { const u = Math.max(260, W * .5), F = mlBSBDots({ W, H: H + 200, u, seed: 13, keep: .42, edge: null });   /* the BSB plan, big and whimsical */
+      for (const q of F.dots) { const d = mk(q.x, q.y - 100, q.r); d.c = q.c; d.ring = q.ring && q.r > 10; D.push(d); } return; }
     if (V === 'E') { const S = Math.max(60, W / 9); for (let tries = 0; tries < 900; tries++) { const x = Math.random() * W, y = Math.random() * (H + 200) - 100, r = S * (.25 + Math.random() * .45); if (D.some(o => Math.hypot(o.x - x, o.y - y) < o.r * 1.1 + r * 1.1 + 14)) continue; D.push(mk(x, y, r)); } return; }
     const S = Math.max(26, Math.min(44, W / 30)), cell = S * 2, grid = new Map(), key = (x, y) => Math.floor(x / cell) + ',' + Math.floor(y / cell);
     for (let tries = 0; tries < W * H / (S * S) * 9; tries++) { const big = Math.random(), r = S * (big < .55 ? .16 + Math.random() * .1 : big < .9 ? .28 + Math.random() * .12 : .46 + Math.random() * .16);

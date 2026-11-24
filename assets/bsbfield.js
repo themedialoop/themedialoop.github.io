@@ -53,3 +53,16 @@
     return { dots, P, D, W };
   };
 })();
+
+/* the BSB plan as a soft background of organic dots in the palette (no blue): the building's big hexagons and its fine lines and walls in
+   orange, pink and purple, the field round them in gold with a few teal, thinned so the plan shows through as a gentle rhythm of big,
+   medium and small. mlBSBDots({ W, H, u, seed, periodic, keep }) returns { dots: [{ x, y, r, c, ring, b }], W } */
+window.mlBSBDots = o => {
+  const f = mlBSB({ W: o.W, H: o.H, u: o.u, seed: o.seed || 5, periodic: !!o.periodic, gap: o.gap == null ? 6 : o.gap, edge: o.edge == null ? 4 : o.edge });
+  let s = (o.seed || 5) * 7 + 3; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const keep = o.keep == null ? .5 : o.keep, BIG = ['#e0773a', '#d8708e', '#9b6aa6', '#e0773a'], FINE = ['#9b6aa6', '#d8708e', '#2a8c8c'], FIELD = ['#e7aa4d', '#e7aa4d', '#e7aa4d', '#e0773a', '#2a8c8c'];
+  const dots = [];
+  for (const q of f.dots) { if (!q.b && rnd() > keep) continue;
+    dots.push({ x: q.x, y: q.y, r: q.r, b: q.b && !q.fine, ring: q.ring, c: q.b ? (q.fine ? FINE : BIG)[Math.floor(rnd() * (q.fine ? 3 : 4))] : FIELD[Math.floor(rnd() * 5)] }); }
+  return { dots, W: f.W };
+};
