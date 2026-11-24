@@ -4577,5 +4577,24 @@ html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-r
 html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_):is(:hover,:focus-visible){background:#d8708e !important;color:#f2eedd !important}
 html body :is(.ab-pill p, .p-bio, .res-intro, .r-sub){line-height:1.75 !important}   /* room between lines, so stickers on neighbouring lines never touch */
 </style>
+<style>
+/* desktop: "Graduate admissions" moves to the right half of the Apply card, big, orange and steeply tilted, filling that side */
+@media (min-width:900px){
+  html body .apply:not(#_){overflow:hidden}
+  html body .apply:not(#_) .ap-kind{position:absolute;right:4%;top:50%;width:46%;translate:0 -50%;rotate:-14deg;display:block;text-align:center;
+    color:#e0773a !important;font:900 clamp(44px,5.4vw,86px)/.92 Figtree,Inter,sans-serif;letter-spacing:-.01em;text-transform:none;pointer-events:none}
+  html body .apply:not(#_) .ap-kind::before{display:none !important}
+  html body .apply:not(#_) :is(.ap-h,.ap-t,.ap-go){position:relative;max-width:48%}
+}
+</style>
+<style>
+/* desktop: "Graduate admissions" moves to the empty right side of the Apply card, big, orange and tilted */
+@media (min-width:900px){
+  html body .apply:not(#_){position:relative}
+  html body .apply:not(#_) .ap-kind{position:absolute;right:clamp(30px,5vw,80px);top:50%;translate:0 -50%;rotate:-12deg;margin:0 !important;
+    font:900 clamp(52px,6.6vw,104px)/.9 Figtree,Inter,sans-serif !important;letter-spacing:-.01em !important;text-transform:none !important;color:#e0773a !important;text-align:center;width:min(46%,600px);white-space:normal;pointer-events:none}
+  html body .apply:not(#_) .ap-kind::before{display:none !important}
+}
+</style>
 </body>
 </html>
