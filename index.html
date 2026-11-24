@@ -4323,7 +4323,7 @@ html body .about-grid .ab-pill.ab-pill:is(.ab-b2,.ab-b3,.ab-b4){background:#2c54
 html body .about-grid .ab-pill.ab-pill:is(.ab-b2,.ab-b3,.ab-b4) :is(h3,p){color:#f2eedd !important}
 html body .ab-pill.ab-pill .pm{background:#e7aa4d !important}
 .ab-stripes{position:absolute;z-index:0;pointer-events:none;transition:height .5s cubic-bezier(.25,.8,.3,1)}
-.ab-stripes{--s:clamp(60px,7vw,110px);background:repeating-linear-gradient(90deg,#e7aa4d 0 var(--s),#e0773a var(--s) calc(var(--s) * 2),#d8708e calc(var(--s) * 2) calc(var(--s) * 3),#9b6aa6 calc(var(--s) * 3) calc(var(--s) * 4),#2a8c8c calc(var(--s) * 4) calc(var(--s) * 5),#e0503c calc(var(--s) * 5) calc(var(--s) * 6))}
+.ab-stripes{background:linear-gradient(90deg,#e7aa4d 0 25%,#e0773a 25% 50%,#d8708e 50% 75%,#9b6aa6 75% 100%)}   /* four wide stripes across the whole screen: gold, orange, pink, purple */
 html body .about-grid .ab-pill h3,html body .about-grid .ab-pill[open] h3{white-space:nowrap !important;font-size:clamp(26px,min(7.2vw,5.4vw + 6px),68px) !important}
 html body .about-grid .ab-pill h3 br{display:none}   /* each title on one line */
 html body .about-grid .ab-pill h3 .ab-w{display:inline !important}
