@@ -4168,12 +4168,10 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
 </script>
 <style>
 /* Our Favorite Things: four rows of pills sliding slowly, each row the other way, at the river's slant */
-.fav-pills{display:grid;gap:clamp(10px,1.2vw,16px);width:112vw;margin:clamp(18px,3vw,40px) 0 0 calc(50% - 56vw);rotate:-3.5deg;padding:clamp(16px,2vw,28px) 0}
+.fav-pills{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;display:grid;gap:clamp(10px,1.2vw,16px);width:112vw;margin:clamp(18px,3vw,40px) 0 0 calc(50% - 56vw);rotate:-3.5deg;padding:clamp(16px,2vw,28px) 0}
 .fav-row{overflow:hidden;padding:8px 0;margin:-8px 0}   /* room for a pill to tip on hover without being clipped */
 .fav-half{display:flex;align-items:center;gap:clamp(8px,.9vw,12px);padding-right:clamp(8px,.9vw,12px)}   /* each copy carries its own trailing gap, so the loop joins seamlessly */
-.fav-tr{display:flex;width:max-content;animation:favMove var(--d,80s) linear infinite}
-.fav-row:nth-child(even) .fav-tr{animation-direction:reverse}
-.fav-pills:hover .fav-tr{animation-play-state:paused}
+.fav-tr{display:flex;width:max-content;will-change:transform}
 @keyframes favMove{to{transform:translateX(-50%)}}
 .fav-p{display:inline-flex;align-items:center;white-space:nowrap;font:700 clamp(15px,1.35vw,19px)/1 Inter,system-ui,sans-serif;padding:.95em 1.25em;border-radius:999px;transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
 .fav-p.fun{font-style:italic;font-weight:400}
@@ -4183,7 +4181,7 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
 .fav-dot{flex:none;width:clamp(26px,2.4vw,36px);aspect-ratio:1;border-radius:52% 48% 55% 45% / 47% 54% 46% 53%}
 .fav-dot.ring{background:none !important;border:clamp(4px,.4vw,6px) solid currentColor;box-sizing:border-box}   /* some dots are open circles */
 .fav-logo{flex:none;height:clamp(30px,2.6vw,40px);width:auto;margin:0 .5em;display:block}
-@media (prefers-reduced-motion:reduce){.fav-tr{animation:none}.fav-row{overflow-x:auto}}
+.fav-pills.drag{cursor:grabbing}.fav-pills img{-webkit-user-drag:none;pointer-events:none}
 </style>
 <script>
 (() => { const box = document.getElementById('marquee'); if (!box) return;
@@ -4200,7 +4198,26 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
   let n = 0, dn = 0; wrap.innerHTML = [0, 1, 2, 3].map(r => { const row = all.filter((_, i) => i % 4 === r), DC = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c'], h = row.map((w, i) => `<span class="fav-p k${Math.random() < .65 ? 0 : 1 + n++ % 5}${w.fun ? ' fun' : ''}">${w.t}</span>`
       + (i % 9 === 5 ? '<img class="fav-logo" src="assets/medialoop-wordmark.svg" alt="">' : i % 3 === 2 ? `<span class="fav-dot${[1, 4, 7].includes(dn++ % 10) ? ' ring' : ''}" style="background:${DC[(i + r) % 5]};color:${DC[(i + r) % 5]}"></span>` : '')).join('');   /* mostly blue; every few pills a dot, now and then the medialoop logo */
     return `<div class="fav-row"><div class="fav-tr" style="--d:${[96, 112, 88, 104][r]}s"><div class="fav-half">${h}</div><div class="fav-half">${h}</div></div></div>`; }).join('');
-  box.append(wrap); })();
+  box.append(wrap);
+  /* the rows drift on their own (alternating directions); drag them, or use the arrows, to slide them left and right */
+  const nav = document.createElement('div'); nav.className = 'rv-nav';
+  nav.innerHTML = '<button type="button" class="rv-b rv-l" aria-label="Show earlier words"><i></i></button><button type="button" class="rv-b rv-r" aria-label="Show more words"><i></i></button>';
+  wrap.after(nav);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, trs = [...wrap.querySelectorAll('.fav-tr')], SP = [22, -19, 25, -21];   /* px a second */
+  let t = 0, drag = 0, dv = 0, held = null, hover = false, last = 0, vis = false, raf = 0;
+  const frame = now => { raf = 0; const dt = last ? Math.min(.05, (now - last) / 1000) : .016; last = now;
+    if (!reduce && !held && !hover) t += dt;
+    if (!held) { drag += dv; dv *= Math.pow(.92, dt * 60); if (Math.abs(dv) < .02) dv = 0; }
+    trs.forEach((tr, i) => { const half = tr.firstElementChild.offsetWidth || 1; let x = (-(t * SP[i]) + drag) % half; if (x > 0) x -= half; tr.style.transform = `translateX(${x}px)`; });
+    if (vis) raf = requestAnimationFrame(frame); };
+  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) { last = 0; raf = requestAnimationFrame(frame); } }, { rootMargin: '100px' }).observe(wrap);
+  wrap.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') hover = true; }); wrap.addEventListener('pointerleave', () => hover = false);
+  wrap.addEventListener('pointerdown', e => { if (e.button) return; held = { x: e.clientX, tm: performance.now(), id: e.pointerId }; dv = 0; wrap.classList.add('drag'); wrap.setPointerCapture(e.pointerId); });
+  wrap.addEventListener('pointermove', e => { if (!held || e.pointerId !== held.id) return; const now = performance.now(), dx = e.clientX - held.x; drag += dx; dv = dx / Math.max(8, now - held.tm) * 16; held.x = e.clientX; held.tm = now; });
+  const letGo = () => { held = null; wrap.classList.remove('drag'); };
+  wrap.addEventListener('pointerup', letGo); wrap.addEventListener('pointercancel', letGo); wrap.addEventListener('lostpointercapture', letGo);
+  nav.querySelector('.rv-l').addEventListener('click', () => { dv = 26; });
+  nav.querySelector('.rv-r').addEventListener('click', () => { dv = -26; }); })();   /* (like a carousel: the right arrow brings in what's to the right) */
 </script>
 <style>
 /* the monogram band (in place of river 2): blue medialoop wordmarks drifting right to left, a rainbow dot between each, about 30% of them open circles */
