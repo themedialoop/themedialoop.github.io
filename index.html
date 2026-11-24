@@ -4138,7 +4138,7 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
   if (getComputedStyle(host).position === 'static') host.style.position = 'relative'; cards.forEach(c => { if (getComputedStyle(c).position === 'static') c.style.position = 'relative'; });
   const band = document.createElement('div'); band.className = 'pp-band'; band.setAttribute('aria-hidden', 'true'); const cv = document.createElement('canvas'); band.append(cv); host.prepend(band); const g = cv.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const COLS = [['#2c5494', .3], ['#e7aa4d', .26], ['#e0773a', .14], ['#d8708e', .13], ['#9b6aa6', .1], ['#2a8c8c', .07]];
+  const COLS = [['#e7aa4d', .34], ['#e0773a', .2], ['#d8708e', .19], ['#9b6aa6', .15], ['#2a8c8c', .12]];   /* no blue in the backgrounds */
   const pick = () => { let u = Math.random(); for (const [c, w] of COLS) { u -= w; if (u <= 0) return c; } return COLS[0][0]; };
   const SH = [...Array(14)].map(() => { const q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3], p = new Path2D();
     for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2, k = 1 + .05 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); }
