@@ -4466,13 +4466,25 @@ window.mlWob = (seed) => { const p = [1, 2, 3].map(i => ((Math.sin(seed * 12.989
   return (u, amp) => amp * (.62 * Math.sin(u * 1.3 + p[0]) + .28 * Math.sin(u * 2.9 + p[1]) + .1 * Math.sin(u * 5.1 + p[2])); };   /* slow, brush-like wander */
 window.mlEdge = (n, len, f, amp, step = 14) => { const pts = []; for (let t = 0; t <= len + .1; t += step) pts.push([t, f(t / len * 6.283 * (len / 900 + .6), amp)]); return pts; };
 </script>
+<script>
+/* stripes come in each time their band arrives on screen (first load, scrolling down to it, or scrolling back up to it),
+   one after another; once the band is wholly off screen it resets, ready to play again */
+window.mlStripeIn = (band, paths, axis, keepFirst) => { const still = matchMedia('(prefers-reduced-motion: reduce)').matches; let t0 = null, raf = 0;
+  const set = q => paths().forEach((p, k) => { if (keepFirst && k === 0) { p.style.transform = ''; return; } p.style.transform = q === null ? '' : `${axis}(${q(k).toFixed(3)})`; });
+  const tick = now => { raf = 0; const r = band.getBoundingClientRect(), vh = innerHeight, seen = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+    if (r.bottom < 0 || r.top > vh) { t0 = null; if (!still) set(() => 0); }   /* out of sight: ready to play again */
+    else if (t0 === null && seen > Math.min(vh, r.height) * .3) t0 = now;   /* a good third of it in view: play */
+    if (t0 !== null && !still) { const n = paths().length; set(k => { const j = keepFirst ? k - 1 : k, e = Math.min(1, Math.max(0, (now - t0 - j * 150) / 850)); return 1 - Math.pow(1 - e, 3); }); }
+    if (still) set(null); };
+  const loop = now => { tick(now); raf = requestAnimationFrame(loop); }; raf = requestAnimationFrame(loop); };
+</script>
 <style>
 /* the Apply card: plain, with no dots */
 html body .apply > canvas,html body .apply .kdots{display:none !important}
 </style>
 <style>
 /* behind the Apply card: big bold stripes in the palette's other colours (no gold, the card's own), sliding very slowly */
-.ap-stripes{position:absolute;z-index:0;pointer-events:none;overflow:hidden}
+.ap-stripes{position:absolute;z-index:0;pointer-events:none;overflow:hidden;background:#2c5494}
 .ap-stripes i{position:absolute;inset:-12% 0;animation:apStripe 9s ease-in-out infinite alternate}
 .ap-stripes i svg{position:absolute;inset:0;width:100%;height:100%;display:block}   /* seven equal hand-drawn stripes, bobbing gently up and down */
 @keyframes apStripe{from{translate:0 -4%}to{translate:0 4%}}
@@ -4491,19 +4503,14 @@ html body .apply{position:relative;z-index:1}
   let tw = 0; const tile = () => { const W = document.documentElement.clientWidth, H = band.offsetHeight, T = H * 1.24, S = H / 6;   /* every colour gets a whole stripe the same size, teal and red included */ if (W === tw && band.dataset.h == H) return; tw = W; band.dataset.h = H;
     const C = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c'], A = 3,   /* no red; nearly straight edges */ edge = k => { const f = mlWob(50 + (k % 7)); const pts = []; for (let x = -4; x <= W + 4; x += 14) pts.push([x, H * .12 + k * S + f(x / W * 6.283 * (W / 900 + .6), A)]); return pts; };
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${T}" viewBox="0 ${-S} ${W} ${T + 2 * S}" preserveAspectRatio="none">`;
-    for (let k = 0; k < 6; k++) { const t = k === 0 ? [[-4, -4], [W + 4, -4]] : edge(k), b = k === 5 ? [[-4, T + 4], [W + 4, T + 4]] : edge(k + 1).map(([x, y]) => [x, y + 2]); svg += `<path fill="${C[k]}" d="M${t.map(p => p.join(' ')).join('L')}L${[...b].reverse().map(p => p.join(' ')).join('L')}Z"/>`; }   /* each stripe its own band, tucked 2px under the next, so colours always touch */   /* each stripe runs down to the bottom; the next paints over it, so colours always touch */
+    for (let k = 0; k < 6; k++) { const t = k === 0 ? [[-4, -4], [W + 4, -4]] : edge(k), b = k === 0 ? [[-4, T + 4], [W + 4, T + 4]] : k === 5 ? [[-4, T + 4], [W + 4, T + 4]] : edge(k + 1).map(([x, y]) => [x, y + 2]); svg += `<path fill="${C[k]}" d="M${t.map(p => p.join(' ')).join('L')}L${[...b].reverse().map(p => p.join(' ')).join('L')}Z"/>`; }   /* each stripe its own band, tucked 2px under the next, so colours always touch */   /* each stripe runs down to the bottom; the next paints over it, so colours always touch */
     svg = svg.replace(`viewBox="0 ${-S} ${W} ${T + 2 * S}"`, `viewBox="0 0 ${W} ${T}"`);
     const i = band.querySelector('i'); i.innerHTML = svg.replace('<svg ', '<svg preserveAspectRatio="none" ').replace(/ width="[^"]*" height="[^"]*"/, '') + '</svg>';
-    [...i.querySelectorAll('path')].forEach((p, k) => { p.style.transformBox = 'view-box'; p.style.transformOrigin = k % 2 ? '100% 50%' : '0% 50%'; if (!shown && !still) p.style.transform = 'scaleX(0)'; });
+    [...i.querySelectorAll('path')].forEach((p, k) => { p.style.transformBox = 'view-box'; p.style.transformOrigin = k % 2 ? '100% 50%' : '0% 50%'; });
     const mt = mlWob(91), mb = mlWob(97), mA = 2.5;   /* top and bottom: only just off straight */ let m = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="M-4 ${H}`;
     for (let x = -4; x <= W + 4; x += 14) m += `L${x} ${(mA + 2 + mt(x / W * 6.283 * (W / 900 + .6), mA)).toFixed(1)}`; for (let x = W + 4; x >= -4; x -= 14) m += `L${x} ${(H - mA - 2 + mb(x / W * 6.283 * (W / 900 + .6), mA)).toFixed(1)}`;
     m += 'Z"/></svg>'; const u = `url("data:image/svg+xml,${encodeURIComponent(m)}")`; band.style.webkitMaskImage = band.style.maskImage = u; band.style.webkitMaskSize = band.style.maskSize = '100% 100%'; };   /* the band's own top and bottom edges are hand-drawn too */
-  const still = matchMedia('(prefers-reduced-motion: reduce)').matches; let shown = false;
-  /* coming in: the stripes sweep across one after another, alternately from the left and from the right */
-  const intro = () => { shown = true; const P = [...band.querySelectorAll('i path')], t0 = performance.now(); const step = now => { let done = true;
-      P.forEach((p, k) => { const e = Math.min(1, Math.max(0, (now - t0 - k * 140) / 900)), q = 1 - Math.pow(1 - e, 3); if (e < 1) done = false; p.style.transform = `scaleX(${q.toFixed(3)})`; }); if (!done && shown) requestAnimationFrame(step); };
-    if (still) P.forEach(p => p.style.transform = ''); else requestAnimationFrame(step); };
-  new IntersectionObserver(e => { if (e[0].isIntersecting && e[0].intersectionRatio > .2) { if (!shown) intro(); } else if (!e[0].isIntersecting) { shown = false; if (!still) band.querySelectorAll('i path').forEach(p => p.style.transform = 'scaleX(0)'); } }, { threshold: [0, .2] }).observe(band);
+  window.mlStripeIn && mlStripeIn(band, () => [...band.querySelectorAll('i path')], 'scaleX', true);   /* the blue is there from the start; the other colours sweep in over it */
   const fit2 = () => { fit(); tile(); }; fit2(); addEventListener('resize', fit2); addEventListener('load', fit2); new ResizeObserver(fit2).observe(a); new ResizeObserver(fit2).observe(document.documentElement); setTimeout(fit2, 1500); })();
 </script>
 <style>
@@ -4536,7 +4543,7 @@ html body .about-grid .ab-pill > summary:not(#_){align-items:center !important} 
   const draw = (W, H) => { if (Math.abs(W - lastW) < 2 && Math.abs(H - lastH) < 2) return; lastW = W; lastH = H; bw = W; bh = H; const u = x => x / W * 6.283 * (W / 900 + .6);
     let clip = 'M-4 ' + (E + 2); for (let x = -4; x <= W + 4; x += 14) clip += `L${x} ${(E + 2 + mlWob(11)(u(x), E)).toFixed(1)}`; for (let x = W + 4; x >= -4; x -= 14) clip += `L${x} ${(H - E - 2 + mlWob(23)(u(x), E)).toFixed(1)}`; clip += 'Z';
     band.innerHTML = `<svg xmlns="${NS}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><clipPath id="abClip"><path d="${clip}"/></clipPath></defs><g clip-path="url(#abClip)">${C.map(c => `<path fill="${c}"/>`).join('')}</g></svg>`;
-    P = [...band.querySelectorAll('g path')]; P.forEach((p, k) => { p.style.transformBox = 'view-box'; p.style.transformOrigin = k % 2 ? '50% 100%' : '50% 0%'; if (!shown && !still) p.style.transform = 'scaleY(0)'; }); paint(performance.now()); };
+    P = [...band.querySelectorAll('g path')]; P.forEach((p, k) => { p.style.transformBox = 'view-box'; p.style.transformOrigin = k % 2 ? '50% 100%' : '50% 0%'; }); paint(performance.now()); };
   /* the stripes breathe: two at a time (chosen at random) widen by about a fifth and ease back as the next two begin to widen */
   const SPAN = 7000, pairs = [], pickPair = prev => { let a, b; do { a = Math.floor(Math.random() * 5); b = Math.floor(Math.random() * 5); } while (a === b || (prev && (prev.includes(a) || prev.includes(b)))); return [a, b]; };
   const pairAt = i => { while (pairs.length <= i) pairs.push(pickPair(pairs[pairs.length - 1])); return pairs[i]; };
@@ -4546,9 +4553,8 @@ html body .about-grid .ab-pill > summary:not(#_){align-items:center !important} 
     const sum = w.reduce((a, b) => a + b, 0); let acc = 0; const xs = w.map(v => { const x = acc / sum * W; acc += v; return x; });
     P.forEach((p, k) => { let d = `M${W + 10} -10`; if (k === 0) d += `L-10 -10L-10 ${H + 10}`; else { const f = mlWob(31 + k), y = t2 => t2 / H * 6.283 * (H / 600 + .5); for (let t2 = -10; t2 <= H + 10; t2 += 12) d += `L${(xs[k] + f(y(t2), A)).toFixed(1)} ${t2}`; }
       p.setAttribute('d', d + `L${W + 10} ${H + 10}Z`); });
-    if (inAt !== null) { let done = true; P.forEach((p, k) => { const e = still ? 1 : Math.min(1, Math.max(0, (now - inAt - k * 140) / 900)), q = 1 - Math.pow(1 - e, 3); if (e < 1) done = false; p.style.transform = `scaleY(${q.toFixed(3)})`; }); if (done) inAt = null; } };   /* coming in: the stripes grow one after another, alternately from the top and from the bottom */
-  let inAt = null, shown = false; const intro = () => { shown = true; inAt = performance.now(); };
-  new IntersectionObserver(e => { if (e[0].isIntersecting && e[0].intersectionRatio > .2) { if (!shown) intro(); } else if (!e[0].isIntersecting) { shown = false; inAt = null; P.forEach(p => p.style.transform = 'scaleY(0)'); } }, { threshold: [0, .2] }).observe(band);
+  };   /* coming in: the stripes grow one after another, alternately from the top and from the bottom */
+  window.mlStripeIn && mlStripeIn(band, () => P, 'scaleY', false);
   let vis = false, raf = 0; const loop = now => { raf = 0; paint(now); if (vis && !still) raf = requestAnimationFrame(loop); };
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(loop); }, { rootMargin: '100px' }).observe(band);
   fit(); addEventListener('resize', fit); addEventListener('load', fit); new ResizeObserver(fit).observe(grid);
@@ -4587,10 +4593,24 @@ html body :is(.ab-pill p, .p-bio, .res-intro, .r-sub){line-height:1.75 !importan
   const cv = document.createElement('canvas'); box.append(cv); a.append(box); const g = cv.getContext('2d'), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let W = 0, H = 0, dpr = 1, D = [], vis = false, raf = 0, inAt = null, bw = 0, bh = 0;
   const build = () => { W = box.clientWidth; H = box.clientHeight; if (!W || !H || (W === bw && H === bh)) return; bw = W; bh = H; dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr;
-    const u = Math.min((W - 16) / 6, (H - 16) / 3), pw = 6 * u, ph = 3 * u, ox = (W - pw) / 2, oy = (H - ph) / 2;   /* the whole plan: six bays by three */
-    let n = 3; const rnd = () => (n = (n * 16807) % 2147483647) / 2147483647;
-    D = mlBSB({ W: pw, H: ph, u, seed: 11, gap: 1.5, edge: null }).dots.filter(q => q.b || rnd() < .14).map(q => ({ x: q.x + ox, y: q.y + oy, r: q.r,
-      c: q.b ? (q.fine ? (rnd() < .5 ? '#e0773a' : '#d8708e') : '#2c5494') : '#e7aa4d', ring: q.ring, ph: rnd() * 6.3, d: Math.hypot(q.x - pw / 2, q.y - ph / 2) / Math.hypot(pw / 2, ph / 2) })); };
+    const u = Math.min((W - 24) / 6, (H - 24) / 3), pw = 6 * u, ph = 3 * u, ox = (W - pw) / 2, oy = (H - ph) / 2;   /* Netsch's plan, literally: six bays by three */
+    const MASK = ['.####.', '######', '.##.##'], has = (c, r) => r >= 0 && r < 3 && c >= 0 && c < 6 && MASK[r][c] === '#';
+    let n = 3; const rnd = () => (n = (n * 16807) % 2147483647) / 2147483647; D = [];
+    const P = (x, y) => [ox + x * u, oy + y * u];
+    const trace = (pts, closed, step, r, c) => { const Q = closed ? [...pts, pts[0]] : pts; for (let i = 1; i < Q.length; i++) { const [ax, ay] = Q[i - 1], [bx, by] = Q[i], L = Math.hypot(bx - ax, by - ay), m = Math.max(1, Math.round(L / step));
+      for (let j = 0; j < m; j++) { const f = j / m, x = ax + (bx - ax) * f, y = ay + (by - ay) * f; if (D.some(o => Math.hypot(o.x - x, o.y - y) < (o.r + r) * .9)) continue;
+        D.push({ x, y, r, c, ring: rnd() < .1, ph: rnd() * 6.3, d: Math.hypot(x - W / 2, y - H / 2) / Math.hypot(pw / 2, ph / 2) }); } } };
+    const hex = (cx, cy, h, a0) => [0, 1, 2, 3, 4, 5].map(i => P(cx + h * Math.cos(a0 + i * Math.PI / 3), cy + h * Math.sin(a0 + i * Math.PI / 3)));
+    const s = u * .085;
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) { if (!has(c, r)) continue;
+      for (const [dc, dr] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) { if (has(c + dc, r + dr)) continue;   /* the outer wall, in 45-degree teeth */
+        const tx = -dr, ty = dc, ax = c + .5 + dc / 2 - tx / 2, ay = r + .5 + dr / 2 - ty / 2, w = []; for (let i = 0; i <= 4; i++) { const k = i % 2 ? .18 : 0; w.push(P(ax + tx * i / 4 + dc * k, ay + ty * i / 4 + dr * k)); }
+        trace(w, false, s * 1.05, u * .034, '#2c5494'); } }
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) { if (!has(c, r)) continue; const x = c + .5, y = r + .5;
+      trace(hex(x, y, .34, 0), true, s * 1.25, u * .04, '#2c5494');             /* the big hexagon of each bay */
+      trace(hex(x, y, .16, Math.PI / 6), true, s, u * .026, '#e0773a');          /* the small hexagon at its heart */
+      trace([P(c + .06, r + .06), P(c + .94, r + .94)], false, s * 1.1, u * .022, '#d8708e');   /* the corridors cutting across it */
+      trace([P(c + .94, r + .06), P(c + .06, r + .94)], false, s * 1.1, u * .022, '#d8708e'); } };
   const draw = now => { raf = 0; build(); const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
     const p = reduce || inAt === null ? 1 : Math.min(1, (now - inAt) / 1400);
     for (const d of D) { const e = reduce ? 1 : Math.min(1, Math.max(0, (p * 1.5 - d.d * .5) / .5)), k = e * e * (3 - 2 * e); if (k <= .01) continue;   /* the plan grows out from its centre */
