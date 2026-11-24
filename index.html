@@ -4429,7 +4429,7 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(VH * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(VH * dpr); }
     if (W === bw && Math.abs(H - bh) < 30 && D.length) return; bw = W; bh = H; D = [];
     if (window.mlBSBDots) { const u = innerWidth < 700 ? 130 : 170, F = mlBSBDots({ W, H, u, seed: 21, keep: .5, gap: 4, edge: 6 });   /* the BSB plan in small dots: hexagons, lines and field */
-      D = F.dots.map(q => ({ x: q.x, y: q.y, r: q.r, c: q.c, p: SH[Math.floor(Math.random() * 14)], ring: q.ring && q.r > 6, rot: Math.random() * 6.3, sp: (Math.random() < .5 ? -1 : 1) * (6.283 / (24 + Math.random() * 24)) }));
+      D = F.dots.map(q => ({ x: q.x, y: q.y, r: q.r, c: Math.random() < .12 ? '#2c5494' : q.c, p: SH[Math.floor(Math.random() * 14)], ring: q.ring && q.r > 6,   /* a light sprinkle of blue */ rot: Math.random() * 6.3, sp: (Math.random() < .5 ? -1 : 1) * (6.283 / (24 + Math.random() * 24)) }));
       D.sort((a, b) => a.y - b.y); return; }
     const S = innerWidth < 700 ? 15 : 20, cell = S * 2, grid = new Map(), K = (a, b) => a * 9973 + b;
     for (let t = 0, n = W * H / (S * S) * 6; t < n; t++) { const x = Math.random() * W, y = Math.random() * H, r = S * (.16 + Math.random() * .2); if (Math.min(y, H - y) < r * 1.6 + 4) continue;   /* whole dots only at the top and the end */
