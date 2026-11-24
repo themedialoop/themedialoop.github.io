@@ -4124,5 +4124,41 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
   build(); new ResizeObserver(build).observe(box);
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) { last = 0; raf = requestAnimationFrame(frame); } }, { rootMargin: '100px' }).observe(box); })();
 </script>
+<style>
+.people .card .dotline{display:none !important}   /* no dot lines on the people cards: a band of big dots sits behind them instead */
+.pp-band{position:absolute;left:50%;width:100vw;translate:-50% 0;z-index:0;pointer-events:none}
+.pp-band canvas{width:100%;height:100%;display:block}
+.people .card{z-index:2}
+#people .more{position:relative;z-index:2}   /* the Alumni &amp; Peers button sits above the dots */
+</style>
+<script>
+/* The Company We Keep: a band of big organic dots behind the people cards. The title keeps its cream; the dots never touch,
+   never run off the band's top or bottom, and breathe in a slow swell */
+(() => { const sec = document.querySelector('#people'); if (!sec) return; const cards = [...sec.querySelectorAll('.card')]; if (!cards.length) return; const host = cards[0].parentElement;
+  if (getComputedStyle(host).position === 'static') host.style.position = 'relative'; cards.forEach(c => { if (getComputedStyle(c).position === 'static') c.style.position = 'relative'; });
+  const band = document.createElement('div'); band.className = 'pp-band'; band.setAttribute('aria-hidden', 'true'); const cv = document.createElement('canvas'); band.append(cv); host.prepend(band); const g = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COLS = [['#2c5494', .3], ['#e7aa4d', .26], ['#e0773a', .14], ['#d8708e', .13], ['#9b6aa6', .1], ['#2a8c8c', .07]];
+  const pick = () => { let u = Math.random(); for (const [c, w] of COLS) { u -= w; if (u <= 0) return c; } return COLS[0][0]; };
+  const SH = [...Array(14)].map(() => { const q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3], p = new Path2D();
+    for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2, k = 1 + .05 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); }
+    p.closePath(); return p; });
+  let W = 0, H = 0, dpr = 1, D = [], vis = false, raf = 0, bw = 0, bh = 0;
+  const build = () => { const pad = innerWidth < 700 ? 60 : 110, ttl = sec.querySelector('h2'), gap = ttl ? host.getBoundingClientRect().top - ttl.getBoundingClientRect().bottom - 18 : pad, top = Math.min(pad, Math.max(0, gap));
+    band.style.top = -top + 'px'; band.style.height = (host.offsetHeight + top + pad) + 'px';
+    W = band.offsetWidth; H = band.offsetHeight; if (W === bw && Math.abs(H - bh) < 30 && D.length) return; bw = W; bh = H;
+    dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; D = [];
+    const S = Math.max(60, W / 9);
+    for (let t = 0; t < 1600; t++) { const x = Math.random() * W, y = Math.random() * H, r = S * (.25 + Math.random() * .45); if (Math.min(y, H - y) < r * 1.15) continue;
+      if (D.some(o => Math.hypot(o.x - x, o.y - y) < o.r * 1.15 + r * 1.15 + 14)) continue;
+      D.push({ x, y, r, c: pick(), p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * 14)], ring: Math.random() < .15, rot: Math.random() * 6.3, ph: Math.random() * 6.3 }); } };
+  const draw = now => { raf = 0; const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    for (const d of D) { const r = d.r * (reduce ? 1 : .94 + .06 * Math.sin(t * .7 + d.x / W * 4 + d.ph * .4));
+      g.setTransform(dpr * r, 0, 0, dpr * r, dpr * d.x, dpr * d.y); g.rotate(d.rot); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
+    if (vis && !reduce) raf = requestAnimationFrame(draw); };
+  const go = () => { build(); if (!raf) raf = requestAnimationFrame(draw); };
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(go); new ResizeObserver(go).observe(host);
+  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(draw); }, { rootMargin: '100px' }).observe(band); })();
+</script>
 </body>
 </html>
