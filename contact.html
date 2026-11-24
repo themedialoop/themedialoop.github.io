@@ -483,7 +483,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 <main class="wrap research" id="main" tabindex="-1">
   <a class="back" href="index.html#contact"><span class="arr back-arr" aria-hidden="true"></span> Home</a>
   <header class="r-hero">
-    <h1 class="r-h al-h ct-title" id="r-h">Do send me a little note</h1>
+    <h1 class="r-h al-h ct-title" id="r-h">Do send me A little note</h1>
     <p class="ct-more">Nothing would please me more.</p>
     <p class="r-sub">Messy, rambling, it doesn&rsquo;t matter. Those are the best kind. But, please don&rsquo;t have AI write for you. I want to hear from you.</p>
   </header>
@@ -703,7 +703,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 
   /* research page: letters that hop, years that fill in when you reach them, and the type filter */
   { const h = document.getElementById('r-h');
-    if (h) { const w = h.textContent.trim(); h.setAttribute('aria-label', w); h.innerHTML = w.split(/\s+/).map((wd, wi) => `<span style="white-space:nowrap"${h.classList.contains('ct-title') && wi >= 2 ? ' class="w2"' : ''}>${[...wd].map(c => `<span class="el" aria-hidden="true">${c}</span>`).join('')}</span>`).join(' ');   /* letters dance, words stay whole */ }
+    if (h) { const w = h.textContent.trim(); h.setAttribute('aria-label', w); h.innerHTML = w.split(/\s+/).map((wd, wi) => (h.classList.contains('ct-title') && wi === 3 ? '<br>' : '') + `<span style="white-space:nowrap"${h.classList.contains('ct-title') && wi >= 3 ? ' class="w2"' : ''}>${[...wd].map(c => `<span class="el" aria-hidden="true">${c}</span>`).join('')}</span>`).join(' ');   /* contact: "Do send me" / "A little note" in gold */   /* letters dance, words stay whole */ }
     const yrs = [...document.querySelectorAll('.r-year')];
     if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('lit', e.isIntersecting)), { rootMargin: '-30% 0px -45% 0px' }); yrs.forEach(y => io.observe(y)); }
     else yrs.forEach(y => y.classList.add('lit'));
@@ -908,7 +908,8 @@ body{color:#f2eedd !important}
 .top.solid{background:color-mix(in srgb, #2c5494 85%, transparent) !important}
 .top,.top nav a,.menu-btn{color:#f2eedd !important}
 .top .mark{filter:brightness(0) invert(94%) sepia(9%) saturate(395%) hue-rotate(10deg)}
-.ct-title,.ct-title .w2,.r-h{color:#f2eedd !important}
+.ct-title,.r-h{color:#f2eedd !important}
+html body .ct-title .w2{color:#e7aa4d !important}
 html body .ct-title{letter-spacing:-.015em !important}   /* no letters touching */
 .ct-more{margin:.25em 0 clamp(18px,2.4vw,30px);font-size:clamp(26px,3.4vw,46px);font-weight:300;line-height:1.1;letter-spacing:-.015em;color:#e7aa4d}
 .r-sub{color:#f2eedd !important;max-width:40ch}
