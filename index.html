@@ -885,7 +885,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
   </section>
 
   <!-- the BSB banner: Netsch's plan for the Behavioral Sciences Building in dots, drifting left to right at a slight downward tilt -->
-  <div class="bsb-band" aria-hidden="true"><canvas></canvas></div>
+  <div class="mono-band" aria-hidden="true"><div class="mono-tr"></div></div>
 
   <section id="resources" aria-labelledby="res-h">
     <h2 class="bz-h sec-h" id="res-h"><span class="bz-a">We&rsquo;d Love</span> <span class="bz-b">to Help Out</span></h2>
@@ -902,7 +902,7 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
 </div>
 
 <!-- the footprint band: Netsch's plan, before Join Our Orbit -->
-<div class="orbit-band" aria-hidden="true"></div>
+
 
 <footer class="wrap" id="contact" data-net="0.14 0.42 0.33" data-net-m="0.12 0.4 0.36">
   <h2 class="bz-h sec-h ct-h"><span class="bz-a">Join</span> <span class="bz-b">Our Orbit</span></h2>
@@ -4199,6 +4199,22 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
       + (i % 9 === 5 ? '<img class="fav-logo" src="assets/medialoop-wordmark.svg" alt="">' : i % 3 === 2 ? `<span class="fav-dot" style="background:${DC[(i + r) % 5]}"></span>` : '')).join('');   /* mostly blue; every few pills a dot, now and then the medialoop logo */
     return `<div class="fav-row"><div class="fav-tr" style="--d:${[96, 112, 88, 104][r]}s">${h}${h}</div></div>`; }).join('');
   box.append(wrap); })();
+</script>
+<style>
+/* the monogram band (in place of river 2): blue medialoop wordmarks drifting right to left, a rainbow dot between each, about 30% of them open circles */
+.mono-band{overflow:hidden;width:112vw;margin:clamp(40px,6vw,90px) 0 clamp(40px,6vw,90px) calc(50% - 56vw);rotate:-3deg;padding:12px 0;pointer-events:none}
+.mono-tr{display:flex;align-items:center;width:max-content;animation:monoGo 80s linear infinite}
+@keyframes monoGo{to{transform:translateX(-50%)}}
+.mono-wm{flex:none;height:clamp(40px,4.4vw,60px);width:auto;margin:0 clamp(20px,2.4vw,34px);display:block}
+.mono-dot{flex:none;width:clamp(16px,1.6vw,22px);aspect-ratio:1;border-radius:52% 48% 55% 45% / 47% 54% 46% 53%;box-sizing:border-box}
+.mono-dot.ring{background:none !important;border:clamp(4px,.42vw,5.5px) solid currentColor}
+@media (prefers-reduced-motion:reduce){.mono-tr{animation:none}}
+</style>
+<script>
+(() => { const tr = document.querySelector('.mono-band .mono-tr'); if (!tr) return;
+  const C = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c'];
+  const unit = [...Array(20)].map((_, i) => { const c = C[i % 5]; return `<img class="mono-wm" src="assets/medialoop-wordmark.svg" alt=""><span class="mono-dot${[1, 4, 8, 11, 14, 18].includes(i) ? ' ring' : ''}" style="background:${c};color:${c}"></span>`; }).join('');   /* 6 of every 20 dots (30%) are open circles */
+  tr.innerHTML = unit + unit; })();
 </script>
 </body>
 </html>
