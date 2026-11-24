@@ -4243,7 +4243,7 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
 /* We'd Love to Help Out: a field of small colourful dots behind the resource cards. They stay in place, each turning slowly round.
    Only one screen's worth is ever drawn (the canvas sticks to the screen and shows the part of the field in view), so scrolling stays smooth */
 .res-band{position:absolute;left:50%;width:100vw;translate:-50% 0;z-index:0;pointer-events:none}
-.res-band canvas{position:sticky;top:0;width:100%;height:100vh;display:block}
+.res-band canvas{position:sticky;top:0;width:100%;height:100vh;height:100lvh;display:block}   /* (the tallest the screen gets, so no strip is ever left bare when a phone's bars slide away) */
 #resources .res{z-index:1}   /* (the cards keep their own sticky stacking) */
 </style>
 <script>
@@ -4259,11 +4259,11 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
   const intro = document.querySelector('#resources .res-intro'), Y = el => { let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; return y; };
   const build = () => { const pad = innerWidth < 700 ? 30 : 60, room = intro ? Y(host) - (Y(intro) + intro.offsetHeight) - (innerWidth < 700 ? 36 : 56) : pad, top = Math.max(0, Math.min(pad, room));   /* clear space under the description */
     band.style.top = -top + 'px'; band.style.height = (host.offsetHeight + top + pad) + 'px';
-    W = band.offsetWidth; H = band.offsetHeight; VH = innerHeight; dpr = Math.min(1.5, devicePixelRatio || 1);
+    W = band.offsetWidth; H = band.offsetHeight; VH = Math.min(cv.clientHeight || innerHeight, H); dpr = Math.min(1.5, devicePixelRatio || 1);   /* draw at the canvas's real size, so nothing is stretched or cut */
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(VH * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(VH * dpr); }
     if (W === bw && Math.abs(H - bh) < 30 && D.length) return; bw = W; bh = H; D = [];
     const S = innerWidth < 700 ? 15 : 20, cell = S * 2, grid = new Map(), K = (a, b) => a * 9973 + b;
-    for (let t = 0, n = W * H / (S * S) * 6; t < n; t++) { const x = Math.random() * W, y = Math.random() * H, r = S * (.16 + Math.random() * .2); if (Math.min(y, H - y) < r * 1.3) continue;
+    for (let t = 0, n = W * H / (S * S) * 6; t < n; t++) { const x = Math.random() * W, y = Math.random() * H, r = S * (.16 + Math.random() * .2); if (Math.min(y, H - y) < r * 1.6 + 4) continue;   /* whole dots only at the top and the end */
       const gx = Math.floor(x / cell), gy = Math.floor(y / cell); let ok = true;
       for (let a = -1; a <= 1 && ok; a++) for (let b = -1; b <= 1 && ok; b++) for (const o of grid.get(K(gx + a, gy + b)) || []) if (Math.hypot(o.x - x, o.y - y) < o.r + r + S * .55) { ok = false; break; }
       if (!ok) continue; const d = { x, y, r, c: pick(), p: SH[Math.floor(Math.random() * 14)], ring: r > S * .26 && Math.random() < .2, rot: Math.random() * 6.3, sp: (Math.random() < .5 ? -1 : 1) * (6.283 / (24 + Math.random() * 24)) };   /* one full turn every 24–48 s */
@@ -4271,6 +4271,7 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
     D.sort((a, b) => a.y - b.y); };
   const draw = now => { raf = 0; const t = reduce ? 0 : now / 1000, off = cv.getBoundingClientRect().top - band.getBoundingClientRect().top;
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    if (cv.clientHeight && Math.abs(cv.clientHeight - VH) > 2 && cv.clientHeight <= H) { VH = cv.clientHeight; cv.height = Math.round(VH * dpr); }
     let lo = 0, hi = D.length; while (lo < hi) { const m = (lo + hi) >> 1; if (D[m].y < off - 20) lo = m + 1; else hi = m; }   /* only the dots on screen */
     for (let i = lo; i < D.length; i++) { const d = D[i], y = d.y - off; if (y > VH + 20) break;
       g.setTransform(dpr * d.r, 0, 0, dpr * d.r, dpr * d.x, dpr * y); g.rotate(d.rot + t * d.sp); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
