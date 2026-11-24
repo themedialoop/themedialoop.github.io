@@ -4221,7 +4221,7 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
 </script>
 <style>
 /* the monogram band (in place of river 2): blue medialoop wordmarks drifting right to left, a rainbow dot between each, about 30% of them open circles */
-.mono-band{overflow:hidden;width:112vw;margin:clamp(40px,6vw,90px) 0 clamp(40px,6vw,90px) calc(50% - 56vw);rotate:-3deg;padding:12px 0;pointer-events:none}
+.mono-band{overflow:hidden;width:112vw;margin:calc(-1 * clamp(36px,5vw,80px)) 0 calc(-1 * clamp(44px,6vw,96px)) calc(50% - 56vw);position:relative;z-index:1;rotate:-3deg;padding:12px 0;pointer-events:none}
 .mono-tr{display:flex;align-items:center;width:max-content;animation:monoGo 80s linear infinite}
 @keyframes monoGo{to{transform:translateX(-50%)}}
 .mono-wm{flex:none;height:clamp(40px,4.4vw,60px);width:auto;margin:0 clamp(20px,2.4vw,34px);display:block}
