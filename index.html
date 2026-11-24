@@ -4374,5 +4374,10 @@ html body .about-grid .ab-pill > summary:not(#_){align-items:center !important} 
   html body #resources .res:not(#_) > .r-go{grid-column:2;grid-row:3}
 }
 </style>
+<style>
+/* Alumni & Peers: a blue pill with cream words; on hover the words turn gold */
+html body #people a.more:not(#_){background:#2c5494 !important;color:#f2eedd !important;transition:color .25s,transform .35s cubic-bezier(.3,1.5,.5,1)}
+html body #people a.more:not(#_):is(:hover,:focus-visible){color:#e7aa4d !important;background:#2c5494 !important}
+</style>
 </body>
 </html>
