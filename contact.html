@@ -487,6 +487,8 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
     <p class="r-sub">Curious questions, half-baked ideas, wild collaborations, a book we simply must read: all of it is welcome here. <span class="t4">Pressing send opens your email app with your note ready to go.</span></p>
   </header>
   <form class="cf" id="cf" novalidate>
+    <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">   <!-- a trap for spam bots: people never see it -->
+    <input type="hidden" name="_subject" value="medialoop: a note from the website">
     <div class="two">
       <div><label for="cf-name">What should we call you?</label><input id="cf-name" name="name" autocomplete="name"></div>
       <div><label for="cf-email">Where can we write back?</label><input id="cf-email" name="email" type="email" autocomplete="email" inputmode="email"></div>
@@ -822,7 +824,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 <script>
 /* the contact form: the address is put together only on send, so it never sits in the page for bots to find.
    To send straight from the page instead of opening an email app, put a Formspree form address in ENDPOINT. */
-(() => { const ENDPOINT = '';
+(() => { const ENDPOINT = 'https://formspree.io/f/mnpdoyrb';
   const f = document.getElementById('cf'), note = document.getElementById('cf-note'), msg = document.getElementById('cf-msg');
   const addr = () => 'ude.ciu|thleumas'.split('').reverse().join('').replace('|', '@');
   f.addEventListener('submit', async e => { e.preventDefault();
