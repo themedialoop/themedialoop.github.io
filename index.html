@@ -4571,12 +4571,12 @@ html body #people a.more:not(#_){background:#2c5494 !important;color:#f2eedd !im
 html body #people a.more:not(#_):is(:hover,:focus-visible){color:#e7aa4d !important;background:#2c5494 !important}
 </style>
 <style>
-/* links in text: the words (a touch bolder) followed by a little orange dot that pops on hover, in place of the blue highlight */
-html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_){background:none !important;color:inherit !important;text-decoration:none !important;font-weight:600;padding:0 !important;box-shadow:none !important}
-html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_)::after{content:'';display:inline-block;width:.4em;height:.4em;border-radius:50%;background:#e0773a;margin-left:.2em;vertical-align:.1em;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
-html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_):is(:hover,:focus-visible){background:none !important;color:inherit !important}
-html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_):is(:hover,:focus-visible)::after{transform:scale(1.7)}
-html body .cf-alt a:not(#_)::after{background:#e7aa4d}
+/* links in text: a colour shift, bolder words in orange that turn purple on hover; on the blue cards, gold that turns cream */
+html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_){background:none !important;color:#e0773a !important;text-decoration:none !important;font-weight:650;padding:0 !important;box-shadow:none !important;transition:color .25s}
+html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_)::after{content:none !important}
+html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_):is(:hover,:focus-visible){background:none !important;color:#9b6aa6 !important}
+html body :is(a.ab-inl, .cf-alt a, .p-role a, .ph-in a.inl, .ph-in .p-bio a):not(#_){color:#e7aa4d !important}
+html body :is(a.ab-inl, .cf-alt a, .p-role a, .ph-in a.inl, .ph-in .p-bio a):not(#_):is(:hover,:focus-visible){color:#f2eedd !important}
 </style>
 </body>
 </html>
