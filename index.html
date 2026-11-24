@@ -3369,7 +3369,9 @@ document.querySelectorAll('.vvv').forEach(el => el.addEventListener('click', () 
     const topD = (mob ? .3 : .34) * (1 + .22 * Math.sin(u * 7.3 + 1 + t * .18) + .12 * Math.sin(u * 15 + 2 - t * .12));
     const rgtD = (mob ? .2 : .5) * (.3 + .95 * Math.pow(Math.sin(Math.PI * Math.min(1, Math.max(0, v * .82 + .02))), 1.4)) * (1 + .08 * Math.sin(v * 9 + .5 + t * .12));   // a crescent: widest halfway down, thinning to points above and below
     const foot = 1 - ss(.7 + .06 * Math.sin(u * 5.3 + 1.7 + t * .12), .9, v);   /* reaches further down, then tapers away well before the bottom edge, so nothing is cut */   // and the band down the right tapers away before the landing ends: no dot is ever cut off by its edge
-    return Math.max(1 - ss(topD * .55, topD, v), (1 - ss(rgtD * .55, rgtD, 1 - u)) * foot); };
+    const botD = (mob ? .16 : .19) * (1 + .2 * Math.sin(u * 6.1 + 2.3 + t * .16) + .1 * Math.sin(u * 13 + .7 - t * .11));   /* and along the bottom, framing the words from below */
+    const bot = (1 - ss(botD * .5, botD, 1 - v)) * (1 - ss(.975, .998, v));
+    return Math.max(1 - ss(topD * .55, topD, v), (1 - ss(rgtD * .55, rgtD, 1 - u)) * Math.max(foot, bot), bot); };
 
   // ---- the opener's state: pv runs 0 (landing) to 1 (home page). It only moves forward, on its own, once started
   let pv = 1, going = false, on = false, idle = 0, lastT = 0, guard = 0, popped = true;
