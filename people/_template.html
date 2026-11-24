@@ -1441,10 +1441,10 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
 </style>
 <style>
 /* links in text: a little tilted gold sticker with blue words; on hover it tips the other way and turns pink with cream words */
-html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_){display:inline-block;max-width:100%;background:#e7aa4d !important;color:#2c5494 !important;text-decoration:none !important;font-weight:600;padding:0 .35em !important;border-radius:6px;rotate:-2deg;line-height:1.3;box-shadow:none !important;transition:rotate .3s cubic-bezier(.3,1.6,.5,1),background-color .2s,color .2s}
+html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_){display:inline;-webkit-box-decoration-break:clone;box-decoration-break:clone;margin:0 .05em;background:#e7aa4d !important;color:#2c5494 !important;text-decoration:none !important;font-weight:600;padding:0 .35em !important;border-radius:6px;rotate:none;line-height:1.3;box-shadow:none !important;transition:rotate .3s cubic-bezier(.3,1.6,.5,1),background-color .2s,color .2s}
 html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_)::after{content:none !important}
-html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_):is(:hover,:focus-visible){background:#d8708e !important;color:#f2eedd !important;rotate:2deg}
-html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_):nth-of-type(even){rotate:1.5deg}html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_):nth-of-type(even):is(:hover,:focus-visible){rotate:-2deg}
+html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_):is(:hover,:focus-visible){background:#d8708e !important;color:#f2eedd !important}
+html body :is(.ab-pill p, .p-bio, .res-intro, .r-sub){line-height:1.75 !important}   /* room between lines, so stickers on neighbouring lines never touch */
 </style>
 </body>
 </html>
