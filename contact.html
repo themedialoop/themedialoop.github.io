@@ -445,7 +445,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 .fld svg{position:absolute;inset:-7px;width:calc(100% + 14px);height:calc(100% + 14px);pointer-events:none;overflow:visible}
 .fld svg path{fill:var(--blue);transition:fill .25s}
 .fld:focus-within svg path{fill:var(--gold)}
-.cf textarea{min-height:200px;resize:vertical;border-radius:26px 20px 28px 22px / 22px 28px 20px 26px}
+.cf textarea{min-height:200px;resize:vertical;border-radius:20px}
 .cf .two{display:grid;gap:clamp(22px,3vw,34px);grid-template-columns:1fr 1fr}
 @media (max-width:640px){.cf .two{grid-template-columns:1fr}}
 .cf button{justify-self:start;font:700 19px Inter,sans-serif;color:var(--blue);background:var(--gold);border:0;padding:.85em 1.6em;border-radius:52% 48% 55% 45% / 46% 54% 47% 53%;cursor:pointer;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
@@ -841,7 +841,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
   const NS = 'http://www.w3.org/2000/svg';
   const pen = (w, h, seed) => {   /* a rounded rectangle traced once round, as a filled brush shape */
     let k = seed; const rnd = () => (k = (k * 16807) % 2147483647) / 2147483647;
-    const P = 7, r = Math.min(22, h / 2 - 2), x0 = P, y0 = P, x1 = w - P, y1 = h - P, pts = [];
+    const P = 7, r = Math.min(20, h / 2 - 2),   /* the box's own corner */ x0 = P, y0 = P, x1 = w - P, y1 = h - P, pts = [];
     const seg = (ax, ay, bx, by, n) => { for (let i = 0; i < n; i++) pts.push([ax + (bx - ax) * i / n, ay + (by - ay) * i / n]); };
     const arc = (cx, cy, a0, n) => { for (let i = 0; i < n; i++) { const a = a0 + i / n * Math.PI / 2; pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); } };
     const nw = Math.max(8, Math.round((x1 - x0) / 9)), nh = Math.max(6, Math.round((y1 - y0) / 9));
@@ -850,7 +850,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
     const N = pts.length, start = Math.floor(N * (.55 + rnd() * .2)), over = Math.round(N * .035);   /* the loop closes low on one side, out of the way */
     const ph = [rnd() * 6.3, rnd() * 6.3, rnd() * 6.3], C = [];
     for (let i = 0; i <= N + over; i++) { const p = pts[(start + i) % N], t = i / (N + over);
-      const wob = 1.6 * Math.sin(t * 6.283 * 2 + ph[0]) + .9 * Math.sin(t * 6.283 * 5 + ph[1]);   /* a slow wander, as a hand does */
+      const wob = .55 * Math.sin(t * 6.283 * 2 + ph[0]) + .3 * Math.sin(t * 6.283 * 5 + ph[1]);   /* hugs the box closely, with just a hint of the hand */   /* a slow wander, as a hand does */
       const q = pts[(start + i + 1) % N], dx = q[0] - p[0], dy = q[1] - p[1], L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L;
       const lift = i > N ? (i - N) / over * 1.2 : 0;   /* the overshoot drifts off the line a little */
       C.push([p[0] + nx * (wob + lift), p[1] + ny * (wob + lift), nx, ny, t]); }
