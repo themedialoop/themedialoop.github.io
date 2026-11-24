@@ -4324,7 +4324,7 @@ html body .apply{position:relative;z-index:1}
     for (let k = -1; k < 8; k++) { const t = k < 0 ? [[-4, 0], [W + 4, 0]] : edge(k), b = k > 6 ? [[-4, T], [W + 4, T]] : edge(k + 1); svg += `<path fill="${C[Math.max(0, Math.min(6, k))]}" d="M${t.map(p => p.join(' ')).join('L')}L${[...b].reverse().map(p => p.join(' ')).join('L')}Z"/>`; }
     svg = svg.replace(`viewBox="0 ${-S} ${W} ${T + 2 * S}"`, `viewBox="0 0 ${W} ${T}"`);
     const i = band.querySelector('i'); i.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg + '</svg>')}")`; i.style.setProperty('--T', T + 'px');
-    const mt = mlWob(91), mb = mlWob(97), mA = Math.min(10, W / 60); let m = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="M-4 ${H}`;
+    const mt = mlWob(91), mb = mlWob(97), mA = 2.5;   /* top and bottom: only just off straight */ let m = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="M-4 ${H}`;
     for (let x = -4; x <= W + 4; x += 14) m += `L${x} ${(mA + 2 + mt(x / W * 6.283 * (W / 900 + .6), mA)).toFixed(1)}`; for (let x = W + 4; x >= -4; x -= 14) m += `L${x} ${(H - mA - 2 + mb(x / W * 6.283 * (W / 900 + .6), mA)).toFixed(1)}`;
     m += 'Z"/></svg>'; const u = `url("data:image/svg+xml,${encodeURIComponent(m)}")`; band.style.webkitMaskImage = band.style.maskImage = u; band.style.webkitMaskSize = band.style.maskSize = '100% 100%'; };   /* the band's own top and bottom edges are hand-drawn too */
   const fit2 = () => { fit(); tile(); }; fit2(); addEventListener('resize', fit2); addEventListener('load', fit2); new ResizeObserver(fit2).observe(a); })();
@@ -4354,7 +4354,7 @@ html body .about-grid .ab-pill > summary:not(#_){align-items:center !important} 
     band.style.left = -gl + 'px'; band.style.width = vw + 'px'; band.style.top = -pad + 'px'; band.style.height = (grid.offsetHeight + pad * 2) + 'px'; draw(vw, grid.offsetHeight + pad * 2); };
   let lastW = 0, lastH = 0; const draw = (W, H) => { if (Math.abs(W - lastW) < 2 && Math.abs(H - lastH) < 2) return; lastW = W; lastH = H; const A = Math.min(9, W / 60);
     const top = mlEdge(1, W, mlWob(11), A), bot = mlEdge(1, W, mlWob(23), A), xs = [0, .25, .5, .75, 1].map((q, i) => i === 0 ? null : i === 4 ? null : mlEdge(1, H, mlWob(31 + i), A * .9).map(([y, d]) => [q * W + d, y]));
-    const C = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6'], yT = x => A + 2 + mlWob(11)(x / W * 6.283 * (W / 900 + .6), A), yB = x => H - A - 2 + mlWob(23)(x / W * 6.283 * (W / 900 + .6), A);
+    const C = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6'], E = 2.5, yT = x => E + 2 + mlWob(11)(x / W * 6.283 * (W / 900 + .6), E), yB = x => H - E - 2 + mlWob(23)(x / W * 6.283 * (W / 900 + .6), E);   /* top and bottom: only just off straight */
     let out = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">`;
     for (let k = 0; k < 4; k++) { const L = xs[k] ? xs[k] : [[-4, 0], [-4, H]], R = xs[k + 1] ? xs[k + 1] : [[W + 4, 0], [W + 4, H]], x0 = L[0][0], x1 = R[0][0];
       const pts = [];
