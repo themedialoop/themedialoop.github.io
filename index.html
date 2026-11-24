@@ -4292,6 +4292,12 @@ html body .res .r-go:not(#_) canvas.rg-ring{display:none !important}
 html body .res .r-go:not(#_) .r-label{translate:none !important;max-width:none !important;text-align:left}
 html body .res:is(:hover,:focus-visible) .r-go:not(#_){transform:translateX(4px) rotate(-2deg)}
 </style>
+<script>
+/* hand-drawn stripes: edges that wander a little, as a brush would, never ruler-straight */
+window.mlWob = (seed) => { const p = [1, 2, 3].map(i => ((Math.sin(seed * 12.9898 + i * 78.233) * 43758.5453) % 1 + 1) % 1 * 6.283);
+  return (u, amp) => amp * (.62 * Math.sin(u * 1.3 + p[0]) + .28 * Math.sin(u * 2.9 + p[1]) + .1 * Math.sin(u * 5.1 + p[2])); };   /* slow, brush-like wander */
+window.mlEdge = (n, len, f, amp, step = 14) => { const pts = []; for (let t = 0; t <= len + .1; t += step) pts.push([t, f(t / len * 6.283 * (len / 900 + .6), amp)]); return pts; };
+</script>
 <style>
 /* the Apply card: plain, with no dots */
 html body .apply canvas{display:none !important}
@@ -4299,8 +4305,8 @@ html body .apply canvas{display:none !important}
 <style>
 /* behind the Apply card: big bold stripes in the palette's other colours (no gold, the card's own), sliding very slowly */
 .ap-stripes{position:absolute;z-index:0;pointer-events:none;overflow:hidden}
-.ap-stripes i{position:absolute;inset:0;--s:clamp(88px,10vw,144px);background:repeating-linear-gradient(180deg,#2c5494 0 var(--s),#e7aa4d var(--s) calc(var(--s) * 2),#e0773a calc(var(--s) * 2) calc(var(--s) * 3),#d8708e calc(var(--s) * 3) calc(var(--s) * 4),#9b6aa6 calc(var(--s) * 4) calc(var(--s) * 5),#2a8c8c calc(var(--s) * 5) calc(var(--s) * 6),#e0503c calc(var(--s) * 6) calc(var(--s) * 7));animation:apStripe 60s linear infinite}   /* fat horizontal colour stripes, drifting slowly upward */
-@keyframes apStripe{to{background-position-y:calc(var(--s) * -7)}}
+.ap-stripes i{position:absolute;inset:-12% 0;background-repeat:no-repeat;background-size:100% 100%;animation:apStripe 9s ease-in-out infinite alternate}   /* seven equal hand-drawn stripes, bobbing gently up and down */
+@keyframes apStripe{from{translate:0 -4%}to{translate:0 4%}}
 html body .apply.apply:not(#_){background:#f2eedd !important;color:#2c5494 !important}
 .ap-stripes-gap{display:block;height:clamp(60px,8vw,120px)}   /* the card itself in cream */
 html body .apply:not(#_) :is(.ap-kind,.ap-h,.ap-t){color:#2c5494 !important}
@@ -4310,9 +4316,18 @@ html body .apply{position:relative;z-index:1}
 <script>
 (() => { const a = document.querySelector('.apply'); if (!a) return; const host = a.parentElement; if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
   const band = document.createElement('div'); band.className = 'ap-stripes'; band.setAttribute('aria-hidden', 'true'); band.innerHTML = '<i></i>'; a.before(band); const gap = document.createElement('span'); gap.className = 'ap-stripes-gap'; gap.setAttribute('aria-hidden', 'true'); band.before(gap);   /* clear cream room before the stripes */
-  const fit = () => { const pad = innerWidth < 700 ? 40 : 70, vw = document.documentElement.clientWidth, hl = host.getBoundingClientRect().left;
+  const fit = () => { const pad = Math.max(innerWidth < 700 ? 40 : 70, a.offsetHeight / 5 + 12), vw = document.documentElement.clientWidth, hl = host.getBoundingClientRect().left;
     band.style.left = -hl + 'px'; band.style.width = vw + 'px'; band.style.top = (a.offsetTop - pad) + 'px'; band.style.height = (a.offsetHeight + pad * 2) + 'px'; };
-  fit(); addEventListener('resize', fit); addEventListener('load', fit); new ResizeObserver(fit).observe(a); })();
+  let tw = 0; const tile = () => { const W = document.documentElement.clientWidth, H = band.offsetHeight, T = H * 1.24, S = H / 7;   /* every colour gets a whole stripe the same size, teal and red included */ if (W === tw && band.dataset.h == H) return; tw = W; band.dataset.h = H;
+    const C = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c', '#e0503c'], A = Math.min(8, W / 70), edge = k => { const f = mlWob(50 + (k % 7)); const pts = []; for (let x = -4; x <= W + 4; x += 14) pts.push([x, H * .12 + k * S + f(x / W * 6.283 * (W / 900 + .6), A)]); return pts; };
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${T}" viewBox="0 ${-S} ${W} ${T + 2 * S}" preserveAspectRatio="none">`;
+    for (let k = -1; k < 8; k++) { const t = k < 0 ? [[-4, 0], [W + 4, 0]] : edge(k), b = k > 6 ? [[-4, T], [W + 4, T]] : edge(k + 1); svg += `<path fill="${C[Math.max(0, Math.min(6, k))]}" d="M${t.map(p => p.join(' ')).join('L')}L${[...b].reverse().map(p => p.join(' ')).join('L')}Z"/>`; }
+    svg = svg.replace(`viewBox="0 ${-S} ${W} ${T + 2 * S}"`, `viewBox="0 0 ${W} ${T}"`);
+    const i = band.querySelector('i'); i.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg + '</svg>')}")`; i.style.setProperty('--T', T + 'px');
+    const mt = mlWob(91), mb = mlWob(97), mA = Math.min(10, W / 60); let m = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="M-4 ${H}`;
+    for (let x = -4; x <= W + 4; x += 14) m += `L${x} ${(mA + 2 + mt(x / W * 6.283 * (W / 900 + .6), mA)).toFixed(1)}`; for (let x = W + 4; x >= -4; x -= 14) m += `L${x} ${(H - mA - 2 + mb(x / W * 6.283 * (W / 900 + .6), mA)).toFixed(1)}`;
+    m += 'Z"/></svg>'; const u = `url("data:image/svg+xml,${encodeURIComponent(m)}")`; band.style.webkitMaskImage = band.style.maskImage = u; band.style.webkitMaskSize = band.style.maskSize = '100% 100%'; };   /* the band's own top and bottom edges are hand-drawn too */
+  const fit2 = () => { fit(); tile(); }; fit2(); addEventListener('resize', fit2); addEventListener('load', fit2); new ResizeObserver(fit2).observe(a); })();
 </script>
 <style>
 /* the Our cards: all blue, cream words, a gold open/close dot, no dots inside. Behind them, fat vertical stripes in the palette (no blue),
@@ -4323,7 +4338,7 @@ html body .about-grid .ab-pill.ab-pill:is(.ab-b2,.ab-b3,.ab-b4){background:#2c54
 html body .about-grid .ab-pill.ab-pill:is(.ab-b2,.ab-b3,.ab-b4) :is(h3,p){color:#f2eedd !important}
 html body .ab-pill.ab-pill .pm{background:#e7aa4d !important}
 .ab-stripes{position:absolute;z-index:0;pointer-events:none;transition:height .5s cubic-bezier(.25,.8,.3,1)}
-.ab-stripes{background:linear-gradient(90deg,#e7aa4d 0 25%,#e0773a 25% 50%,#d8708e 50% 75%,#9b6aa6 75% 100%)}   /* four wide stripes across the whole screen: gold, orange, pink, purple */
+.ab-stripes svg{position:absolute;inset:0;width:100%;height:100%;display:block}   /* four wide hand-drawn stripes across the whole screen: gold, orange, pink, purple */
 html body .about-grid .ab-pill h3,html body .about-grid .ab-pill[open] h3{white-space:nowrap !important;font-size:clamp(26px,min(7.2vw,5.4vw + 6px),68px) !important}
 html body .about-grid .ab-pill h3 br{display:none}   /* each title on one line */
 html body .about-grid .ab-pill h3 .ab-w{display:inline !important}
@@ -4336,7 +4351,19 @@ html body .about-grid .ab-pill > summary:not(#_){align-items:center !important} 
 (() => { const grid = document.querySelector('.about-grid.ab-pills'); if (!grid) return;
   const band = document.createElement('div'); band.className = 'ab-stripes'; band.setAttribute('aria-hidden', 'true'); grid.prepend(band);
   const fit = () => { const pad = innerWidth < 700 ? 40 : 70, vw = document.documentElement.clientWidth, gl = grid.getBoundingClientRect().left;
-    band.style.left = -gl + 'px'; band.style.width = vw + 'px'; band.style.top = -pad + 'px'; band.style.height = (grid.offsetHeight + pad * 2) + 'px'; };
+    band.style.left = -gl + 'px'; band.style.width = vw + 'px'; band.style.top = -pad + 'px'; band.style.height = (grid.offsetHeight + pad * 2) + 'px'; draw(vw, grid.offsetHeight + pad * 2); };
+  let lastW = 0, lastH = 0; const draw = (W, H) => { if (Math.abs(W - lastW) < 2 && Math.abs(H - lastH) < 2) return; lastW = W; lastH = H; const A = Math.min(9, W / 60);
+    const top = mlEdge(1, W, mlWob(11), A), bot = mlEdge(1, W, mlWob(23), A), xs = [0, .25, .5, .75, 1].map((q, i) => i === 0 ? null : i === 4 ? null : mlEdge(1, H, mlWob(31 + i), A * .9).map(([y, d]) => [q * W + d, y]));
+    const C = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6'], yT = x => A + 2 + mlWob(11)(x / W * 6.283 * (W / 900 + .6), A), yB = x => H - A - 2 + mlWob(23)(x / W * 6.283 * (W / 900 + .6), A);
+    let out = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">`;
+    for (let k = 0; k < 4; k++) { const L = xs[k] ? xs[k] : [[-4, 0], [-4, H]], R = xs[k + 1] ? xs[k + 1] : [[W + 4, 0], [W + 4, H]], x0 = L[0][0], x1 = R[0][0];
+      const pts = [];
+      for (let x = Math.max(-4, L[0][0]); x <= Math.min(W + 4, R[0][0]); x += 12) pts.push([x, yT(x)]);   /* top edge */
+      R.forEach(([x, y]) => pts.push([x, Math.max(yT(x), Math.min(yB(x), y))]));
+      for (let x = Math.min(W + 4, R[R.length - 1][0]); x >= Math.max(-4, L[L.length - 1][0]); x -= 12) pts.push([x, yB(x)]);   /* bottom edge */
+      [...L].reverse().forEach(([x, y]) => pts.push([x, Math.max(yT(x), Math.min(yB(x), y))]));
+      out += `<path fill="${C[k]}" d="M${pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L')}Z"/>`; }
+    band.innerHTML = out + '</svg>'; };
   fit(); addEventListener('resize', fit); addEventListener('load', fit); new ResizeObserver(fit).observe(grid);
   grid.querySelectorAll('.ab-pill').forEach(d => new MutationObserver(() => requestAnimationFrame(fit)).observe(d, { attributes: true, attributeFilter: ['open', 'class', 'style'] })); })();
 </script>
