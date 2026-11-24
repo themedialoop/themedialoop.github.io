@@ -4593,24 +4593,19 @@ html body :is(.ab-pill p, .p-bio, .res-intro, .r-sub){line-height:1.75 !importan
   const cv = document.createElement('canvas'); box.append(cv); a.append(box); const g = cv.getContext('2d'), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let W = 0, H = 0, dpr = 1, D = [], vis = false, raf = 0, inAt = null, bw = 0, bh = 0;
   const build = () => { W = box.clientWidth; H = box.clientHeight; if (!W || !H || (W === bw && H === bh)) return; bw = W; bh = H; dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr;
-    const u = Math.min((W - 24) / 6, (H - 24) / 3), pw = 6 * u, ph = 3 * u, ox = (W - pw) / 2, oy = (H - ph) / 2;   /* Netsch's plan, literally: six bays by three */
-    const MASK = ['.####.', '######', '.##.##'], has = (c, r) => r >= 0 && r < 3 && c >= 0 && c < 6 && MASK[r][c] === '#';
-    let n = 3; const rnd = () => (n = (n * 16807) % 2147483647) / 2147483647; D = [];
-    const P = (x, y) => [ox + x * u, oy + y * u];
-    const trace = (pts, closed, step, r, c) => { const Q = closed ? [...pts, pts[0]] : pts; for (let i = 1; i < Q.length; i++) { const [ax, ay] = Q[i - 1], [bx, by] = Q[i], L = Math.hypot(bx - ax, by - ay), m = Math.max(1, Math.round(L / step));
-      for (let j = 0; j < m; j++) { const f = j / m, x = ax + (bx - ax) * f, y = ay + (by - ay) * f; if (D.some(o => Math.hypot(o.x - x, o.y - y) < (o.r + r) * .9)) continue;
-        D.push({ x, y, r, c, ring: rnd() < .1, ph: rnd() * 6.3, d: Math.hypot(x - W / 2, y - H / 2) / Math.hypot(pw / 2, ph / 2) }); } } };
-    const hex = (cx, cy, h, a0) => [0, 1, 2, 3, 4, 5].map(i => P(cx + h * Math.cos(a0 + i * Math.PI / 3), cy + h * Math.sin(a0 + i * Math.PI / 3)));
-    const s = u * .085;
-    for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) { if (!has(c, r)) continue;
-      for (const [dc, dr] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) { if (has(c + dc, r + dr)) continue;   /* the outer wall, in 45-degree teeth */
-        const tx = -dr, ty = dc, ax = c + .5 + dc / 2 - tx / 2, ay = r + .5 + dr / 2 - ty / 2, w = []; for (let i = 0; i <= 4; i++) { const k = i % 2 ? .18 : 0; w.push(P(ax + tx * i / 4 + dc * k, ay + ty * i / 4 + dr * k)); }
-        trace(w, false, s * 1.05, u * .034, '#2c5494'); } }
-    for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) { if (!has(c, r)) continue; const x = c + .5, y = r + .5;
-      trace(hex(x, y, .34, 0), true, s * 1.25, u * .04, '#2c5494');             /* the big hexagon of each bay */
-      trace(hex(x, y, .16, Math.PI / 6), true, s, u * .026, '#e0773a');          /* the small hexagon at its heart */
-      trace([P(c + .06, r + .06), P(c + .94, r + .94)], false, s * 1.1, u * .022, '#d8708e');   /* the corridors cutting across it */
-      trace([P(c + .94, r + .06), P(c + .06, r + .94)], false, s * 1.1, u * .022, '#d8708e'); } };
+    /* the BSB lattice, as in the river we drew of it: big blue dots where the diagonal corridors cross, the corridors themselves in
+       blue dots, and the diamonds between them filled with small dots in the palette */
+    const R = 2, u = Math.min((H - 20) / R, (W - 20) / 4), nx = Math.floor((W - 20) / u), pw = nx * u, ph = R * u, ox = (W - pw) / 2, oy = (H - ph) / 2, Dd = u * .2;
+    let n = 7; const rnd = () => (n = (n * 16807) % 2147483647) / 2147483647; D = [];
+    const FILL = v => v < .38 ? '#e7aa4d' : v < .56 ? '#e0773a' : v < .72 ? '#d8708e' : v < .86 ? '#9b6aa6' : '#2a8c8c';
+    const put = (x, y, sz, c, gp, kind) => { const Rr = Dd * .46 * sz; if (x < Rr || x > W - Rr || y < Rr || y > H - Rr) return; for (const o of D) if ((o.x - x) ** 2 + (o.y - y) ** 2 < (Rr + o.R + gp) ** 2) return;
+      D.push({ x, y, R: Rr, r: Dd * .38 * sz, c, kind, ring: kind === 'f' && rnd() < .15, ph: rnd() * 6.3, d: Math.hypot(x - W / 2, y - H / 2) / Math.hypot(W / 2, H / 2) }); };
+    for (let i = 0; i <= nx * 2; i++) for (let j = 0; j <= R * 2; j++) if ((i + j) % 2 === 0) put(ox + i * u / 2, oy + j * u / 2, .95 + rnd() * .1, '#2c5494', 0, 'x');   /* the crossings */
+    const L = Math.hypot(pw, ph) * 2, step = Dd * .5;
+    for (let k = -R; k <= nx; k++) for (const dir of [1, -1]) { const x0 = dir > 0 ? ox + k * u : ox + (k + R) * u;   /* the corridors, at 45 degrees */
+      for (let t = 0; t <= L; t += step) { const x = x0 + dir * t / Math.SQRT2, y = oy + t / Math.SQRT2; if (y > oy + ph + 1 || x < ox - 1 || x > ox + pw + 1) continue; put(x, y, .44 + rnd() * .06, '#2c5494', Dd * .06, 'c'); } }
+    const st = Dd * .36; for (let y = oy, row = 0; y < oy + ph; y += st * .87, row++) for (let x = ox + (row % 2) * st * .5; x < ox + pw; x += st)   /* the rooms between, in colour */
+      if (rnd() < .6) put(x + (rnd() - .5) * st * .5, y + (rnd() - .5) * st * .5, .2 + rnd() * .08, FILL(rnd()), Dd * .12, 'f'); };
   const draw = now => { raf = 0; build(); const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
     const p = reduce || inAt === null ? 1 : Math.min(1, (now - inAt) / 1400);
     for (const d of D) { const e = reduce ? 1 : Math.min(1, Math.max(0, (p * 1.5 - d.d * .5) / .5)), k = e * e * (3 - 2 * e); if (k <= .01) continue;   /* the plan grows out from its centre */
