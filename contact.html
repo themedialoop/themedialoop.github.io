@@ -491,10 +491,10 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
     <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">   <!-- a trap for spam bots: people never see it -->
     <input type="hidden" name="_subject" value="medialoop: a note from the website">
     <div class="two">
-      <div><label for="cf-name">What should we call you?</label><input id="cf-name" name="name" autocomplete="name"></div>
-      <div><label for="cf-email">Where can we write back?</label><input id="cf-email" name="email" type="email" autocomplete="email" inputmode="email"></div>
+      <div><label for="cf-name">Name</label><input id="cf-name" name="name" autocomplete="name"></div>
+      <div><label for="cf-email">Email</label><input id="cf-email" name="email" type="email" autocomplete="email" inputmode="email"></div>
     </div>
-    <div><label for="cf-msg">What is on your mind? <span class="req" aria-hidden="true">*</span></label><textarea id="cf-msg" name="message" required aria-required="true"></textarea></div>
+    <div><label for="cf-msg">Now, what is on your mind? Tell me everything. <span class="req" aria-hidden="true">*</span></label><textarea id="cf-msg" name="message" required aria-required="true"></textarea></div>
     <button type="submit">Send it our way</button>
     <p class="cf-note" id="cf-note" role="status" aria-live="polite"></p>
   </form>
