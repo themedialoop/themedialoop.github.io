@@ -483,8 +483,9 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 <main class="wrap research" id="main" tabindex="-1">
   <a class="back" href="index.html#contact"><span class="arr back-arr" aria-hidden="true"></span> Home</a>
   <header class="r-hero">
-    <h1 class="r-h al-h ct-title" id="r-h">Drop Us a Line</h1>
-    <p class="r-sub">Curious questions, half-baked ideas, wild collaborations, a book we simply must read: all of it is welcome here. <span class="t4">Pressing send opens your email app with your note ready to go.</span></p>
+    <h1 class="r-h al-h ct-title" id="r-h">Do send me a little note</h1>
+    <p class="ct-more">Nothing would please me more.</p>
+    <p class="r-sub">Messy, rambling, it doesn&rsquo;t matter. Those are the best kind. But, please don&rsquo;t have AI write for you. I want to hear from you.</p>
   </header>
   <form class="cf" id="cf" novalidate>
     <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">   <!-- a trap for spam bots: people never see it -->
@@ -822,23 +823,15 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 @media (max-width:760px){.top nav a{margin-inline:-40px;padding-inline:40px}}
 </style>
 <script>
-/* the contact form: the address is put together only on send, so it never sits in the page for bots to find.
-   To send straight from the page instead of opening an email app, put a Formspree form address in ENDPOINT. */
+/* the contact form: notes go straight to Sam's inbox through Formspree; no email address appears anywhere on the site */
 (() => { const ENDPOINT = 'https://formspree.io/f/mnpdoyrb';
-  const f = document.getElementById('cf'), note = document.getElementById('cf-note'), msg = document.getElementById('cf-msg');
-  const addr = () => 'ude.ciu|thleumas'.split('').reverse().join('').replace('|', '@');
+  const f = document.getElementById('cf'), note = document.getElementById('cf-note'), msg = document.getElementById('cf-msg'), btn = f.querySelector('button');
   f.addEventListener('submit', async e => { e.preventDefault();
     if (!msg.value.trim()) { note.textContent = 'Please write a note first.'; msg.focus(); return; }
-    const name = f.name.value.trim(), mail = f.email.value.trim(), topic = 'a note';
-    if (ENDPOINT) { note.textContent = 'Sending…';
-      try { const r = await fetch(ENDPOINT, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(f) });
-        if (r.ok) { f.reset(); note.textContent = 'Sent. Thank you! We will write back soon.'; return; } } catch (_) {}
-      note.textContent = 'That did not go through. '; }
-    const subject = 'medialoop: ' + topic + (name ? ' (from ' + name + ')' : '');
-    const body = msg.value.trim() + (name || mail ? '\n\n— ' + [name, mail].filter(Boolean).join(', ') : '');
-    location.href = 'mailto:' + addr() + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-    note.innerHTML = 'Your email app should open with your note. Nothing happened? <a href="#" id="cf-show">Show our address</a>.';
-    document.getElementById('cf-show').onclick = ev => { ev.preventDefault(); note.textContent = 'Write to us at ' + addr() + '.'; }; });
+    note.textContent = 'Sending\u2026'; btn.disabled = true;
+    try { const r = await fetch(ENDPOINT, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(f) });
+      if (r.ok) { f.reset(); btn.disabled = false; note.innerHTML = 'It&rsquo;s in my inbox now. You&rsquo;ll hear from me soon.<br>Toodle-oo, Sam'; return; } } catch (_) {}
+    btn.disabled = false; note.textContent = 'That didn\u2019t go through. Please try again in a moment.'; });
 })();
 </script>
 <script>
@@ -879,7 +872,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 (() => {
   const box = document.querySelector('.sea'); if (!box) return; const cv = box.querySelector('canvas'); window.mlBreezeOn && mlBreezeOn(cv, box); const g = cv.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const COLS = [['#2c5494', .62], ['#e7aa4d', .24], ['#e0773a', .05], ['#d8708e', .05], ['#9b6aa6', .04]];
+  const COLS = [['#f2eedd', .62], ['#e7aa4d', .24], ['#e0773a', .05], ['#d8708e', .05], ['#9b6aa6', .04]];
   let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const pick = () => { let u = rnd(); for (const [c, w] of COLS) { u -= w; if (u <= 0) return c; } return COLS[0][0]; };
   const SH = [...Array(12)].map(() => { const q = [rnd() * 6.3, rnd() * 6.3, rnd() * 6.3], p = new Path2D();
@@ -890,7 +883,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
     /* the BSB field (assets/bsbfield.js): the building in blue, the field in gold; nothing cut by an edge */
     const FC = ['#e7aa4d'];   /* blue and gold only */ D = [];
     for (const q of mlBSB({ W, H, u: Math.max(90, Math.min(H * .45, 150)), seed: 23, gap: 3, edge: 4 }).dots)
-      D.push({ x: q.x, y: q.y, r: q.r, c: q.b ? '#2c5494' : FC[Math.floor(rnd() * FC.length)], s: (rnd() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(rnd() * SH.length)], rot: rnd() * 6.3, ring: q.ring }); };
+      D.push({ x: q.x, y: q.y, r: q.r, c: q.b ? '#f2eedd' : FC[Math.floor(rnd() * FC.length)], s: (rnd() < .07 && window.mlIDot) ? mlIDot : SH[Math.floor(rnd() * SH.length)], rot: rnd() * 6.3, ring: q.ring }); };
   const draw = t => { g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     for (const d of D) { const k = reduce ? 1 : .88 + .12 * Math.sin(t * 1.1 - (d.x + d.y) * .011), r = d.r * k, cq = Math.cos(d.rot) * r * dpr, sq = Math.sin(d.rot) * r * dpr;
       g.setTransform(cq, sq, -sq, cq, d.x * dpr, d.y * dpr);
@@ -908,6 +901,31 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
 :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):is(:hover,:focus-visible,:active){background:#e7aa4d !important;color:#2c5494 !important;outline:none}
 /* on blue, a blue highlight would vanish: there it is cream with blue text */
 :is(.ab-pill a.ab-inl, .p-role a):not(:hover,:focus-visible,:active){background:#f2eedd !important;color:#2c5494 !important}
+
+/* the contact page in blue: cream (and gold) words, cream boxes traced in gold, typed words in blue */
+html,body,body::before{background:#2c5494 !important}
+body{color:#f2eedd !important}
+.top.solid{background:color-mix(in srgb, #2c5494 85%, transparent) !important}
+.top,.top nav a,.menu-btn{color:#f2eedd !important}
+.top .mark{filter:brightness(0) invert(94%) sepia(9%) saturate(395%) hue-rotate(10deg)}
+.ct-title,.ct-title .w2,.r-h{color:#f2eedd !important}
+html body .ct-title{letter-spacing:-.015em !important}   /* no letters touching */
+.ct-more{margin:.25em 0 clamp(18px,2.4vw,30px);font-size:clamp(26px,3.4vw,46px);font-weight:300;line-height:1.1;letter-spacing:-.015em;color:#e7aa4d}
+.r-sub{color:#f2eedd !important;max-width:40ch}
+.back,.back .arr{color:#f2eedd !important}
+.back:hover .arr{color:#e7aa4d !important}
+.cf label{color:#f2eedd}
+.cf .req{color:#e7aa4d !important}
+.cf input,.cf textarea{background:#f2eedd !important;color:#2c5494 !important;box-shadow:none !important;caret-color:#2c5494}
+.fld svg path{fill:#e7aa4d !important;stroke:none}   /* the hand-drawn trace round each box, in gold */
+.fld:focus-within svg path{fill:#f2eedd !important}
+html body .top.solid:not(.open){background:linear-gradient(to bottom, #2c5494 0%, #2c5494 45%, color-mix(in srgb, #2c5494 70%, transparent) 70%, transparent 100%) !important}
+.cf button{background:#e7aa4d !important;color:#2c5494 !important}
+.cf button:hover,.cf button:focus-visible{box-shadow:0 0 0 4px #f2eedd !important}
+.cf button:disabled{opacity:.7;cursor:progress}
+.cf-note{color:#e7aa4d;font-size:clamp(18px,1.5vw,22px) !important;font-weight:400 !important;line-height:1.4}
+.cf-alt,.cf-alt a{color:#f2eedd !important}
+.cf-alt a{text-decoration-color:#e7aa4d}
 </style>
 </body>
 </html>
