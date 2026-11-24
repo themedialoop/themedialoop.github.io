@@ -4174,10 +4174,13 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
 .fav-row:nth-child(even) .fav-tr{animation-direction:reverse}
 .fav-pills:hover .fav-tr{animation-play-state:paused}
 @keyframes favMove{to{transform:translateX(-50%)}}
-.fav-p{display:inline-flex;align-items:center;white-space:nowrap;font:700 clamp(15px,1.35vw,19px)/1 Inter,system-ui,sans-serif;padding:.62em 1.15em;border-radius:999px;transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
+.fav-p{display:inline-flex;align-items:center;white-space:nowrap;font:700 clamp(15px,1.35vw,19px)/1 Inter,system-ui,sans-serif;padding:.95em 1.25em;border-radius:999px;transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
 .fav-p.fun{font-style:italic;font-weight:400}
 .fav-p:hover{transform:rotate(-3deg) scale(1.07)}
 .fav-p.k0{background:#2c5494;color:#f2eedd}.fav-p.k1{background:#e7aa4d;color:#2c5494}.fav-p.k2{background:#e0773a;color:#f2eedd}.fav-p.k3{background:#d8708e;color:#f2eedd}.fav-p.k4{background:#9b6aa6;color:#f2eedd}.fav-p.k5{background:#2a8c8c;color:#f2eedd}
+.fav-tr{align-items:center}
+.fav-dot{flex:none;width:clamp(26px,2.4vw,36px);aspect-ratio:1;border-radius:52% 48% 55% 45% / 47% 54% 46% 53%}
+.fav-logo{flex:none;height:clamp(30px,2.6vw,40px);width:auto;margin:0 .5em;display:block}
 @media (prefers-reduced-motion:reduce){.fav-tr{animation:none}.fav-row{overflow-x:auto}}
 </style>
 <script>
@@ -4192,7 +4195,8 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
   const all = ROWS.flat().map(w => ({ t: w.replace(/^\*/, ''), fun: w[0] === '*' }));
   for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
   const wrap = document.createElement('div'); wrap.className = 'fav-pills'; wrap.setAttribute('aria-hidden', 'true');   /* (the words are listed for screen readers just above) */
-  let n = 0; wrap.innerHTML = [0, 1, 2, 3].map(r => { const row = all.filter((_, i) => i % 4 === r), h = row.map(w => `<span class="fav-p k${Math.random() < .65 ? 0 : 1 + n++ % 5}${w.fun ? ' fun' : ''}">${w.t}</span>`).join('');   /* mostly blue, a sprinkle of the other colours */
+  let n = 0; wrap.innerHTML = [0, 1, 2, 3].map(r => { const row = all.filter((_, i) => i % 4 === r), DC = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c'], h = row.map((w, i) => `<span class="fav-p k${Math.random() < .65 ? 0 : 1 + n++ % 5}${w.fun ? ' fun' : ''}">${w.t}</span>`
+      + (i % 9 === 5 ? '<img class="fav-logo" src="assets/medialoop-wordmark.svg" alt="">' : i % 3 === 2 ? `<span class="fav-dot" style="background:${DC[(i + r) % 5]}"></span>` : '')).join('');   /* mostly blue; every few pills a dot, now and then the medialoop logo */
     return `<div class="fav-row"><div class="fav-tr" style="--d:${[96, 112, 88, 104][r]}s">${h}${h}</div></div>`; }).join('');
   box.append(wrap); })();
 </script>
