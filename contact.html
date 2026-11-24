@@ -860,7 +860,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
     const a = C[0], z = C[C.length - 1];
     return 'M' + L1.map(f).join('L') + 'L' + L2.map(f).join('L') + 'Z';   /* ink blobs where the pen lands and lifts */
   };
-  const fields = [...document.querySelectorAll('.cf input, .cf textarea')];
+  const fields = [...document.querySelectorAll('.cf input:not([name="_gotcha"]):not([type="hidden"]), .cf textarea')];   /* (not the hidden spam trap)*/
   fields.forEach((el, n) => { const wrap = document.createElement('span'); wrap.className = 'fld'; el.before(wrap); wrap.append(el);
     const svg = document.createElementNS(NS, 'svg'), path = document.createElementNS(NS, 'path'); svg.setAttribute('aria-hidden', 'true'); svg.append(path); wrap.append(svg);
     const draw = () => { const w = el.offsetWidth + 14, h = el.offsetHeight + 14; if (w < 20) return; svg.setAttribute('viewBox', `0 0 ${w} ${h}`); path.setAttribute('d', pen(w, h, 101 + n * 977)); };
