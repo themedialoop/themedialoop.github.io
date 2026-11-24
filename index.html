@@ -4049,7 +4049,8 @@ html body .about-grid .ab-pill.ab-pill[open] > p:not(summary):not(canvas){paddin
 /* resource cards: keep the text clear of the circle and its ring of dots (with room for the hover swell); where the words would run into it,
    the card grows taller so the circle sits below them */
 (() => { const cards = [...document.querySelectorAll('#resources .res')];
-  const fit = () => cards.forEach(c => { const go = c.querySelector('.r-go'); if (!go) return; c.style.minHeight = ''; go.style.marginTop = ''; const base = c.getBoundingClientRect().height, inflow = getComputedStyle(go).position !== 'absolute', mt0 = parseFloat(getComputedStyle(go).marginTop) || 0;
+  const PILL = true;   /* the button is a plain pill again, in the flow of the card: nothing to make room for */
+  const fit = () => cards.forEach(c => { const go = c.querySelector('.r-go'); if (!go) return; c.style.minHeight = ''; go.style.marginTop = ''; if (PILL) return; const base = c.getBoundingClientRect().height, inflow = getComputedStyle(go).position !== 'absolute', mt0 = parseFloat(getComputedStyle(go).marginTop) || 0;
     const cr = c.getBoundingClientRect(), gr = go.getBoundingClientRect(), gw = go.offsetWidth;
     const cx = gr.left + gr.width / 2 - cr.left, cy = gr.top + gr.height / 2 - cr.top, Rz = (gw / 2 * 1.09 + 22 + 13) * 1.09 + 10;
     let need = 0;
@@ -4272,5 +4273,14 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(go); new ResizeObserver(go).observe(host);
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis) build(); if (vis && !raf) raf = requestAnimationFrame(draw); }, { rootMargin: '100px' }).observe(band); })();
 </script>
+<style>
+/* resource cards: the link is a pill again (no big corner dot, no ring of dots round it) */
+html body .res .r-go:not(#_){position:relative !important;right:auto !important;bottom:auto !important;width:auto !important;height:auto !important;margin:clamp(18px,2.4vw,28px) 0 0 !important;padding:.8em 1.5em !important;
+  justify-self:start;align-self:start;display:inline-flex;align-items:center;border-radius:999px !important;background:var(--gd-bg,#2c5494) !important;font-size:clamp(15px,1.2vw,17px);font-weight:700;line-height:1;transition:transform .35s cubic-bezier(.3,1.5,.5,1),filter .3s}
+html body .res .r-go:not(#_)::before{display:none !important}
+html body .res .r-go:not(#_) canvas.rg-ring{display:none !important}
+html body .res .r-go:not(#_) .r-label{translate:none !important;max-width:none !important;text-align:left}
+html body .res:is(:hover,:focus-visible) .r-go:not(#_){transform:translateX(4px) rotate(-2deg)}
+</style>
 </body>
 </html>
