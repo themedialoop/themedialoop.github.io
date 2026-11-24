@@ -4473,7 +4473,8 @@ html body .apply canvas{display:none !important}
 <style>
 /* behind the Apply card: big bold stripes in the palette's other colours (no gold, the card's own), sliding very slowly */
 .ap-stripes{position:absolute;z-index:0;pointer-events:none;overflow:hidden}
-.ap-stripes i{position:absolute;inset:-12% 0;background-repeat:no-repeat;background-size:100% 100%;animation:apStripe 9s ease-in-out infinite alternate}   /* seven equal hand-drawn stripes, bobbing gently up and down */
+.ap-stripes i{position:absolute;inset:-12% 0;animation:apStripe 9s ease-in-out infinite alternate}
+.ap-stripes i svg{position:absolute;inset:0;width:100%;height:100%;display:block}   /* seven equal hand-drawn stripes, bobbing gently up and down */
 @keyframes apStripe{from{translate:0 -4%}to{translate:0 4%}}
 html body .apply.apply:not(#_){background:#f2eedd !important;color:#2c5494 !important}
 .ap-stripes-gap{display:block;height:clamp(60px,8vw,120px)}   /* the card itself in cream */
@@ -4484,17 +4485,25 @@ html body .apply{position:relative;z-index:1}
 <script>
 (() => { const a = document.querySelector('.apply'); if (!a) return; const host = a.parentElement; if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
   const band = document.createElement('div'); band.className = 'ap-stripes'; band.setAttribute('aria-hidden', 'true'); band.innerHTML = '<i></i>'; a.before(band); const gap = document.createElement('span'); gap.className = 'ap-stripes-gap'; gap.setAttribute('aria-hidden', 'true'); band.before(gap);   /* clear cream room before the stripes */
-  const fit = () => { const X = el => { let x = 0; for (let e = el; e; e = e.offsetParent) x += e.offsetLeft; return x; };   /* page position, unaffected by any fly-in motion */ const pad = Math.max(innerWidth < 700 ? 40 : 70, a.offsetHeight / 5 + 12), vw = document.documentElement.clientWidth, hl = X(host);
+  const fit = () => { const X = el => { let x = 0; for (let e = el; e; e = e.offsetParent) x += e.offsetLeft; return x; };   /* page position, unaffected by any fly-in motion */ const VH = Math.max(innerHeight, document.documentElement.clientHeight), pad = Math.max(innerWidth < 700 ? 40 : 70, a.offsetHeight / 5 + 12, (VH - a.offsetHeight) / 2), vw = document.documentElement.clientWidth, hl = X(host);   /* a whole screen of stripes, the card in the middle */
+    a.style.setProperty('margin-top', pad + 'px', 'important'); a.style.setProperty('margin-bottom', pad + 'px', 'important');
     band.style.left = -hl + 'px'; band.style.width = vw + 'px'; band.style.top = (a.offsetTop - pad) + 'px'; band.style.height = (a.offsetHeight + pad * 2) + 'px'; };
   let tw = 0; const tile = () => { const W = document.documentElement.clientWidth, H = band.offsetHeight, T = H * 1.24, S = H / 6;   /* every colour gets a whole stripe the same size, teal and red included */ if (W === tw && band.dataset.h == H) return; tw = W; band.dataset.h = H;
     const C = ['#2c5494', '#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c'], A = 3,   /* no red; nearly straight edges */ edge = k => { const f = mlWob(50 + (k % 7)); const pts = []; for (let x = -4; x <= W + 4; x += 14) pts.push([x, H * .12 + k * S + f(x / W * 6.283 * (W / 900 + .6), A)]); return pts; };
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${T}" viewBox="0 ${-S} ${W} ${T + 2 * S}" preserveAspectRatio="none">`;
-    for (let k = 0; k < 6; k++) { const t = k === 0 ? [[-4, -4], [W + 4, -4]] : edge(k); svg += `<path fill="${C[k]}" d="M${t.map(p => p.join(' ')).join('L')}L${W + 4} ${T + 4}L-4 ${T + 4}Z"/>`; }   /* each stripe runs down to the bottom; the next paints over it, so colours always touch */
+    for (let k = 0; k < 6; k++) { const t = k === 0 ? [[-4, -4], [W + 4, -4]] : edge(k), b = k === 5 ? [[-4, T + 4], [W + 4, T + 4]] : edge(k + 1).map(([x, y]) => [x, y + 2]); svg += `<path fill="${C[k]}" d="M${t.map(p => p.join(' ')).join('L')}L${[...b].reverse().map(p => p.join(' ')).join('L')}Z"/>`; }   /* each stripe its own band, tucked 2px under the next, so colours always touch */   /* each stripe runs down to the bottom; the next paints over it, so colours always touch */
     svg = svg.replace(`viewBox="0 ${-S} ${W} ${T + 2 * S}"`, `viewBox="0 0 ${W} ${T}"`);
-    const i = band.querySelector('i'); i.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg + '</svg>')}")`; i.style.setProperty('--T', T + 'px');
+    const i = band.querySelector('i'); i.innerHTML = svg.replace('<svg ', '<svg preserveAspectRatio="none" ').replace(/ width="[^"]*" height="[^"]*"/, '') + '</svg>';
+    [...i.querySelectorAll('path')].forEach((p, k) => { p.style.transformBox = 'view-box'; p.style.transformOrigin = k % 2 ? '100% 50%' : '0% 50%'; if (!shown && !still) p.style.transform = 'scaleX(0)'; });
     const mt = mlWob(91), mb = mlWob(97), mA = 2.5;   /* top and bottom: only just off straight */ let m = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="M-4 ${H}`;
     for (let x = -4; x <= W + 4; x += 14) m += `L${x} ${(mA + 2 + mt(x / W * 6.283 * (W / 900 + .6), mA)).toFixed(1)}`; for (let x = W + 4; x >= -4; x -= 14) m += `L${x} ${(H - mA - 2 + mb(x / W * 6.283 * (W / 900 + .6), mA)).toFixed(1)}`;
     m += 'Z"/></svg>'; const u = `url("data:image/svg+xml,${encodeURIComponent(m)}")`; band.style.webkitMaskImage = band.style.maskImage = u; band.style.webkitMaskSize = band.style.maskSize = '100% 100%'; };   /* the band's own top and bottom edges are hand-drawn too */
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches; let shown = false;
+  /* coming in: the stripes sweep across one after another, alternately from the left and from the right */
+  const intro = () => { shown = true; const P = [...band.querySelectorAll('i path')], t0 = performance.now(); const step = now => { let done = true;
+      P.forEach((p, k) => { const e = Math.min(1, Math.max(0, (now - t0 - k * 140) / 900)), q = 1 - Math.pow(1 - e, 3); if (e < 1) done = false; p.style.transform = `scaleX(${q.toFixed(3)})`; }); if (!done && shown) requestAnimationFrame(step); };
+    if (still) P.forEach(p => p.style.transform = ''); else requestAnimationFrame(step); };
+  new IntersectionObserver(e => { if (e[0].isIntersecting && e[0].intersectionRatio > .2) { if (!shown) intro(); } else if (!e[0].isIntersecting) { shown = false; if (!still) band.querySelectorAll('i path').forEach(p => p.style.transform = 'scaleX(0)'); } }, { threshold: [0, .2] }).observe(band);
   const fit2 = () => { fit(); tile(); }; fit2(); addEventListener('resize', fit2); addEventListener('load', fit2); new ResizeObserver(fit2).observe(a); new ResizeObserver(fit2).observe(document.documentElement); setTimeout(fit2, 1500); })();
 </script>
 <style>
