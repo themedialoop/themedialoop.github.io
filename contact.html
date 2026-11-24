@@ -863,7 +863,7 @@ html body .top nav a:is(:hover,:focus-visible,.tapped)::before{background:var(--
     if (!msg.value.trim()) { note.textContent = 'Please write a note first.'; msg.focus(); return; }
     note.textContent = 'Sending\u2026'; btn.disabled = true;
     try { const r = await fetch(ENDPOINT, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(f) });
-      if (r.ok) { f.reset(); btn.disabled = false; note.innerHTML = 'It&rsquo;s in my inbox now. You&rsquo;ll hear from me soon.<br>Toodle-oo, Sam'; return; } } catch (_) {}
+      if (r.ok) { f.reset(); btn.disabled = false; note.innerHTML = 'The message is on its way. We will talk soon.<br>Toodle-oo.'; return; } } catch (_) {}
     btn.disabled = false; note.textContent = 'That didn\u2019t go through. Please try again in a moment.'; });
 })();
 </script>
