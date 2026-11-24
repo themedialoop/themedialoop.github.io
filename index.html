@@ -4299,7 +4299,7 @@ html body .apply canvas{display:none !important}
 <style>
 /* behind the Apply card: big bold stripes in the palette's other colours (no gold, the card's own), sliding very slowly */
 .ap-stripes{position:absolute;z-index:0;pointer-events:none;overflow:hidden}
-.ap-stripes i{position:absolute;inset:0;--s:clamp(26px,3vw,42px);background:repeating-linear-gradient(180deg,#2c5494 0 var(--s),#e0773a var(--s) calc(var(--s) * 2),#d8708e calc(var(--s) * 2) calc(var(--s) * 3),#9b6aa6 calc(var(--s) * 3) calc(var(--s) * 4),#2a8c8c calc(var(--s) * 4) calc(var(--s) * 5),#e0503c calc(var(--s) * 5) calc(var(--s) * 6));animation:apStripe 50s linear infinite}   /* horizontal colour stripes, no cream between; drifting slowly upward */
+.ap-stripes i{position:absolute;inset:0;--s:clamp(44px,5vw,72px);background:repeating-linear-gradient(180deg,#2c5494 0 var(--s),#e0773a var(--s) calc(var(--s) * 2),#d8708e calc(var(--s) * 2) calc(var(--s) * 3),#9b6aa6 calc(var(--s) * 3) calc(var(--s) * 4),#2a8c8c calc(var(--s) * 4) calc(var(--s) * 5),#e0503c calc(var(--s) * 5) calc(var(--s) * 6));animation:apStripe 50s linear infinite}   /* horizontal colour stripes, no cream between; drifting slowly upward */
 @keyframes apStripe{to{background-position-y:calc(var(--s) * -6)}}
 @media (prefers-reduced-motion:reduce){.ap-stripes i{animation:none}}
 html body .apply{position:relative;z-index:1}
