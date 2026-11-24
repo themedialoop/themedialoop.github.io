@@ -995,7 +995,7 @@ html body .top:not(.lift){background:none !important;backdrop-filter:none !impor
 <style>
 /* Our Favorite Things: four rows of pills sliding slowly, each row the other way, at the river's slant */
 .fav-pills{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;display:grid;gap:clamp(10px,1.2vw,16px);width:112vw;margin:clamp(18px,3vw,40px) 0 0 calc(50% - 56vw);rotate:-3.5deg;padding:clamp(16px,2vw,28px) 0}
-.fav-row{overflow:hidden;padding:8px 0;margin:-8px 0}   /* room for a pill to tip on hover without being clipped */
+.fav-row{overflow:hidden;padding:18px 0;margin:-18px 0}   /* room for a pill to tip on hover without being clipped */
 .fav-half{display:flex;align-items:center;gap:clamp(8px,.9vw,12px);padding-right:clamp(8px,.9vw,12px)}   /* each copy carries its own trailing gap, so the loop joins seamlessly */
 .fav-tr{display:flex;width:max-content;will-change:transform}
 @keyframes favMove{to{transform:translateX(-50%)}}
@@ -1024,7 +1024,7 @@ window.mlFavPills = (box, all, logo) => {
     return `<div class="fav-row"><div class="fav-tr"><div class="fav-half">${h}</div><div class="fav-half">${h}</div></div></div>`; }).join('');
   box.append(wrap);
   wrap.addEventListener('pointerover', e => { const p = e.target.closest && e.target.closest('.fav-p'); if (!p || p.contains(e.relatedTarget)) return; const R = (a, b) => (a + Math.random() * (b - a)).toFixed(2);
-    p.style.setProperty('--hr', (Math.random() < .5 ? -1 : 1) * R(1.5, 7) + 'deg'); p.style.setProperty('--hs', R(1.03, 1.13)); p.style.setProperty('--hy', R(-7, 3) + 'px'); p.style.setProperty('--ht', R(.22, .5) + 's'); });
+    p.style.setProperty('--hr', (Math.random() < .5 ? -1 : 1) * R(1.5, 5) + 'deg'); p.style.setProperty('--hs', R(1.03, 1.08)); p.style.setProperty('--hy', R(-5, 2) + 'px'); p.style.setProperty('--ht', R(.22, .5) + 's'); });
   const nav = document.createElement('div'); nav.className = 'rv-nav';
   nav.innerHTML = '<button type="button" class="rv-b rv-l" aria-label="Show earlier words"><i></i></button><button type="button" class="rv-b rv-r" aria-label="Show more words"><i></i></button>';
   wrap.after(nav);

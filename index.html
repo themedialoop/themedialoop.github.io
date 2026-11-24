@@ -4171,7 +4171,7 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
 <style>
 /* Our Favorite Things: four rows of pills sliding slowly, each row the other way, at the river's slant */
 .fav-pills{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;display:grid;gap:clamp(10px,1.2vw,16px);width:112vw;margin:clamp(18px,3vw,40px) 0 0 calc(50% - 56vw);rotate:-3.5deg;padding:clamp(16px,2vw,28px) 0}
-.fav-row{overflow:hidden;padding:8px 0;margin:-8px 0}   /* room for a pill to tip on hover without being clipped */
+.fav-row{overflow:hidden;padding:18px 0;margin:-18px 0}   /* room for a pill to tip on hover without being clipped */
 .fav-half{display:flex;align-items:center;gap:clamp(8px,.9vw,12px);padding-right:clamp(8px,.9vw,12px)}   /* each copy carries its own trailing gap, so the loop joins seamlessly */
 .fav-tr{display:flex;width:max-content;will-change:transform}
 @keyframes favMove{to{transform:translateX(-50%)}}
@@ -4204,7 +4204,7 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
     return `<div class="fav-row"><div class="fav-tr" style="--d:${[96, 112, 88, 104][r]}s"><div class="fav-half">${h}</div><div class="fav-half">${h}</div></div></div>`; }).join('');
   box.append(wrap);
   wrap.addEventListener('pointerover', e => { const p = e.target.closest && e.target.closest('.fav-p'); if (!p || p.contains(e.relatedTarget)) return; const R = (a, b) => (a + Math.random() * (b - a)).toFixed(2);
-    p.style.setProperty('--hr', (Math.random() < .5 ? -1 : 1) * R(1.5, 7) + 'deg'); p.style.setProperty('--hs', R(1.03, 1.13)); p.style.setProperty('--hy', R(-7, 3) + 'px'); p.style.setProperty('--ht', R(.22, .5) + 's'); });
+    p.style.setProperty('--hr', (Math.random() < .5 ? -1 : 1) * R(1.5, 5) + 'deg'); p.style.setProperty('--hs', R(1.03, 1.08)); p.style.setProperty('--hy', R(-5, 2) + 'px'); p.style.setProperty('--ht', R(.22, .5) + 's'); });
   /* the rows drift on their own (alternating directions); drag them, or use the arrows, to slide them left and right */
   const nav = document.createElement('div'); nav.className = 'rv-nav';
   nav.innerHTML = '<button type="button" class="rv-b rv-l" aria-label="Show earlier words"><i></i></button><button type="button" class="rv-b rv-r" aria-label="Show more words"><i></i></button>';
@@ -4319,7 +4319,10 @@ html body .ab-pill .ab-fl{display:none !important}
 html body .about-grid .ab-pill.ab-pill:is(.ab-b2,.ab-b3,.ab-b4){background:#2c5494 !important;color:#f2eedd !important}
 html body .about-grid .ab-pill.ab-pill:is(.ab-b2,.ab-b3,.ab-b4) :is(h3,p){color:#f2eedd !important}
 html body .ab-pill.ab-pill .pm{background:#e7aa4d !important}
-.ab-conf{position:absolute;left:50%;width:100vw;translate:-50% 0;z-index:0;pointer-events:none}
+.ab-conf{position:absolute;z-index:0;pointer-events:none}
+html body .about-grid .ab-pill h3,html body .about-grid .ab-pill[open] h3{white-space:nowrap !important;font-size:clamp(26px,min(7.2vw,5.4vw + 6px),68px) !important}
+html body .about-grid .ab-pill h3 br{display:none}   /* each title on one line */
+html body .about-grid .ab-pill h3 .ab-w{display:inline !important}
 .ab-conf canvas{width:100%;height:100%;display:block}
 .about-grid.ab-pills{position:relative}
 .about-grid .ab-pill{position:relative;z-index:1}
@@ -4331,6 +4334,7 @@ html body .ab-pill.ab-pill .pm{background:#e7aa4d !important}
   const SH = [...Array(12)].map(() => { const q = [Math.random() * 6.3, Math.random() * 6.3], p = new Path2D(); for (let i = 0; i <= 32; i++) { const a = i / 32 * 6.283, k = 1 + .06 * Math.sin(2 * a + q[0]) + .04 * Math.sin(3 * a + q[1]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); } p.closePath(); return p; });
   let W = 0, H = 0, dpr = 1, D = [], vis = false, raf = 0;
   const build = () => { const pad = innerWidth < 700 ? 50 : 90; band.style.top = -pad + 'px'; band.style.height = (grid.offsetHeight + pad * 2) + 'px';
+    const vw = document.documentElement.clientWidth, gl = grid.getBoundingClientRect().left; band.style.left = -gl + 'px'; band.style.width = vw + 'px';   /* edge to edge of the screen */
     const w = band.offsetWidth, h = band.offsetHeight; if (!w) return; const grow = h > H + 30 || w !== W; W = w; H = h; dpr = Math.min(2, devicePixelRatio || 1);
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
     D = D.filter(d => d.y < H - d.r - 4);   /* a card closing: the dots below simply aren't needed */
