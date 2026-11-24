@@ -1742,5 +1742,36 @@ html body h2.bz-h .tilt-sub{font-weight:200 !important;letter-spacing:-.01em !im
 
 html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#_),html body h2:not(#_),html body h2 *:not(.tilt-sub):not(#_),html body .about-grid .ab-pill h3:not(#_),html body .about-grid .ab-pill h3 *:not(#_){font-family:Figtree,Inter,system-ui,sans-serif !important;font-weight:900 !important;letter-spacing:-.01em !important}   /* every title in Figtree Black, with a little air so no letters touch */
 </style>
+<style>
+/* the profile header: a cream page of big colourful dots, and Sam's details on a big blue card floating above them */
+html body .ph-d{background:#f2eedd !important}
+html body .ph-d .ph-field{display:none !important}
+html body .top:not(.lift) .menu-btn{color:#2c5494 !important}html body .top:not(.lift) .mark{filter:none !important}   /* the header sits on cream now: blue menu and logo */
+.ph-d .ph-big{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:0}
+html body .ph-d .ph-in{position:relative;z-index:1;box-sizing:border-box;max-width:1080px;margin:0 auto;background:#2c5494;color:#f2eedd;padding:clamp(24px,4vw,56px) clamp(22px,4.5vw,64px) clamp(30px,4.5vw,64px);
+  border-radius:46px 40px 50px 42px / 42px 50px 40px 46px;box-shadow:0 2px 0 #24467d,0 28px 70px -20px #2c549488,0 10px 30px -12px #2c549455}
+</style>
+<script>
+(() => { const sec = document.querySelector('.ph-d'); if (!sec) return; const cv = document.createElement('canvas'); cv.className = 'ph-big'; cv.setAttribute('aria-hidden', 'true'); sec.prepend(cv); const g = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COLS = [['#2c5494', .3], ['#e7aa4d', .26], ['#e0773a', .14], ['#d8708e', .13], ['#9b6aa6', .1], ['#2a8c8c', .07]];
+  const pick = () => { let u = Math.random(); for (const [c, w] of COLS) { u -= w; if (u <= 0) return c; } return COLS[0][0]; };
+  const SH = [...Array(14)].map(() => { const q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3], p = new Path2D();
+    for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2, k = 1 + .05 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); }
+    p.closePath(); return p; });
+  let W = 0, H = 0, dpr = 1, D = [], vis = true, raf = 0, bw = 0, bh = 0;
+  const build = () => { W = sec.clientWidth; H = sec.clientHeight; if (!W || (W === bw && Math.abs(H - bh) < 40 && D.length)) return; bw = W; bh = H;
+    dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; D = []; const S = Math.max(60, W / 9);
+    for (let t = 0; t < 1800; t++) { const x = Math.random() * W, y = Math.random() * H, r = S * (.25 + Math.random() * .45); if (Math.min(y, H - y) < r * 1.1) continue;
+      if (D.some(o => Math.hypot(o.x - x, o.y - y) < o.r * 1.15 + r * 1.15 + 14)) continue;
+      D.push({ x, y, r, c: pick(), p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * 14)], ring: Math.random() < .15, rot: Math.random() * 6.3, ph: Math.random() * 6.3 }); } };
+  const draw = now => { raf = 0; const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    for (const d of D) { const r = d.r * (reduce ? 1 : .94 + .06 * Math.sin(t * .7 + d.x / W * 4 + d.ph * .4));
+      g.setTransform(dpr * r, 0, 0, dpr * r, dpr * d.x, dpr * d.y); g.rotate(d.rot); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
+    if (vis && !reduce) raf = requestAnimationFrame(draw); };
+  const go = () => { build(); if (!raf) raf = requestAnimationFrame(draw); }; go(); new ResizeObserver(go).observe(sec);
+  if (window.mlBreezeOn) mlBreezeOn(cv, sec);
+  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(draw); }).observe(sec); })();
+</script>
 </body>
 </html>
