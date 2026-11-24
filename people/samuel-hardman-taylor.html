@@ -1746,6 +1746,7 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
 /* the profile header: a cream page of big colourful dots, and Sam's details on a big blue card floating above them */
 html body .ph-d{background:#f2eedd !important}
 html body .ph-d .ph-field{display:none !important}
+html body .top{z-index:20 !important}
 html body .top:not(.lift) .menu-btn{color:#2c5494 !important}html body .top:not(.lift) .mark{filter:none !important}   /* the header sits on cream now: blue menu and logo */
 .ph-d .ph-big{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:0}
 html body .ph-d .ph-in{position:relative;z-index:1;box-sizing:border-box;max-width:1080px;margin:0 auto;background:#2c5494;color:#f2eedd;padding:clamp(24px,4vw,56px) clamp(22px,4.5vw,64px) clamp(30px,4.5vw,64px);
@@ -1762,14 +1763,18 @@ html body .ph-d .ph-in{position:relative;z-index:1;box-sizing:border-box;max-wid
   let W = 0, H = 0, dpr = 1, D = [], vis = true, raf = 0, bw = 0, bh = 0;
   const build = () => { W = sec.clientWidth; H = sec.clientHeight; if (!W || (W === bw && Math.abs(H - bh) < 40 && D.length)) return; bw = W; bh = H;
     dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; D = []; const S = Math.max(60, W / 9);
-    for (let t = 0; t < 1800; t++) { const x = Math.random() * W, y = Math.random() * H, r = S * (.25 + Math.random() * .45); if (Math.min(y, H - y) < r * 1.1) continue;
+    const TOP = (document.querySelector('.top')?.offsetHeight || 80) + 24;   /* nothing under the logo and menu */
+    for (let t = 0; t < 1800; t++) { const x = Math.random() * W, y = Math.random() * H, r = S * (.25 + Math.random() * .45); if (y - r * 1.1 < TOP || H - y < r * 1.1) continue;
       if (D.some(o => Math.hypot(o.x - x, o.y - y) < o.r * 1.15 + r * 1.15 + 14)) continue;
       D.push({ x, y, r, c: pick(), p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * 14)], ring: Math.random() < .15, rot: Math.random() * 6.3, ph: Math.random() * 6.3 }); } };
   const draw = now => { raf = 0; const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
     for (const d of D) { const r = d.r * (reduce ? 1 : .94 + .06 * Math.sin(t * .7 + d.x / W * 4 + d.ph * .4));
       g.setTransform(dpr * r, 0, 0, dpr * r, dpr * d.x, dpr * d.y); g.rotate(d.rot); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
     if (vis && !reduce) raf = requestAnimationFrame(draw); };
-  const go = () => { build(); if (!raf) raf = requestAnimationFrame(draw); }; go(); new ResizeObserver(go).observe(sec);
+  const card = sec.querySelector('.ph-in'), row = document.querySelector('.mm-row');
+  const fit = () => { if (!card || !row) return; card.style.removeProperty('width'); card.style.removeProperty('margin-left'); const a = row.getBoundingClientRect(), c = sec.getBoundingClientRect(), pl = parseFloat(getComputedStyle(sec).paddingLeft) || 0;
+    card.style.setProperty('width', a.width + 'px', 'important'); card.style.setProperty('max-width', 'none', 'important'); card.style.setProperty('margin-left', (a.left - c.left - pl) + 'px', 'important'); card.style.setProperty('margin-right', '0', 'important'); };   /* the card lines up exactly with the link tiles below it */
+  const go = () => { fit(); build(); if (!raf) raf = requestAnimationFrame(draw); }; go(); new ResizeObserver(go).observe(sec); addEventListener('load', go);
   if (window.mlBreezeOn) mlBreezeOn(cv, sec);
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(draw); }).observe(sec); })();
 </script>

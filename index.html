@@ -4144,21 +4144,26 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
     for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2, k = 1 + .05 * Math.sin(2 * a + q[0]) + .03 * Math.sin(3 * a + q[1]) + .015 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * k, Math.sin(a) * k) : p.moveTo(Math.cos(a) * k, Math.sin(a) * k); }
     p.closePath(); return p; });
   let W = 0, H = 0, dpr = 1, D = [], vis = false, raf = 0, bw = 0, bh = 0;
-  const build = () => { const pad = innerWidth < 700 ? 60 : 110, ttl = sec.querySelector('h2'), gap = ttl ? host.getBoundingClientRect().top - ttl.getBoundingClientRect().bottom - 18 : pad, top = Math.min(pad, Math.max(0, gap));
-    band.style.top = -top + 'px'; band.style.height = (host.offsetHeight + top + pad) + 'px';
-    W = band.offsetWidth; H = band.offsetHeight; if (W === bw && Math.abs(H - bh) < 30 && D.length) return; bw = W; bh = H;
+  const build = () => { const pad = innerWidth < 700 ? 56 : 96, ttl = sec.querySelector('h2');
+    const Y = el => { let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; return y; };   /* layout positions, untouched by the titles' tilt and reveal motion */
+    host.style.removeProperty('margin-top'); if (ttl) { const g0 = Y(host) - (Y(ttl) + ttl.offsetHeight), need = pad + 24; if (g0 < need) host.style.setProperty('margin-top', (parseFloat(getComputedStyle(host).marginTop) || 0) + need - g0 + 'px', 'important'); }   /* room above the cards so the title keeps its cream */
+    band.style.top = -pad + 'px'; band.style.height = (host.offsetHeight + pad * 2) + 'px';   /* the cards sit in the middle of the dots */
+    const more = sec.querySelector('.more'); if (more) { more.style.removeProperty('margin-top'); const g1 = Y(more) - (Y(host) + host.offsetHeight), need = pad + 30; if (g1 < need) more.style.setProperty('margin-top', (parseFloat(getComputedStyle(more).marginTop) || 0) + need - g1 + 'px', 'important'); }   /* Alumni & Peers below the dots, with room */
+    W = band.offsetWidth; H = band.offsetHeight; if (W === bw && Math.abs(H - bh) < 30 && D.length) return;   /* (layout above is re-checked every time) */ bw = W; bh = H;
     dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; D = [];
     const S = Math.max(60, W / 9);
-    for (let t = 0; t < 1600; t++) { const x = Math.random() * W, y = Math.random() * H, r = S * (.25 + Math.random() * .45); if (Math.min(y, H - y) < r * 1.15) continue;
-      if (D.some(o => Math.hypot(o.x - x, o.y - y) < o.r * 1.15 + r * 1.15 + 14)) continue;
-      D.push({ x, y, r, c: pick(), p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * 14)], ring: Math.random() < .15, rot: Math.random() * 6.3, ph: Math.random() * 6.3 }); } };
+    const mk = (x, y, r) => ({ x, y, r, c: pick(), p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * 14)], ring: Math.random() < .15, rot: Math.random() * 6.3, ph: Math.random() * 6.3 });
+    const clear = (x, y, r) => Math.min(y, H - y) >= r * 1.15 && !D.some(o => Math.hypot(o.x - x, o.y - y) < o.r * 1.15 + r * 1.15 + 14);
+    /* balanced: every dot in the top half has a partner in the bottom half (mirrored, its own colour and shape), so the cards sit squarely in the middle */
+    for (let t = 0; t < 1600; t++) { const x = Math.random() * W, y = Math.random() * H / 2, r = S * (.25 + Math.random() * .45), x2 = W - x + (Math.random() - .5) * S * .3, y2 = H - y;
+      if (!clear(x, y, r) || !clear(x2, y2, r)) continue; if (Math.hypot(x - x2, y - y2) < r * 2.4 + 14) continue; D.push(mk(x, y, r)); D.push(mk(x2, y2, r)); } };
   const draw = now => { raf = 0; const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
     for (const d of D) { const r = d.r * (reduce ? 1 : .94 + .06 * Math.sin(t * .7 + d.x / W * 4 + d.ph * .4));
       g.setTransform(dpr * r, 0, 0, dpr * r, dpr * d.x, dpr * d.y); g.rotate(d.rot); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
     if (vis && !reduce) raf = requestAnimationFrame(draw); };
   const go = () => { build(); if (!raf) raf = requestAnimationFrame(draw); };
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(go); new ResizeObserver(go).observe(host);
-  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis && !raf) raf = requestAnimationFrame(draw); }, { rootMargin: '100px' }).observe(band); })();
+  new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis) build(); if (vis && !raf) raf = requestAnimationFrame(draw); }, { rootMargin: '100px' }).observe(band); })();
 </script>
 </body>
 </html>
