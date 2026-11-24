@@ -4159,9 +4159,12 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
     for (let t = 0; t < 1600; t++) { const x = Math.random() * W, y = Math.random() * H / 2, r = S * (.25 + Math.random() * .45), x2 = W - x + (Math.random() - .5) * S * .3, y2 = H - y;
       if (!clear(x, y, r) || !clear(x2, y2, r)) continue; if (Math.hypot(x - x2, y - y2) < r * 2.4 + 14) continue; D.push(mk(x, y, r)); D.push(mk(x2, y2, r)); } };
   const draw = now => { raf = 0; const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    const M = W / 6, span = W + 2 * M;   /* a very soft breeze: the dots float slowly to the right, bobbing a touch, and wrap round */
     for (const d of D) { const r = d.r * (reduce ? 1 : .94 + .06 * Math.sin(t * .7 + d.x / W * 4 + d.ph * .4));
-      g.setTransform(dpr * r, 0, 0, dpr * r, dpr * d.x, dpr * d.y); g.rotate(d.rot); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
+      const x = reduce ? d.x : ((d.x + M + t * 7) % span + span) % span - M, y = d.y + (reduce ? 0 : Math.sin(t * .35 + d.ph) * 3);
+      g.setTransform(dpr * r, 0, 0, dpr * r, dpr * x, dpr * y); g.rotate(d.rot + (reduce ? 0 : t * .02 * (d.ph > 3 ? 1 : -1))); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
     if (vis && !reduce) raf = requestAnimationFrame(draw); };
+  if (window.mlBreezeOn) mlBreezeOn(cv, band);   /* blown in and out by the breeze, like the other dots */
   const go = () => { build(); if (!raf) raf = requestAnimationFrame(draw); };
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(go); new ResizeObserver(go).observe(host);
   new IntersectionObserver(e => { vis = e[0].isIntersecting; if (vis) build(); if (vis && !raf) raf = requestAnimationFrame(draw); }, { rootMargin: '100px' }).observe(band); })();

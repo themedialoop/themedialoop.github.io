@@ -1818,8 +1818,10 @@ html body .ph-d .ph-in{position:relative;z-index:1;box-sizing:border-box;max-wid
       if (D.some(o => Math.hypot(o.x - x, o.y - y) < o.r * 1.15 + r * 1.15 + 14)) continue;
       D.push({ x, y, r, c: pick(), p: (window.mlIsIDot && mlIsIDot()) ? mlIDot : SH[Math.floor(Math.random() * 14)], ring: Math.random() < .15, rot: Math.random() * 6.3, ph: Math.random() * 6.3 }); } };
   const draw = now => { raf = 0; const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    const M = W / 6, span = W + 2 * M;   /* a very soft breeze: the dots float slowly to the right, bobbing a touch, and wrap round */
     for (const d of D) { const r = d.r * (reduce ? 1 : .94 + .06 * Math.sin(t * .7 + d.x / W * 4 + d.ph * .4));
-      g.setTransform(dpr * r, 0, 0, dpr * r, dpr * d.x, dpr * d.y); g.rotate(d.rot); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
+      const x = reduce ? d.x : ((d.x + M + t * 7) % span + span) % span - M, y = d.y + (reduce ? 0 : Math.sin(t * .35 + d.ph) * 3);
+      g.setTransform(dpr * r, 0, 0, dpr * r, dpr * x, dpr * y); g.rotate(d.rot + (reduce ? 0 : t * .02 * (d.ph > 3 ? 1 : -1))); g.fillStyle = d.c; if (d.ring && window.mlHole) mlHole(g, d.p); else g.fill(d.p); }
     if (vis && !reduce) raf = requestAnimationFrame(draw); };
   const card = sec.querySelector('.ph-in'), row = document.querySelector('.mm-row');
   const fit = () => { if (!card || !row) return; card.style.removeProperty('width'); card.style.removeProperty('margin-left'); const a = row.getBoundingClientRect(), c = sec.getBoundingClientRect(), pl = parseFloat(getComputedStyle(sec).paddingLeft) || 0;
