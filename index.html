@@ -4353,11 +4353,11 @@ html body .about-grid .ab-pill > summary:not(#_){align-items:center !important} 
   const fit = () => { const pad = innerWidth < 700 ? 40 : 70, vw = document.documentElement.clientWidth, gl = grid.getBoundingClientRect().left;
     band.style.left = -gl + 'px'; band.style.width = vw + 'px'; band.style.top = -pad + 'px'; band.style.height = (grid.offsetHeight + pad * 2) + 'px'; draw(vw, grid.offsetHeight + pad * 2); };
   let lastW = 0, lastH = 0; const draw = (W, H) => { if (Math.abs(W - lastW) < 2 && Math.abs(H - lastH) < 2) return; lastW = W; lastH = H;
-    const C = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6'], u = x => x / W * 6.283 * (W / 900 + .6), E = 2.5, A = 3;   /* nearly straight, just lightly imperfect */
+    const C = ['#e7aa4d', '#e0773a', '#d8708e', '#e7aa4d', '#9b6aa6'], u = x => x / W * 6.283 * (W / 900 + .6), E = 2.5, A = 3;   /* nearly straight, just lightly imperfect */
     let clip = 'M-4 ' + (E + 2); for (let x = -4; x <= W + 4; x += 14) clip += `L${x} ${(E + 2 + mlWob(11)(u(x), E)).toFixed(1)}`; for (let x = W + 4; x >= -4; x -= 14) clip += `L${x} ${(H - E - 2 + mlWob(23)(u(x), E)).toFixed(1)}`; clip += 'Z';
     let out = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><clipPath id="abClip"><path d="${clip}"/></clipPath></defs><g clip-path="url(#abClip)">`;
-    for (let k = 0; k < 4; k++) { let d = `M${W + 10} -10`;   /* each stripe runs from its own wavy left edge to beyond the right; the next one paints over it, so colours always touch */
-      if (k === 0) d += `L-10 -10L-10 ${H + 10}`; else { const f = mlWob(31 + k), y = t => t / H * 6.283 * (H / 600 + .5); for (let t = -10; t <= H + 10; t += 12) d += `L${(k * W / 4 + f(y(t), A)).toFixed(1)} ${t}`; }
+    for (let k = 0; k < 5; k++) { let d = `M${W + 10} -10`;   /* each stripe runs from its own wavy left edge to beyond the right; the next one paints over it, so colours always touch */
+      if (k === 0) d += `L-10 -10L-10 ${H + 10}`; else { const f = mlWob(31 + k), y = t => t / H * 6.283 * (H / 600 + .5); for (let t = -10; t <= H + 10; t += 12) d += `L${(k * W / 5 + f(y(t), A)).toFixed(1)} ${t}`; }
       d += `L${W + 10} ${H + 10}Z`; out += `<path fill="${C[k]}" d="${d}"/>`; }
     band.innerHTML = out + '</g></svg>'; };
   fit(); addEventListener('resize', fit); addEventListener('load', fit); new ResizeObserver(fit).observe(grid);
