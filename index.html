@@ -4468,7 +4468,7 @@ window.mlEdge = (n, len, f, amp, step = 14) => { const pts = []; for (let t = 0;
 </script>
 <style>
 /* the Apply card: plain, with no dots */
-html body .apply canvas{display:none !important}
+html body .apply > canvas,html body .apply .kdots{display:none !important}
 </style>
 <style>
 /* behind the Apply card: big bold stripes in the palette's other colours (no gold, the card's own), sliding very slowly */
@@ -4578,14 +4578,27 @@ html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-r
 html body :is(.ab-pill p, .p-bio, .res-intro, .r-sub){line-height:1.75 !important}   /* room between lines, so stickers on neighbouring lines never touch */
 </style>
 <style>
-/* desktop: "Graduate admissions" moves to the right half of the Apply card, big, orange and steeply tilted, filling that side */
-@media (min-width:900px){
-  html body .apply:not(#_){overflow:hidden}
-  html body .apply:not(#_) .ap-kind{position:absolute;right:4%;top:50%;width:46%;translate:0 -50%;rotate:-14deg;display:block;text-align:center;
-    color:#e0773a !important;font:900 clamp(44px,5.4vw,86px)/.92 Figtree,Inter,sans-serif;letter-spacing:-.01em;text-transform:none;pointer-events:none}
-  html body .apply:not(#_) .ap-kind::before{display:none !important}
-  html body .apply:not(#_) :is(.ap-h,.ap-t,.ap-go){position:relative;max-width:48%}
-}
+/* desktop: the empty right side of the Apply card holds Netsch's BSB plan, in dots, fairly literally */
+.ap-plan{display:none}
+@media (min-width:900px){ html body .apply:not(#_){position:relative} .ap-plan{display:block;position:absolute;top:8%;bottom:8%;right:3%;width:44%;pointer-events:none} .ap-plan canvas{width:100%;height:100%;display:block} }
 </style>
+<script>
+(() => { const a = document.querySelector('.apply'); if (!a || !window.mlBSB) return; const box = document.createElement('span'); box.className = 'ap-plan'; box.setAttribute('aria-hidden', 'true');
+  const cv = document.createElement('canvas'); box.append(cv); a.append(box); const g = cv.getContext('2d'), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, dpr = 1, D = [], vis = false, raf = 0, inAt = null, bw = 0, bh = 0;
+  const build = () => { W = box.clientWidth; H = box.clientHeight; if (!W || !H || (W === bw && H === bh)) return; bw = W; bh = H; dpr = Math.min(2, devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr;
+    const u = Math.min((W - 16) / 6, (H - 16) / 3), pw = 6 * u, ph = 3 * u, ox = (W - pw) / 2, oy = (H - ph) / 2;   /* the whole plan: six bays by three */
+    let n = 3; const rnd = () => (n = (n * 16807) % 2147483647) / 2147483647;
+    D = mlBSB({ W: pw, H: ph, u, seed: 11, gap: 1.5, edge: null }).dots.filter(q => q.b || rnd() < .14).map(q => ({ x: q.x + ox, y: q.y + oy, r: q.r,
+      c: q.b ? (q.fine ? (rnd() < .5 ? '#e0773a' : '#d8708e') : '#2c5494') : '#e7aa4d', ring: q.ring, ph: rnd() * 6.3, d: Math.hypot(q.x - pw / 2, q.y - ph / 2) / Math.hypot(pw / 2, ph / 2) })); };
+  const draw = now => { raf = 0; build(); const t = reduce ? 0 : now / 1000; g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height);
+    const p = reduce || inAt === null ? 1 : Math.min(1, (now - inAt) / 1400);
+    for (const d of D) { const e = reduce ? 1 : Math.min(1, Math.max(0, (p * 1.5 - d.d * .5) / .5)), k = e * e * (3 - 2 * e); if (k <= .01) continue;   /* the plan grows out from its centre */
+      const r = d.r * k * (reduce ? 1 : .93 + .07 * Math.sin(t * 1.1 + d.ph)); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.beginPath(); g.arc(d.x, d.y, r, 0, 6.283);
+      if (d.ring && r > 3) { g.lineWidth = r * .45; g.strokeStyle = d.c; g.beginPath(); g.arc(d.x, d.y, r * .76, 0, 6.283); g.stroke(); } else { g.fillStyle = d.c; g.fill(); } }
+    if (vis && !reduce) raf = requestAnimationFrame(draw); };
+  new ResizeObserver(() => { bw = 0; if (!raf) raf = requestAnimationFrame(draw); }).observe(box);
+  new IntersectionObserver(e => { const was = vis; vis = e[0].isIntersecting; if (vis && !was) inAt = performance.now(); if (vis && !raf) raf = requestAnimationFrame(draw); }, { threshold: .3 }).observe(a); })();
+</script>
 </body>
 </html>
