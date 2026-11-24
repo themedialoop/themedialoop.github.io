@@ -4169,8 +4169,9 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
 <style>
 /* Our Favorite Things: four rows of pills sliding slowly, each row the other way, at the river's slant */
 .fav-pills{display:grid;gap:clamp(10px,1.2vw,16px);width:112vw;margin:clamp(18px,3vw,40px) 0 0 calc(50% - 56vw);rotate:-3.5deg;padding:clamp(16px,2vw,28px) 0}
-.fav-row{overflow:hidden}
-.fav-tr{display:flex;gap:clamp(8px,.9vw,12px);width:max-content;animation:favMove var(--d,80s) linear infinite}
+.fav-row{overflow:hidden;padding:8px 0;margin:-8px 0}   /* room for a pill to tip on hover without being clipped */
+.fav-half{display:flex;align-items:center;gap:clamp(8px,.9vw,12px);padding-right:clamp(8px,.9vw,12px)}   /* each copy carries its own trailing gap, so the loop joins seamlessly */
+.fav-tr{display:flex;width:max-content;animation:favMove var(--d,80s) linear infinite}
 .fav-row:nth-child(even) .fav-tr{animation-direction:reverse}
 .fav-pills:hover .fav-tr{animation-play-state:paused}
 @keyframes favMove{to{transform:translateX(-50%)}}
@@ -4180,6 +4181,7 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
 .fav-p.k0{background:#2c5494;color:#f2eedd}.fav-p.k1{background:#e7aa4d;color:#2c5494}.fav-p.k2{background:#e0773a;color:#f2eedd}.fav-p.k3{background:#d8708e;color:#f2eedd}.fav-p.k4{background:#9b6aa6;color:#f2eedd}.fav-p.k5{background:#2a8c8c;color:#f2eedd}
 .fav-tr{align-items:center}
 .fav-dot{flex:none;width:clamp(26px,2.4vw,36px);aspect-ratio:1;border-radius:52% 48% 55% 45% / 47% 54% 46% 53%}
+.fav-dot.ring{background:none !important;border:clamp(4px,.4vw,6px) solid currentColor;box-sizing:border-box}   /* some dots are open circles */
 .fav-logo{flex:none;height:clamp(30px,2.6vw,40px);width:auto;margin:0 .5em;display:block}
 @media (prefers-reduced-motion:reduce){.fav-tr{animation:none}.fav-row{overflow-x:auto}}
 </style>
@@ -4195,9 +4197,9 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
   const all = ROWS.flat().map(w => ({ t: w.replace(/^\*/, ''), fun: w[0] === '*' }));
   for (let i = all.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [all[i], all[j]] = [all[j], all[i]]; }
   const wrap = document.createElement('div'); wrap.className = 'fav-pills'; wrap.setAttribute('aria-hidden', 'true');   /* (the words are listed for screen readers just above) */
-  let n = 0; wrap.innerHTML = [0, 1, 2, 3].map(r => { const row = all.filter((_, i) => i % 4 === r), DC = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c'], h = row.map((w, i) => `<span class="fav-p k${Math.random() < .65 ? 0 : 1 + n++ % 5}${w.fun ? ' fun' : ''}">${w.t}</span>`
-      + (i % 9 === 5 ? '<img class="fav-logo" src="assets/medialoop-wordmark.svg" alt="">' : i % 3 === 2 ? `<span class="fav-dot" style="background:${DC[(i + r) % 5]}"></span>` : '')).join('');   /* mostly blue; every few pills a dot, now and then the medialoop logo */
-    return `<div class="fav-row"><div class="fav-tr" style="--d:${[96, 112, 88, 104][r]}s">${h}${h}</div></div>`; }).join('');
+  let n = 0, dn = 0; wrap.innerHTML = [0, 1, 2, 3].map(r => { const row = all.filter((_, i) => i % 4 === r), DC = ['#e7aa4d', '#e0773a', '#d8708e', '#9b6aa6', '#2a8c8c'], h = row.map((w, i) => `<span class="fav-p k${Math.random() < .65 ? 0 : 1 + n++ % 5}${w.fun ? ' fun' : ''}">${w.t}</span>`
+      + (i % 9 === 5 ? '<img class="fav-logo" src="assets/medialoop-wordmark.svg" alt="">' : i % 3 === 2 ? `<span class="fav-dot${[1, 4, 7].includes(dn++ % 10) ? ' ring' : ''}" style="background:${DC[(i + r) % 5]};color:${DC[(i + r) % 5]}"></span>` : '')).join('');   /* mostly blue; every few pills a dot, now and then the medialoop logo */
+    return `<div class="fav-row"><div class="fav-tr" style="--d:${[96, 112, 88, 104][r]}s"><div class="fav-half">${h}</div><div class="fav-half">${h}</div></div></div>`; }).join('');
   box.append(wrap); })();
 </script>
 <style>
@@ -4206,8 +4208,8 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
 .mono-tr{display:flex;align-items:center;width:max-content;animation:monoGo 80s linear infinite}
 @keyframes monoGo{to{transform:translateX(-50%)}}
 .mono-wm{flex:none;height:clamp(40px,4.4vw,60px);width:auto;margin:0 clamp(20px,2.4vw,34px);display:block}
-.mono-dot{flex:none;width:clamp(16px,1.6vw,22px);aspect-ratio:1;border-radius:52% 48% 55% 45% / 47% 54% 46% 53%;box-sizing:border-box}
-.mono-dot.ring{background:none !important;border:clamp(4px,.42vw,5.5px) solid currentColor}
+.mono-dot{flex:none;width:clamp(11px,1.12vw,15px);aspect-ratio:1;border-radius:52% 48% 55% 45% / 47% 54% 46% 53%;box-sizing:border-box}
+.mono-dot.ring{background:none !important;border:clamp(3px,.3vw,4px) solid currentColor}
 @media (prefers-reduced-motion:reduce){.mono-tr{animation:none}}
 </style>
 <script>
