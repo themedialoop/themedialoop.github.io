@@ -1870,5 +1870,13 @@ html body h1:not(.st-h1):not(#_),html body h1:not(.st-h1) *:not(.tilt-sub):not(#
   if ('ResizeObserver' in window) new ResizeObserver(fit).observe(box); else addEventListener('resize', fit);
 })();
 </script>
+<style>
+/* links in text: the words (a touch bolder) followed by a little orange dot that pops on hover, in place of the blue highlight */
+html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_){background:none !important;color:inherit !important;text-decoration:none !important;font-weight:600;padding:0 !important;box-shadow:none !important}
+html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_)::after{content:'';display:inline-block;width:.4em;height:.4em;border-radius:50%;background:#e0773a;margin-left:.2em;vertical-align:.1em;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_):is(:hover,:focus-visible){background:none !important;color:inherit !important}
+html body :is(a.inl, a.ab-inl, .res-intro a, .r-sub a, .cf-alt a, .p-bio a, .p-role a):not(#_):is(:hover,:focus-visible)::after{transform:scale(1.7)}
+html body .cf-alt a:not(#_)::after{background:#e7aa4d}
+</style>
 </body>
 </html>
