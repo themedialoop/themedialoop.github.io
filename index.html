@@ -1444,14 +1444,16 @@ html body .bz-h.tilt-h .tilt-sub{display:block;font-size:max(.3em,20px);font-wei
         // the holes stay put and breathe in slow ripples from the middle of the band, exactly like the blue net
         let ew = 0, eh = 0, evOn = false;
         const sizeEv = () => { const r = evs.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1); ew = Math.round(r.width * dpr); eh = Math.round(r.height * dpr); if (cv.width !== ew || cv.height !== eh) { cv.width = ew; cv.height = eh; } };
-        const drawEv = time => { if (!ew || !eh || !holes.length) return; const g = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1);
-          g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, ew, eh);
-          const T = Math.min(3300, Math.max(2100, innerWidth * 2.1)) * dpr, k = T / TILE, cx = ew / 2, cy = eh / 2, R = Math.hypot(cx, cy);
-          g.fillStyle = 'rgb(242,238,221)';
-          for (let ty = -1; ty * T < eh + T; ty++) for (let tx = -1; tx * T < ew + T; tx++) for (const hh of holes) {
-            const x = (tx * TILE + hh.cx) * k, y = (ty * TILE + hh.cy) * k; if (x < -60 || y < -60 || x > ew + 60 || y > eh + 60) continue;
-            const d = Math.hypot(x - cx, y - cy), wave = .5 + .5 * Math.sin(time * .9 - d / R * 7 + hh.ph * .35), s = reduce ? .82 : Math.min(1, .6 + .34 * wave);
-            g.setTransform(k * s, 0, 0, k * s, x, y); g.fill(hh.p); }
+        /* the cream dots on the gold follow Netsch's BSB plan (big dots at the bays, finer lines, a softer field), at the same scale as before */
+        const EVSH = [...Array(10)].map(() => { const q = [Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3], p = new Path2D(); for (let i = 0; i <= 36; i++) { const a = i / 36 * 6.283, kk = 1 + .07 * Math.sin(2 * a + q[0]) + .05 * Math.sin(3 * a + q[1]) + .02 * Math.sin(5 * a + q[2]); i ? p.lineTo(Math.cos(a) * kk, Math.sin(a) * kk) : p.moveTo(Math.cos(a) * kk, Math.sin(a) * kk); } p.closePath(); return p; });
+        let EVD = [], evW = 0, evH = 0;
+        const buildEv = () => { const r = evs.getBoundingClientRect(); if (Math.abs(r.width - evW) < 2 && Math.abs(r.height - evH) < 40 && EVD.length) return; evW = r.width; evH = r.height;
+          const u = Math.max(240, Math.min(340, innerWidth * .24));
+          EVD = window.mlBSB ? mlBSB({ W: evW, H: evH, u, seed: 33, gap: 5, edge: 6 }).dots.map((q, i) => ({ x: q.x, y: q.y, r: q.r, p: EVSH[i % 10], rot: Math.random() * 6.3, ph: Math.random() * 6.3 })) : []; };
+        const drawEv = time => { if (!ew || !eh) return; buildEv(); const g = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1);
+          g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, ew, eh); g.fillStyle = 'rgb(242,238,221)'; const cx = evW / 2, cy = evH / 2, R = Math.hypot(cx, cy);
+          for (const d of EVD) { const dd = Math.hypot(d.x - cx, d.y - cy), wave = .5 + .5 * Math.sin(time * .9 - dd / R * 7 + d.ph * .35), s = reduce ? 1 : .8 + .2 * wave;   /* breathing in slow ripples from the middle, as before */
+            const r = d.r * s * dpr; g.setTransform(r, 0, 0, r, d.x * dpr, d.y * dpr); g.rotate(d.rot); g.fill(d.p); }
           g.setTransform(1, 0, 0, 1, 0, 0); };
         sizeEv(); let rz; const onRz = () => { clearTimeout(rz); rz = setTimeout(sizeEv, 150); }; addEventListener('resize', onRz);
         if ('ResizeObserver' in window) new ResizeObserver(onRz).observe(evs);
